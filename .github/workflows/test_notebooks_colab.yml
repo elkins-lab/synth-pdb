@@ -1,0 +1,38 @@
+name: Test Notebooks in Colab
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  test_notebooks:
+    runs-on: ubuntu-latest
+    container: us-docker.pkg.dev/colab-images/public/cpu-runtime
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install local package
+      run: |
+        pip install -e ".[dev,notebooks,plm,gnn,ai]"
+        pip install umap-learn matplotlib seaborn  # Extra notebook dependencies
+
+    - name: Test Tutorials
+      run: |
+        pytest --nbmake docs/tutorials/
+
+    - name: Test Interactive Examples
+      run: |
+        pytest --nbmake examples/interactive_tutorials/
+
+    - name: Test ML Integration Examples
+      run: |
+        pytest --nbmake examples/ml_integration/
+
+    - name: Test ML Loading Examples
+      run: |
+        pytest --nbmake examples/ml_loading/

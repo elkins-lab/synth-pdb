@@ -50,7 +50,7 @@ REPO_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 echo "Running notebook tests inside the Colab container..."
 docker run --rm -v "${REPO_ROOT}:/workspace" -w /workspace $COLAB_IMAGE /bin/bash -c "
 echo 'Installing package and dependencies...' &&
-pip install -e '.[dev,plm,gnn,ai]' &&
+pip install -e '.[dev,notebooks,plm,gnn,ai]' &&
 pip install umap-learn matplotlib seaborn &&
 echo 'Running notebook tests with pytest-nbmake...' &&
 pytest --nbmake docs/tutorials/ examples/interactive_tutorials/ examples/ml_integration/ examples/ml_loading/
