@@ -1,4 +1,4 @@
-name: Test Notebooks in Colab
+name: Test Notebooks
 
 on:
   push:
@@ -8,20 +8,26 @@ on:
 
 jobs:
   test_notebooks:
+    # Run on the standard runner — the Colab container's kernel sends
+    # 'colab_request' IPython messages that require the Colab UI backend,
+    # causing an immediate DeadKernelError when run headlessly.
     runs-on: ubuntu-latest
-    container: us-docker.pkg.dev/colab-images/public/cpu-runtime
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 1
 
-    - name: Install local package
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Install package and notebook dependencies
       run: |
-        # pytest-nbmake is unavailable in the Colab container's pip index.
-        # nbconvert is pre-installed in the Colab image, so we use it instead.
+        python -m pip install --upgrade pip
         pip install -e ".[dev,plm,gnn,ai]"
-        pip install umap-learn matplotlib seaborn
+        pip install jupyter nbconvert umap-learn matplotlib seaborn
 
     - name: Test Tutorials
       run: |

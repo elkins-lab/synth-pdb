@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Apple crap
+.DS_Store
+
 # C extensions
 *.so
 
@@ -24,6 +27,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+bioconda_recipe/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -47,6 +51,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+decoys/
 
 # Translations
 *.mo
