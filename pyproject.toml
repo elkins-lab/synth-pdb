@@ -66,10 +66,6 @@ dev = [
     "scikit-learn>=1.0.0",  # for test_train_quality_filter dynamic script load
     "joblib>=1.1.0",        # for test_train_quality_filter dynamic script load
 ]
-notebooks = [
-    # pytest-nbmake is installed directly in CI (not via extras) to avoid
-    # pip resolver conflicts with pre-installed packages in the Colab container.
-]
 test = [
     "pynmrstar",
     "requests",

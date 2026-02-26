@@ -51,9 +51,14 @@ echo "Running notebook tests inside the Colab container..."
 docker run --rm -v "${REPO_ROOT}:/workspace" -w /workspace $COLAB_IMAGE /bin/bash -c "
 echo 'Installing package and dependencies...' &&
 pip install -e '.[dev,plm,gnn,ai]' &&
-pip install pytest-nbmake umap-learn matplotlib seaborn &&
-echo 'Running notebook tests with pytest-nbmake...' &&
-pytest --nbmake docs/tutorials/ examples/interactive_tutorials/ examples/ml_integration/ examples/ml_loading/
+pip install umap-learn matplotlib seaborn &&
+echo 'Running notebook tests with jupyter nbconvert...' &&
+jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
+  --ExecutePreprocessor.timeout=600 \
+  docs/tutorials/*.ipynb \
+  examples/interactive_tutorials/*.ipynb \
+  examples/ml_integration/*.ipynb \
+  examples/ml_loading/*.ipynb
 "
 
 echo "Notebook testing in Colab simulation complete."

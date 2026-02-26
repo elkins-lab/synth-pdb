@@ -18,21 +18,27 @@ jobs:
 
     - name: Install local package
       run: |
+        # pytest-nbmake is unavailable in the Colab container's pip index.
+        # nbconvert is pre-installed in the Colab image, so we use it instead.
         pip install -e ".[dev,plm,gnn,ai]"
-        pip install pytest-nbmake umap-learn matplotlib seaborn  # installed separately to avoid pip resolver conflicts
+        pip install umap-learn matplotlib seaborn
 
     - name: Test Tutorials
       run: |
-        pytest --nbmake docs/tutorials/
+        jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
+          --ExecutePreprocessor.timeout=600 docs/tutorials/*.ipynb
 
     - name: Test Interactive Examples
       run: |
-        pytest --nbmake examples/interactive_tutorials/
+        jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
+          --ExecutePreprocessor.timeout=600 examples/interactive_tutorials/*.ipynb
 
     - name: Test ML Integration Examples
       run: |
-        pytest --nbmake examples/ml_integration/
+        jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
+          --ExecutePreprocessor.timeout=600 examples/ml_integration/*.ipynb
 
     - name: Test ML Loading Examples
       run: |
-        pytest --nbmake examples/ml_loading/
+        jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
+          --ExecutePreprocessor.timeout=600 examples/ml_loading/*.ipynb
