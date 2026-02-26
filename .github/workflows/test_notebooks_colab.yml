@@ -8,9 +8,9 @@ on:
 
 jobs:
   test_notebooks:
-    # Run on the standard runner — the Colab container's kernel sends
-    # 'colab_request' IPython messages that require the Colab UI backend,
-    # causing an immediate DeadKernelError when run headlessly.
+    # The Colab Docker container's kernel sends 'colab_request' messages that
+    # require the Colab UI backend, causing DeadKernelError when run headlessly.
+    # We use a standard runner + clean Jupyter install instead.
     runs-on: ubuntu-latest
 
     steps:
@@ -27,24 +27,37 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev,plm,gnn,ai]"
-        pip install jupyter nbconvert umap-learn matplotlib seaborn
+        # Notebook visualization / interactivity dependencies
+        pip install jupyter nbconvert \
+          umap-learn matplotlib seaborn plotly ipywidgets \
+          py3Dmol "jax[cpu]"
 
     - name: Test Tutorials
       run: |
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
-          --ExecutePreprocessor.timeout=600 docs/tutorials/*.ipynb
+          --ExecutePreprocessor.timeout=600 \
+          --ExecutePreprocessor.extra_arguments='["--IPKernelApp.exec_files=scripts/ci_notebook_startup.py"]' \
+          docs/tutorials/*.ipynb
 
     - name: Test Interactive Examples
       run: |
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
-          --ExecutePreprocessor.timeout=600 examples/interactive_tutorials/*.ipynb
+          --ExecutePreprocessor.timeout=600 \
+          --ExecutePreprocessor.extra_arguments='["--IPKernelApp.exec_files=scripts/ci_notebook_startup.py"]' \
+          examples/interactive_tutorials/*.ipynb
 
     - name: Test ML Integration Examples
       run: |
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
-          --ExecutePreprocessor.timeout=600 examples/ml_integration/*.ipynb
+          --ExecutePreprocessor.timeout=600 \
+          --ExecutePreprocessor.extra_arguments='["--IPKernelApp.exec_files=scripts/ci_notebook_startup.py"]' \
+          examples/ml_integration/*.ipynb
 
     - name: Test ML Loading Examples
       run: |
+        # mlx_handover.ipynb requires Apple Silicon (MLX is macOS-only) — skipped in Linux CI.
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
-          --ExecutePreprocessor.timeout=600 examples/ml_loading/*.ipynb
+          --ExecutePreprocessor.timeout=600 \
+          --ExecutePreprocessor.extra_arguments='["--IPKernelApp.exec_files=scripts/ci_notebook_startup.py"]' \
+          examples/ml_loading/jax_handover.ipynb \
+          examples/ml_loading/pytorch_handover.ipynb
