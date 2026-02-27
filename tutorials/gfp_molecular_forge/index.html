@@ -3870,8 +3870,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
     <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'colab'</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter / CI environment'</span><span class="p">)</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'notebook'</span>  <span class="c1"># Prevent browser-open hang in CI</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
 </pre></div>
@@ -3891,8 +3893,10 @@ if IN_COLAB:
     import plotly.io as pio
     pio.renderers.default = 'colab'
 else:
-    print('💻 Running in local Jupyter environment')
+    print('💻 Running in local Jupyter / CI environment')
     sys.path.append(os.path.abspath('../../'))
+    import plotly.io as pio
+    pio.renderers.default = 'notebook'  # Prevent browser-open hang in CI
 
 print('✅ Environment configured!')</div>
 </div>
