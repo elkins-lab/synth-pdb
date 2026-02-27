@@ -62,7 +62,7 @@ class BatchedPeptide:
             return BatchedPeptide(self.coords[index:index+1], self.sequence, self.atom_names, self.residue_indices)
         return BatchedPeptide(self.coords[index], self.sequence, self.atom_names, self.residue_indices)
 
-    def save_pdb(self, path: str, index: int = 0):
+    def save_pdb(self, path: str, index: int = 0) -> None:
         """Saves one structure from the batch to a PDB file."""
         with open(path, 'w') as f:
             f.write(self.to_pdb(index))

@@ -1,3 +1,4 @@
+from typing import Dict, List
 import logging
 import numpy as np
 import biotite.structure as struc
@@ -14,7 +15,7 @@ class DecoyGenerator:
     Generates ensembles of protein structures (decoys) with specific properties.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def generate_ensemble(
@@ -190,7 +191,7 @@ class DecoyGenerator:
         logger.info(f"Finished. Generated {len(generated_decoys)} decoys.")
         return generated_decoys
 
-    def _extract_backbone_dihedrals(self, pdb_content: str):
+    def _extract_backbone_dihedrals(self, pdb_content: str) -> Dict[str, List[float]]:
         """Extracts phi, psi, omega lists from PDB content."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
@@ -204,7 +205,7 @@ class DecoyGenerator:
         # dihedral_backbone returns radians.
         return np.rad2deg(phi).tolist(), np.rad2deg(psi).tolist(), np.rad2deg(omega).tolist()
 
-    def _shuffle_pdb_sequence(self, pdb_content: str):
+    def _shuffle_pdb_sequence(self, pdb_content: str) -> str:
         """Shuffles residue names in PDB content while keeping backbone intact."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)

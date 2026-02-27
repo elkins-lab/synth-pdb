@@ -117,7 +117,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _check_pyg():
+def _check_pyg() -> None:
     """Raise a clear ImportError if torch_geometric is not installed."""
     try:
         import torch

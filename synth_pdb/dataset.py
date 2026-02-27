@@ -4,7 +4,7 @@ import csv
 import random
 import logging
 from pathlib import Path
-from typing import Optional, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import concurrent.futures
 
@@ -25,7 +25,7 @@ import io
 
 logger = logging.getLogger(__name__)
 
-def _generate_single_sample_task(args):
+def _generate_single_sample_task(args: tuple) -> Optional[Dict[str, Any]]:
     """
     Helper function to generate a single sample.
     Arguments are passed as a tuple to be compatible with map/submit if needed,
@@ -157,7 +157,7 @@ class DatasetGenerator:
         
         self.dataset_format = dataset_format.lower() if dataset_format else 'pdb'
             
-    def prepare_directories(self):
+    def prepare_directories(self) -> None:
         """Create the directory structure for the dataset."""
         train_dir = self.output_dir / "train"
         test_dir = self.output_dir / "test"
@@ -175,7 +175,7 @@ class DatasetGenerator:
                 else:
                      writer.writerow(["id", "length", "conformation", "split", "pdb_path", "cmap_path"])
 
-    def generate(self):
+    def generate(self) -> None:
         """Run the generation loop using multiprocessing."""
         import multiprocessing
         
@@ -258,7 +258,7 @@ class DatasetGenerator:
                     
         logger.info(f"Bulk generation complete. Generated {completed_count}/{self.num_samples} samples.")
 
-def _generate_single_sample_npz_task(args):
+def _generate_single_sample_npz_task(args: tuple) -> Optional[Dict[str, Any]]:
     """
     Generate a single sample in NPZ format (AI-Ready).
     Does NOT write intermediate PDB files.

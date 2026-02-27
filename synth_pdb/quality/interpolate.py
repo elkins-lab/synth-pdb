@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -95,7 +96,7 @@ def interpolate_structures(start_pdb_path: str, end_pdb_path: str, steps: int, o
         _write_simple_pdb(coords, res_names, out_name)
         logger.info(f"Wrote frame {step}: {out_name}")
 
-def _reconstruct_backbone(phi, psi, omega):
+def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -> np.ndarray:
     """Reconstruct backbone coordinates from angles."""
     from synth_pdb.geometry import position_atoms_batch
     from synth_pdb.data import (
@@ -122,7 +123,7 @@ def _reconstruct_backbone(phi, psi, omega):
     # Place O(0)
     # position_atoms_batch expects arrays (B, ...)
     # adapt single to batch
-    def pos(p1, p2, p3, bl, ba, di):
+    def pos(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, bl: float, ba: float, di: float) -> np.ndarray:
         return position_atoms_batch(
             p1.reshape(1,3), p2.reshape(1,3), p3.reshape(1,3), 
             np.array([bl]), np.array([ba]), np.array([np.degrees(di)])
@@ -155,7 +156,7 @@ def _reconstruct_backbone(phi, psi, omega):
                             
     return coords
 
-def _write_simple_pdb(coords, res_names, path):
+def _write_simple_pdb(coords: np.ndarray, res_names: List[str], path: str) -> None:
     """Write minimal PDB."""
     with open(path, 'w') as f:
         atom_idx = 1

@@ -155,7 +155,7 @@ def generate_msa_sequences(
         
     return msa
 
-def write_msa(sequences: List[str], filename: str):
+def write_msa(sequences: List[str], filename: str) -> None:
     """
     Write MSA in FASTA format.
     """

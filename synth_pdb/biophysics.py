@@ -16,6 +16,7 @@ Biological function depends on pH. The most sensitive residue near physiological
 - pH > 6.0: Imidazole ring is neutral (0 charge). Tautomers: HIE (epsilon protonated) or HID (delta protonated).
 """
 
+from typing import Any, Dict, List
 import biotite.structure as struc
 import logging
 import random
@@ -281,7 +282,7 @@ BASIC_RESIDUES = ["LYS", "ARG", "HIS"]
 ACIDIC_ATOMS = ["OD1", "OD2", "OE1", "OE2"]
 BASIC_ATOMS = ["NZ", "NH1", "NH2", "ND1", "NE2"]
 
-def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0):
+def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]:
     """
     Automatically detects potential salt bridges in a protein structure.
     

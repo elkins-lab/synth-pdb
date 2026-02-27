@@ -22,7 +22,7 @@ class ProteinQualityClassifier:
     - Negative samples: Raw unminimized structures, decoys, and random perturbations
     """
     
-    def __init__(self, model_path: Optional[str] = None):
+    def __init__(self, model_path: Optional[str] = None) -> None:
         self.model = None
         self.feature_names = get_feature_names()
         
@@ -36,7 +36,7 @@ class ProteinQualityClassifier:
             else:
                 logger.warning(f"No model found at {default_path}. Classifier is not initialized.")
 
-    def load_model(self, path: str):
+    def load_model(self, path: str) -> None:
         """Loads a pre-trained scikit-learn model."""
         try:
             import joblib

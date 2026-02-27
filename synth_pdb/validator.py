@@ -36,7 +36,7 @@ class PDBValidator:
     sequences_by_chain: Dict[str, List[str]]
     violations: List[str]
 
-    def __init__(self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None):
+    def __init__(self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None) -> None:
         if pdb_content:
             self.pdb_content = pdb_content
             self.atoms = self._parse_pdb_atoms(pdb_content)
@@ -313,7 +313,7 @@ class PDBValidator:
         """
         return self.violations
 
-    def validate_bond_lengths(self, tolerance: float = 0.05):
+    def validate_bond_lengths(self, tolerance: float = 0.05) -> None:
         """
         Validates backbone bond lengths (N-CA, CA-C, C-O, C-N peptide bond) against standard values.
         """
@@ -393,7 +393,7 @@ class PDBValidator:
                                 f"deviates from standard ({expected_length:.2f}Å) by more than {tolerance}Å. Actual: {actual_length:.2f}"
                             )
 
-    def validate_bond_angles(self, tolerance: float = 5.0):
+    def validate_bond_angles(self, tolerance: float = 5.0) -> None:
         """
         Validates backbone bond angles (N-CA-C, CA-C-O, CA-C-N_next) against standard values.
         """
@@ -498,7 +498,7 @@ class PDBValidator:
             p1x, p1y = p2x, p2y
         return inside
 
-    def validate_ramachandran(self):
+    def validate_ramachandran(self) -> None:
         """
         Validates Ramachandran angles (Phi, Psi) against MolProbity-defined polygonal regions.
         Checks if angles fall within simplified "Favored" (98%) or "Allowed" (99.8%) polygons.
@@ -608,7 +608,7 @@ class PDBValidator:
         min_ca_distance: float = 3.0,
         vdw_overlap_factor: float = 0.6,
         backbone_only: bool = False,
-    ):
+    ) -> None:
         """
         Implements steric clash checks including:
         - General atom-atom minimum distance (any atom-atom > min_atom_distance).
@@ -817,7 +817,7 @@ class PDBValidator:
                     )
                     # self.violations.append(...) - DISABLED
 
-    def validate_peptide_plane(self, tolerance_deg: float = 30.0):
+    def validate_peptide_plane(self, tolerance_deg: float = 30.0) -> None:
         """
         Validates peptide bond planarity by checking the omega (ω) dihedral angle.
         The omega angle is defined by N(i-1) - CA(i-1) - C(i-1) - N(i).
@@ -877,7 +877,7 @@ class PDBValidator:
         max_consecutive_charged: int = 4,
         max_hydrophobic_stretch: int = 10,
         pro_pro_pro_rare: int = 2,
-    ):
+    ) -> None:
         """
         Checks for biologically improbable amino acid sequence patterns.
         """
@@ -1140,7 +1140,7 @@ class PDBValidator:
 
         return modified_atoms
 
-    def validate_side_chain_rotamers(self, tolerance: float = 40.0):
+    def validate_side_chain_rotamers(self, tolerance: float = 40.0) -> None:
         """
         Validates side-chain rotamers against the Backbone-Dependent Library.
         
@@ -1359,7 +1359,7 @@ class PDBValidator:
                         f"improper dihedral = {improper:.1f}° ({expected_desc})"
                     )
 
-    def calculate_dihedrals(self, input_data=None) -> Dict[str, List[float]]:
+    def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
         """
         Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
         

@@ -32,7 +32,7 @@ class SideChainPacker:
     # This probability is given by the Boltzmann factor: P = exp(-DeltaE / Temperature)
     """
     
-    def __init__(self, steps: int = 500, temperature: float = 0.5):
+    def __init__(self, steps: int = 500, temperature: float = 0.5) -> None:
         """
         Args:
             steps: Number of Monte Carlo steps (attempts).
@@ -158,7 +158,7 @@ class SideChainPacker:
         logger.info(f"Optimization complete. Final Clash Score: {current_score:.4f} (Moves accepted: {accepted_moves})")
         return peptide
 
-def optimize_sidechains(peptide: struc.AtomArray, steps=500) -> struc.AtomArray:
+def optimize_sidechains(peptide: struc.AtomArray, steps: int = 500) -> struc.AtomArray:
     """Convenience wrapper."""
     packer = SideChainPacker(steps=steps)
     return packer.optimize(peptide)

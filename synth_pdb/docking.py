@@ -12,7 +12,7 @@ class DockingPrep:
     Utilities for preparing PDB structures for molecular docking.
     """
     
-    def __init__(self, forcefield_name='amber14-all.xml'):
+    def __init__(self, forcefield_name: str = 'amber14-all.xml') -> None:
         self.forcefield_name = forcefield_name
         try:
             self.forcefield = app.ForceField(self.forcefield_name, 'amber14/tip3pfb.xml')

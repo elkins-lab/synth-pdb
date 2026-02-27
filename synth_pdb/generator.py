@@ -13,7 +13,7 @@ import numpy as np
 #    - NMR: Often used to represent local RMSD across the ensemble.
 
 import logging
-from typing import List, Optional, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from .data import (
     STANDARD_AMINO_ACIDS,
     MODIFIED_AMINO_ACIDS,
@@ -1612,7 +1612,7 @@ class PeptideGenerator:
     Object-oriented wrapper for protein structure generation.
     Provides a cleaner API for interactive notebooks and complex workflows.
     """
-    def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs):
+    def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs: Any) -> None:
         self.sequence = sequence
         self.config = kwargs
         self._last_result = None
@@ -1638,7 +1638,7 @@ class PeptideResult:
     Container for generation outputs, providing easy access to 
     PDB strings, Biotite structures, and metadata.
     """
-    def __init__(self, pdb_content: str):
+    def __init__(self, pdb_content: str) -> None:
         self.pdb = pdb_content
         self._structure = None
 
@@ -1665,7 +1665,7 @@ class PeptideResult:
                 self._structure = f.get_structure(model=1)
         return self._structure
 
-    def save(self, path: str):
+    def save(self, path: str) -> None:
         """Saves the PDB content to a file."""
         with open(path, 'w') as f:
             f.write(self.pdb)

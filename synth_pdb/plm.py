@@ -405,7 +405,7 @@ class ESM2Embedder:
 # Utility: sequence extraction from AtomArray
 # ──────────────────────────────────────────────────────────────────────────
 
-def _extract_sequence(structure) -> str:
+def _extract_sequence(structure: Any) -> str:
     """
     Extract the one-letter amino acid sequence from a biotite AtomArray.
 

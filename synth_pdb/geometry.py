@@ -2,7 +2,7 @@ import numpy as np
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ try:
     from numba import njit
 except ImportError:
     # Fallback to no-op decorator if numba is not installed
-    def njit(func=None, **kwargs):
+    def njit(func: Optional[Any] = None, **kwargs: Any) -> Any:
         if func is None:
             return lambda f: f
         return func
@@ -229,7 +229,7 @@ def position_atoms_batch(
     
     # Normalize vectors (Batch-wise)
     # Using keepdims=True for proper broadcasting
-    def normalize(v):
+    def normalize(v: np.ndarray) -> np.ndarray:
         norm = np.linalg.norm(v, axis=-1, keepdims=True)
         # Avoid division by zero
         norm = np.where(norm == 0, 1.0, norm)
@@ -523,7 +523,7 @@ def reconstruct_sidechain(
     
     # Helper to rotate points about an axis
     @njit
-    def rotate_points(points, axis_p1, axis_p2, angle_deg):
+    def rotate_points(points: np.ndarray, axis_p1: np.ndarray, axis_p2: np.ndarray, angle_deg: float) -> np.ndarray:
         # Translate to origin
         v = (axis_p2 - axis_p1).astype(np.float64)
         v_norm = np.sqrt(np.sum(v**2))

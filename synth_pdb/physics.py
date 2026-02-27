@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
 import logging
 try:
     import openmm.app as app
@@ -56,7 +57,7 @@ class EnergyMinimizer:
     This module performs that final "geometry regularization" step.
     """
     
-    def __init__(self, forcefield_name='amber14-all.xml', solvent_model='app.OBC2', box_size=1.0):
+    def __init__(self, forcefield_name: str = 'amber14-all.xml', solvent_model: str = 'app.OBC2', box_size: float = 1.0) -> None:
         """
         Initialize the Minimizer with a Forcefield and Solvent Model.
         
@@ -127,7 +128,7 @@ class EnergyMinimizer:
         except Exception as e:
             logger.error(f"Failed to load forcefield: {e}"); raise
 
-    def minimize(self, pdb_file_path, output_path, max_iterations=0, tolerance=10.0, cyclic=False, disulfides=None, coordination=None):
+    def minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Run energy minimization to regularize geometry and resolve clashes.
         
@@ -189,7 +190,7 @@ class EnergyMinimizer:
         res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=False, max_iterations=max_iterations, tolerance=tolerance, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
         return res is not None
 
-    def equilibrate(self, pdb_file_path, output_path, steps=1000, cyclic=False, disulfides=None, coordination=None):
+    def equilibrate(self, pdb_file_path: str, output_path: str, steps: int = 1000, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Run Thermal Equilibration (MD) at 300K.
         
@@ -209,7 +210,7 @@ class EnergyMinimizer:
         res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=True, equilibration_steps=steps, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
         return res is not None
 
-    def add_hydrogens_and_minimize(self, pdb_file_path, output_path, max_iterations=0, tolerance=10.0, cyclic=False, disulfides=None, coordination=None):
+    def add_hydrogens_and_minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
         
@@ -242,7 +243,7 @@ class EnergyMinimizer:
         res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=True, max_iterations=max_iterations, tolerance=tolerance, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
         return res is not None
 
-    def calculate_energy(self, input_data, cyclic=False) -> float:
+    def calculate_energy(self, input_data: Union[str, Any], cyclic: bool = False) -> Optional[float]:
         """
         Calculates the potential energy of a structure.
         
@@ -290,7 +291,7 @@ class EnergyMinimizer:
                 try: os.unlink(temp_file.name)
                 except: pass
 
-    def _create_system_robust(self, topology, constraints, modeller=None):
+    def _create_system_robust(self, topology: Any, constraints: Any, modeller: Optional[Any] = None) -> Tuple[Any, Any, Any]:
         """
         Creates an OpenMM system, with robust fallbacks for template mismatches
         and incompatible forcefield arguments. Returns (system, topology, positions).
@@ -349,7 +350,7 @@ class EnergyMinimizer:
             return sys, current_topo, current_pos
 
 
-    def _preprocess_pdb_for_simulation(self, input_path, cyclic, disulfides_param):
+    def _preprocess_pdb_for_simulation(self, input_path: str, cyclic: bool, disulfides_param: Optional[List]) -> Tuple[Any, Any, List[str], Dict[Any, Any]]:
         """Load and sanitize the input PDB for OpenMM; return OpenMM topology/positions.
 
         Performs PTM residue renaming (SEP→SER, etc.), HETATM ion stripping,
@@ -541,8 +542,9 @@ class EnergyMinimizer:
         return topology, positions, hetatm_lines, original_metadata
 
     def _setup_openmm_modeller(
-        self, topology, positions, add_hydrogens, cyclic, coordination_param, atom_list
-    ):
+        self, topology: Any, positions: Any, add_hydrogens: bool,
+        cyclic: bool, coordination_param: Optional[List], atom_list: List[Any]
+    ) -> Tuple[Any, List, List, List, List[Any]]:
         """Build the OpenMM Modeller, apply H handling, detect disulfides and salt bridges.
 
         Steps:
@@ -823,9 +825,9 @@ class EnergyMinimizer:
         return modeller, added_bonds, salt_bridge_restraints, coordination_restraints, atom_list
 
     def _build_simulation_context(
-        self, modeller, cyclic, added_bonds, salt_bridge_restraints,
-        coordination_restraints, atom_list
-    ):
+        self, modeller: Any, cyclic: bool, added_bonds: List,
+        salt_bridge_restraints: List, coordination_restraints: List, atom_list: List[Any]
+    ) -> Tuple[Any, Any, int, int, Any, Any]:
         """Create OpenMM System + Simulation, apply forces, return context objects.
 
         Wraps system creation (implicit/explicit solvent), cyclic terminal
@@ -1114,9 +1116,10 @@ class EnergyMinimizer:
         return simulation, system, n_idx, c_idx, topology, positions
 
     def _finalize_output(
-        self, output_path, simulation, cyclic, added_bonds,
-        coordination_restraints, hetatm_lines, original_metadata, atom_list
-    ):
+        self, output_path: str, simulation: Any, cyclic: bool, added_bonds: List,
+        coordination_restraints: List, hetatm_lines: List[str],
+        original_metadata: Dict[Any, Any], atom_list: List[Any]
+    ) -> Optional[bool]:
         """Write the post-simulation structure to *output_path*.
 
         Handles macrocycle terminal-atom cleanup, restores original residue
@@ -1288,7 +1291,7 @@ class EnergyMinimizer:
         return True
 
 
-    def _run_simulation(self, input_path, output_path, max_iterations=0, tolerance=10.0, add_hydrogens=True, equilibration_steps=0, cyclic=False, disulfides=None, coordination=None):
+    def _run_simulation(self, input_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, add_hydrogens: bool = True, equilibration_steps: int = 0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> Optional[float]:
         """Internal engine. Returns final_energy if successful, else None."""
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")

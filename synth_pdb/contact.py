@@ -1,7 +1,8 @@
+from typing import Any, Optional
 import numpy as np
 import biotite.structure as struc
 
-def compute_contact_map(structure, method="ca", threshold=8.0, power=None):
+def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:
     """
     Computes a residue-residue contact map.
     
