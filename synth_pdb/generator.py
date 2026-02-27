@@ -694,6 +694,757 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
     return residue_conformations
 
 
+def _resolve_conformation_map(
+    sequence: List[str],
+    conformation: str,
+    structure: Optional[str],
+) -> Dict[int, str]:
+    """Build per-residue conformation map from default and optional structure spec.
+
+    Validates the default conformation, expands the optional per-region structure
+    string into a 0-based residue-index dict, and fills gaps with the default.
+
+    Args:
+        sequence: List of 3-letter amino acid codes.
+        conformation: Default secondary structure for all residues.
+        structure: Optional per-region spec (e.g. ``"1-10:alpha,11-20:beta"``).
+
+    Returns:
+        Dict mapping 0-based residue index to conformation name.
+    """
+    sequence_length = len(sequence)
+    # EDUCATIONAL NOTE - Input Validation:
+    # We validate the default conformation early to give clear error messages.
+    # Even if structure parameter overrides it for some residues, we need to
+    # ensure the default is valid for any gaps or when structure is not provided.
+    valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random']
+    if conformation not in valid_conformations:
+        raise ValueError(
+            f"Invalid conformation '{conformation}'. "
+            f"Valid options are: {', '.join(valid_conformations)}"
+        )
+    # EDUCATIONAL NOTE - Per-Residue Conformation Assignment:
+    # We now support two modes:
+    # 1. Uniform conformation (old behavior): All residues use same conformation
+    # 2. Per-region conformation (new!): Different regions can have different conformations
+
+    # Parse per-residue conformations if structure parameter is provided
+    if structure:
+        residue_conformations = _parse_structure_regions(structure, sequence_length)
+        # EDUCATIONAL NOTE - Gap Handling:
+        # If a residue is not specified in the structure parameter,
+        # we use the default conformation. This allows users to specify
+        # only the interesting regions and let the rest use a sensible default.
+        for i in range(sequence_length):
+            if i not in residue_conformations:
+                residue_conformations[i] = conformation
+    else:
+        residue_conformations = {i: conformation for i in range(sequence_length)}
+    # EDUCATIONAL NOTE - Why We Don't Validate Conformations Here:
+    # We already validated conformations in _parse_structure_regions(),
+    # so we don't need to re-validate them here. The default conformation
+    # will be validated when we actually use it below.
+    return residue_conformations
+
+
+def _build_peptide_chain(
+    sequence: List[str],
+    residue_conformations: Dict[int, str],
+    conformation: str,
+    structure: Optional[str],
+    cyclic: bool,
+    cis_proline_frequency: float,
+    drift: float,
+    phi_list: Optional[List[float]],
+    psi_list: Optional[List[float]],
+    omega_list: Optional[List[float]],
+    rng: random.Random,
+) -> struc.AtomArray:
+    """Build the backbone + sidechain AtomArray for the full peptide.
+
+    Places N, CA, C atoms residue-by-residue via NeRF (internal-coordinate)
+    geometry using the conformation map, Ramachandran distributions, beta-turn
+    definitions and rotamer libraries.  Handles D-amino acids by chirality
+    mirroring and applies hard-decoy torsion drift when requested.
+
+    Args:
+        sequence: List of 3-letter amino acid codes (possibly with D- prefix).
+        residue_conformations: Per-residue conformation dict (0-based index).
+        conformation: Default conformation used as fallback in gap detection.
+        structure: Original structure spec string (used only for ``not structure``
+            short-circuit logic; pass ``None`` when not specified).
+        cyclic: Whether to suppress terminal atoms for head-to-tail ring closure.
+        cis_proline_frequency: Probability that a PRO residue adopts cis-omega.
+        drift: Max uniform drift (degrees) added to phi/psi for hard-decoy mode.
+        phi_list: Explicit phi angles (threaded backbone); overrides sampling.
+        psi_list: Explicit psi angles (threaded backbone); overrides sampling.
+        omega_list: Explicit omega angles; overrides sampling.
+        rng: Seeded random generator for reproducible drift.
+
+    Returns:
+        Complete :class:`biotite.structure.AtomArray` with chain_id ``"A"``.
+    """
+    sequence_length = len(sequence)
+    peptide = struc.AtomArray(0)
+    residue_coordinates: Dict[int, Dict[str, np.ndarray]] = {}
+
+    for i, full_res_name in enumerate(sequence):
+        res_id = i + 1
+
+        # EDUCATIONAL NOTE - D-Amino Acid Handling:
+        # D-amino acids are the mirror images of the standard L-amino acids.
+        is_d = full_res_name.startswith("D-")
+        res_name = full_res_name[2:] if is_d else full_res_name
+
+        # Determine conformation for this residue
+        res_conformation = residue_conformations.get(i, conformation)
+        if res_conformation == 'alpha' and not structure:
+            cys_count = sum(1 for aa in sequence if "CYS" in aa.upper() or "DCY" in aa.upper())
+            if cyclic or cys_count >= 2:
+                res_conformation = 'curved'
+
+        # Compatibility alias for rotamer selection logic downstream
+        current_conformation = res_conformation
+
+        # ── Backbone coordinate placement ───────────────────────────────────
+        if i == 0:
+            # First residue (N-terminus)
+            n_coord = np.array([0.0, 0.0, 0.0])
+            ca_coord = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
+
+            angle_with_x = np.pi - ANGLE_N_CA_C_RAD
+            c_x = ca_coord[0] + BOND_LENGTH_CA_C * np.cos(angle_with_x)
+            c_y = ca_coord[1] + BOND_LENGTH_CA_C * np.sin(angle_with_x)
+            c_coord = np.array([c_x, c_y, 0.0])
+
+            if res_conformation in RAMACHANDRAN_PRESETS:
+                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
+            elif res_conformation == 'random':
+                next_res_name = sequence[i + 1] if i + 1 < sequence_length else None
+                _, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
+            elif res_conformation in BETA_TURN_TYPES:
+                current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+            else:
+                current_psi = -47.0  # Default Alpha
+
+        else:
+            # Subsequent residues use internal-coordinate (NeRF) placement
+            prev_res_idx = i - 1
+            prev_coords = residue_coordinates[prev_res_idx]
+            prev_n_coord = prev_coords['N']
+            prev_ca_coord = prev_coords['CA']
+            prev_c_coord = prev_coords['C']
+
+            next_full_res_name = sequence[i + 1] if i + 1 < sequence_length else None
+            next_res_name = (
+                next_full_res_name[2:]
+                if next_full_res_name and next_full_res_name.startswith("D-")
+                else next_full_res_name
+            )
+
+            prev_conformation = residue_conformations.get(prev_res_idx, conformation)
+
+            current_phi = None
+            current_psi = None
+
+            # Handle Beta-Turns explicitly
+            pass
+
+            if prev_conformation in RAMACHANDRAN_PRESETS:
+                prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]['psi']
+            elif prev_conformation in BETA_TURN_TYPES:
+                c_prev = prev_conformation
+                if residue_conformations.get(prev_res_idx - 1) != c_prev:
+                    turn_pos = 1
+                elif residue_conformations.get(prev_res_idx - 2) != c_prev:
+                    turn_pos = 2
+                elif residue_conformations.get(prev_res_idx - 3) != c_prev:
+                    turn_pos = 3
+                else:
+                    turn_pos = 4
+
+                turn_angles = BETA_TURN_TYPES[prev_conformation]
+                if turn_pos == 1:
+                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+                elif turn_pos == 2:
+                    prev_psi = turn_angles[0][1]
+                elif turn_pos == 3:
+                    prev_psi = turn_angles[1][1]
+                else:
+                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+            elif prev_conformation == 'random':
+                prev_full_res_name = sequence[prev_res_idx]
+                prev_base_res_name = (
+                    prev_full_res_name[2:]
+                    if prev_full_res_name.startswith("D-")
+                    else prev_full_res_name
+                )
+                _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name)
+            else:
+                prev_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
+
+            # Place N(i)
+            n_coord = _place_atom_with_dihedral(
+                prev_n_coord, prev_ca_coord, prev_c_coord,
+                BOND_LENGTH_C_N, ANGLE_CA_C_N, prev_psi
+            )
+
+            # Place CA(i) — sample omega (including cis-proline)
+            omega_mean = OMEGA_TRANS
+            if res_name == 'PRO' and random.random() < cis_proline_frequency:
+                omega_mean = 0.0
+
+            if omega_list is not None and i > 0 and (i - 1) < len(omega_list):
+                omega = omega_list[i - 1]
+            else:
+                omega = np.random.normal(omega_mean, OMEGA_VARIATION)
+
+            ca_coord = _place_atom_with_dihedral(
+                prev_ca_coord, prev_c_coord, n_coord,
+                BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
+            )
+
+            # Determine phi/psi for this residue
+            if (
+                phi_list is not None and i < len(phi_list)
+                and psi_list is not None and i < len(psi_list)
+            ):
+                current_phi = phi_list[i]
+                current_psi = psi_list[i]
+            elif res_conformation in RAMACHANDRAN_PRESETS:
+                current_phi = RAMACHANDRAN_PRESETS[res_conformation]['phi']
+                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
+            elif res_conformation in BETA_TURN_TYPES:
+                c_curr = res_conformation
+                if residue_conformations.get(i - 1) != c_curr:
+                    turn_pos = 1
+                elif residue_conformations.get(i - 2) != c_curr:
+                    turn_pos = 2
+                elif residue_conformations.get(i - 3) != c_curr:
+                    turn_pos = 3
+                else:
+                    turn_pos = 4
+                turn_angles = BETA_TURN_TYPES[res_conformation]
+                if turn_pos == 1:
+                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi']
+                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+                elif turn_pos == 2:
+                    current_phi = turn_angles[0][0]
+                    current_psi = turn_angles[0][1]
+                elif turn_pos == 3:
+                    current_phi = turn_angles[1][0]
+                    current_psi = turn_angles[1][1]
+                else:
+                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi']
+                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+            elif res_conformation == 'random':
+                current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
+            else:
+                current_phi = RAMACHANDRAN_PRESETS['alpha']['phi']
+                current_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
+
+            # Apply hard-decoy torsion drift
+            if drift > 0:
+                current_phi += rng.uniform(-drift, drift)
+                current_psi += rng.uniform(-drift, drift)
+                current_phi = ((current_phi + 180) % 360) - 180
+                current_psi = ((current_psi + 180) % 360) - 180
+
+            # Place C(i)
+            # D-amino acids invert the chirality by negating phi/psi before placement
+            if is_d:
+                current_phi *= -1.0
+                current_psi *= -1.0
+
+            c_coord = _place_atom_with_dihedral(
+                prev_c_coord, n_coord, ca_coord,
+                BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
+            )
+
+        # ── Store coordinates for next iteration ────────────────────────────
+        residue_coordinates[i] = {
+            'N': n_coord,
+            'CA': ca_coord,
+            'C': c_coord,
+        }
+
+        # Store Psi for next iteration (kept for readability; recomputed in loop)
+        prev_psi = current_psi
+
+        # ── Biotite reference template ───────────────────────────────────────
+        # CRITICAL FIX: Always use .copy() — residue() returns a cached template.
+        ref_res_template = struc.info.residue(res_name).copy()
+
+        # EDUCATIONAL NOTE - Peptide Bond Chemistry:
+        # A peptide bond forms via dehydration synthesis (loss of H2O).
+        # The Carboxyl group (COOH) of one amino acid joins the Amine group (NH2) of the next.
+        # This means internal residues lose their terminal Oxygen (OXT) and associated Hydrogens.
+        # We must explicitly remove terminal-only atoms from all residues to represent
+        # a continuous polypeptide chain correctly and avoid OpenMM template errors.
+
+        # EDUCATIONAL NOTE - Terminal Atom Management in Rings:
+        # In a linear peptide, the ends are "unfinished" (OXT at C-term, extra H at N-term).
+        # In a cyclic peptide, these atoms are SACRIFICED to form the peptide bond
+        # between the ends. Failing to remove them leads to "impossible" geometry
+        # with 5-valent carbons or nitrogen atoms with too many bonds.
+
+        # Remove terminal atoms that are incompatible with internal peptide bonds
+        if i < len(sequence) - 1 or cyclic:
+            ref_res_template = ref_res_template[ref_res_template.atom_name != "OXT"]
+            ref_res_template = ref_res_template[ref_res_template.atom_name != "HXT"]
+
+        if i > 0 or cyclic:
+            ref_res_template = ref_res_template[ref_res_template.atom_name != "H2"]
+            ref_res_template = ref_res_template[ref_res_template.atom_name != "H3"]
+            # PROLINE FIX: Internal/Cyclic Proline has NO amide hydrogen.
+            if res_name == "PRO":
+                ref_res_template = ref_res_template[ref_res_template.atom_name != "H"]
+
+        # EDUCATIONAL NOTE - Rotamer Selection Strategy:
+        # We employ a 'Backbone-Dependent' selection strategy where possible.
+        # This means we check the residue's secondary structure context (Helix vs Sheet)
+        # to choose the most likely side-chain conformation.
+        # Logic:
+        # 1. Check if specific rotamers exist for this residue + conformation in BACKBONE_DEPENDENT_LIB.
+        # 2. If not, fall back to the generic ROTAMER_LIBRARY (Backbone-Independent).
+        # ── Rotamer selection ────────────────────────────────────────────────
+        rotamers = None
+        if res_name in BACKBONE_DEPENDENT_ROTAMER_LIBRARY:
+            if current_conformation in BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name]:
+                rotamers = BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name][current_conformation]
+        if rotamers is None and res_name in ROTAMER_LIBRARY:
+            rotamers = ROTAMER_LIBRARY[res_name]
+
+        if rotamers:
+            weights = [r.get('prob', 0.0) for r in rotamers]
+            selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
+
+            if 'chi1' in selected_rotamer:
+                chi1_target = selected_rotamer["chi1"][0]
+                gamma_atom_name = None
+                for candidate in ["CG", "CG1", "OG", "OG1", "SG"]:
+                    if len(ref_res_template[ref_res_template.atom_name == candidate]) > 0:
+                        gamma_atom_name = candidate
+                        break
+
+                if gamma_atom_name:
+                    # EDUCATIONAL NOTE - Sidechain Rotation:
+                    # Instead of placing a single atom (which breaks branched residues like VAL),
+                    # we rotate the ENTIRE sidechain about the CA-CB axis to reach target chi1.
+                    # We use Rodrigues' rotation formula (CCW looking down CA->CB).
+                    # rotation_angle = target - current (standard IUPAC convention).
+                    ca_atom = ref_res_template[ref_res_template.atom_name == "CA"][0]
+                    cb_atom = ref_res_template[ref_res_template.atom_name == "CB"][0]
+                    n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
+                    g_atom = ref_res_template[ref_res_template.atom_name == gamma_atom_name][0]
+
+                    current_chi1 = calculate_dihedral_angle(
+                        n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
+                    )
+                    diff_deg = chi1_target - current_chi1
+
+                    backbone_names = {"N", "CA", "C", "O", "H", "HA", "CB"}
+                    for atom_idx in range(len(ref_res_template)):
+                        if ref_res_template.atom_name[atom_idx] not in backbone_names:
+                            p = ref_res_template.coord[atom_idx]
+                            v = cb_atom.coord - ca_atom.coord
+                            v /= np.linalg.norm(v)
+                            alpha = np.deg2rad(diff_deg)
+                            cos_a = np.cos(alpha)
+                            sin_a = np.sin(alpha)
+                            rel_p = p - ca_atom.coord
+                            rotated_p = (
+                                rel_p * cos_a
+                                + np.cross(v, rel_p) * sin_a
+                                + v * np.dot(v, rel_p) * (1 - cos_a)
+                            )
+                            ref_res_template.coord[atom_idx] = rotated_p + ca_atom.coord
+
+        # ── Superimpose template onto constructed backbone frame ─────────────
+        template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
+        template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
+        template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
+        mobile_backbone_from_template = (
+            template_backbone_n + template_backbone_ca + template_backbone_c
+        )
+
+        if len(mobile_backbone_from_template) != 3:
+            raise ValueError(
+                f"Reference residue template for {res_name} is missing required "
+                f"backbone atoms (N, CA, C) for superimposition. "
+                f"Found atoms: {list(mobile_backbone_from_template.atom_name)}"
+            )
+
+        target_backbone_constructed = struc.array([
+            struc.Atom(n_coord, atom_name="N", res_id=res_id, res_name=res_name, element="N", hetero=False),
+            struc.Atom(ca_coord, atom_name="CA", res_id=res_id, res_name=res_name, element="C", hetero=False),
+            struc.Atom(c_coord, atom_name="C", res_id=res_id, res_name=res_name, element="C", hetero=False),
+        ])
+
+        # AHA MOMENT - Superimposition Direction:
+        # In the "AI Trinity" debugging phase, we found that residues were disconnected
+        # (6A-13A gaps). This was due to superimposing the backbone onto the template
+        # instead of moving the template into our newly constructed global frame.
+        # Fixed: target=constructed_frame, mobile=residue_template.
+        _, transformation = struc.superimpose(target_backbone_constructed, mobile_backbone_from_template)
+        transformed_res = ref_res_template
+        transformed_res.coord = transformation.apply(transformed_res.coord)
+
+        # EDUCATIONAL NOTE - Chiral Mirroring strategy:
+        # -------------------------------------------
+        # To convert an L-amino acid to a D-amino acid without separate templates,
+        # we treat the CA as the origin and the N-CA-C plane as our mirror.
+        #
+        # Why Mirroring Works:
+        # 1. Geometry Preservation: Mirroring across the backbone plane preserves
+        #    all bond lengths and angles within the sidechain.
+        # 2. Stereocenter Inversion: This transformation exactly inverts the
+        #    chirality at the C-alpha atom (from L to D).
+        # 3. Backbone Compatibility: Because we reflect *across* the backbone plane,
+        #    the positions of the backbone atoms (N, CA, C) remain unchanged,
+        #    ensuring the chain connectivity is not broken.
+        # ── D-amino acid chiral mirroring ─────────────────────────────────
+        if is_d and res_name != "GLY":
+            vec1 = c_coord - ca_coord
+            vec2 = n_coord - ca_coord
+            normal = np.cross(vec1, vec2)
+            normal /= np.linalg.norm(normal)
+            backbone_names = {"N", "CA", "C", "O", "H", "HA"}
+            for atom_idx in range(len(transformed_res)):
+                if transformed_res.atom_name[atom_idx] not in backbone_names:
+                    p = transformed_res.coord[atom_idx]
+                    w = p - ca_coord
+                    dist_to_plane = np.dot(w, normal)
+                    transformed_res.coord[atom_idx] = p - 2 * dist_to_plane * normal
+
+        # ── Assign residue metadata ──────────────────────────────────────────
+        transformed_res.res_id[:] = res_id
+        # EDUCATIONAL NOTE - D-Residue Naming:
+        # We use a 4-letter prefix 'D' (e.g., DALA, DGLU) to distinguish
+        # D-amino acids from their L-counterparts in the PDB file.
+        # This makes it easier for validators and downstream tools to recognize the chirality.
+        if is_d:
+            transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)
+        else:
+            transformed_res.res_name[:] = res_name
+        transformed_res.chain_id[:] = "A"
+
+        if i == 0:
+            peptide = transformed_res.copy()
+        else:
+            peptide += transformed_res
+
+        # Store for next iteration (dead code, residue_coordinates takes precedence)
+        prev_n_coord = n_coord
+        prev_ca_coord = ca_coord
+        prev_c_coord = c_coord
+
+    # Ensure global chain_id is 'A'
+    peptide.chain_id = np.array(["A"] * peptide.array_length(), dtype="U1")
+    return peptide
+
+
+def _apply_biophysical_mods(
+    peptide: struc.AtomArray,
+    optimize_sidechains: bool,
+    cap_termini: bool,
+    cyclic: bool,
+    ph: float,
+    metal_ions: str,
+) -> struc.AtomArray:
+    """Apply post-construction biophysical modifications in-place on a copy.
+
+    Order of application matches the original generator logic:
+    1. Monte Carlo sidechain optimization (if requested)
+    2. ACE/NME terminal capping (disabled for cyclic peptides)
+    3. pH-dependent protonation state titration
+    4. Automatic metal-ion injection (Zn coordination motifs)
+
+    Args:
+        peptide: Input AtomArray.
+        optimize_sidechains: Run Monte Carlo rotamer packing.
+        cap_termini: Add ACE/NME caps (ignored when ``cyclic=True``).
+        cyclic: Skip capping for cyclic peptides.
+        ph: Solution pH for histidine protonation state assignment.
+        metal_ions: ``'auto'`` detects Zn coordination sites; any other value skips.
+
+    Returns:
+        Modified AtomArray (may be the same object or a new one with ions).
+    """
+    # EDUCATIONAL NOTE - Biophysical Realism (Phase 2):
+    # We apply chemical modifications after geometric construction/packing but BEFORE
+    # energy minimization. Correct protonation states (pH) are critical for
+    # correct electrostatics in the forcefield.
+
+    # EDUCATIONAL NOTE - Side-Chain Optimization:
+    # If requested, run Monte Carlo optimization to fix steric clashes.
+    # This is "Phase 1" of biophysical realism.
+    if optimize_sidechains:
+        logger.info("Running side-chain optimization...")
+        peptide = run_optimization(peptide)
+
+    # 1. Terminal Capping (ACE/NME) — cyclic peptides are naturally capped.
+    if cap_termini and not cyclic:
+        peptide = biophysics.cap_termini(peptide)
+
+    # 2. pH Titration (Protonation States)
+    peptide = biophysics.apply_ph_titration(peptide, ph=ph)
+
+    # EDUCATIONAL NOTE - Metal Ion Coordination (Phase 15):
+    # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
+    # If a coordination motif is found (Cys/His clusters), the ion is
+    # injected and harmonic constraints are applied in the physics module.
+    if metal_ions == 'auto':
+        from .cofactors import find_metal_binding_sites, add_metal_ion
+        sites = find_metal_binding_sites(peptide)
+        for site in sites:
+            peptide = add_metal_ion(peptide, site)
+
+    return peptide
+
+
+def _do_energy_minimization(
+    peptide: struc.AtomArray,
+    sequence: List[str],
+    forcefield: str,
+    minimization_k: float,
+    minimization_max_iter: int,
+    cyclic: bool,
+    equilibrate: bool,
+    equilibrate_steps: int,
+) -> Tuple[Optional[str], struc.AtomArray]:
+    """Run OpenMM energy minimization (or MD equilibration) and return results.
+
+    Writes a temporary PDB, invokes :class:`.EnergyMinimizer`, and reads the
+    optimized structure back.  PTM residue names (SEP, TPO, PTR) that were
+    reverted to their parent types for forcefield compatibility are restored.
+
+    Args:
+        peptide: Un-minimized AtomArray.
+        sequence: Original amino-acid sequence list (used for PTM restoration).
+        forcefield: Forcefield XML name passed to OpenMM (e.g. ``'amber14-all.xml'``).
+        minimization_k: Energy convergence tolerance (kJ/mol).
+        minimization_max_iter: Max minimization iterations (0 = until convergence).
+        cyclic: If ``True``, caps termini before writing temp PDB for OpenMM.
+        equilibrate: Run MD equilibration instead of pure minimization.
+        equilibrate_steps: Number of 2 fs MD steps for equilibration.
+
+    Returns:
+        ``(atomic_and_ter_content, updated_peptide)`` where *atomic_and_ter_content*
+        is the raw PDB string from OpenMM (or ``None`` on failure) and
+        *updated_peptide* is the (possibly updated) AtomArray.
+    """
+    # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
+    # OpenMM requires a file-based interaction for easy topology handling from PDB.
+    # So we write the current state to a temp file, minimize it, and read it back.
+    logger.info("Running energy minimization (OpenMM)...")
+    try:
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            input_pdb_path = os.path.join(tmpdirname, "pre_min.pdb")
+            output_pdb_path = os.path.join(tmpdirname, "minimized.pdb")
+
+            # CRITICAL Fix for OpenMM: cyclic peptides need terminal caps so
+            # Amber template-matching works, then physics.py prunes them.
+            if cyclic:
+                peptide_to_save = biophysics.cap_termini(peptide)
+            else:
+                peptide_to_save = peptide[peptide.element != "H"]
+
+            pdb_file_write = pdb.PDBFile()
+            pdb_file_write.set_structure(peptide_to_save)
+            pdb_file_write.write(input_pdb_path)
+
+            minimizer = EnergyMinimizer(forcefield_name=forcefield)
+            current_disulfides = _detect_disulfide_bonds(peptide)
+
+            if equilibrate:
+                logger.info(
+                    f"Running MD Equilibration ({equilibrate_steps} steps). "
+                    "This includes minimization."
+                )
+                success = minimizer.equilibrate(
+                    input_pdb_path, output_pdb_path,
+                    steps=equilibrate_steps, cyclic=cyclic,
+                    disulfides=current_disulfides,
+                )
+            else:
+                success = minimizer.add_hydrogens_and_minimize(
+                    input_pdb_path, output_pdb_path,
+                    max_iterations=minimization_max_iter,
+                    tolerance=minimization_k,
+                    cyclic=cyclic,
+                    disulfides=current_disulfides,
+                )
+
+            if not success:
+                logger.error("Minimization failed. Returning un-minimized structure.")
+                return None, peptide
+
+            logger.info("Minimization/Equilibration successful.")
+            with open(output_pdb_path, 'r') as f:
+                atomic_and_ter_content = f.read()
+
+            pdb_file_read = pdb.PDBFile.read(output_pdb_path)
+            peptide = pdb_file_read.get_structure(model=1)
+
+            # RESTORE PTM NAMES (Fix for "Missing Orange Balls"):
+            # OpenMM reverted SEP→SER etc.; restore for downstream viewers.
+            try:
+                unique_res_ids = np.unique(peptide.res_id)
+                n_seq = len(sequence)
+                n_min = len(unique_res_ids)
+                start_offset = 0
+                if n_min > 0:
+                    first_res_id_local = unique_res_ids[0]
+                    mask_first = peptide.res_id == first_res_id_local
+                    if np.any(mask_first):
+                        first_res_name_local = peptide.res_name[mask_first][0]
+                        if first_res_name_local == "ACE":
+                            logger.info(
+                                "Detected N-terminal ACE cap. Applying start offset of 1."
+                            )
+                            start_offset = 1
+                if n_min >= n_seq + start_offset:
+                    for idx, res_name_target in enumerate(sequence):
+                        rid = unique_res_ids[idx + start_offset]
+                        if res_name_target in ['SEP', 'TPO', 'PTR', 'HIE', 'HID', 'HIP']:
+                            mask = peptide.res_id == rid
+                            peptide.res_name[mask] = res_name_target
+            except Exception as ptm_err:
+                logger.warning(f"Failed to restore PTM names: {ptm_err}")
+
+            return atomic_and_ter_content, peptide
+
+    except Exception as e:
+        logger.error(f"Error during minimization workflow: {e}")
+        return None, peptide
+
+
+def _assemble_pdb_output(
+    peptide: struc.AtomArray,
+    atomic_and_ter_content: Optional[str],
+    sequence_length: int,
+    cyclic: bool,
+) -> str:
+    """Assemble the final PDB string with realistic B-factors, occupancy, and records.
+
+    If *atomic_and_ter_content* is ``None`` (no minimization was run), generates
+    the raw PDB from the Biotite AtomArray first.  Then post-processes every
+    ATOM/HETATM line to insert order-parameter-derived B-factors and occupancy,
+    adds a TER record if missing, generates CONECT records for cyclic and
+    disulfide bonds, and delegates final assembly to :func:`.assemble_pdb_content`.
+
+    Args:
+        peptide: Final AtomArray (minimized or raw).
+        atomic_and_ter_content: Raw ATOM-block PDB string from OpenMM, or ``None``.
+        sequence_length: Number of residues (used for PDB header metadata).
+        cyclic: Whether to add a head-to-tail CONECT record.
+
+    Returns:
+        Complete PDB file as a string.
+    """
+    if atomic_and_ter_content is None:
+        peptide.atom_id = np.arange(1, peptide.array_length() + 1)
+        pdb_file_out = pdb.PDBFile()
+        pdb_file_out.set_structure(peptide)
+        string_io = io.StringIO()
+        pdb_file_out.write(string_io)
+        atomic_and_ter_content = string_io.getvalue()
+
+    # EDUCATIONAL NOTE - Adding Realistic B-factors:
+    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
+    # to replace these with realistic values based on atom type, position, and residue type.
+    # This makes the output look more professional and realistic.
+
+    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
+    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
+    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
+    total_residues = len(set(peptide.res_id))
+    s2_map = predict_order_parameters(peptide)
+
+    # Sanitize: Extract only atomic content to avoid header duplication
+    atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
+
+    processed_lines = []
+    n_term_serial = None
+    c_term_serial = None
+    sg_serials: Dict[int, int] = {}
+    serial = 0  # Initialize to avoid UnboundLocalError
+
+    for line in atomic_and_ter_content.splitlines():
+        if line.startswith("ATOM") or line.startswith("HETATM"):
+            serial = int(line[6:11].strip())
+            atom_name = line[12:16].strip()
+            res_name = line[17:20].strip()
+            res_num = int(line[22:26].strip())
+
+            if cyclic:
+                if res_num == 1 and atom_name == "N":
+                    n_term_serial = serial
+                if res_num == total_residues and atom_name == "C":
+                    c_term_serial = serial
+
+            if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
+                sg_serials[res_num] = serial
+
+            current_s2 = s2_map.get(res_num, 0.85)
+            bfactor = _calculate_bfactor(atom_name, res_num, total_residues, res_name, s2=current_s2)
+            occupancy = _calculate_occupancy(atom_name, res_num, total_residues, res_name, bfactor)
+            line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
+
+        processed_lines.append(line)
+
+    atomic_and_ter_content = "\n".join(processed_lines) + "\n"
+
+    # Ensure TER record exists at the end
+    lines = atomic_and_ter_content.strip().splitlines()
+    if not lines:
+        logger.error("Generated PDB content is empty! Falling back to raw sequence string.")
+        return atomic_and_ter_content
+
+    last_line = lines[-1]
+    if last_line.startswith("ATOM") or last_line.startswith("HETATM"):
+        last_atom = peptide[-1]
+        ter_atom_num = serial + 1
+        ter_record = (
+            f"TER   {ter_atom_num: >5}      {last_atom.res_name: >3} "
+            f"{last_atom.chain_id: <1}{last_atom.res_id: >4}"
+        ).ljust(80)
+        atomic_and_ter_content = atomic_and_ter_content.strip() + "\n" + ter_record + "\n"
+
+    # Pad to 80 chars
+    padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]
+    final_atomic_content_block = "\n".join(padded_lines).strip()
+
+    # Generate CONECT records for visualization
+    conect_records = []
+    if cyclic and n_term_serial and c_term_serial:
+        conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
+
+    disulfides = _detect_disulfide_bonds(peptide)
+    ssbond_records = _generate_ssbond_records(disulfides, chain_id='A')
+
+    if disulfides:
+        for r1, r2 in disulfides:
+            s1 = sg_serials.get(r1)
+            s2 = sg_serials.get(r2)
+            if s1 and s2:
+                conect_records.append(f"CONECT{s1:5d}{s2:5d}".ljust(80))
+                conect_records.append(f"CONECT{s2:5d}{s1:5d}".ljust(80))
+
+    conect_block = "\n".join(conect_records)
+    if conect_block:
+        conect_block += "\n"
+
+    return assemble_pdb_content(
+        final_atomic_content_block,
+        sequence_length,
+        command_args=None,
+        extra_records=ssbond_records if ssbond_records else None,
+        conect_records=conect_block if conect_block else None,
+    )
+
+
 def generate_pdb_content(
     length: Optional[int] = None,
     sequence_str: Optional[str] = None,
@@ -790,14 +1541,15 @@ def generate_pdb_content(
        one sequence using the backbone torsion angles of another. This maps a 
        "wrong" sequence to a "right" fold, a key test for discriminative models.
     """
+
     if seed is not None:
-         logger.info(f"Setting random seed to {seed} for reproducibility.")
-         random.seed(seed)
-         np.random.seed(seed)
-    
+        logger.info(f"Setting random seed to {seed} for reproducibility.")
+        random.seed(seed)
+        np.random.seed(seed)
+
     # Use localized random generator for better control and thread-safety
     rng = random.Random(seed)
-         
+
     sequence = _resolve_sequence(
         length=length,
         user_sequence_str=sequence_str,
@@ -805,23 +1557,8 @@ def generate_pdb_content(
     )
 
     # EDUCATIONAL NOTE - Post-Translational Modifications (PTMs):
-    # -----------------------------------------------------------
-    # Phosphorylation (addition of a phosphate group, PO4^3-) is a reversible
-    # modification that acts as a molecular switch.
-    # 
-    # Biophysical Impact:
-    # 1. Electrostatics: Adds a massive negative charge (-2e at physiological pH).
-    #    This can repel nearby negative residues or attract positive ones (Salt Bridges),
-    #    drastically altering the local conformation.
-    # 2. Sterics: The phosphate group is bulky, often forcing the backbone into
-    #    new shapes to accommodate it.
-    #
-    # Simulation:
-    # We convert the standard residue (SER/THR/TYR) to its phosphorylated form
-    # (SEP/TPO/PTR) which OpenMM's AMBER forcefield recognizes and treats with
-    # correct physics (charge and partial double bond parameters).
+    # Phosphorylation converts SER/THR/TYR to SEP/TPO/PTR before geometry build.
     if phosphorylation_rate > 0:
-         # ... conversion logic ...
         modified_sequence = []
         for aa in sequence:
             if aa == 'SER' and random.random() < phosphorylation_rate:
@@ -838,891 +1575,37 @@ def generate_pdb_content(
         if sequence_str is not None and len(sequence_str) == 0:
             raise ValueError("Provided sequence string cannot be empty.")
         raise ValueError(
-            "Length must be a positive integer when no sequence is provided and no valid sequence string is given."
+            "Length must be a positive integer when no sequence is provided "
+            "and no valid sequence string is given."
         )
 
-    # Calculate sequence length first - we need this for parsing structure regions
     sequence_length = len(sequence)
 
-    # EDUCATIONAL NOTE - Input Validation:
-    # We validate the default conformation early to give clear error messages.
-    # Even if structure parameter overrides it for some residues, we need to
-    # ensure the default is valid for any gaps or when structure is not provided.
-    valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random']
-    if conformation not in valid_conformations:
-        raise ValueError(
-            f"Invalid conformation '{conformation}'. "
-            f"Valid options are: {', '.join(valid_conformations)}"
-        )
+    # Build the per-residue {index: conformation} map (validates inputs)
+    residue_conformations = _resolve_conformation_map(sequence, conformation, structure)
 
-    # EDUCATIONAL NOTE - Per-Residue Conformation Assignment:
-    # We now support two modes:
-    # 1. Uniform conformation (old behavior): All residues use same conformation
-    # 2. Per-region conformation (new!): Different regions can have different conformations
-    
-    # Parse per-residue conformations if structure parameter is provided
-    if structure:
-        # Parse the structure specification into a dictionary
-        # mapping residue index (0-based) to conformation name
-        residue_conformations = _parse_structure_regions(structure, sequence_length)
-        
-        # Fill in any gaps with the default conformation
-        # EDUCATIONAL NOTE - Gap Handling:
-        # If a residue is not specified in the structure parameter,
-        # we use the default conformation. This allows users to specify
-        # only the interesting regions and let the rest use a sensible default.
-        for i in range(sequence_length):
-            if i not in residue_conformations:
-                residue_conformations[i] = conformation
-    else:
-        # No structure parameter provided - use uniform conformation for all residues
-        # This maintains backward compatibility with existing code
-        residue_conformations = {i: conformation for i in range(sequence_length)}
-
-    
-    # EDUCATIONAL NOTE - Why We Don't Validate Conformations Here:
-    # We already validated conformations in _parse_structure_regions(),
-    # so we don't need to re-validate them here. The default conformation
-    # will be validated when we actually use it below.
-
-
-    peptide = struc.AtomArray(0)
-    residue_coordinates = {}
-    
-    # Build backbone and add side chains
-    for i, full_res_name in enumerate(sequence):
-        res_id = i + 1
-        
-        # EDUCATIONAL NOTE - D-Amino Acid Handling:
-        # D-amino acids are the mirror images of the standard L-amino acids.
-        # They are rare in ribosomal proteins but common in bacterial cell walls,
-        # peptide antibiotics, and specialized marine toxins.
-        #
-        # Implementation Trick:
-        # Instead of storing separate templates for all D-amino acids, we use 
-        # the standard L-templates and "mirror" the sidechain coordinates 
-        # across the plane defined by the backbone atoms (N, CA, C).
-        is_d = full_res_name.startswith("D-")
-        res_name = full_res_name[2:] if is_d else full_res_name
-        
-        # Determine backbone coordinates based on previous residue or initial placement
-        # Determine conformation for this residue
-        # Use 0-based index to lookup in dictionary
-        # Default to 'alpha' if not specified (though _parse_structure_regions handles this mostly)
-
-        # If no conformation specified and (cyclic OR potential disulfide loop), 
-        # use 'curved' for better initial overlap.
-        res_conformation = residue_conformations.get(i, conformation)
-        if res_conformation == 'alpha' and not structure:
-             # Search the resolved sequence (list of 3-letter codes)
-             cys_count = sum(1 for aa in sequence if "CYS" in aa.upper() or "DCY" in aa.upper())
-             if cyclic or cys_count >= 2:
-                  res_conformation = 'curved'
-        
-        # Compatibility alias for rotamer selection logic downstream
-        current_conformation = res_conformation
-        
-        # Calculate backbone coordinates
-        if i == 0:
-            # First residue (N-terminus)
-            # Place N at origin (0,0,0)
-            n_coord = np.array([0.0, 0.0, 0.0])
-            
-            # Place CA along x-axis
-            ca_coord = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
-            
-            # Place C in x-y plane using N-CA-C angle
-            # We assume a default psi angle to start or just place it geometrically flat first
-            # Ideally, we place it based on the first psi, but we don't have previous omega.
-            # Simplified: Place C such that N-CA-C angle is correct in x-y plane.
-            
-            # Calculate coordinates for C
-            # Using simple trigonometry for the first angle
-            # x = CA_x + d * cos(pi - angle)
-            # y = CA_y + d * sin(pi - angle)
-            
-            # Correction: N is at origin, CA is at (d, 0, 0).
-            # Vector CA->N is (-1, 0, 0).
-            # We want vector CA->C to have angle ANGLE_N_CA_C with CA->N.
-            # So angle with x-axis is (180 - angle).
-            angle_with_x = np.pi - ANGLE_N_CA_C_RAD
-            
-            c_x = ca_coord[0] + BOND_LENGTH_CA_C * np.cos(angle_with_x)
-            c_y = ca_coord[1] + BOND_LENGTH_CA_C * np.sin(angle_with_x)
-            c_z = 0.0
-            c_z = 0.0
-            c_coord = np.array([c_x, c_y, c_z])
-            
-            # Initialize current_psi for usage in next iteration logic or end of loop
-            if res_conformation in RAMACHANDRAN_PRESETS:
-                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
-            elif res_conformation == 'random':
-                 # Check next residue
-                 next_res_name = sequence[i+1] if i + 1 < sequence_length else None
-                 _, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
-            elif res_conformation in BETA_TURN_TYPES:
-                # Residue 1 of turn?
-                # For i=0, it's always pos 1 of ANY structure starting at 1.
-                # If generated logic requires robust turn pos:
-                current_psi = RAMACHANDRAN_PRESETS['extended']['psi'] # Entry to turn
-            else:
-                current_psi = -47.0 # Default Alpha
-            
-        else:
-            # For subsequent residues, we place atoms N, CA, C using internal coordinates
-            # defined by previous atoms.
-            
-            prev_res_idx = i - 1
-            prev_coords = residue_coordinates[prev_res_idx]
-            prev_n_coord = prev_coords['N']
-            prev_ca_coord = prev_coords['CA']
-            prev_c_coord = prev_coords['C']
-            
-            # Determine Phi/Psi angles
-            # Note: Phi is torsion of C(i-1)-N(i)-CA(i)-C(i)
-            # Psi is torsion of N(i)-CA(i)-C(i)-N(i+1)
-            # Omega is torsion of CA(i-1)-C(i-1)-N(i)-CA(i) -- Peptide bond
-            
-            # Get next residue name if available
-            next_full_res_name = sequence[i+1] if i + 1 < sequence_length else None
-            next_res_name = next_full_res_name[2:] if next_full_res_name and next_full_res_name.startswith("D-") else next_full_res_name
-            
-            # 1. Place N(i)
-            # Bond: C(i-1)-N(i)
-            # Angle: CA(i-1)-C(i-1)-N(i)
-            # Dihedral: Psi(i-1) - typically ~180 for trans? No, Omega is the peptide bond dihedral.
-            # Wait. Omega is CA(prev)-C(prev)-N(curr)-CA(curr).
-            # The dihedral to place N(curr) relative to prev_N, prev_CA, prev_C is PSI(prev).
-            # No.
-            # Chain: ... N(prev) - CA(prev) - C(prev) - N(curr) ...
-            # To place N(curr), we need:
-            # - Bond: C(prev)-N(curr)
-            # - Angle: CA(prev)-C(prev)-N(curr) (Angle 1)
-            # - Dihedral: N(prev)-CA(prev)-C(prev)-N(curr) -> This is PSI(prev)
-            
-            # Retrieve Psi from previous residue's conformation
-            prev_conformation = residue_conformations.get(prev_res_idx, conformation)
-            
-            current_phi = None
-            current_psi = None
-
-            # Handle Beta-Turns explicitly
-            # If we are in a turn, the angles are fixed based on position in turn.
-            # Need to know which residue of the turn we are (1, 2, 3, 4)
-            # We need to find the START of this turn region to calculate offset.
-            # This is slightly inefficient but robust: find the range this index belongs to.
-            # Since we stored per-residue conformations, we don't have the ranges directly.
-            # But we can infer position:
-            # If prev_conformation is 'typeI', check i-1, i-2, i-3 to find start.
-            
-            # Check if we are residue 2 or 3 of the turn (the ones with angles).
-            # Res 1: i (start)
-            # Res 2: i+1 (offset 1) -> Has specific Phi/Psi
-            # Res 3: i+2 (offset 2) -> Has specific Phi/Psi
-            # Res 4: i+3 (end)
-            
-            # To place N(i), we use Psi(i-1).
-            # If prev_res (i-1) was Res 1 of turn, use random/default Psi? Or Helix/Sheet?
-            # Actually, Beta-Turns define Phi2, Psi2, Phi3, Psi3.
-            # Psi1 and Phi4 are not strictly defined (they connect to rest of chain).
-            
-            # Let's handle standard sampling first, then override if specific turn res.
-            pass
-
-            if prev_conformation in RAMACHANDRAN_PRESETS:
-                prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]['psi']
-            elif prev_conformation in BETA_TURN_TYPES:
-                # Logic to determine Psi based on position in turn
-                # Scan backward to find start of turn
-                start_dist = 0
-                while (prev_res_idx - start_dist) >= 0 and residue_conformations.get(prev_res_idx - start_dist) == prev_conformation:
-                    start_dist += 1
-                # start_dist is now how far back the block goes.
-                # If we are at i, prev is i-1.
-                # If block is 0,1,2,3. i=1 (Res 2). prev=0 (Res 1).
-                # start_dist would be 1 (since 0 is same).
-                # Position index within turn for prev_res:
-                # Turn length is 4.
-                # We need to forward-scan to find total length? No, we validated it's 4.
-                # So if we are in a block of 4, we need to know index 0..3
-                
-                # This is tricky with just the dict.
-                # Let's look at i-1. Is it the 1st, 2nd, 3rd residue of the turn?
-                # Check i-2. If same type, not 1st.
-                # Check i-3. If same type.
-                
-                c_prev = prev_conformation
-                if residue_conformations.get(prev_res_idx - 1) != c_prev:
-                    turn_pos = 1 # Prev is 1st residue.
-                elif residue_conformations.get(prev_res_idx - 2) != c_prev:
-                    turn_pos = 2 # Prev is 2nd residue.
-                elif residue_conformations.get(prev_res_idx - 3) != c_prev:
-                    turn_pos = 3 # Prev is 3rd residue.
-                else:
-                    turn_pos = 4 # Prev is 4th residue.
-                
-                # Turn angles defined for Res 2 and Res 3.
-                # "Type": [(Phi2, Psi2), (Phi3, Psi3)]
-                turn_angles = BETA_TURN_TYPES[prev_conformation]
-                
-                if turn_pos == 1:
-                    # Prev is Res 1. We need Psi1.
-                    # Turns usually connect strands, so Psi1 is often sheet-like/extended?
-                    # Or we sample random 'general'.
-                    # Ideally we'd be robust. Let's use 'extended' for entry into turn as default.
-                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi'] 
-                elif turn_pos == 2:
-                    # Prev is Res 2. We need Psi2.
-                    prev_psi = turn_angles[0][1]
-                elif turn_pos == 3:
-                    # Prev is Res 3. We need Psi3.
-                    prev_psi = turn_angles[1][1]
-                else: # turn_pos == 4 (End of turn)
-                    # Prev is Res 4. We need Psi4.
-                    # Exit turn. Use extended or helix default.
-                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi']
-                 
-            elif prev_conformation == 'random':
-                # Use the stored psi if we generated it?
-                # We synthesize fresh here. This ignores continuity if we don't store.
-                # Ideally we should generate all angles first.
-                # But current loop generates on fly.
-                # For 'random', we re-sample. This is inconsistent if we need Phi/Psi pairs.
-                # Assuming simple independent sampling for now as per original code.
-                
-                # Get base name for prev_res if it was D
-                prev_full_res_name = sequence[prev_res_idx]
-                prev_base_res_name = prev_full_res_name[2:] if prev_full_res_name.startswith("D-") else prev_full_res_name
-                _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name)
-
-            else:
-                # Should not happen
-                prev_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
-
-            # CRITICAL FIX for OpenMM Minimization:
-            # Force standard bond geometry when transitioning between distinct conformations.
-            # The simple NeRF algorithm relies on the previous frame being perfectly geometric.
-            # If standard sampling leads to a weird Psi, the next N placement might be valid spatially
-            # but OpenMM's bond heuristic is strict.
-            # We explicitly ensure C-N bond length is EXACTLY BOND_LENGTH_C_N (1.33A).
-            
-            n_coord = _place_atom_with_dihedral(
-                prev_n_coord, prev_ca_coord, prev_c_coord,
-                BOND_LENGTH_C_N,
-                ANGLE_CA_C_N, # Angle at C: CA-C-N
-                prev_psi
-            )
-            
-            # 2. Place CA(i)
-            # Bond: N(i)-CA(i)
-            # Angle: C(prev)-N(i)-CA(i)
-            # Dihedral: CA(prev)-C(prev)-N(i)-CA(i) -> This is OMEGA (Peptide bond)
-            
-            # Sample Omega
-            # Check for Cis-Proline
-            omega_mean = OMEGA_TRANS # 180
-            if res_name == 'PRO' and random.random() < cis_proline_frequency:
-                omega_mean = 0.0 # Cis
-            
-            # Sample with variation
-            if omega_list is not None and i > 0 and (i-1) < len(omega_list):
-                omega = omega_list[i-1]
-            else:
-                omega = np.random.normal(omega_mean, OMEGA_VARIATION)
-            
-            ca_coord = _place_atom_with_dihedral(
-                prev_ca_coord, prev_c_coord, n_coord,
-                BOND_LENGTH_N_CA,
-                ANGLE_C_N_CA,
-                omega
-            )
-            
-            # 3. Place C(i)
-            # Bond: CA(i)-C(i)
-            # Angle: N(i)-CA(i)-C(i)
-            # Dihedral: C(prev)-N(i)-CA(i)-C(i) -> This is PHI(i)
-            
-            # 3a. Determine Phi/Psi for this residue
-            if phi_list is not None and i < len(phi_list) and psi_list is not None and i < len(psi_list):
-                current_phi = phi_list[i]
-                current_psi = psi_list[i]
-            elif res_conformation in RAMACHANDRAN_PRESETS:
-                current_phi = RAMACHANDRAN_PRESETS[res_conformation]['phi']
-                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
-            elif res_conformation in BETA_TURN_TYPES:
-                # Same logic as Psi, but for current residue Phi
-                c_curr = res_conformation
-                # Find position of CURRENT residue
-                if residue_conformations.get(i - 1) != c_curr:
-                    turn_pos = 1 # Current is 1st residue.
-                elif residue_conformations.get(i - 2) != c_curr:
-                    turn_pos = 2 # Current is 2nd residue.
-                elif residue_conformations.get(i - 3) != c_curr:
-                    turn_pos = 3 # Current is 3rd residue.
-                else:
-                    turn_pos = 4 # Current is 4th residue.
-                
-                turn_angles = BETA_TURN_TYPES[res_conformation]
-                if turn_pos == 1:
-                    # Entry into turn. Phi1/Psi1.
-                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi']
-                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
-                elif turn_pos == 2:
-                    current_phi = turn_angles[0][0] # Phi2
-                    current_psi = turn_angles[0][1] # Psi2
-                elif turn_pos == 3:
-                    current_phi = turn_angles[1][0] # Phi3
-                    current_psi = turn_angles[1][1] # Psi3
-                else:
-                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi'] # Phi4
-                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi'] # Psi4
-
-            elif res_conformation == 'random':
-                current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
-            else:
-                current_phi = RAMACHANDRAN_PRESETS['alpha']['phi']
-                current_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
-
-            # Apply hard decoy drift (if specified)
-            if drift > 0:
-                current_phi += rng.uniform(-drift, drift)
-                current_psi += rng.uniform(-drift, drift)
-                # Keep within standard PDB dihedral range [-180, 180]
-                current_phi = ((current_phi + 180) % 360) - 180
-                current_psi = ((current_psi + 180) % 360) - 180
-            
-            # Place C(i)
-            c_coord = _place_atom_with_dihedral(
-                prev_c_coord, n_coord, ca_coord,
-                BOND_LENGTH_CA_C,
-                ANGLE_N_CA_C,
-                current_phi
-            )
-            # D-amino acids are stereochemically the mirror image of standard L-amino acids.
-            # This applies not just to the sidechains, but to the backbone energetic landscape.
-            # A D-residue naturally "wants" to have Phi/Psi angles that are the negative of
-            # its L-counterpart. We multiply by -1.0 to reflect the conformation into 
-            # the "right-handed" region of the Ramachandran plot.
-            if is_d:
-                current_phi *= -1.0
-                current_psi *= -1.0
-                 
-            c_coord = _place_atom_with_dihedral(
-                prev_c_coord, n_coord, ca_coord,
-                BOND_LENGTH_CA_C,
-                ANGLE_N_CA_C,
-                current_phi
-            )
-
-
-        # Store coordinates for next iteration (NeRF needs them)
-        residue_coordinates[i] = {
-            'N': n_coord,
-            'CA': ca_coord,
-            'C': c_coord
-        }
-
-        # Store Psi for next iteration
-        prev_psi = current_psi
-        
-        # Get reference residue from biotite
-        # CRITICAL FIX: Always use .copy() because struc.info.residue returns cached templates.
-        # Modifying the template in-place causes subsequent residues of the same type to be broken.
-        if i == 0: # N-terminal residue
-            #ref_res_template = struc.info.residue(res_name, 'N_TERM').copy() # Not supported in all biotite versions - Roberto Tejero
-            ref_res_template = struc.info.residue(res_name).copy()
-        elif i == len(sequence) - 1: # C-terminal residue
-            #ref_res_template = struc.info.residue(res_name, 'C_TERM').copy() # Not supported in all biotite versions - Roberto Tejero
-            ref_res_template = struc.info.residue(res_name).copy()
-        else: # Internal residue
-            #ref_res_template = struc.info.residue(res_name, 'INTERNAL').copy() # Not supported in all biotite versions - Roberto Tejero
-            ref_res_template = struc.info.residue(res_name).copy()
-
-        # EDUCATIONAL NOTE - Peptide Bond Chemistry:
-        # A peptide bond forms via dehydration synthesis (loss of H2O).
-        # The Carboxyl group (COOH) of one amino acid joins the Amine group (NH2) of the next.
-        # This means internal residues lose their terminal Oxygen (OXT) and associated Hydrogens.
-        # We must explicitly remove terminal-only atoms from all residues to represent 
-        # a continuous polypeptide chain correctly and avoid OpenMM template errors.
-        
-        # EDUCATIONAL NOTE - Terminal Atom Management in Rings:
-        # In a linear peptide, the ends are "unfinished" (OXT at C-term, extra H at N-term).
-        # In a cyclic peptide, these atoms are SACRIFICED to form the peptide bond 
-        # between the ends. Failing to remove them leads to "impossible" geometry
-        # with 5-valent carbons or nitrogen atoms with too many bonds.
-        
-        # 1. Remove OXT for all except absolute C-terminus
-        # If cyclic, even the absolute C-terminus loses OXT to form the head-to-tail bond.
-        if i < len(sequence) - 1 or cyclic:
-            ref_res_template = ref_res_template[ref_res_template.atom_name != "OXT"]
-            # Also remove HXT (Hydroxyl Hydrogen) if present in template
-            ref_res_template = ref_res_template[ref_res_template.atom_name != "HXT"]
-            
-        # 2. Remove extra N-terminal Hydrogens (H2, H3) for all except absolute N-terminus
-        # If cyclic, even the absolute N-terminus loses H2/H3 as it's no longer a zwitterion.
-        if i > 0 or cyclic:
-            ref_res_template = ref_res_template[ref_res_template.atom_name != "H2"]
-            ref_res_template = ref_res_template[ref_res_template.atom_name != "H3"]
-            
-            # PROLINE FIX: Internal/Cyclic Proline has NO amide hydrogen (H).
-            # Biotite templates often include a single 'H' which must be stripped
-            # to avoid OpenMM template mismatch errors in cyclic peptides.
-            if res_name == "PRO":
-                ref_res_template = ref_res_template[ref_res_template.atom_name != "H"]
-
-        # 3. Apply rotamers if available
-        # EDUCATIONAL NOTE - Rotamer Selection Strategy:
-        # We employ a 'Backbone-Dependent' selection strategy where possible.
-        # This means we check the residue's secondary structure context (Helix vs Sheet)
-        # to choose the most likely side-chain conformation.
-        # Logic:
-        # 1. Check if specific rotamers exist for this residue + conformation in BACKBONE_DEPENDENT_LIB.
-        # 2. If not, fall back to the generic ROTAMER_LIBRARY (Backbone-Independent).
-        
-        rotamers = None
-        
-        # Try Backbone-Dependent Lookup first
-        # current_conformation is available from earlier in the loop (e.g., 'alpha', 'beta')
-        # Try Backbone-Dependent Lookup first
-        # current_conformation is available from earlier in the loop (e.g., 'alpha', 'beta')
-        # Try Backbone-Dependent Lookup first
-        # current_conformation is available from earlier in the loop (e.g., 'alpha', 'beta')
-        if res_name in BACKBONE_DEPENDENT_ROTAMER_LIBRARY:
-            if current_conformation in BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name]:
-                rotamers = BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name][current_conformation]
-        
-        # Fallback to Backbone-Independent Library
-        if rotamers is None and res_name in ROTAMER_LIBRARY:
-            rotamers = ROTAMER_LIBRARY[res_name]
-            
-        if rotamers:
-            # Weighted random selection based on experimental probabilities
-            weights = [r.get('prob', 0.0) for r in rotamers]
-            selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
-                
-            # Apply chi angles
-            if 'chi1' in selected_rotamer:
-                chi1_target = selected_rotamer["chi1"][0]
-                
-                # Logic to find the gamma atom (CG, CG1, OG, OG1, SG) for Chi1 definition (N-CA-CB-Gamma)
-                # Priority: CG > CG1 > OG > OG1 > SG
-                gamma_atom_name = None
-                for candidate in ["CG", "CG1", "OG", "OG1", "SG"]:
-                    if len(ref_res_template[ref_res_template.atom_name == candidate]) > 0:
-                        gamma_atom_name = candidate
-                        break
-                
-                if gamma_atom_name:
-                    # EDUCATIONAL NOTE - Sidechain Rotation:
-                    # Instead of placing a single atom (which breaks branched residues like VAL),
-                    # we rotate the ENTIRE sidechain about the CA-CB axis to reach target chi1.
-                    # We removed the +180.0 offset because NeRF and IUPAC both use 0 for Cis.
-                    ca_atom = ref_res_template[ref_res_template.atom_name == "CA"][0]
-                    cb_atom = ref_res_template[ref_res_template.atom_name == "CB"][0]
-                    n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
-                    g_atom = ref_res_template[ref_res_template.atom_name == gamma_atom_name][0]
-                    
-                    current_chi1 = calculate_dihedral_angle(
-                        n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
-                    )
-                    # Rodrigues rotation formula CCW looking down CA->CB 
-                    # results in a NEGATIVE change in dihedral angle in our convention?
-                    # No, with standard IUPAC, Rotation (+CCW) adds to Dihedral.
-                    # So rotation_angle = target - current
-                    diff_deg = chi1_target - current_chi1
-                    
-                    # Rotate all atoms downstream of CB
-                    # We identify sidechain atoms as everything except N, CA, C, O, H, HA
-                    backbone_names = {"N", "CA", "C", "O", "H", "HA", "CB"}
-                    for atom_idx in range(len(ref_res_template)):
-                        if ref_res_template.atom_name[atom_idx] not in backbone_names:
-                            # Rotate point about CA-CB axis
-                            p = ref_res_template.coord[atom_idx]
-                            v = cb_atom.coord - ca_atom.coord
-                            v /= np.linalg.norm(v)
-                            
-                            # Rodrigues' rotation formula
-                            alpha = np.deg2rad(diff_deg)
-                            cos_a = np.cos(alpha)
-                            sin_a = np.sin(alpha)
-                            
-                            rel_p = p - ca_atom.coord
-                            rotated_p = (
-                                rel_p * cos_a + 
-                                np.cross(v, rel_p) * sin_a + 
-                                v * np.dot(v, rel_p) * (1 - cos_a)
-                            )
-                            ref_res_template.coord[atom_idx] = rotated_p + ca_atom.coord
-            
-        # Extract N, CA, C from ref_res_template
-        # Ensure these atoms are present in the template for superimposition
-        template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
-        template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
-        template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
-
-        # Concatenate backbone atoms into a single AtomArray
-        # We must have exactly 3 atoms (N, CA, C) to match the target array
-        mobile_backbone_from_template = template_backbone_n + template_backbone_ca + template_backbone_c
-        
-        if len(mobile_backbone_from_template) != 3:
-            raise ValueError(
-                f"Reference residue template for {res_name} is missing required "
-                f"backbone atoms (N, CA, C) for superimposition. "
-                f"Found atoms: {list(mobile_backbone_from_template.atom_name)}"
-            )
-
-        # Create the 'target' structure for superimposition from the *constructed* coordinates
-        target_backbone_constructed = struc.array([
-            struc.Atom(n_coord, atom_name="N", res_id=res_id, res_name=res_name, element="N", hetero=False),
-            struc.Atom(ca_coord, atom_name="CA", res_id=res_id, res_name=res_name, element="C", hetero=False),
-            struc.Atom(c_coord, atom_name="C", res_id=res_id, res_name=res_name, element="C", hetero=False)
-        ])
-        
-        # AHA MOMENT - Superimposition Direction:
-        # In the "AI Trinity" debugging phase, we found that residues were disconnected 
-        # (6A-13A gaps). This was due to superimposing the backbone onto the template 
-        # instead of moving the template into our newly constructed global frame.
-        # Fixed: target=constructed_frame, mobile=residue_template.
-        _, transformation = struc.superimpose(target_backbone_constructed, mobile_backbone_from_template)
-        
-        # Apply transformation to the entire reference residue template
-        transformed_res = ref_res_template
-        transformed_res.coord = transformation.apply(transformed_res.coord)
-        
-        # EDUCATIONAL NOTE - Chiral Mirroring strategy:
-        # -------------------------------------------
-        # To convert an L-amino acid to a D-amino acid without separate templates,
-        # we treat the CA as the origin and the N-CA-C plane as our mirror.
-        #
-        # Why Mirroring Works:
-        # 1. Geometry Preservation: Mirroring across the backbone plane preserves 
-        #    all bond lengths and angles within the sidechain.
-        # 2. Stereocenter Inversion: This transformation exactly inverts the 
-        #    chirality at the C-alpha atom (from L to D).
-        # 3. Backbone Compatibility: Because we reflect *across* the backbone plane, 
-        #    the positions of the backbone atoms (N, CA, C) remain unchanged, 
-        #    ensuring the chain connectivity is not broken.
-        if is_d and res_name != "GLY":
-            # 1. Define the plane normal vector n = (C-CA) x (N-CA)
-            vec1 = c_coord - ca_coord
-            vec2 = n_coord - ca_coord
-            normal = np.cross(vec1, vec2)
-            normal /= np.linalg.norm(normal)
-            
-            # 2. Identify sidechain atoms (everything except N, CA, C, O, H, HA)
-            backbone_names = {"N", "CA", "C", "O", "H", "HA"}
-            for atom_idx in range(len(transformed_res)):
-                if transformed_res.atom_name[atom_idx] not in backbone_names:
-                    # 3. Reflect point across the plane passing through ca_coord with normal
-                    p = transformed_res.coord[atom_idx]
-                    w = p - ca_coord
-                    dist_to_plane = np.dot(w, normal)
-                    # New position = p - 2 * (projection onto normal)
-                    transformed_res.coord[atom_idx] = p - 2 * dist_to_plane * normal
-        
-        # Set residue ID and name for the transformed residue
-        transformed_res.res_id[:] = res_id
-        # EDUCATIONAL NOTE - D-Residue Naming:
-        # We use a 4-letter prefix 'D' (e.g., DALA, DGLU) to distinguish
-        # D-amino acids from their L-counterparts in the PDB file.
-        # This makes it easier for validators and downstream tools to recognize the chirality.
-        if is_d:
-            transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)
-        else:
-            transformed_res.res_name[:] = res_name
-        transformed_res.chain_id[:] = "A" # Ensure chain ID is set
-        
-        # Append the transformed residue to the peptide
-        if i == 0:
-            peptide = transformed_res.copy()
-        else:
-            peptide += transformed_res
-            
-        # Store these for next iteration
-        # Use BOTH the construction coordinates AND the transformed ones if needed?
-        # Actually, NeRF needs the PREVIOUS frame. 
-        # To perfectly connect residues, we MUST use the coordinates where we placed 
-        # C of the previous residue.
-        prev_n_coord = n_coord
-        prev_ca_coord = ca_coord
-        prev_c_coord = c_coord
-    
-    # After all residues are added, ensure global chain_id is 'A' (redundant if already set above, but good safeguard)
-    peptide.chain_id = np.array(["A"] * peptide.array_length(), dtype="U1")
-    
-    # EDUCATIONAL NOTE - Side-Chain Optimization:
-    # If requested, run Monte Carlo optimization to fix steric clashes.
-    # This is "Phase 1" of biophysical realism.
-    if optimize_sidechains:
-        logger.info("Running side-chain optimization...")
-        peptide = run_optimization(peptide)
-
-    # EDUCATIONAL NOTE - Biophysical Realism (Phase 2):
-    # We apply chemical modifications after geometric construction/packing but BEFORE 
-    # energy minimization. Correct protonation states (pH) are critical for 
-    # correct electrostatics in the forcefield.
-    
-    # 1. Terminal Capping (ACE/NME) - If requested
-    # Cyclic peptides are naturally "capped" by their own ends, so we disable this.
-    if cap_termini and not cyclic:
-         peptide = biophysics.cap_termini(peptide)
-         
-    # 2. pH Titration (Protonation States)
-    # Adjusts HIS -> HIP/HIE/HID based on pH.
-    peptide = biophysics.apply_ph_titration(peptide, ph=ph)
-
-
-    # EDUCATIONAL NOTE - Metal Ion Coordination (Phase 15):
-    # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
-    # If a coordintion motif is found (Cys/His clusters), the ion is 
-    # injected and harmonic constraints are applied in the physics module.
-    if metal_ions == 'auto':
-        from .cofactors import find_metal_binding_sites, add_metal_ion
-        sites = find_metal_binding_sites(peptide)
-        for site in sites:
-            peptide = add_metal_ion(peptide, site)
-
-
-    # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
-    # OpenMM requires a file-based interaction usually for easy topology handling from PDB.
-    # So we write the current state to a temp file, minimize it, and read it back (or return the content).
-    atomic_and_ter_content = None
-    if minimize_energy:
-        logger.info("Running energy minimization (OpenMM)...")
-        try:
-            # We need a temp file for input
-            # Create a temporary directory to avoid race conditions/clutter
-            with tempfile.TemporaryDirectory() as tmpdirname:
-                input_pdb_path = os.path.join(tmpdirname, "pre_min.pdb")
-                output_pdb_path = os.path.join(tmpdirname, "minimized.pdb")
-                
-                # Write current peptide to input_pdb_path
-                # We need to construct a basic PDB file first
-                # Use atomic content + minimal header
-                
-                # CRITICAL Fix for OpenMM:
-                # OpenMM's Amber forcefield requires terminal capping groups (ACE/NME) 
-                # or standard protonation states to match templates.
-                # For CYCLIC peptides, we temporarily add caps to satisfy the engine,
-                # then prune them in physics.py cleanup.
-                if cyclic:
-                    peptide_to_save = biophysics.cap_termini(peptide)
-                else:
-                    peptide_to_save = peptide[peptide.element != "H"]
-                
-                # Actually we can use assemble_pdb_content but we need atomic lines first
-                # Or just use biotite to write
-                pdb_file = pdb.PDBFile()
-                pdb_file.set_structure(peptide_to_save)
-                pdb_file.write(input_pdb_path)
-                
-                minimizer = EnergyMinimizer(forcefield_name=forcefield)
-                
-                # We use add_hydrogens_and_minimize because synth-pdb lacks H by default
-                # Detect restraints for physics
-                current_disulfides = _detect_disulfide_bonds(peptide)
-                # Note: Coordination currently handles Zn motifs
-                # generator.py calls cofactors.find_metal_binding_sites earlier
-                # but we need to pass them to physics. For now, we'll focus on disulfides
-                # which are established by proximity.
-                
-                if equilibrate:
-                    logger.info(f"Running MD Equilibration ({equilibrate_steps} steps). This includes minimization.")
-                    success = minimizer.equilibrate(
-                        input_pdb_path, 
-                        output_pdb_path, 
-                        steps=equilibrate_steps,
-                        cyclic=cyclic,
-                        disulfides=current_disulfides
-                    )
-                else:
-                    success = minimizer.add_hydrogens_and_minimize(
-                        input_pdb_path, 
-                        output_pdb_path,
-                        max_iterations=minimization_max_iter,
-                        tolerance=minimization_k,
-                        cyclic=cyclic,
-                        disulfides=current_disulfides
-                    )
-                
-                if success:
-                    logger.info("Minimization/Equilibration successful.")
-                    # Read back the optimized structure
-                    with open(output_pdb_path, 'r') as f:
-                        atomic_and_ter_content = f.read()
-                    
-                    pdb_file = pdb.PDBFile.read(output_pdb_path)
-                    peptide = pdb_file.get_structure(model=1)
-                    
-                    # RESTORE PTM NAMES (Fix for "Missing Orange Balls"):
-                    # OpenMM minimization required reverting SEP->SER etc.
-                    # We now restore the original names so the viewer (and user) knows 
-                    # where the PTMs are, even if the Phosphate atom is missing (sacrificed for physics).
-                    # The sequence list contains the INTENDED residue names.
-                    # We assume 1-to-1 mapping (residue indices align).
-                    try:
-                        unique_res_ids = np.unique(peptide.res_id)
-                        n_seq = len(sequence)
-                        n_min = len(unique_res_ids)
-                        
-                        start_offset = 0
-                        
-                        # Robust Offset Detection:
-                        if n_min > 0:
-                            first_res_id = unique_res_ids[0]
-                            mask_first = peptide.res_id == first_res_id
-                            if np.any(mask_first):
-                                first_res_name = peptide.res_name[mask_first][0]
-                                if first_res_name == "ACE":
-                                    logger.info("Detected N-terminal ACE cap. Applying start offset of 1.")
-                                    start_offset = 1
-                        
-                        if n_min >= n_seq + start_offset:
-                            for i, res_name_target in enumerate(sequence):
-                                rid = unique_res_ids[i + start_offset]
-                                if res_name_target in ['SEP', 'TPO', 'PTR', 'HIE', 'HID', 'HIP']:
-                                    mask = peptide.res_id == rid
-                                    peptide.res_name[mask] = res_name_target
-                    except Exception as e:
-                        logger.warning(f"Failed to restore PTM names: {e}")
-                    
-                else:
-                    logger.error("Minimization failed. Returning un-minimized structure.")
-                    atomic_and_ter_content = None
-        except Exception as e:
-            logger.error(f"Error during minimization workflow: {e}")
-            # Fallthrough to return original peptide content
-            atomic_and_ter_content = None
-
-    if atomic_and_ter_content is None:
-        # Assign sequential atom_id to all atoms in the peptide AtomArray
-        peptide.atom_id = np.arange(1, peptide.array_length() + 1)
-    
-        pdb_file = pdb.PDBFile()
-        pdb_file.set_structure(peptide)
-        
-        string_io = io.StringIO()
-        pdb_file.write(string_io)
-        
-        # Biotite's PDBFile.write() will write ATOM records, which can be 78 or 80 chars.
-        # It also handles TER records between chains, but not necessarily at the end of a single chain.
-        atomic_and_ter_content = string_io.getvalue()
-    
-    # EDUCATIONAL NOTE - Adding Realistic B-factors:
-    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
-    # to replace these with realistic values based on atom type, position, and residue type.
-    # This makes the output look more professional and realistic.
-    
-    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
-    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
-    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
-    
-    # Get total number of residues for B-factor and occupancy calculation
-    total_residues = len(set(peptide.res_id))
-    
-    # Calculate Order Parameters (S2) for the generated structure
-    # This ensures consistency between the structure (Helices/Loops) and the Data (B-factors/Relaxation).
-    s2_map = predict_order_parameters(peptide)
-    
-    # Sanitize: Extract only atomic content to avoid header duplication/mess
-    atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
-    
-    # Process each line and add realistic B-factors and occupancy
-    processed_lines = []
-    
-    # Track atom serials for CONECT records (visualization support)
-    n_term_serial = None
-    c_term_serial = None
-    sg_serials = {} # res_num -> serial
-    serial = 0 # Initialize to avoid UnboundLocalError
-    
-    for line in atomic_and_ter_content.splitlines():
-        if line.startswith("ATOM") or line.startswith("HETATM"):
-            # Serial is in columns 7-11 (0-indexed: 6-11)
-            serial = int(line[6:11].strip())
-            atom_name = line[12:16].strip()
-            res_name = line[17:20].strip()
-            res_num = int(line[22:26].strip())
-            
-            # Collect serials for cyclic/disulfide CONECT records
-            if cyclic:
-                if res_num == 1 and atom_name == "N":
-                    n_term_serial = serial
-                if res_num == total_residues and atom_name == "C":
-                    c_term_serial = serial
-            
-            if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
-                sg_serials[res_num] = serial
-
-            # Lookup S2 for this residue (default 0.85 if not found)
-            current_s2 = s2_map.get(res_num, 0.85)
-
-            # Calculate realistic B-factor (temperature factor) for this atom
-            bfactor = _calculate_bfactor(atom_name, res_num, total_residues, res_name, s2=current_s2)
-            
-            # Calculate realistic occupancy for this atom (correlates with B-factor)
-            occupancy = _calculate_occupancy(atom_name, res_num, total_residues, res_name, bfactor)
-            
-            # Replace B-factor and occupancy in the line
-            line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
-        
-        processed_lines.append(line)
-    
-    atomic_and_ter_content = "\n".join(processed_lines) + "\n"
-
-    # Ensure TER record exists at the end
-    lines = atomic_and_ter_content.strip().splitlines()
-    if not lines:
-        logger.error("Generated PDB content is empty! Falling back to raw sequence string.")
-        return atomic_and_ter_content
-    
-    last_line = lines[-1]
-    if last_line.startswith("ATOM") or last_line.startswith("HETATM"):
-        last_atom = peptide[-1]
-        # serial is guaranteed to be at least its initial value 0
-        ter_atom_num = serial + 1
-        ter_record = f"TER   {ter_atom_num: >5}      {last_atom.res_name: >3} {last_atom.chain_id: <1}{last_atom.res_id: >4}".ljust(80)
-        atomic_and_ter_content = atomic_and_ter_content.strip() + "\n" + ter_record + "\n"
-
-    # Ensure each line is 80 characters
-    padded_atomic_and_ter_content_lines = []
-    for line in atomic_and_ter_content.splitlines():
-        padded_atomic_and_ter_content_lines.append(line.ljust(80))
-    
-    final_atomic_content_block = "\n".join(padded_atomic_and_ter_content_lines).strip()
-    
-    # Generate CONECT records for visualization
-    conect_records = []
-    if cyclic and n_term_serial and c_term_serial:
-        conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
-    
-    # Detect disulfides to get records and serials
-    disulfides = _detect_disulfide_bonds(peptide)
-    ssbond_records = _generate_ssbond_records(disulfides, chain_id='A')
-    
-    if disulfides:
-        for r1, r2 in disulfides:
-            s1 = sg_serials.get(r1)
-            s2 = sg_serials.get(r2)
-            if s1 and s2:
-                # Add both directions for bidirectional CONECT
-                conect_records.append(f"CONECT{s1:5d}{s2:5d}".ljust(80))
-                conect_records.append(f"CONECT{s2:5d}{s1:5d}".ljust(80))
-
-    conect_block = "\n".join(conect_records)
-    if conect_block:
-        conect_block += "\n"
-
-
-    # Final assembly using centralized utility
-    return assemble_pdb_content(
-        final_atomic_content_block,
-        sequence_length,
-        command_args=_build_command_string(args) if 'args' in locals() else None,
-        extra_records=ssbond_records if ssbond_records else None,
-        conect_records=conect_block if conect_block else None
+    # Build backbone + sidechains via NeRF geometry
+    peptide = _build_peptide_chain(
+        sequence, residue_conformations, conformation, structure, cyclic,
+        cis_proline_frequency, drift, phi_list, psi_list, omega_list, rng,
     )
 
+    # Sidechain optimization, terminal capping, pH titration, metal ions
+    peptide = _apply_biophysical_mods(
+        peptide, optimize_sidechains, cap_termini, cyclic, ph, metal_ions,
+    )
+
+    # Optional energy minimization / MD equilibration via OpenMM
+    atomic_and_ter_content: Optional[str] = None
+    if minimize_energy:
+        atomic_and_ter_content, peptide = _do_energy_minimization(
+            peptide, sequence, forcefield,
+            minimization_k, minimization_max_iter,
+            cyclic, equilibrate, equilibrate_steps,
+        )
+
+    # Assemble final PDB with B-factors, occupancy, TER, CONECT records
+    return _assemble_pdb_output(peptide, atomic_and_ter_content, sequence_length, cyclic)
 
 class PeptideGenerator:
     """
