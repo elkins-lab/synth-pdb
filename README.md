@@ -2,7 +2,7 @@
 
 A command-line tool to generate Protein Data Bank (PDB) files with full atomic representation for testing, benchmarking and educational purposes.
 
-[![PyPI version](https://img.shields.io/badge/pypi-v1.20.0-blue)](https://pypi.org/project/synth-pdb/)
+[![PyPI version](https://img.shields.io/badge/pypi-v1.21.0-blue)](https://pypi.org/project/synth-pdb/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)
@@ -101,18 +101,18 @@ Choose a path based on your background and goals:
 - **Conformational diversity**: Generate alpha helices, beta sheets, extended chains, or random conformations
 - **Backbone-Dependent Rotamers**: Side-chain conformations are selected based on local secondary structure (Helix/Sheet) to minimize steric clashes (Dunbrack library).
 - **Bulk Dataset Generation**: Generate thousands of (Structure, Sequence, Contact Map) triplets for AI training via `--mode dataset`.
-- **Metal Ion Coordination**: Automatic detection and structural injection of cofactors like **Zinc (Zn2+)** with physics-aware harmonic constraints. ✅
-- **Disulfide Bonds**: Automatic detection and annotation of **SSBOND** records for Cysteine pairs. ✅
-- **Salt Bridge Stabilization**: Automatic detection of ionic interactions with harmonic restraints in OpenMM. ✅
-- **Advanced Chemical Shifts**: SPARTA-lite prediction + **Ring Current Effects** (shielding/deshielding from aromatic rings). ✅
-- **Relaxation Rates**: Lipari-Szabo Model-Free formalism with **SASA-modulated Order Parameters** ($S^2$), allowing "buried" residues to be more rigid than "exposed" ones. ✅
+- **Metal Ion Coordination**: Automatic detection and structural injection of cofactors like **Zinc (Zn2+)** with physics-aware harmonic constraints.
+- **Disulfide Bonds**: Automatic detection and annotation of **SSBOND** records for Cysteine pairs.
+- **Salt Bridge Stabilization**: Automatic detection of ionic interactions with harmonic restraints in OpenMM.
+- **Advanced Chemical Shifts**: SPARTA-lite prediction + **Ring Current Effects** (shielding/deshielding from aromatic rings).
+- **Relaxation Rates**: Lipari-Szabo Model-Free formalism with **SASA-modulated Order Parameters** ($S^2$), allowing "buried" residues to be more rigid than "exposed" ones.
 - **Biophysical Realism**: 
     - **Backbone-Dependent Rotamers**: Chi angles depend on secondary structure.
-    - **Pre-Proline Bias**: Residues preceding Proline automatically adopt restricted conformations (extended/beta). ✅
-    - **Cis-Proline Isomerization**: X-Pro bonds can adopt cis conformations (~5% probability). ✅
-    - **Post-Translational Modifications**: Support for Phosphorylation (SEP, TPO, PTR) with valid physics parameters. ✅
-- **Cyclic Peptides (Macrocycles)**: Support for **Head-to-Tail cyclization**. Closes the peptide bond between N- and C-termini using physics-based minimization. ✅
-- **NMR Functionality**: As of v1.16.0, all NMR-related features (chemical shifts, relaxation, NOEs, J-couplings) have been refactored into the separate [`synth-nmr`](https://pypi.org/project/synth-nmr/) Python package. This allows for independent use and development of NMR tools.
+    - **Pre-Proline Bias**: Residues preceding Proline automatically adopt restricted conformations (extended/beta).
+    - **Cis-Proline Isomerization**: X-Pro bonds can adopt cis conformations (~5% probability).
+    - **Post-Translational Modifications**: Support for Phosphorylation (SEP, TPO, PTR) with valid physics parameters.
+- **Cyclic Peptides (Macrocycles)**: Support for **Head-to-Tail cyclization**. Closes the peptide bond between N- and C-termini using physics-based minimization.
+- **NMR Functionality**: As of v1.16.0, all NMR-related features (chemical shifts, relaxation, NOEs, J-couplings) have been refactored into the separate [`synth-nmr`](https://pypi.org/project/synth-nmr/) Python package.  This allows for independent use and development of NMR tools.
 
 🚀 **High Performance Physics**
 - **Hardware Acceleration**: Automatically detects and uses **GPU acceleration** (CUDA, OpenCL/Metal) if available.
@@ -1193,7 +1193,7 @@ pytest tests/test_generator.py -v
 ```
 
 **Test Coverage**: 95% overall
-- 557 tests covering generation, validation, CLI, and edge cases
+- 561 tests covering generation, validation, CLI, and edge cases
 
 ### Project Structure
 
