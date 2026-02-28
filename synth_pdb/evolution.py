@@ -14,11 +14,12 @@ Theoretical Basis:
 - **Structural Constraints**: The fold of the protein is more conserved than the sequence. The core packing is the primary constraint.
 """
 
-import numpy as np
-import biotite.structure as struc
 import logging
-from typing import List, Dict, Set
-import random # We use random for stochastic mutation
+import random  # We use random for stochastic mutation
+from typing import List
+
+import biotite.structure as struc
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 # For simulation, we classify amino acids to define "safe" mutations.
 
 # Hydrophobic Core residues (Non-polar)
-CORE_ALLOWED = {'A', 'V', 'I', 'L', 'M', 'F', 'W', 'Y'} 
+CORE_ALLOWED = {'A', 'V', 'I', 'L', 'M', 'F', 'W', 'Y'}
 # Note: Y/W are aromatic but can be buried. A is small and ambivalent.
 
 # Surface residues (Polar/Charged/All)
@@ -50,7 +51,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
         np.array: Array of rSASA values (0.0 to 1.0) for each residue.
     """
     logger.info("Calculating Solvent Accessible Surface Area (SASA)...")
-    
+
     # 1. Calculate Absolute SASA using Shrake-Rupley algorithm
     # Biotite provides this. It requires vdW radii.
     try:
@@ -65,14 +66,14 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
 
     # 2. Sum SASA per residue
     res_sasa = struc.apply_residue_wise(atom_array, sasa, np.sum)
-    
+
     # 3. Normalize (Approximation for educational purposes)
     # We use roughly approximated max SASA values from literature (Tien et al, 2013)
     # For a rigorous implementation, we'd lookup exact values.
     # Here we define an approximate average max to assume "normalization".
     # Simplified approach: If SASA > 20 Å², it's exposed.
     # We return normalized-ish values or just a raw fraction if we had maxes.
-    
+
     # Let's map strict "Buried" threshold to return binary-like logic for the mutator,
     # or implement real max values.
     # Implementing approximate Max SASA (in Å²) for X in G-X-G
@@ -81,26 +82,26 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
         'G': 97,  'H': 216, 'I': 195, 'L': 191, 'K': 230, 'M': 203, 'F': 228,
         'P': 154, 'S': 143, 'T': 163, 'W': 264, 'Y': 255, 'V': 165
     }
-    
+
     # Get residue names to look up max
     # We iterate residue starts
     res_names = [atom_array.res_name[i] for i in struc.get_residue_starts(atom_array)]
     from .data import ONE_TO_THREE_LETTER_CODE
     three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
-    
+
     rel_sasa = []
     for i, area in enumerate(res_sasa):
         res_3 = res_names[i]
         res_1 = three_to_one.get(res_3, 'A')
         max_area = MAX_SASA.get(res_1, 200.0)
         rel_sasa.append(min(1.0, area / max_area))
-        
+
     return np.array(rel_sasa)
 
 
 def generate_msa_sequences(
-    structure: struc.AtomArray, 
-    n_seqs: int = 100, 
+    structure: struc.AtomArray,
+    n_seqs: int = 100,
     mutation_rate: float = 0.1,
     conservation_threshold: float = 0.2
 ) -> List[str]:
@@ -118,41 +119,41 @@ def generate_msa_sequences(
     """
     # 1. Analyze Structure
     rel_sasa = calculate_relative_sasa(structure)
-    
+
     # Get initial sequence
     res_names = [structure.res_name[i] for i in struc.get_residue_starts(structure)]
     from .data import ONE_TO_THREE_LETTER_CODE
     three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
     initial_seq = [three_to_one.get(r, 'A') for r in res_names]
-    
+
     msa = []
     logger.info(f"Simulating evolution for {n_seqs} generations...")
-    
+
     for _ in range(n_seqs):
         # Start from original (Star phylogeny) or evolve cumulatively?
         # Star phylogeny (all independent variants of WT) is simpler for training data usually.
         # But real evolution is a tree.
         # Let's do Star Phylogeny for AlphaFold inputs (simulating independent homologs found in DB).
-        
+
         new_seq = list(initial_seq)
-        
+
         for i, ref_aa in enumerate(initial_seq):
             # Roll for mutation
             if random.random() < mutation_rate:
                 # Decide allowed mutations based on structure
                 is_buried = rel_sasa[i] < conservation_threshold
-                
+
                 if is_buried:
                     # Burial Constraint: Must result in hydrophobic residue
                     choice = random.choice(list(CORE_ALLOWED))
                 else:
                     # Surface: Free mutation (Neutral drift)
                     choice = random.choice(ALL_AMINO_ACIDS)
-                
+
                 new_seq[i] = choice
-                
+
         msa.append("".join(new_seq))
-        
+
     return msa
 
 def write_msa(sequences: List[str], filename: str) -> None:

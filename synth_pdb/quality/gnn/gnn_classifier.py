@@ -66,7 +66,7 @@ The PyTorch approach is more portable across Python / PyTorch versions.
 
 import logging
 import os
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 
@@ -188,8 +188,9 @@ class GNNQualityClassifier:
                 "Install with: pip install synth-pdb[gnn]"
             ) from exc
 
-        from .graph import build_protein_graph
         from torch_geometric.data import Batch
+
+        from .graph import build_protein_graph
 
         # Step 1 — Build graph from PDB coordinates
         graph = build_protein_graph(pdb_content)

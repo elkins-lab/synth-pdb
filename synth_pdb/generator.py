@@ -1,5 +1,3 @@
-import random
-import numpy as np
 # EDUCATIONAL OVERVIEW - How Synthetic Protein Generation Works:
 # 1. Sequence Resolution: Determine the amino acid string (e.g., "ALA-GLY-SER").
 # 2. Backbone Generation: Place N-CA-C-O atoms for each residue.
@@ -11,50 +9,53 @@ import numpy as np
 # 5. Metadata: Fill in B-factors and Occupancy.
 #    - X-ray: Represents thermal motion.
 #    - NMR: Often used to represent local RMSD across the ensemble.
-
 import logging
+import random
 from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+
 from .data import (
-    STANDARD_AMINO_ACIDS,
-    MODIFIED_AMINO_ACIDS,
     ALL_VALID_AMINO_ACIDS,
-    ONE_TO_THREE_LETTER_CODE,
     AMINO_ACID_FREQUENCIES,
-    BOND_LENGTH_N_CA,
-    BOND_LENGTH_CA_C,
-    BOND_LENGTH_C_O,
-    ANGLE_N_CA_C,
+    ANGLE_C_N_CA,
     ANGLE_CA_C_N,
     ANGLE_CA_C_O,
-    BOND_LENGTH_C_N,
-    ANGLE_C_N_CA,
-    ROTAMER_LIBRARY,
-    RAMACHANDRAN_PRESETS,
-    RAMACHANDRAN_REGIONS,
+    ANGLE_N_CA_C,
     BACKBONE_DEPENDENT_ROTAMER_LIBRARY,
     BETA_TURN_TYPES,
+    BOND_LENGTH_C_N,
+    BOND_LENGTH_CA_C,
+    BOND_LENGTH_N_CA,
     L_TO_D_MAPPING,
+    ONE_TO_THREE_LETTER_CODE,
+    RAMACHANDRAN_PRESETS,
+    RAMACHANDRAN_REGIONS,
+    ROTAMER_LIBRARY,
+    STANDARD_AMINO_ACIDS,
 )
-from .pdb_utils import create_pdb_header, create_pdb_footer, extract_atomic_content, assemble_pdb_content
 from .geometry import (
-    position_atom_3d_from_internal_coords,
-    calculate_angle,
     calculate_dihedral_angle,
+    position_atom_3d_from_internal_coords,
 )
+from .pdb_utils import (
+    assemble_pdb_content,
+    extract_atomic_content,
+)
+
 # Re-export for backward compatibility with tests
 _position_atom_3d_from_internal_coords = position_atom_3d_from_internal_coords
 
-from .packing import optimize_sidechains as run_optimization
-from .physics import EnergyMinimizer
-from .batch_generator import BatchedGenerator, BatchedPeptide
-from . import biophysics # New Module
+import io
 import os
-import shutil
 import tempfile
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
-import io
+
+from . import biophysics  # New Module
+from .packing import optimize_sidechains as run_optimization
+from .physics import EnergyMinimizer
 
 # Convert angles to radians for numpy trigonometric functions
 ANGLE_N_CA_C_RAD = np.deg2rad(ANGLE_N_CA_C)
@@ -80,6 +81,7 @@ PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_
 
 
 from .relaxation import predict_order_parameters
+
 
 def _calculate_bfactor(
     atom_name: str,
@@ -144,40 +146,40 @@ def _calculate_bfactor(
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
     BACKBONE_ATOMS = {'N', 'CA', 'C', 'O', 'H', 'HA'}
-    
+
     # Base physics: B-factor inversely related to Order Parameter
     # Calibration:
     # S2=1.00 -> B=5.0
     # S2=0.85 -> B=20.0 (Typical Core)
     # S2=0.50 -> B=55.0 (Typical Termini/Loop)
-    
+
     # Simple linear map: B = M * (1 - S2) + C
     # Delta S2 = 0.35 (0.85->0.50) -> Delta B = 35 (20->55)
     # Slope M = 35/0.35 = 100
     # B = 100 * (1 - S2) + Offset
     # Check: S2=0.85 -> B = 100*0.15 = 15. Need 20. So Offset=5.
-    
+
     base_bfactor = 100.0 * (1.0 - s2) + 5.0
-    
+
     # Atom type adjustments
     if atom_name not in BACKBONE_ATOMS:
         base_bfactor *= 1.5  # Side chains are more mobile than backbone
-        
+
     # Residue-specific adjustments
     if residue_name == 'GLY':
         base_bfactor += 5.0
     elif residue_name == 'PRO':
         base_bfactor -= 3.0
-    
+
     # Add small random variation
     random_variation = np.random.uniform(-2.0, 2.0)
-    
+
     # Calculate final B-factor
     bfactor = base_bfactor + random_variation
-    
+
     # Clamp to realistic range (5-99 Ų)
     bfactor = max(5.0, min(99.0, bfactor))
-    
+
     return round(bfactor, 2)
 
 
@@ -190,34 +192,34 @@ def _calculate_occupancy(
 ) -> float:
     """Calculate realistic occupancy for an atom (0.85-1.00)."""
     BACKBONE_ATOMS = {'N', 'CA', 'C', 'O', 'H', 'HA'}
-    
+
     # Base occupancy
     base_occupancy = 0.98 if atom_name in BACKBONE_ATOMS else 0.95
-    
+
     # Terminal disorder
     dist_from_n_term = (residue_number - 1) / max(total_residues - 1, 1)
     dist_from_c_term = (total_residues - residue_number) / max(total_residues - 1, 1)
     dist_from_nearest_term = min(dist_from_n_term, dist_from_c_term)
     terminal_factor = -0.10 * (1.0 - dist_from_nearest_term)
-    
+
     # Residue-specific
     residue_factor = 0.0
     if residue_name in ['GLY', 'SER', 'ASN', 'GLN']:
         residue_factor = -0.03
     elif residue_name in ['PRO', 'TRP', 'PHE']:
         residue_factor = +0.02
-    
+
     # B-factor correlation
     normalized_bfactor = (bfactor - 5.0) / 55.0
     bfactor_correlation = -0.08 * normalized_bfactor
-    
+
     # Random variation
     random_variation = np.random.uniform(-0.01, 0.01)
-    
+
     # Calculate and clamp
     occupancy = base_occupancy + terminal_factor + residue_factor + bfactor_correlation + random_variation
     occupancy = max(0.85, min(1.00, occupancy))
-    
+
     return round(occupancy, 2)
 
 
@@ -326,39 +328,38 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
         >>> print(disulfides)
         [(3, 8), (12, 20)]  # CYS 3-8 and CYS 12-20 are bonded
     """
-    import biotite.structure as struc
-    
+
     disulfides = []
-    
+
     # Find all CYS/CYX residues
     cys_residues = peptide[(peptide.res_name == 'CYS') | (peptide.res_name == 'CYX')]
-    
+
     if len(cys_residues) < 2:
         return disulfides  # Need at least 2 CYS for a bond
-    
+
     # Get unique residue IDs
     cys_res_ids = np.unique(cys_residues.res_id)
-    
+
     # Check all pairs of CYS residues
     for i, res_id1 in enumerate(cys_res_ids):
         for res_id2 in cys_res_ids[i+1:]:  # Avoid duplicates
             # Get SG atoms for both residues
             sg1 = peptide[(peptide.res_id == res_id1) & (peptide.atom_name == 'SG')]
             sg2 = peptide[(peptide.res_id == res_id2) & (peptide.atom_name == 'SG')]
-            
+
             if len(sg1) > 0 and len(sg2) > 0:
                 # Calculate distance
                 p1 = sg1[0].coord
                 p2 = sg2[0].coord
                 distance = np.sqrt(np.sum((p1 - p2)**2))
-                
+
                 # Check if within disulfide bond range
                 # Minimized structures can be highly strained (especially small cyclic rings),
                 # so we use a generous range [1.5, 3.0] to ensure the SSBOND record is generated
                 # if the physics engine identified a bond.
                 if 1.5 <= distance <= 3.0:
                     disulfides.append((int(res_id1), int(res_id2)))
-    
+
     return disulfides
 
 
@@ -404,14 +405,14 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = 'A') -> str:
     """
     if not disulfides:
         return ""
-    
+
     records = []
     for serial, (res_id1, res_id2) in enumerate(disulfides, 1):
         # Format according to PDB specification
         # SSBOND   1 CYS A    6    CYS A   11
         record = f"SSBOND{serial:4d} CYS {chain_id}{res_id1:5d}    CYS {chain_id}{res_id2:5d}"
         records.append(record)
-    
+
     return "\n".join(records) + "\n" if records else ""
 
 
@@ -428,9 +429,9 @@ def _resolve_sequence(
             # Assume 3-letter code format like 'ALA-GLY-VAL' or 'D-ALA-GLY'
             # Note: We split by '-' but if somebody uses 'D-ALA', splitting by '-'
             # will give ['D', 'ALA']. This is ambiguous with 'ALA-GLY'.
-            # Better logic: if there are any residues starting with 'D-', 
+            # Better logic: if there are any residues starting with 'D-',
             # we should preserve them.
-            
+
             # Simple fix: join them back if they were part of a D- moiety
             raw_splits = [s.strip().upper() for s in user_sequence_str_upper.split("-") if s.strip()]
             amino_acids = []
@@ -510,23 +511,23 @@ def _sample_ramachandran_angles(res_name: str, next_res_name: Optional[str] = No
         regions = RAMACHANDRAN_REGIONS.get('PRE_PRO', RAMACHANDRAN_REGIONS['general'])
     else:
         regions = RAMACHANDRAN_REGIONS['general']
-    
+
     # Get favored regions
     favored_regions = regions['favored']
     weights = [r['weight'] for r in favored_regions]
-    
+
     # Choose region based on weights
     region_idx = np.random.choice(len(favored_regions), p=weights)
     chosen_region = favored_regions[region_idx]
-    
+
     # Sample angles from Gaussian around region center
     phi = np.random.normal(chosen_region['phi'], chosen_region['std'])
     psi = np.random.normal(chosen_region['psi'], chosen_region['std'])
-    
+
     # Wrap to [-180, 180]
     phi = ((phi + 180) % 360) - 180
     psi = ((psi + 180) % 360) - 180
-    
+
     return phi, psi
 
 
@@ -580,24 +581,24 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
     # Handle empty input - return empty dictionary (all residues will use default)
     if not structure_str:
         return {}
-    
+
     # EDUCATIONAL NOTE - Data Structure Choice:
     # We use a dictionary to map residue indices to conformations because:
     # 1. Fast lookup: O(1) to check if a residue has a specified conformation
     # 2. Sparse representation: Only stores specified residues (memory efficient)
     # 3. Easy to check for overlaps: Just check if key already exists
     residue_conformations = {}
-    
+
     # Split the input string by commas to get individual region specifications
     # Example: "1-10:alpha,11-20:beta" -> ["1-10:alpha", "11-20:beta"]
     regions = structure_str.split(',')
-    
+
     # Process each region specification
     for region in regions:
         # Remove any leading/trailing whitespace for robustness
         # This allows users to write "1-10:alpha, 11-20:beta" (with spaces)
         region = region.strip()
-        
+
         # VALIDATION STEP 1: Check for colon separator
         # Expected format: "start-end:conformation"
         if ':' not in region:
@@ -605,11 +606,11 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                 f"Invalid region syntax: '{region}'. "
                 f"Expected format: 'start-end:conformation' (e.g., '1-10:alpha')"
             )
-        
+
         # Split by colon to separate range from conformation
         # Example: "1-10:alpha" -> range_part="1-10", conformation="alpha"
         range_part, conformation = region.split(':', 1)
-        
+
         # VALIDATION STEP 2: Check conformation name
         # Build list of valid conformations from presets plus 'random'
         valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random'] + list(BETA_TURN_TYPES.keys())
@@ -618,7 +619,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                 f"Invalid conformation '{conformation}'. "
                 f"Valid options are: {', '.join(valid_conformations)}"
             )
-        
+
         # VALIDATION STEP 3: Check for dash separator in range
         # Expected format: "start-end"
         if '-' not in range_part:
@@ -626,11 +627,11 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                 f"Invalid range syntax: '{range_part}'. "
                 f"Expected format: 'start-end' (e.g., '1-10')"
             )
-        
+
         # Split range by dash to get start and end positions
         # Example: "1-10" -> start_str="1", end_str="10"
         start_str, end_str = range_part.split('-', 1)
-        
+
         # VALIDATION STEP 4: Parse numbers
         # Try to convert strings to integers, give clear error if they're not numbers
         try:
@@ -641,7 +642,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                 f"Invalid range numbers: '{range_part}'. "
                 f"Start and end must be integers (e.g., '1-10')"
             )
-        
+
         # Special Check for Beta-Turns
         if conformation in BETA_TURN_TYPES:
             if (end - start + 1) != 4:
@@ -649,7 +650,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                     f"Beta-turn '{conformation}' region {start}-{end} must be exactly 4 residues long. "
                     f"Got {end - start + 1}."
                 )
-        
+
         # VALIDATION STEP 5: Check range bounds
         # EDUCATIONAL NOTE - Why These Checks Matter:
         # 1. start < 1: PDB/biology uses 1-based indexing, so 0 or negative makes no sense
@@ -665,7 +666,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                 f"Invalid range: start ({start}) is greater than end ({end}). "
                 f"Range must be in format 'smaller-larger' (e.g., '1-10', not '10-1')"
             )
-        
+
         # VALIDATION STEP 6: Check for overlaps and assign conformations
         # EDUCATIONAL NOTE - Why We Forbid Overlaps:
         # If residue 5 is specified as both "alpha" and "beta", which should we use?
@@ -681,10 +682,10 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                     f"Overlapping regions detected: residue {res_idx + 1} is specified "
                     f"in multiple regions. Each residue can only have one conformation."
                 )
-            
+
             # Assign the conformation to this residue (using 0-based indexing internally)
             residue_conformations[res_idx] = conformation
-    
+
     # Return the mapping of residue indices to conformations
     # EDUCATIONAL NOTE - What Happens to Gaps:
     # If a residue index is not in this dictionary, the calling code will use
@@ -739,7 +740,7 @@ def _resolve_conformation_map(
             if i not in residue_conformations:
                 residue_conformations[i] = conformation
     else:
-        residue_conformations = {i: conformation for i in range(sequence_length)}
+        residue_conformations = dict.fromkeys(range(sequence_length), conformation)
     # EDUCATIONAL NOTE - Why We Don't Validate Conformations Here:
     # We already validated conformations in _parse_structure_regions(),
     # so we don't need to re-validate them here. The default conformation
@@ -1016,11 +1017,12 @@ def _build_peptide_chain(
             rotamers = ROTAMER_LIBRARY[res_name]
 
         if rotamers:
-            weights = [r.get('prob', 0.0) for r in rotamers]
+            weights = [float(r.get('prob', 0.0)) for r in rotamers]
             selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
 
             if 'chi1' in selected_rotamer:
-                chi1_target = selected_rotamer["chi1"][0]
+                _chi1_val = selected_rotamer["chi1"]
+                chi1_target = _chi1_val[0] if isinstance(_chi1_val, list) else float(_chi1_val)
                 gamma_atom_name = None
                 for candidate in ["CG", "CG1", "OG", "OG1", "SG"]:
                     if len(ref_res_template[ref_res_template.atom_name == candidate]) > 0:
@@ -1195,7 +1197,7 @@ def _apply_biophysical_mods(
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.
     if metal_ions == 'auto':
-        from .cofactors import find_metal_binding_sites, add_metal_ion
+        from .cofactors import add_metal_ion, find_metal_binding_sites
         sites = find_metal_binding_sites(peptide)
         for site in sites:
             peptide = add_metal_ion(peptide, site)
@@ -1281,7 +1283,7 @@ def _do_energy_minimization(
                 return None, peptide
 
             logger.info("Minimization/Equilibration successful.")
-            with open(output_pdb_path, 'r') as f:
+            with open(output_pdb_path) as f:
                 atomic_and_ter_content = f.read()
 
             pdb_file_read = pdb.PDBFile.read(output_pdb_path)
@@ -1621,13 +1623,13 @@ class PeptideGenerator:
         """Generates the protein structure and returns a Result object."""
         # Merge init config with call-time overrides
         call_config = {**self.config, **overrides}
-        
+
         # Call the functional generator
         pdb_content = generate_pdb_content(
             sequence_str=self.sequence,
             **call_config
         )
-        
+
         # Package into a Result object for easy access
         self._last_result = PeptideResult(pdb_content)
         return self._last_result
@@ -1653,10 +1655,11 @@ class PeptideResult:
                 return self._structure
 
             # We use io.StringIO to avoid disk I/O
-            from biotite.structure.io.pdb import PDBFile
             import io
+
+            from biotite.structure.io.pdb import PDBFile
             f = PDBFile.read(io.StringIO(self.pdb))
-            
+
             # Additional check: ensure at least one model exists
             if f.get_model_count() == 0:
                 logger.error("PDB content has 0 models. Returning empty AtomArray.")

@@ -157,7 +157,6 @@ class ProteinGNN:
     def __new__(cls, node_features: int = 8, edge_features: int = 2,
                 hidden_dim: int = 64, num_classes: int = 2) -> Any:
         _check_pyg()
-        import torch
         import torch.nn as nn
         import torch.nn.functional as F
         from torch_geometric.nn import GATConv, global_mean_pool

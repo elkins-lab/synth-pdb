@@ -55,8 +55,7 @@ GRAPH STRUCTURE
 
 import logging
 import math
-import io
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 

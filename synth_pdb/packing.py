@@ -1,8 +1,7 @@
-import numpy as np
-import biotite.structure as struc
 import logging
-import copy
-from typing import List, Optional
+
+import biotite.structure as struc
+import numpy as np
 
 from .data import ROTAMER_LIBRARY
 from .geometry import reconstruct_sidechain
@@ -31,7 +30,7 @@ class SideChainPacker:
     #
     # This probability is given by the Boltzmann factor: P = exp(-DeltaE / Temperature)
     """
-    
+
     def __init__(self, steps: int = 500, temperature: float = 0.5) -> None:
         """
         Args:
@@ -41,7 +40,7 @@ class SideChainPacker:
         """
         self.steps = steps
         self.temperature = temperature
-        
+
     def optimize(self, peptide: struc.AtomArray) -> struc.AtomArray:
         """
         Run the optimization protocol on the given peptide structure.
@@ -54,62 +53,62 @@ class SideChainPacker:
             The optimized structure (reference to input).
         """
         logger.info(f"Starting side-chain packing optimization ({self.steps} steps)...")
-        
+
         # 1. Identify valid residues for optimization
         # (Those that have rotamer options in our library)
         residue_ids = sorted(list(set(peptide.res_id)))
         optimizable_residues = []
-        
+
         # Build map of resid -> res_name
         # Using CA atom to identify residue name
         ca_atoms = peptide[peptide.atom_name == "CA"]
         res_map = {atom.res_id: atom.res_name for atom in ca_atoms}
-        
+
         for res_id in residue_ids:
             res_name = res_map.get(res_id)
             if res_name in ROTAMER_LIBRARY and ROTAMER_LIBRARY[res_name]:
                 optimizable_residues.append((res_id, res_name))
-                
+
         if not optimizable_residues:
             logger.info("No optimizable residues found.")
             return peptide
-            
+
         # Initial score
         current_score = calculate_clash_score(peptide)
         best_score = current_score
-        
+
         # We need a way to revert changes if we reject a step.
         # Since 'reconstruct_sidechain' modifies in place, we can:
         # A) Make a full copy of the structure every step (Slow for large proteins, OK for peptides)
         # B) Store the old coordinates of the changing residue only.
-        
+
         # For 'synth-pdb' (educational peptides), structure is small. Copying is acceptable for code simplicity.
         # But efficiently: store old coords of relevant atoms.
-        
+
         logger.info(f"Initial Clash Score: {current_score:.4f}")
-        
+
         accepted_moves = 0
-        
+
         for step in range(self.steps):
             # Pick random residue
             target_res_id, target_res_name = optimizable_residues[np.random.randint(len(optimizable_residues))]
-            
+
             # Pick random new rotamer
             rotamer_options = ROTAMER_LIBRARY[target_res_name]
             weights = [r.get('prob', 1.0) for r in rotamer_options]
             # Normalize weights
             weights = np.array(weights) / np.sum(weights)
-            
+
             # Select index
             rotamer_idx = np.random.choice(len(rotamer_options), p=weights)
             new_rotamer = rotamer_options[rotamer_idx]
-            
+
             # Save state (coordinates of this residue)
             # Efficient backup: find indices
             mask = peptide.res_id == target_res_id
             indices = np.where(mask)[0]
             old_coords = peptide.coord[indices].copy()
-            
+
             # Apply move
             try:
                 # The reconstruct_sidechain will need to get the template residue.
@@ -124,15 +123,15 @@ class SideChainPacker:
             except Exception as e:
                 logger.warning(f"Failed to apply rotamer: {e}")
                 continue
-                
+
             # Calculate new score
             # Optimization: Only calculate score contribution of this residue?
             # For correctness/simplicity now: Full calculation
             new_score = calculate_clash_score(peptide)
-            
+
             # Metropolis Criterion
             delta = new_score - current_score
-            
+
             accept = False
             if delta < 0:
                 # Improvement
@@ -145,7 +144,7 @@ class SideChainPacker:
                     prob = np.exp(-delta / self.temperature)
                     if np.random.random() < prob:
                         accept = True
-            
+
             if accept:
                 current_score = new_score
                 accepted_moves += 1
@@ -154,7 +153,7 @@ class SideChainPacker:
             else:
                 # Revert
                 peptide.coord[indices] = old_coords
-        
+
         logger.info(f"Optimization complete. Final Clash Score: {current_score:.4f} (Moves accepted: {accepted_moves})")
         return peptide
 

@@ -1,9 +1,10 @@
-import numpy as np
-import biotite.structure as struc
 import csv
 import json
 import logging
-from typing import List, Dict, Union, Any
+from typing import Any, Dict, List
+
+import biotite.structure as struc
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -23,41 +24,41 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
         - omega: Omega angle in degrees (or None)
     """
     logger.info("Calculating backbone torsion angles...")
-    
+
     # Calculate angles using Biotite
     # dihedral_backbone returns (phi, psi, omega) in RADIANS for each residue.
     # Note: biotite.structure.dihedral_backbone calculates phi, psi, omega for each residue.
     # The first residue's phi is usually NaN, last residue's psi is NaN.
-    
+
     phi, psi, omega = struc.dihedral_backbone(atom_array)
-    
+
     # Convert to degrees
     phi_deg = np.degrees(phi)
     psi_deg = np.degrees(psi)
     omega_deg = np.degrees(omega)
-    
+
     # Get residue identifiers
     # We iterate through indices corresponding to the backbone results
     # Ideally should use residue iterator to be safe, but backbone arrays map to residues.
-    
+
     # Get unique residue IDs to map back
     residue_starts = struc.get_residue_starts(atom_array)
-    
+
     results = []
-    
+
     for i, start_idx in enumerate(residue_starts):
         res_name = atom_array.res_name[start_idx]
         res_id = int(atom_array.res_id[start_idx])
-        
+
         # Handle NaN values (convert to None for JSON compliance)
         p = phi_deg[i]
         ps = psi_deg[i]
         o = omega_deg[i]
-        
+
         if np.isnan(p): p = None
         if np.isnan(ps): ps = None
         if np.isnan(o): o = None
-        
+
         entry = {
             'residue': res_name,
             'res_id': res_id,
@@ -66,7 +67,7 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
             'omega': o
         }
         results.append(entry)
-        
+
     logger.info(f"Calculated angles for {len(results)} residues.")
     return results
 
@@ -80,11 +81,11 @@ def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str
         fmt: Format 'csv' or 'json'.
     """
     logger.info(f"Exporting torsion angles to {output_file} ({fmt})...")
-    
+
     if fmt.lower() == "json":
         with open(output_file, 'w') as f:
             json.dump(data, f, indent=2)
-            
+
     elif fmt.lower() == "csv":
         fieldnames = ['residue', 'res_id', 'phi', 'psi', 'omega']
         with open(output_file, 'w', newline='') as f:
@@ -98,5 +99,5 @@ def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str
                 writer.writerow(row)
     else:
         raise ValueError(f"Unknown format: {fmt}")
-        
+
     logger.info("Export complete.")

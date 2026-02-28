@@ -7,19 +7,17 @@ This module provides the main() function that serves as the command-line interfa
 for generating PDB files.
 """
 
-import sys
-import logging
 import argparse
 import datetime
+import logging
 import os
-from pathlib import Path
+import sys
 
-from .generator import generate_pdb_content
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
-import os
+from .generator import generate_pdb_content
+from .pdb_utils import assemble_pdb_content, extract_atomic_content, extract_header_records
 from .validator import PDBValidator
-from .pdb_utils import extract_atomic_content, assemble_pdb_content, extract_header_records
 from .viewer import view_structure_in_browser
 
 # Get a logger for this module
@@ -33,7 +31,7 @@ def _build_command_string(args: argparse.Namespace) -> str:
         cmd_parts.append(f"--sequence {args.sequence}")
     else:
         cmd_parts.append(f"--length {args.length}")
-    
+
     if args.plausible_frequencies:
         cmd_parts.append("--plausible-frequencies")
     if args.conformation != 'alpha':  # Only add if not default
@@ -54,30 +52,30 @@ def _build_command_string(args: argparse.Namespace) -> str:
     if args.minimize:
         cmd_parts.append("--minimize")
         cmd_parts.append(f"--forcefield {args.forcefield}")
-    
+
     if args.cyclic:
         cmd_parts.append("--cyclic")
-    
+
     # Phase 7/8/9 flags
     if args.gen_nef:
         cmd_parts.append("--gen-nef")
         cmd_parts.append(f"--noe-cutoff {args.noe_cutoff}")
         if args.nef_output:
             cmd_parts.append(f"--nef-output {args.nef_output}")
-            
+
     if args.gen_relax:
         cmd_parts.append("--gen-relax")
         cmd_parts.append(f"--field {args.field}")
         cmd_parts.append(f"--tumbling-time {args.tumbling_time}")
-        
+
     if args.gen_shifts:
         cmd_parts.append("--gen-shifts")
         if args.shift_output:
             cmd_parts.append(f"--shift-output {args.shift_output}")
-            
+
     if args.output:
         cmd_parts.append(f"--output {args.output}")
-    
+
     return " ".join(cmd_parts)
 
 
@@ -191,7 +189,7 @@ def main() -> None:
         default="amber14-all.xml",
         help="Forcefield to use for minimization (default: amber14-all.xml).",
     )
-    
+
     # Phase 3: Research Utilities Arguments
     # Using 'mode' argument to distinguish workflows without breaking BC (default is 'generate')
     parser.add_argument(
@@ -249,7 +247,7 @@ def main() -> None:
         type=str,
         help="Output PyMOL script path (for --mode pymol).",
     )
-    
+
     # Phase 7: Synthetic NMR Data (NEF)
     parser.add_argument(
         "--gen-nef",
@@ -303,7 +301,7 @@ def main() -> None:
         type=str,
         help="Optional: Output NEF filename for chemical shifts.",
     )
-    
+
     # Phase 9.5: J-Couplings
     parser.add_argument(
         "--gen-couplings",
@@ -315,7 +313,7 @@ def main() -> None:
         type=str,
         help="Optional: Output CSV filename for J-couplings.",
     )
-    
+
     # Phase 10: Constraint Export
     parser.add_argument(
         "--export-constraints",
@@ -368,7 +366,7 @@ def main() -> None:
         default=0.1,
         help="Mutation rate per position per sequence (default: 0.1).",
     )
-    
+
     # Phase 13: Distogram Export (AI Trinity #3)
     parser.add_argument(
         "--export-distogram",
@@ -382,7 +380,7 @@ def main() -> None:
         default="json",
         help="Format for distogram export (default: json).",
     )
-    
+
     # Phase 14: Biophysical Realism (Capping & pH)
     parser.add_argument(
         "--cap-termini",
@@ -407,14 +405,14 @@ def main() -> None:
         default=0.0,
         help="Probability (0.0-1.0) of Ser/Thr/Tyr phosphorylation (default: 0.0).",
     )
-    
+
     # Phase 2: MD Equilibration
     parser.add_argument(
         "--equilibrate",
         action="store_true",
         help="Run Molecular Dynamics equilibration (at 300K) after minimization. Requires OpenMM."
     )
-    
+
     # Phase 15: Bulk Dataset Generation (ML)
     parser.add_argument(
         "--num-samples",
@@ -488,7 +486,7 @@ def main() -> None:
         default=5,
         help="Number of steps for interpolation (default: 5).",
     )
-    
+
     parser.add_argument(
         "--seed",
         type=int,
@@ -504,7 +502,7 @@ def main() -> None:
         raise ValueError(f"Invalid log level: {args.log_level}")
     logging.getLogger().setLevel(log_level)
     logger.debug("Logging level set to %s.", args.log_level.upper())
-    
+
     logger.info("Starting PDB file generation process.")
     logger.debug(
         "Parsed arguments: length=%s, output='%s', sequence='%s', plausible_frequencies=%s, validate=%s",
@@ -523,7 +521,7 @@ def main() -> None:
     elif args.guarantee_valid: # Only apply if best-of-N is not active
         args.validate = True
         logger.info("--guarantee-valid is set. Will attempt to generate a valid PDB.")
-    
+
     if args.refine_clashes > 0:
         args.validate = True # Refinement implies validation during initial generation
         logger.info(f"--refine-clashes is set to {args.refine_clashes}. Validation will be performed.")
@@ -549,7 +547,7 @@ def main() -> None:
                                 _, end_str = range_part.split('-', 1)
                                 end = int(end_str)
                                 max_residue = max(max_residue, end)
-                    
+
                     if max_residue > 0:
                         args.length = max_residue
                         logger.info(f"Inferred length={max_residue} from --structure parameter")
@@ -581,10 +579,10 @@ def main() -> None:
         if not args.input_pdb or not args.input_nef or not args.output_pml:
             logger.error("PyMOL mode requires --input-pdb, --input-nef, and --output-pml.")
             sys.exit(1)
-        
-        from .visualization import generate_pymol_script
+
         from .nef_io import read_nef_restraints
-        
+        from .visualization import generate_pymol_script
+
         try:
             # Read restraints first (the function now expects a list)
             restraints = read_nef_restraints(args.input_nef)
@@ -594,21 +592,22 @@ def main() -> None:
             logger.error(f"Failed to generate PyMOL script: {e}")
             sys.exit(1)
         return # Exit after visualization generation
-    
+
     if args.mode == "decoys":
         if not args.sequence and not args.length:
              logger.error("Decoy generation requires --sequence or --length.")
              sys.exit(1)
-        
+
         target_sequence = args.sequence
         if not target_sequence:
             # Generate random sequence if not provided
             import random
-            from .data import ONE_TO_THREE_LETTER_CODE, AMINO_ACID_FREQUENCIES
-            
+
+            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+
             rng = random.Random(args.seed)
             three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
-            
+
             if args.plausible_frequencies:
                 # Sample 3-letter and convert.
                 residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
@@ -618,7 +617,7 @@ def main() -> None:
             else:
                 residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
                 target_sequence = "".join(rng.choices(residues_1, k=args.length))
-            
+
             logger.info(f"Generated random sequence for decoys: {target_sequence}")
 
 
@@ -632,7 +631,7 @@ def main() -> None:
              rmsd_min, rmsd_max = 0.0, 999.0
 
         out_dir = args.output if args.output else "decoys"
-        
+
         generator.generate_ensemble(
             sequence=target_sequence,
             n_decoys=args.n_decoys,
@@ -653,7 +652,7 @@ def main() -> None:
     if args.mode == "dataset":
         from .dataset import DatasetGenerator
         out_dir = args.output if args.output else "dataset"
-        
+
         logger.info(f"Starting bulk dataset generation in '{out_dir}'...")
         generator = DatasetGenerator(
             output_dir=out_dir,
@@ -674,7 +673,7 @@ def main() -> None:
             if not args.start_pdb or not args.end_pdb:
                 logger.error("Interpolation requires --start-pdb and --end-pdb.")
                 sys.exit(1)
-            
+
             try:
                 out_prefix = args.output if args.output else "morph"
                 interpolate_structures(args.start_pdb, args.end_pdb, args.steps, out_prefix)
@@ -742,13 +741,13 @@ def main() -> None:
                 validator.validate_all()
                 current_violations = validator.get_violations()
                 logger.debug(f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}. Content: {current_violations}")
-            
+
             if args.quality_filter:
                 try:
                     from .quality.classifier import ProteinQualityClassifier
                     classifier = ProteinQualityClassifier()
                     is_good, prob, _ = classifier.predict(current_pdb_content)
-                    
+
                     if prob < args.quality_score_cutoff:
                         logger.warning(f"Quality Filter Reject (Attempt {attempt_num}): Score {prob:.2f} < {args.quality_score_cutoff}")
                         continue # Retry
@@ -802,21 +801,21 @@ def main() -> None:
                      if "-" in rng:
                          start_s, end_s = rng.split("-")
                          start, end = int(start_s), int(end_s)
-                         
+
                          # Only highlight specific turns or interesting features
                          if "type" in s_type or "beta" in s_type and "turn" in s_type: # e.g. typeII, beta-turn
                              highlights.append({
-                                 'start': start, 
-                                 'end': end, 
-                                 'color': 'purple', 
+                                 'start': start,
+                                 'end': end,
+                                 'color': 'purple',
                                  'style': 'stick', # Stick makes turn geometry visible
                                  'label': s_type
                              })
                          elif "helix" in s_type or "alpha" in s_type:
                              highlights.append({
-                                 'start': start, 
-                                 'end': end, 
-                                 'color': 'magenta', 
+                                 'start': start,
+                                 'end': end,
+                                 'color': 'magenta',
                                  'style': 'cartoon',
                                  'label': 'Alpha Helix'
                              })
@@ -829,7 +828,7 @@ def main() -> None:
     else:
         # Extract atomic content from the initially selected PDB for subsequent refinement or final assembly.
         final_pdb_atomic_content = extract_atomic_content(final_pdb_content)
-        
+
         # PRESERVE HEADER RECORDS (SSBOND)
         # generator.py creates them, but extract_atomic_content strips them.
         # We must re-inject them during assembly.
@@ -840,7 +839,7 @@ def main() -> None:
         if args.refine_clashes > 0:
             args.validate = True # Refinement implies validation
             logger.info(f"Starting steric clash refinement for {args.refine_clashes} iterations.")
-            
+
             # current_refined_atomic_content will hold only ATOM/TER lines
             current_refined_atomic_content = final_pdb_atomic_content
             current_refined_violations = final_violations
@@ -855,7 +854,7 @@ def main() -> None:
                 # Parse atoms from current atomic PDB content
                 # PDBValidator._parse_pdb_atoms can work directly on atomic lines.
                 parsed_atoms_for_refinement = PDBValidator._parse_pdb_atoms(current_refined_atomic_content)
-                
+
                 # Apply steric clash tweak
                 modified_atoms = PDBValidator._apply_steric_clash_tweak(parsed_atoms_for_refinement)
 
@@ -891,7 +890,7 @@ def main() -> None:
             else: # Should not happen if logic is correct, but for completeness
                 logger.warning(f"Refinement process completed. Violations increased from {initial_violations_count} to {len(final_violations)}. This indicates an issue with the refinement logic.")
         # If no refinement was requested, final_pdb_atomic_content was already set from the initial extraction.
- 
+
         # After successful generation (and optional validation)
         # Only proceed to file writing if final_pdb_atomic_content is not None
 
@@ -955,32 +954,38 @@ def main() -> None:
                 # Phase 7, 8, & 9 + 10: Synthetic NMR Data & Exports
                 # We perform calculations first, so we can capture data (like restraints) for visualization if needed.
                 generated_restraints = None # To hold restraints for viewer
-                
+
                 if args.gen_nef or args.gen_relax or args.gen_shifts or args.gen_couplings or args.export_constraints or args.export_torsion or args.gen_msa or args.export_distogram:
                     if args.mode != "generate":
                         logger.warning("Synthetic Data Generation is currently only supported in single structure 'generate' mode.")
                     else:
-                        from .nmr import calculate_synthetic_noes
-                        from .nef_io import write_nef_file, write_nef_relaxation, write_nef_chemical_shifts
-                        from .relaxation import calculate_relaxation_rates
+                        import io
+
+                        import biotite.structure.io.pdb as pdb_io
+                        import numpy as np
+
                         from .chemical_shifts import predict_chemical_shifts
+
                         # NEW IMPORTS for Export
                         from .contact import compute_contact_map
-                        from .export import export_constraints
-                        from .torsion import calculate_torsion_angles, export_torsion_angles
-                        from .evolution import generate_msa_sequences, write_msa
                         from .distogram import calculate_distogram, export_distogram
-                        
-                        import biotite.structure.io.pdb as pdb_io
-                        import io
-                        import numpy as np
-                        
+                        from .evolution import generate_msa_sequences, write_msa
+                        from .export import export_constraints
+                        from .nef_io import (
+                            write_nef_chemical_shifts,
+                            write_nef_file,
+                            write_nef_relaxation,
+                        )
+                        from .nmr import calculate_synthetic_noes
+                        from .relaxation import calculate_relaxation_rates
+                        from .torsion import calculate_torsion_angles, export_torsion_angles
+
                         logger.info("Generating Synthetic Data...")
-                        
+
                         # We need the generated structure as an AtomArray
                         pdb_file = pdb_io.PDBFile.read(io.StringIO(final_full_pdb_content_to_write))
                         structure = pdb_file.get_structure(model=1)
-                        
+
                         # Sequence inference
                         res_names = [structure[structure.res_id == i][0].res_name for i in sorted(list(set(structure.res_id)))]
                         from .data import ONE_TO_THREE_LETTER_CODE
@@ -996,14 +1001,14 @@ def main() -> None:
                                 logger.info("Calculating NOE Restraints...")
                                 restraints = calculate_synthetic_noes(structure, cutoff=args.noe_cutoff)
                                 generated_restraints = restraints # Capture for viewer
-                                
+
                                 nef_filename = args.nef_output
                                 if not nef_filename:
                                     nef_filename = output_filename.replace(".pdb", ".nef")
-                                
+
                                 write_nef_file(nef_filename, seq_str, restraints)
                                 logger.info(f"NEF Restraints generated: {os.path.abspath(nef_filename)}")
-                                
+
                                 if args.gen_pymol:
                                     from .visualization import generate_pymol_script
                                     pml_filename = output_filename.replace(".pdb", ".pml")
@@ -1031,7 +1036,7 @@ def main() -> None:
                                 # Reuse torsion calc if not already done
                                 # Ideally we'd optimize to not recalc, but calculation is cheap.
                                 angles_list = calculate_torsion_angles(structure)
-                                
+
                                 # Convert generic List[Dict] to Dict[int, float] for phis
                                 phi_map = {}
                                 for angle_data in angles_list:
@@ -1039,11 +1044,11 @@ def main() -> None:
                                         phi_map[angle_data['res_id']] = angle_data['phi']
                                     else:
                                         phi_map[angle_data['res_id']] = np.nan
-                                        
+
                                 couplings = predict_couplings_from_structure(phi_map)
-                                
+
                                 coupling_csv = args.coupling_output if args.coupling_output else output_filename.replace(".pdb", "_couplings.csv")
-                                
+
                                 with open(coupling_csv, "w") as f:
                                     f.write("res_id,residue,J_HN_HA\n")
                                     # Write sorted by resid
@@ -1052,25 +1057,25 @@ def main() -> None:
                                         res = angle_data['residue']
                                         jval = couplings.get(rid, np.nan)
                                         f.write(f"{rid},{res},{jval:.4f}\n")
-                                        
+
                                 logger.info(f"J-Couplings exported: {os.path.abspath(coupling_csv)}")
-                                
+
                             # 4. Constraint Export (Phase 10)
                             if args.export_constraints:
                                 logger.info(f"Exporting Constraints in {args.constraint_format.upper()} format...")
                                 # Format: RR or CSV
                                 # We use compute_contact_map relative to cutoff
                                 # For Export, we typically want BINARY map if using CASP
-                                
+
                                 # Calculate Distance Matrix for export
                                 matrix = compute_contact_map(
-                                    structure, 
-                                    method="ca", 
+                                    structure,
+                                    method="ca",
                                     threshold=args.constraint_cutoff
                                 )
-                                
+
                                 content = export_constraints(matrix, seq_str, fmt=args.constraint_format, threshold=args.constraint_cutoff)
-                                
+
                                 export_file = args.export_constraints
                                 with open(export_file, "w") as f:
                                     f.write(content)
@@ -1081,7 +1086,7 @@ def main() -> None:
                                 angles = calculate_torsion_angles(structure)
                                 export_torsion_angles(angles, args.export_torsion, fmt=args.torsion_format)
                                 logger.info(f"Torsion angles exported to: {os.path.abspath(args.export_torsion)}")
-                            
+
                             # 6. MSA Generation (Phase 12)
                             if args.gen_msa:
                                 sequences = generate_msa_sequences(structure, n_seqs=args.msa_depth, mutation_rate=args.mutation_rate)
@@ -1109,7 +1114,7 @@ def main() -> None:
                             show_hbonds=True
                         )
                     except Exception as e:
-                        logger.error(f"Failed to open 3D viewer: {e}") 
+                        logger.error(f"Failed to open 3D viewer: {e}")
 
             except Exception as e:
                 logger.error("An unexpected error occurred during file writing: %s", e)

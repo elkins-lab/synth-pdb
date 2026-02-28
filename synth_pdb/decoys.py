@@ -1,12 +1,12 @@
-from typing import Dict, List, Optional
-import logging
-import numpy as np
-import biotite.structure as struc
-from .generator import generate_pdb_content
-from .packing import optimize_sidechains as run_optimization
-from .physics import EnergyMinimizer
-import biotite.structure.io.pdb as pdb
 import io
+import logging
+from typing import Dict, List, Optional
+
+import biotite.structure as struc
+import biotite.structure.io.pdb as pdb
+import numpy as np
+
+from .generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ class DecoyGenerator:
     """
     Generates ensembles of protein structures (decoys) with specific properties.
     """
-    
+
     def __init__(self) -> None:
         pass
 
@@ -98,18 +98,18 @@ class DecoyGenerator:
         """
         import os
         os.makedirs(out_dir, exist_ok=True)
-        
+
         generated_decoys = []
         reference_structure = None
-        
+
         attempts = 0
         max_attempts = n_decoys * 10 # Avoid infinite loop
-        
+
         logger.info(f"Generating {n_decoys} decoys for sequence length {len(sequence)}...")
-        
+
         while len(generated_decoys) < n_decoys and attempts < max_attempts:
             attempts += 1
-            
+
             # Generate candidate
             # We vary conformation parameters randomly to get diversity
             # Ideally generator should support 'random' seeding or 'random' conformation
@@ -118,7 +118,7 @@ class DecoyGenerator:
                 # 1. Determine local generation parameters
                 gen_sequence = sequence
                 phi_list, psi_list, omega_list = None, None, None
-                
+
                 # Handling Threading (Hard Decoy)
                 if hard_mode and template_sequence:
                     # Generate a template-fold structure first
@@ -130,7 +130,7 @@ class DecoyGenerator:
                     phi_list, psi_list, omega_list = self._extract_backbone_dihedrals(template_pdb)
                     # We thread 'sequence' on this fold
                     gen_sequence = sequence
-                
+
                 pdb_content = generate_pdb_content(
                     sequence_str=gen_sequence,
                     conformation='random',
@@ -147,33 +147,33 @@ class DecoyGenerator:
                 # Handling Shuffling (Hard Decoy)
                 if hard_mode and shuffle_sequence:
                     pdb_content = self._shuffle_pdb_sequence(pdb_content)
-                
+
                 # Parse to AtomArray for RMSD calc
                 pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
                 current_structure = pdb_file.get_structure(model=1)
-                
+
                 # Biopython/Biotite RMSD usually needs CA atoms
                 current_ca = current_structure[current_structure.atom_name == "CA"]
-                
+
                 if reference_structure is None:
                     # First structure is reference
                     reference_structure = current_structure
                     reference_ca = current_ca
-                    
+
                     # Accept it
-                    filename = os.path.join(out_dir, f"decoy_0.pdb")
+                    filename = os.path.join(out_dir, "decoy_0.pdb")
                     with open(filename, 'w') as f:
                         f.write(pdb_content)
                     generated_decoys.append(filename)
-                    logger.info(f"Decoy 0 (Reference) generated.")
-                    
+                    logger.info("Decoy 0 (Reference) generated.")
+
                 else:
                     # Calculate RMSD against reference
                     # Superimpose first to minimize RMSD
                     # Returns (fitted, transform)
                     fitted_ca, _ = struc.superimpose(reference_ca, current_ca)
                     rmsd = struc.rmsd(reference_ca, fitted_ca)
-                    
+
                     if rmsd_min <= rmsd <= rmsd_max:
                         idx = len(generated_decoys)
                         filename = os.path.join(out_dir, f"decoy_{idx}.pdb")
@@ -183,11 +183,11 @@ class DecoyGenerator:
                         logger.info(f"Decoy {idx} accepted (RMSD={rmsd:.2f}A).")
                     else:
                         logger.debug(f"Decoy rejected (RMSD={rmsd:.2f}A outside {rmsd_min}-{rmsd_max}).")
-                        
+
             except Exception as e:
                 logger.warning(f"Decoy generation failed attempt {attempts}: {e}")
                 continue
-                
+
         logger.info(f"Finished. Generated {len(generated_decoys)} decoys.")
         return generated_decoys
 
@@ -198,7 +198,7 @@ class DecoyGenerator:
         # Handle cases where structure might be multiple chains
         if len(struc.get_chains(structure)) > 1:
             structure = structure[structure.chain_id == struc.get_chains(structure)[0]]
-            
+
         phi, psi, omega = struc.dihedral_backbone(structure)
         # Convert to degrees and lists
         # Biotite returns radians or already degrees? Checks docs... usually radians.
@@ -209,25 +209,25 @@ class DecoyGenerator:
         """Shuffles residue names in PDB content while keeping backbone intact."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
-        
+
         res_ids = np.unique(structure.res_id)
         if len(res_ids) == 0:
             return pdb_content
-            
+
         res_names = []
         for rid in res_ids:
              res_names.append(structure[structure.res_id == rid].res_name[0])
-        
+
         # Shuffle labels
         shuffled_names = res_names.copy()
         import random
         random.shuffle(shuffled_names)
-        
+
         # Map back
         name_map = dict(zip(res_ids, shuffled_names))
         for i in range(len(structure)):
              structure.res_name[i] = name_map[structure.res_id[i]]
-             
+
         out_f = pdb.PDBFile()
         out_f.set_structure(structure)
         out = io.StringIO()

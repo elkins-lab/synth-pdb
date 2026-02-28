@@ -5,19 +5,15 @@ Opens generated PDB structures in browser-based 3D viewer using 3Dmol.js.
 Based on pdbstat's molecular viewer implementation.
 """
 
+import io
 import logging
 import tempfile
-import webbrowser
-from pathlib import Path
-import io
 import traceback
-import numpy as np
-import biotite.structure as struc
+import webbrowser
 
-import biotite.structure.io.pdb as pdb
 import biotite.structure.hbond as hbond
-
-
+import biotite.structure.io.pdb as pdb
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -51,34 +47,34 @@ def view_structure_in_browser(
     """
     try:
         logger.info(f"Opening 3D viewer for {filename}")
-        
+
         # Generate HTML with embedded 3Dmol.js viewer
         html = _create_3dmol_html(pdb_content, filename, style, color, restraints, highlights, show_hbonds)
-        
-        
+
+
         # Save to temporary file
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".html", delete=False, encoding="utf-8"
         ) as f:
             f.write(html)
             temp_path = f.name
-        
+
         # Open in default browser
         webbrowser.open(f"file://{temp_path}")
-        
+
         logger.info(f"3D viewer opened in browser: {temp_path}")
-        
+
     except Exception as e:
         logger.error(f"Failed to open 3D viewer: {e}")
         raise
 
 
 def _create_3dmol_html(
-    pdb_data: str, 
-    filename: str, 
-    style: str, 
-    color: str, 
-    restraints: list = None, 
+    pdb_data: str,
+    filename: str,
+    style: str,
+    color: str,
+    restraints: list = None,
     highlights: list = None,
     show_hbonds: bool = False
 ) -> str:
@@ -127,7 +123,7 @@ def _create_3dmol_html(
     # We escape backslashes first, then backticks (used in template literals),
     # and finally $ (to avoid interpolation issues with ${...})
     pdb_escaped = pdb_data.replace("\\", "\\\\").replace("`", "\\`").replace("$", "\\$")
-    
+
     # Calculate H-bonds if requested
     hbond_cmds = ""
     if show_hbonds:
@@ -138,11 +134,11 @@ def _create_3dmol_html(
                  # Add dashed yellow cylinder
                  # We use start_resi and end_resi
                  # Note: JS indices for arrays are 0-based but 3Dmol resi selection is 1-based (PDB numbering)
-                 
+
                  # 3Dmol selection needs explicit atom names for start/end
                  start_sel = f"{{chain:'A', resi:{hb['start_resi']}, atom:'{hb['start_atom']}'}}"
                  end_sel = f"{{chain:'A', resi:{hb['end_resi']}, atom:'{hb['end_atom']}'}}"
-                 
+
                  # JS logic to find atoms and draw line
                  # We wrap in a block to reuse variable names safely
                  hbond_cmds += f"""
@@ -172,11 +168,11 @@ def _create_3dmol_html(
         ssbond_cmds += "/* Detected Disulfide Bonds */\n"
         for ss in ssbonds:
              # Add thick yellow cylinder between SG atoms
-             
+
              # 3Dmol selection
              start_sel = f"{{chain:'{ss['c1']}', resi:{ss['r1']}, atom:'SG'}}"
              end_sel = f"{{chain:'{ss['c2']}', resi:{ss['r2']}, atom:'SG'}}"
-             
+
              ssbond_cmds += f"""
              {{
                  let sel1 = {start_sel};
@@ -206,15 +202,15 @@ def _create_3dmol_html(
     conects = _find_conects(pdb_data)
     if conects:
         conect_cmds += "/* Detected CONECT Records (Cyclic/Extra Bonds) */\n"
-        
+
         # Bridge the gap: style terminal backbones as sticks so they meet the ribbon
         # Ribbon ends at CA. We need path: [Ribbon End CA] --stick-- [N or C] --thick cylinder-- [...]
         # Style entire first and last residues as sticks to be robust
-        conect_cmds += f"viewer.addStyle({{chain:'A', resi:1}}, {{stick:{{radius:0.18, color:'cyan'}}}});\n"
+        conect_cmds += "viewer.addStyle({chain:'A', resi:1}, {stick:{radius:0.18, color:'cyan'}});\n"
         conect_cmds += f"viewer.addStyle({{chain:'A', resi:{max_res}}}, {{stick:{{radius:0.18, color:'cyan'}}}});\n"
-        
+
         # Explicitly ensure CA-C and N-CA path is visible as cyan sticks for contrast
-        conect_cmds += f"viewer.addStyle({{chain:'A', resi:1, atom:['N','CA']}}, {{stick:{{radius:0.25, color:'cyan'}}}});\n"
+        conect_cmds += "viewer.addStyle({chain:'A', resi:1, atom:['N','CA']}, {stick:{radius:0.25, color:'cyan'}});\n"
         conect_cmds += f"viewer.addStyle({{chain:'A', resi:{max_res}, atom:['CA','C']}}, {{stick:{{radius:0.25, color:'cyan'}}}});\n"
 
         for s1, s2 in conects:
@@ -244,16 +240,16 @@ def _create_3dmol_html(
              h_color = h.get('color', 'purple')
              h_style = h.get('style', 'stick')
              h_label = h.get('label', '')
-             
+
              # Create array of residues [3, 4, 5, 6]
              res_array = str(list(range(start, end + 1)))
-             
+
              # Add style override
              if h_style == 'stick':
                  highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{stick:{{colorscheme:'{h_color}', radius:0.2}}}});\n"
              elif h_style == 'cartoon':
                  highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{cartoon:{{color:'{h_color}'}}}});\n"
-             
+
              # Add label at center residue
              center_res = (start + end) // 2
              if h_label:
@@ -311,11 +307,11 @@ def _create_3dmol_html(
             s2 = r.get('seq_2', r.get('residue_index_2'))
             a2 = r.get('atom_2', r.get('atom_name_2'))
             dist = r.get('dist', r.get('actual_distance', 5.0))
-            
+
             if s1 and s2:
                 js_restraints += f"    {{ c1:'{c1}', s1:{s1}, a1:'{a1}', c2:'{c2}', s2:{s2}, a2:'{a2}', d:{dist} }},\n"
         js_restraints += "];\n"
-        
+
         js_restraints += """
             // Add cylinders for restraints
             // EDUCATIONAL NOTE:
@@ -377,7 +373,7 @@ def _create_3dmol_html(
                 console.error("Error visualizing restraints:", e);
             }
         """
-    
+
     html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -770,13 +766,13 @@ def _find_ssbonds(pdb_content: str) -> list:
                 # 18-21: Residue number 1
                 # 30:    Chain ID 2
                 # 32-35: Residue number 2
-                
+
                 try:
                     c1 = line[15]
                     r1 = int(line[17:22].strip()) # 18-21 in spec, but generous slicing
                     c2 = line[29]
                     r2 = int(line[31:36].strip()) # 32-35 in spec
-                    
+
                     ssbonds.append({
                         'c1': c1, 'r1': r1,
                         'c2': c2, 'r2': r2
@@ -797,29 +793,29 @@ def _find_hbonds(pdb_content: str) -> list:
     try:
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
-        
+
         # Use Biotite's hbond analysis
         # Only backbone-backbone (triplet returned: [donor_idx, hydrogen_idx, acceptor_idx])
 
         # Note: synth-pdb often generates explicit hydrogens. If missing, biotite might fail or need mask.
         # We assume explicit hydrogens here or rely on acceptor-donor distance.
-        
-        # Actually, biotite.structure.hbond works well if H usually exists. 
+
+        # Actually, biotite.structure.hbond works well if H usually exists.
         # But synth-pdb might output files without H if generated without minimization/prep?
         # Let's assume hydrogens are present for now (since we usually have them).
-        
+
         # Try finding hydrogens first to see if we can use strict hbond
         has_hydrogens = np.any(structure.element == "H")
-        
+
         triplets = []
         if has_hydrogens:
             try:
                 triplets = hbond(structure, selection1="atom_name N", selection2="atom_name O")
             except Exception:
                 pass # Fallback
-        
+
         hbonds = []
-        
+
         if len(triplets) > 0:
             # Strict mode worked
             for donor_idx, h_idx, acceptor_idx in triplets:
@@ -836,26 +832,26 @@ def _find_hbonds(pdb_content: str) -> list:
             # This is "good enough" for visualization
             ns = structure[structure.atom_name == "N"]
             os_atoms = structure[structure.atom_name == "O"]
-            
+
             if len(ns) > 0 and len(os_atoms) > 0:
                 n_coords = ns.coord
                 o_coords = os_atoms.coord
-                
+
                 # Brute force distance matrix (N_n x N_o)
                 # n_coords[:, None, :] is (N_n, 1, 3)
                 # o_coords[None, :, :] is (1, N_o, 3)
                 # Broadcasting gives (N_n, N_o, 3) displacement vectors
                 diff = n_coords[:, np.newaxis, :] - o_coords[np.newaxis, :, :]
                 dists = np.linalg.norm(diff, axis=2)
-                
+
                 # Find pairs < 4.0 Angstrom (relaxed for visualization)
                 # Returns tuple of arrays (row_indices, col_indices)
                 n_indices, o_indices = np.where(dists < 4.0)
-                
+
                 for i, j in zip(n_indices, o_indices):
                     n_atom = ns[i]
                     o_atom = os_atoms[j]
-                    
+
                     # Check sequence separation
                     seq_sep = abs(n_atom.res_id - o_atom.res_id)
                     if seq_sep >= 3:
@@ -867,7 +863,7 @@ def _find_hbonds(pdb_content: str) -> list:
                         })
 
         return hbonds
-        
+
     except Exception as e:
         logger.warning(f"Could not calculate H-bonds: {e}\n{traceback.format_exc()}")
         return []

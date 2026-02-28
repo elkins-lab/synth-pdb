@@ -1,10 +1,13 @@
+from typing import Dict
+
 import numpy as np
-from typing import Dict, Tuple
+
 from .geometry import batched_angle, batched_dihedral, position_atoms_batch
 
+
 def compute_6d_orientations(
-    coords: np.ndarray, 
-    atom_names: list, 
+    coords: np.ndarray,
+    atom_names: list,
     residue_indices: list,
     n_residues: int
 ) -> Dict[str, np.ndarray]:
@@ -44,7 +47,7 @@ def compute_6d_orientations(
     """
     B = coords.shape[0]
     L = n_residues
-    
+
     # 1. Extract core frame atoms (N, Ca, C, Cb)
     # Using vectorized boolean masking for speed
     n_coords = np.zeros((B, L, 3))
@@ -79,18 +82,18 @@ def compute_6d_orientations(
         p1 = n_coords[:, missing_cb] # (B, num_missing, 3)
         p2 = c_coords[:, missing_cb]
         p3 = ca_coords[:, missing_cb]
-        
+
         # Flatten to (B * num_missing, 3) for position_atoms_batch compatibility
         num_missing = len(missing_cb)
         p1_f = p1.reshape(-1, 3)
         p2_f = p2.reshape(-1, 3)
         p3_f = p3.reshape(-1, 3)
-        
+
         # Ideal L-Alanine C-beta geometry (Z-Matrix)
         bl = np.full(B * num_missing, 1.522)
         ba = np.full(B * num_missing, 110.1)
         di = np.full(B * num_missing, -122.66)
-        
+
         cb_placed = position_atoms_batch(p1_f, p2_f, p3_f, bl, ba, di)
         cb_coords[:, missing_cb] = cb_placed.reshape(B, num_missing, 3)
 

@@ -1,8 +1,9 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
 import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 try:
-    import openmm.app as app
     import openmm as mm
+    import openmm.app as app
     from openmm import unit
     HAS_OPENMM = True
 except ImportError:
@@ -10,10 +11,9 @@ except ImportError:
     app = None
     mm = None
     unit = None
-import sys
 import os
-import numpy as np
 
+import numpy as np
 
 # Constants
 # SSBOND_CAPTURE_RADIUS determines the maximum distance (in Angstroms) between two Sulfur atoms
@@ -56,7 +56,7 @@ class EnergyMinimizer:
     (NOEs, J-couplings) and then energy-minimized to ensure good geometry.
     This module performs that final "geometry regularization" step.
     """
-    
+
     def __init__(self, forcefield_name: str = 'amber14-all.xml', solvent_model: str = 'app.OBC2', box_size: float = 1.0) -> None:
         """
         Initialize the Minimizer with a Forcefield and Solvent Model.
@@ -92,18 +92,18 @@ class EnergyMinimizer:
            parameterizes these radii to match explicit solvent behavior closely.
         """
         if not HAS_OPENMM: return
-        
+
         # Robust Validation
         valid_implicit = ['app.OBC2', 'app.OBC1', 'app.GBn', 'app.GBn2', 'app.HCT']
         if solvent_model != 'explicit' and solvent_model not in valid_implicit and not hasattr(app, str(solvent_model).split('.')[-1]):
              logger.warning(f"Unknown solvent model '{solvent_model}'. Defaulting to 'explicit'.")
              solvent_model = 'explicit'
-             
+
         if box_size <= 0:
             raise ValueError("box_size must be positive (nm).")
 
         self.forcefield_name = forcefield_name
-        self.water_model = 'amber14/tip3pfb.xml' 
+        self.water_model = 'amber14/tip3pfb.xml'
         self.solvent_model = solvent_model
         self.box_size = box_size * unit.nanometers
         ff_files = [self.forcefield_name]
@@ -122,7 +122,7 @@ class EnergyMinimizer:
             self.implicit_solvent_enum = solvent_model if not isinstance(solvent_model, str) else getattr(app, str(solvent_model).split('.')[-1], None)
             if self.implicit_solvent_enum in solvent_xml_map:
                 ff_files.append(solvent_xml_map[self.implicit_solvent_enum])
-        
+
         try:
             self.forcefield = app.ForceField(*ff_files)
         except Exception as e:
@@ -256,11 +256,11 @@ class EnergyMinimizer:
         """
         if not HAS_OPENMM:
             return 0.0
-            
+
         # Handle different input types
         pdb_path = None
         temp_file = None
-        
+
         try:
             if isinstance(input_data, str) and input_data.endswith('.pdb') and os.path.exists(input_data):
                 pdb_path = input_data
@@ -272,18 +272,18 @@ class EnergyMinimizer:
                 temp_file.write(content)
                 temp_file.close()
                 pdb_path = temp_file.name
-            
+
             # Use a dummy output path as we don't care about the result
             with tempfile.TemporaryDirectory() as tmpdir:
                 out_path = os.path.join(tmpdir, "energy_calc.pdb")
                 # We use _run_simulation with max_iterations=1 to just get the initial state's energy?
-                # Actually, _run_simulation usually minimizes. 
+                # Actually, _run_simulation usually minimizes.
                 # To get the energy WITHOUT moving atoms, we need a "0-step" simulation.
-                # I'll update _run_simulation to handle max_iterations=0 correctly or 
+                # I'll update _run_simulation to handle max_iterations=0 correctly or
                 # just use the energy from the first step.
                 # Actually, I'll pass a special flag or just use max_iterations=0 and handle it.
                 # For now, let's assume _run_simulation returns the energy if we add a return value.
-                # Wait, I didn't see _run_simulation return energy. 
+                # Wait, I didn't see _run_simulation return energy.
                 # I'll add a 'return_energy' parameter to _run_simulation.
                 return self._run_simulation(pdb_path, out_path, max_iterations=-1, cyclic=cyclic)
         finally:
@@ -324,7 +324,7 @@ class EnergyMinimizer:
                             self._suppressed_args.add(arg)
                             del kwargs[arg]
                             return _try_create(topo, **kwargs)
-                
+
                 # Fallback 2: Template mismatch (Hydrogen issues)
                 if "No template found" in msg and modeller is not None:
                     try:
@@ -339,7 +339,7 @@ class EnergyMinimizer:
                         return _try_create(current_topo, **kwargs)
                     except Exception as repair_e:
                         logger.warning(f"Repair failed: {repair_e}")
-                
+
                 raise e
 
         try:
@@ -372,7 +372,8 @@ class EnergyMinimizer:
             Exception: Any failure in file I/O or OpenMM loading is re-raised
                 so that the caller's try/except can log and return ``None``.
         """
-        import tempfile, os, numpy as np
+        import os
+        import tempfile
 
         # EDUCATIONAL NOTE - PDB PRE-PROCESSING (OpenMM Template Fix):
         # -----------------------------------------------------------
@@ -403,7 +404,7 @@ class EnergyMinimizer:
         last_res_id = None
 
         if os.path.exists(input_path):
-            with open(input_path, 'r') as f:
+            with open(input_path) as f:
                 pdb_lines = f.readlines()
 
             atom_lines = [l for l in pdb_lines if l.startswith("ATOM")]
@@ -570,7 +571,8 @@ class EnergyMinimizer:
             ``(modeller, added_bonds, salt_bridge_restraints,
               coordination_restraints, atom_list)``
         """
-        import numpy as np, io as _io
+        import io as _io
+
         import biotite.structure.io.pdb as biotite_pdb
 
         coordination_restraints = coordination_param if coordination_param is not None else []
@@ -683,8 +685,8 @@ class EnergyMinimizer:
         # We apply harmonic "Bungee" restraints to help these bridges snap together.
         # Salt bridge + metal coordination detection via biotite
         try:
-            from .cofactors import find_metal_binding_sites
             from .biophysics import find_salt_bridges
+            from .cofactors import find_metal_binding_sites
             tmp_io = _io.StringIO()
             app.PDBFile.writeFile(modeller.topology, modeller.positions, tmp_io)
             tmp_io.seek(0)
@@ -847,7 +849,6 @@ class EnergyMinimizer:
             where *n_idx*/*c_idx* are the N/C-terminus atom indices used for
             the cyclic pull force (``-1`` for non-cyclic structures).
         """
-        import numpy as np
         topology, positions = modeller.topology, modeller.positions
 
         # EDUCATIONAL NOTE - Anatomy of a Forcefield:
@@ -1295,7 +1296,6 @@ class EnergyMinimizer:
         """Internal engine. Returns final_energy if successful, else None."""
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
-        import tempfile, os, numpy as np
 
         # ── Stage 1: PDB preprocessing ──────────────────────────────────────
         try:

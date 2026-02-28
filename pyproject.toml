@@ -100,6 +100,9 @@ Changelog = "https://github.com/elkins/synth-pdb/releases"
 where = ["."]
 include = ["synth_pdb*"]
 
+[tool.setuptools.package-data]
+synth_pdb = ["py.typed"]
+
 [tool.black]
 line-length = 100
 target-version = ["py38", "py39", "py310", "py311", "py312"]

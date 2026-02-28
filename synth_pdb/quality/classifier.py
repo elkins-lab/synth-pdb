@@ -1,7 +1,7 @@
-import os
-import numpy as np
 import logging
+import os
 from typing import Optional, Tuple
+
 from .features import extract_quality_features, get_feature_names
 
 logger = logging.getLogger(__name__)
@@ -21,11 +21,11 @@ class ProteinQualityClassifier:
     - Positive samples: Minimized, valid structures
     - Negative samples: Raw unminimized structures, decoys, and random perturbations
     """
-    
+
     def __init__(self, model_path: Optional[str] = None) -> None:
         self.model = None
         self.feature_names = get_feature_names()
-        
+
         if model_path:
             self.load_model(model_path)
         else:
@@ -44,7 +44,7 @@ class ProteinQualityClassifier:
             logger.error("joblib is not installed. Install synth-pdb[ai] to use the quality filter.")
             self.model = None
             return
-            
+
         try:
             self.model = joblib.load(path)
             logger.info(f"Loaded quality classifier model from {path}")
@@ -63,16 +63,16 @@ class ProteinQualityClassifier:
         """
         if self.model is None:
             raise RuntimeError("Classifier model is not loaded.")
-            
+
         # Extract features
         features_vec = extract_quality_features(pdb_content)
-        
+
         # Predict
         # Reshape to (1, n_features) for scikit-learn
         prob = self.model.predict_proba(features_vec.reshape(1, -1))[0, 1]
         is_good = prob > 0.5
-        
+
         # Create feature dict for debugging/logging
         feature_dict = dict(zip(self.feature_names, features_vec))
-        
+
         return is_good, prob, feature_dict

@@ -15,11 +15,11 @@ $D_{ij} = ||r_i - r_j||$
 This matrix contains all the information needed to reconstruct the 3D shape (up to mirror symmetry). It is the fundamental "image" of a protein that Convolutional Neural Networks (CNNs) and Transformers operate on.
 """
 
-import numpy as np
-import biotite.structure as struc
 import json
 import logging
-from typing import Union, List
+
+import biotite.structure as struc
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
         np.ndarray: NxN matrix where M[i,j] is the distance in Angstroms between residue i and j.
     """
     logger.info(f"Calculating {method.upper()} Distance Matrix (Distogram)...")
-    
+
     # Filter atoms
     if method.lower() == "ca":
         atoms = structure[structure.atom_name == "CA"]
@@ -52,20 +52,20 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
              atoms = structure[structure.atom_name == "CA"]
     else:
         atoms = structure[structure.atom_name == "CA"]
-        
+
     # Calculate pairwise distances
     # Biotite has fast implementation?
     # struc.distance is for pairs.
     # SciPy pdist is standard.
     # Or simple broadcasting in numpy (N,1,3) - (1,N,3)
-    
+
     coords = atoms.coord # Shape (N, 3)
-    
+
     # Efficient calculation:
     # d = sqrt( sum( (xi - xj)^2 ) )
     delta = coords[:, np.newaxis, :] - coords[np.newaxis, :, :] # (N, N, 3)
     dist_matrix = np.sqrt(np.sum(delta**2, axis=-1)) # (N, N)
-    
+
     return dist_matrix
 
 def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
@@ -78,22 +78,22 @@ def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") ->
         fmt: Format 'json', 'csv', 'npz'.
     """
     logger.info(f"Exporting Distogram to {output_file} ({fmt})...")
-    
+
     if fmt.lower() == "json":
         # Convert to list of lists for JSON
         data = matrix.tolist()
         with open(output_file, "w") as f:
             json.dump(data, f)
-            
+
     elif fmt.lower() == "csv":
         # Save as text matrix
         np.savetxt(output_file, matrix, delimiter=",", fmt="%.3f")
-        
+
     elif fmt.lower() in ["npz", "npy", "numpy"]:
         # Save as compressed numpy
         np.savez_compressed(output_file, distogram=matrix)
-        
+
     else:
         raise ValueError(f"Unknown format: {fmt}")
-        
+
     logger.info("Export complete.")

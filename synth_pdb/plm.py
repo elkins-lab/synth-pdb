@@ -110,7 +110,6 @@ BENCHMARK (measured 2026-02-19, CPU, esm2_t6_8M_UR50D)
 """
 
 import logging
-import os
 from typing import Any, Optional
 
 import numpy as np

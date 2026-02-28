@@ -1,4 +1,4 @@
-from typing import List, Dict, Set, Any, Tuple
+from typing import Any, Dict, List, Set, Tuple, Union
 
 """
 This module contains data definitions for the synth_pdb package, starting
@@ -32,37 +32,37 @@ STANDARD_AMINO_ACIDS: List[str] = [
 
 # EDUCATIONAL NOTE - Proline Sterics (The "Proline Effect"):
 # --------------------------------------------------------
-# Proline is the "structure breaker" of the protein world. Unlike any other 
+# Proline is the "structure breaker" of the protein world. Unlike any other
 # amino acid, its sidechain is cyclized back onto the backbone Nitrogen.
-# 
+#
 # Consequences:
-# 1. Exceptional Rigidity: The N-CA bond is locked in a ring, preventing 
-#    rotation. This makes Proline the most restricted residue in the 
+# 1. Exceptional Rigidity: The N-CA bond is locked in a ring, preventing
+#    rotation. This makes Proline the most restricted residue in the
 #    Ramachandran plot.
-# 2. No H-Bonding Donor: Proline lacks the amide Hydrogen (H) that normally 
+# 2. No H-Bonding Donor: Proline lacks the amide Hydrogen (H) that normally
 #    participates in alpha-helix and beta-sheet hydrogen bonding.
 # 3. Cis-Trans Isomerization: While 99.9% of peptide bonds are "trans" (180 deg),
-#    Proline is unique in that "cis" (0 deg) is energetically accessible, 
+#    Proline is unique in that "cis" (0 deg) is energetically accessible,
 #    often forming sharp turns in protein chains.
 
 # --- D-Amino Acids ---
 # Mapping from 3-letter L-code to 3-letter D-code for PDB compatibility.
 # Glycine is achiral and therefore has no D-form.
-# 
+#
 # EDUCATIONAL NOTE - The "Mirror Image" World:
 # -------------------------------------------
 # Amino acids (except Glycine) are chiral, meaning they have a "handedness."
-# In nature, almost all proteins are made of L-amino acids (Left-handed). 
+# In nature, almost all proteins are made of L-amino acids (Left-handed).
 # However, D-amino acids (Right-handed) exist and are structurally fascinating:
-# 
+#
 # 1. Protease Resistance: Because most proteases are evolved to bind L-peptides,
-#    incorporating D-amino acids can "camouflage" a peptide from degradation, 
+#    incorporating D-amino acids can "camouflage" a peptide from degradation,
 #    extending its half-life from minutes to hours in the bloodstream.
-# 2. Bacterial Signatures: D-Ala and D-Glu are key components of the bacterial 
-#    cell wall (peptidoglycan). This makes them a target for the immune system 
+# 2. Bacterial Signatures: D-Ala and D-Glu are key components of the bacterial
+#    cell wall (peptidoglycan). This makes them a target for the immune system
 #    and antibiotics like Vancomycin.
-# 3. Structural Induction: D-amino acids favor different backbone angles. 
-#    For example, a "D-Proline" can induce a different type of beta-turn 
+# 3. Structural Induction: D-amino acids favor different backbone angles.
+#    For example, a "D-Proline" can induce a different type of beta-turn
 #    that is energetically impossible for L-Proline.
 #
 # These 3-letter codes are standardized in the PDB (e.g., DAL for D-Alanine).
@@ -159,7 +159,7 @@ RAMACHANDRAN_PRESETS: Dict[str, Dict[str, float]] = {
         'psi': 120.0,
     },
     'curved': {
-        # A specialized "tight" conformation to help the initial guess of cyclic peptides 
+        # A specialized "tight" conformation to help the initial guess of cyclic peptides
         # have N and C ends meet in 3D space.
         'phi': -80.0,
         'psi': -20.0,
@@ -302,21 +302,21 @@ RAMACHANDRAN_POLYGONS: Dict[str, Dict[str, List[List[Tuple[float, float]]]]] = {
 # --- Standard Bond Lengths and Angles (Approximations) ---
 
 # Values are in Angstroms for bond lengths and degrees for angles
-# 
+#
 # EDUCATIONAL NOTE - Engh & Huber Parameters (The Gold Standard):
 # -------------------------------------------------------------
-# These bond lengths and angles are not just "good guesses." They are the 
-# "Engh & Huber Parameters," derived in 1991 from a statistical survey of 
+# These bond lengths and angles are not just "good guesses." They are the
+# "Engh & Huber Parameters," derived in 1991 from a statistical survey of
 # small-molecule crystal structures in the Cambridge Structural Database (CSD).
-# 
+#
 # Significance:
-# 1. Foundation of Crystallography: Almost all protein structure refinement 
-#    software (like Phenix or CCP4) uses these targets as "restraints." If a 
+# 1. Foundation of Crystallography: Almost all protein structure refinement
+#    software (like Phenix or CCP4) uses these targets as "restraints." If a
 #    structure deviates too far from 1.458Ą for an N-CA bond, it's flagged.
-# 2. Physics-Informed: By assuming these bond lengths are fixed (rigid), we 
-#    reduce the complexity of protein simulation from thousands of variables 
+# 2. Physics-Informed: By assuming these bond lengths are fixed (rigid), we
+#    reduce the complexity of protein simulation from thousands of variables
 #    down to just a few torsion angles (Phi, Psi, Chi).
-# 
+#
 # Source: Engh, R. A., & Huber, R. (1991). Acta Crystallographica Section A.
 
 # Peptide bond geometry
@@ -550,7 +550,11 @@ AMINO_ACID_ATOMS: Dict[str, List[Dict[str, Any]]] = {
 # Reference: Dunbrack & Cohen (1997) Protein Science
 # Note: Only the most common rotamer is included for each amino acid
 
-ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
+# A single rotamer entry maps angle names (e.g. 'chi1', 'chi2') to a list of
+# degree values, and 'prob' to a scalar probability weight.
+RotamerEntry = Dict[str, Union[float, List[float]]]
+
+ROTAMER_LIBRARY: Dict[str, List[RotamerEntry]] = {
     # Aliphatic amino acids
     'ALA': [],  # No side-chain dihedrals
     'VAL': [
@@ -572,7 +576,7 @@ ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
         {'chi1': [-60.0], 'chi2': [180.0], 'chi3': [70.0], 'prob': 0.40},
         {'chi1': [-60.0], 'chi2': [180.0], 'chi3': [180.0],'prob': 0.30},
     ],
-    
+
     # Aromatic amino acids
     'PHE': [
         {'chi1': [-60.0], 'chi2': [90.0], 'prob': 0.50},   # g-, g+ (perp)
@@ -587,7 +591,7 @@ ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
         {'chi1': [-60.0], 'chi2': [-90.0], 'prob': 0.50},
         {'chi1': [180.0], 'chi2': [-90.0], 'prob': 0.30},
     ],
-    
+
     # Polar uncharged
     'SER': [
         {'chi1': [60.0], 'prob': 0.45},   # g+
@@ -613,7 +617,7 @@ ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
         {'chi1': [-60.0], 'chi2': [60.0], 'chi3': [0.0], 'prob': 0.40},
         {'chi1': [-60.0], 'chi2': [180.0], 'chi3': [0.0],'prob': 0.30},
     ],
-    
+
     # Charged
     'ASP': [
         {'chi1': [-60.0], 'chi2': [0.0], 'prob': 0.45},
@@ -635,7 +639,7 @@ ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
         {'chi1': [-60.0], 'chi2': [-75.0], 'prob': 0.40},
         {'chi1': [180.0], 'chi2': [-75.0], 'prob': 0.30},
     ],
-    
+
     # Special cases
     'GLY': [],
     'PRO': [],
@@ -647,18 +651,18 @@ ROTAMER_LIBRARY: Dict[str, List[Dict[str, List[float]]]] = {
 # This is due to steric hindrance between side-chain atoms and the backbone.
 #
 # Key Biophysical Principles (Dunbrack, 2002):
-# 1. Alpha-Helix (-60, -45): 
-#    - The "trans" (t, 180 deg) rotamer for Chi1 is often strongly disfavored for 
+# 1. Alpha-Helix (-60, -45):
+#    - The "trans" (t, 180 deg) rotamer for Chi1 is often strongly disfavored for
 #      branched residues (Val, Ile, Thr) due to clashes with the backbone i-3 or i-4.
 #    - "g-" (-60 deg) is typically the dominant rotamer.
 #
 # 2. Beta-Sheet (-135, 135):
-#    - The extended backbone allows more freedom. "trans" rotamers become much more 
+#    - The extended backbone allows more freedom. "trans" rotamers become much more
 #      favorable compared to helices.
 #
 # This simplified library maps secondary structure types ('alpha', 'beta', etc.)
 # to specific rotamer probability distributions.
-BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[Dict[str, List[float]]]]] = {
+BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[RotamerEntry]]] = {
     'VAL': {
         'alpha': [
             # In Helix: g- is dominant, trans is rare
@@ -688,7 +692,7 @@ BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[Dict[str, List[floa
     'THR': {
         'alpha': [
             {'chi1': [60.0], 'prob': 0.40},
-            {'chi1': [-60.0], 'prob': 0.55}, # g- 
+            {'chi1': [-60.0], 'prob': 0.55}, # g-
             {'chi1': [180.0], 'prob': 0.05},
         ],
         'beta': [
@@ -717,8 +721,8 @@ BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[Dict[str, List[floa
             # tp (trans, plus) becomes a major conformer.
             {'chi1': [-60.0], 'chi2': [180.0], 'prob': 0.40},  # mt
             {'chi1': [180.0], 'chi2': [60.0],  'prob': 0.40},  # tp (Distinctive for Beta)
-            {'chi1': [-60.0], 'chi2': [60.0],  'prob': 0.15}, 
-            {'chi1': [180.0], 'chi2': [180.0], 'prob': 0.05}, 
+            {'chi1': [-60.0], 'chi2': [60.0],  'prob': 0.15},
+            {'chi1': [180.0], 'chi2': [180.0], 'prob': 0.05},
         ]
     },
     'LYS': {
@@ -771,14 +775,14 @@ BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[Dict[str, List[floa
             {'chi1': [180.0], 'chi2': [-90.0], 'prob': 0.45}, # t
         ]
     },
-    
+
     # --- Charged Residues (ARG, ASP, GLU) & Polar (GLN, HIS, MET) ---
     # EDUCATIONAL NOTE - Electrostatics vs Sterics:
     # While charged residues form salt bridges on the surface, their Chi1 preference
     # is still dominated by backbone sterics.
     # - Long chains (ARG, GLU, GLN, MET) behave like Lysine: g- in Helix, Trans in Sheet.
     # - Short chains (ASP, ASN) have specific "g-" preferences to avoid O...C-backbone clashes.
-    
+
     'ARG': {
         'alpha': [
             {'chi1': [-60.0], 'chi2': [180.0], 'chi3': [180.0], 'chi4': [-85.0], 'prob': 0.70}, # g-
@@ -889,7 +893,7 @@ BETA_TURN_TYPES: Dict[str, List[Tuple[float, float]]] = {
 # CA-CB-G-D  (Chi2)
 # CB-G-D-E   (Chi3)
 # G-D-E-Z    (Chi4)
-AMINO_ACID_CHI_DEFINITIONS: Dict[str, List[Dict[str, List[str]]]] = {
+AMINO_ACID_CHI_DEFINITIONS: Dict[str, List[Dict[str, Union[str, List[str]]]]] = {
     'VAL': [{'name': 'chi1', 'atoms': ['N', 'CA', 'CB', 'CG1']}],
     'THR': [{'name': 'chi1', 'atoms': ['N', 'CA', 'CB', 'OG1']}],
     'ILE': [

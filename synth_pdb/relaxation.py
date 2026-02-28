@@ -14,7 +14,7 @@ from synth_nmr import (
     calculate_relaxation_rates,
     predict_order_parameters,
 )
-from synth_nmr.relaxation import spectral_density, njit
+from synth_nmr.relaxation import njit, spectral_density
 
 __all__ = [
     "calculate_relaxation_rates",

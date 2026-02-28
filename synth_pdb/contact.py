@@ -1,6 +1,7 @@
 from typing import Any, Optional
+
 import numpy as np
-import biotite.structure as struc
+
 
 def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:
     """
@@ -31,7 +32,7 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
         mask = (structure.atom_name == "CA") & (structure.element == "C")
         atoms = structure[mask]
     elif method == "noe":
-        # Realistic NOE is H-H distance. 
+        # Realistic NOE is H-H distance.
         # Approximating as 'N' (Amide) is cheaper, but let's try to do it right?
         # Actually, calculating ALL H-H pairs is expensive (N^2 protons).
         # Let's use CB (Beta Carbon) as a robust proxy for side-chain contacts.
@@ -42,12 +43,12 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
 
     coords = atoms.coord
     n_res = coords.shape[0]
-    
+
     # Compute Distance Matrix (Broadcasting)
     # dist[i, j] = ||r_i - r_j||
     delta = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]
     dist_matrix = np.sqrt(np.sum(delta**2, axis=-1))
-    
+
     if power == 0:
         # Binary Map (AI style)
         contact_map = (dist_matrix < threshold).astype(float)

@@ -1,11 +1,10 @@
 import logging
+from typing import List, Tuple
+
 import numpy as np
-import io
-import biotite.structure as struc
-import biotite.structure.io.pdb as pdb
-from typing import Dict, List, Any, Tuple
+
 from synth_pdb.orientogram import compute_6d_orientations
-from synth_pdb.validator import PDBValidator, RAMACHANDRAN_POLYGONS
+from synth_pdb.validator import RAMACHANDRAN_POLYGONS, PDBValidator
 
 logger = logging.getLogger(__name__)
 
@@ -117,12 +116,12 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
     """Extracts Phi/Psi angles from the validator's parsed atoms."""
     phi_list = []
     psi_list = []
-    
+
     for chain_id, residues_in_chain in validator.grouped_atoms.items():
         sorted_res_numbers = sorted(residues_in_chain.keys())
         for i, res_num in enumerate(sorted_res_numbers):
             current_res_atoms = residues_in_chain[res_num]
-            
+
             # Phi
             phi = None
             if i > 0:
@@ -134,7 +133,7 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
                     p3 = current_res_atoms["CA"]["coords"]
                     p4 = current_res_atoms["C"]["coords"]
                     phi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
-            
+
             # Psi
             psi = None
             if i < len(sorted_res_numbers) - 1:
@@ -146,29 +145,29 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
                     p3 = current_res_atoms["C"]["coords"]
                     p4 = next_res_atoms["N"]["coords"]
                     psi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
-            
+
             if phi is not None and psi is not None:
                 phi_list.append(phi)
                 psi_list.append(psi)
-                
+
     return phi_list, psi_list
 
 def _analyze_ramachandran(phi_list: List[float], psi_list: List[float], validator: PDBValidator) -> Tuple[int, int]:
     """Counts favored and outlier residues."""
     favored = 0
     outliers = 0
-    
+
     # We use "General" polygons for everything to simplify feature extraction
     # This keeps the model robust and noise-tolerant
     polygons = RAMACHANDRAN_POLYGONS["General"]
-    
+
     for phi, psi in zip(phi_list, psi_list):
         is_favored = False
         for poly in polygons["Favored"]:
             if validator._is_point_in_polygon((phi, psi), poly):
                 is_favored = True
                 break
-        
+
         if is_favored:
             favored += 1
         else:
@@ -177,8 +176,8 @@ def _analyze_ramachandran(phi_list: List[float], psi_list: List[float], validato
                 if validator._is_point_in_polygon((phi, psi), poly):
                     is_allowed = True
                     break
-            
+
             if not is_allowed:
                 outliers += 1
-                
+
     return favored, outliers
