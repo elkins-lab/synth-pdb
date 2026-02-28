@@ -5,22 +5,22 @@ import numpy as np
 def export_constraints(contact_map: np.ndarray, sequence: str, fmt: str = "casp", separation_cutoff: int = 0, threshold: float = 8.0) -> str:
     """
     Export a Contact Map or Distance Matrix to text format for AI modeling.
-    
+
     Parameters:
     -----------
     contact_map : np.ndarray
-        NxN matrix. Values can be Binary (0/1), Probabilities (0.0-1.0), 
+        NxN matrix. Values can be Binary (0/1), Probabilities (0.0-1.0),
         or raw distances (Angstroms).
     sequence : str
         The protein sequence (required for CASP header).
     fmt : str
         "casp" (CASP RR format) or "csv" (Simple list).
     separation_cutoff : int
-        Minimum sequence separation |i-j| to include. 
+        Minimum sequence separation |i-j| to include.
         Default 0 includes neighbors.
     threshold : float
         Distance cutoff for including a pair in the export.
-        
+
     Returns:
     --------
     content : str

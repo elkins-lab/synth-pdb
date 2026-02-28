@@ -166,3 +166,23 @@ class TestGNNPredictHappyPath:
         with patch.dict("sys.modules", {"torch": None}):
             with pytest.raises(ImportError, match="torch"):
                 clf.save(ckpt_path)
+
+    def test_init_missing_default_model_logs_info(self, caplog):
+        """
+        Initialization without a model_path should log an info message and
+        create a random-weight model when the default checkpoint is missing
+        (lines 136-146).
+        """
+        import logging
+        from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
+
+        with caplog.at_level(logging.INFO):
+            with patch("os.path.exists", return_value=False):
+                # Ensure we also mock the internal init so we don't accidentally do full setup
+                with patch.object(GNNQualityClassifier, "_init_fresh_model") as mock_init:
+                    clf = GNNQualityClassifier(model_path=None)
+                    
+                    assert "No pre-trained GNN checkpoint found at" in caplog.text
+                    assert "Classifier initialised with a random-weight model" in caplog.text
+                    mock_init.assert_called_once()
+

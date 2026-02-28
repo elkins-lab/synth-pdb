@@ -1,5 +1,5 @@
-from typing import Dict, List, Optional, Tuple, Union, cast
 import logging
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 import biotite.structure as struc
 import numpy as np
@@ -43,33 +43,33 @@ def position_atom_3d_from_internal_coords(
 
     # EDUCATIONAL NOTE - NeRF Geometry (Natural Extension Reference Frame)
     # -----------------------------------------------------------------
-    # Most protein structures are natively defined by their "Internal Coordinates" 
+    # Most protein structures are natively defined by their "Internal Coordinates"
     # (Z-Matrix): Bond Lengths, Bond Angles, and Torsion/Dihedral Angles.
-    # 
-    # To convert these into 3D Cartesian coordinates (X, Y, Z), we use the 
-    # "NeRF" method (Parsons et al., J. Comput. Chem. 2005). 
+    #
+    # To convert these into 3D Cartesian coordinates (X, Y, Z), we use the
+    # "NeRF" method (Parsons et al., J. Comput. Chem. 2005).
     #
     # How it works:
     # 1. We define a local coordinate system based on three previous atoms (P1, P2, P3).
     # 2. P3 is the origin (0, 0, 0).
     # 3. The axis b = (P3 - P2) is the primary direction.
-    # 4. We use Gram-Schmidt orthogonalization to define the Plane Normal (c) and 
+    # 4. We use Gram-Schmidt orthogonalization to define the Plane Normal (c) and
     #    the In-Plane Normal (d).
-    # 5. The new atom P4 is then "placed" in this local frame using spherical-to-Cartesian 
+    # 5. The new atom P4 is then "placed" in this local frame using spherical-to-Cartesian
     #    conversion and then transformed back into the global reference frame.
     #
     # EDUCATIONAL NOTE - Circular Statistics (The 180/-180 Problem):
     # -----------------------------------------------------------
-    # In protein geometry, torsion angles (Phi, Psi, Omega, Chi) are periodic. 
+    # In protein geometry, torsion angles (Phi, Psi, Omega, Chi) are periodic.
     # This introduces a challenge for both math and AI modeling:
-    # 
-    # 1. The Boundary Artifact: An angle of -179 deg is physically very close to 
-    #    +179 deg, but their arithmetic difference is 358 deg. 
-    # 2. Correct Distance: To find the "real" difference between two angles, we 
+    #
+    # 1. The Boundary Artifact: An angle of -179 deg is physically very close to
+    #    +179 deg, but their arithmetic difference is 358 deg.
+    # 2. Correct Distance: To find the "real" difference between two angles, we
     #    must use: `diff = (a - b + 180) % 360 - 180`.
-    # 3. AI Loss Functions: Naive Mean Squared Error (MSE) fails on angles because 
-    #    it doesn't understand this wrapping. High-performance models (like 
-    #    AlphaFold) often predict the (Sine, Cosine) of the angle instead, 
+    # 3. AI Loss Functions: Naive Mean Squared Error (MSE) fails on angles because
+    #    it doesn't understand this wrapping. High-performance models (like
+    #    AlphaFold) often predict the (Sine, Cosine) of the angle instead,
     #    ensuring a smooth, continuous coordinate space.
     # 4. Phase Wrapping: In structure generation, "Drift" must be applied carefully
     #    to avoid discontinuities at the -180/180 boundary.
@@ -115,66 +115,69 @@ def superimpose_batch(
     """
     Vectorized Kabsch algorithm to find the optimal rotation and translation
     that aligns a batch of source point sets to target point sets.
-    
+
     EDUCATIONAL NOTE - Vectorized Kabsch Algorithm:
     ----------------------------------------------
-    The Kabsch algorithm finds the optimal rotation matrix that minimizes the 
+    The Kabsch algorithm finds the optimal rotation matrix that minimizes the
     Root Mean Square Deviation (RMSD) between two sets of points.
-    
+
     By vectorizing this across B structures:
     1. Centering: We calculate B centroids simultaneously and subtract them.
     2. Covariance: We compute B covariance matrices (3x3) using batch matrix multiplication.
     3. SVD: We perform B Singular Value Decompositions in a single call.
-    4. Rotation Correction: We handle the batch-wise determinant to avoid 
+    4. Rotation Correction: We handle the batch-wise determinant to avoid
        reflections (ensuring a right-handed coordinate system).
-    
+
     Args:
         sources: (B, N, 3) batch of point sets to be rotated.
         targets: (B, N, 3) batch of reference point sets.
-        
+
     Returns:
         translations: (B, 3) centroid translations.
         rotations: (B, 3, 3) rotation matrices.
     """
-    B = sources.shape[0]
+    b = sources.shape[0]
 
     # 1. Centroids
-    centroid_s = np.mean(sources, axis=1, keepdims=True) # (B, 1, 3)
-    centroid_t = np.mean(targets, axis=1, keepdims=True) # (B, 1, 3)
+    source_centroid = np.mean(sources, axis=1, keepdims=True) # (B, 1, 3)
+    target_centroid = np.mean(targets, axis=1, keepdims=True) # (B, 1, 3)
 
-    s_centered = sources - centroid_s
-    t_centered = targets - centroid_t
+    s_centered = sources - source_centroid
+    t_centered = targets - target_centroid
 
     # 2. Covariance Matrix (B, 3, 3)
     # Using matmul with transposed s_centered
     cov = np.matmul(s_centered.transpose(0, 2, 1), t_centered)
 
     # 3. SVD (Batched)
-    U, S, Vt = np.linalg.svd(cov)
+    u, s, vt = np.linalg.svd(cov)
 
     # 4. Optimal Rotation Matrix: V * U^T
-    # Note: np.linalg.svd returns Vt = V^T, so we need V = Vt.transpose(0, 2, 1)
-    # And U^T = U.transpose(0, 2, 1)
-    rot = np.matmul(Vt.transpose(0, 2, 1), U.transpose(0, 2, 1))
+    # Note: np.linalg.svd returns vt = v^T, so we need v = vt.transpose(0, 2, 1)
+    # And u^T = u.transpose(0, 2, 1)
+    v = np.transpose(vt, (0, 2, 1))
+    u_t = np.transpose(u, (0, 2, 1))
+    rotations = np.matmul(v, u_t)
 
     # 5. Handle Reflections (Negative Determinant)
     # Ensure a proper rotation (determinant = 1)
-    det = np.linalg.det(rot)
+    det = np.linalg.det(rotations)
 
     # Create correction matrix (B, 3, 3)
     # Identity matrix with the last element being sgn(det)
-    correction = np.repeat(np.eye(3)[np.newaxis, :, :], B, axis=0)
+    correction = np.repeat(np.eye(3)[np.newaxis, :, :], b, axis=0)
     correction[:, 2, 2] = np.sign(det)
 
     # Re-calculate corrected rotation: V * correction * U^T
-    rot = np.matmul(Vt.transpose(0, 2, 1), np.matmul(correction, U.transpose(0, 2, 1)))
+    rotations = np.matmul(v, np.matmul(correction, u_t))
 
     # Translation = Target Centroid - (Rot * Source Centroid)
-    # Note: centroid_s is (B, 1, 3), we need (B, 3, 1) for matmul
-    rotated_centroid_s = np.matmul(rot, centroid_s.transpose(0, 2, 1)).squeeze(2) # (B, 3)
-    trans = centroid_t.squeeze(1) - rotated_centroid_s # (B, 3)
+    # Note: source_centroid is (B, 1, 3), we need (B, 3, 1) for matmul
+    translations = target_centroid.squeeze(1) - np.matmul(
+        rotations, source_centroid.transpose(0, 2, 1)
+    ).squeeze(2)
 
-    return trans, rot
+    return translations, rotations
 
 
 def position_atoms_batch(
@@ -188,22 +191,22 @@ def position_atoms_batch(
     """
     Vectorized version of the NeRF algorithm for large batches of structures.
     Operates on (B, 3) coordinate tensors and (B,) internal coordinate arrays.
-    
+
     EDUCATIONAL NOTE - GPU-First Operations:
     ---------------------------------------
-    On modern hardware (Apple M4 AMX, NVIDIA Tensor Cores), serial loops are 
+    On modern hardware (Apple M4 AMX, NVIDIA Tensor Cores), serial loops are
     extremely inefficient. By vectorizing the math into large matrix operations:
     1. Memory bandwidth is maximized via contiguous array access.
     2. SIMD units perform the same calculation across multiple samples simultaneously.
-    3. Hardware acceleration (Accelerate/MPS/Metal) can be leveraged automatically 
+    3. Hardware acceleration (Accelerate/MPS/Metal) can be leveraged automatically
        by numpy and high-level frameworks.
-    
+
     Args:
         p1, p2, p3: (B, 3) arrays of coordinates for the preceding atoms.
         bond_lengths: (B,) array of bond lengths.
         bond_angles_deg: (B,) array of bond angles in degrees.
         dihedral_angles_deg: (B,) array of dihedral angles in degrees.
-        
+
     Returns:
         np.ndarray: (B, 3) array of coordinates for the placed atoms (p4).
     """
@@ -231,12 +234,12 @@ def position_atoms_batch(
     c = normalize(c)
     d = normalize(d)
 
-    # Reshape lengths for broadcasting (B, 1)
-    L = bond_lengths.reshape(-1, 1)
+    # Reshape lengths for broadcasting (b, 1)
+    length = bond_lengths.reshape(-1, 1)
 
     # NeRF Coordinate Transformation
     # Place P4 in the local reference frame and shift to P3
-    p4 = p3 + L * (
+    p4 = p3 + length * (
         -b * np.cos(angles_rad).reshape(-1, 1)
         + d * (np.sin(angles_rad) * np.cos(dihedrals_rad)).reshape(-1, 1)
         + c * (np.sin(angles_rad) * np.sin(dihedrals_rad)).reshape(-1, 1)
@@ -378,7 +381,7 @@ def reconstruct_sidechain(
     """
     Reconstructs the sidechain of a specific residue in the peptide using the provided rotamer angles.
     Updates the coordinates in place.
-    
+
     Args:
         peptide: The full peptide structure.
         res_id: The residue ID to modify.

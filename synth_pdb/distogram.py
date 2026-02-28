@@ -26,11 +26,11 @@ logger = logging.getLogger(__name__)
 def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.ndarray:
     """
     Calculate the pairwise distance matrix for the given structure.
-    
+
     Args:
         structure: Biotite AtomArray.
         method: Atom to use for distance ("ca" for C-alpha, "cb" for C-beta).
-        
+
     Returns:
         np.ndarray: NxN matrix where M[i,j] is the distance in Angstroms between residue i and j.
     """
@@ -72,7 +72,7 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
 def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
     """
     Export the distance matrix to a file.
-    
+
     Args:
         matrix: NxN numpy array.
         output_file: Output filename.

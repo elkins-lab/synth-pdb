@@ -6,11 +6,11 @@ Based on pdbstat's molecular viewer implementation.
 """
 
 import io
-from typing import Any, List, Optional
 import logging
 import tempfile
 import traceback
 import webbrowser
+from typing import Any, List, Optional
 
 import biotite.structure.hbond as hbond
 import biotite.structure.io.pdb as pdb
@@ -31,18 +31,18 @@ def view_structure_in_browser(
 ) -> None:
     """
     Open 3D structure viewer in browser.
-    
+
     Args:
         pdb_content: PDB file contents as string
         filename: Name to display in viewer title
         style: Initial representation style (cartoon/stick/sphere/line)
         color: Initial color scheme (spectrum/chain/ss/white)
         restraints: Optional list of restraint dicts to visualize
-        
+
     Example:
         >>> pdb = generate_pdb_content(length=20)
         >>> view_structure_in_browser(pdb, "my_peptide.pdb")
-        
+
     Raises:
         Exception: If viewer fails to open
     """
@@ -81,21 +81,21 @@ def _create_3dmol_html(
 ) -> str:
     """
     Generate HTML with embedded 3Dmol.js viewer.
-    
+
     EDUCATIONAL NOTE - Why Browser-Based Visualization:
     Browser-based viewers are ideal for quick structure inspection because:
     1. No installation required (works on any system with a browser)
     2. Interactive (rotate, zoom, change styles)
     3. Lightweight (uses 3Dmol.js JavaScript library)
     4. Shareable (can save HTML file and share with others)
-    
+
     EDUCATIONAL NOTE - 3Dmol.js:
     3Dmol.js is a JavaScript library for molecular visualization that:
     - Runs entirely in the browser (no server needed)
     - Supports PDB, SDF, MOL2, and other formats
     - Provides interactive controls (rotate, zoom, style changes)
     - Uses WebGL for hardware-accelerated 3D graphics
-    
+
     Args:
         pdb_data: PDB file contents
         filename: Name of PDB file for display
@@ -106,7 +106,7 @@ def _create_3dmol_html(
         highlights: Optional list of dicts {'start', 'end', 'color', 'label'} for secondary structure
         show_hbonds: Whether to calculate and show backbone H-bonds
 
-        
+
     Returns:
         Complete HTML document as string
     """
@@ -117,7 +117,8 @@ def _create_3dmol_html(
             try:
                 rid = int(line[22:26].strip())
                 res_ids.append(rid)
-            except: continue
+            except Exception:
+                continue
     max_res = max(res_ids) if res_ids else 1
 
     # Escape PDB data for JavaScript
@@ -189,7 +190,7 @@ def _create_3dmol_html(
                          fromCap: 1, toCap: 1,
                          opacity: 1.0
                      }});
-                     
+
                      /* Force stick visibility for these residues so the bond doesn't float in space */
                      viewer.addStyle({{chain: sel1.chain, resi: sel1.resi}}, {{stick:{{radius:0.2}}}});
                      viewer.addStyle({{chain: sel2.chain, resi: sel2.resi}}, {{stick:{{radius:0.2}}}});
@@ -224,7 +225,7 @@ def _create_3dmol_html(
                          start: {{x: atoms1[0].x, y: atoms1[0].y, z: atoms1[0].z}},
                          end:   {{x: atoms2[0].x, y: atoms2[0].y, z: atoms2[0].z}},
                          radius: 0.25, /* Thicker for definitive closure */
-                         color: 'cyan', 
+                         color: 'cyan',
                          fromCap: 1, toCap: 1,
                          opacity: 1.0
                      }});
@@ -265,25 +266,25 @@ def _create_3dmol_html(
         /* PTM Visualization Logic with Fallback for Minimized Structures */
         /* If P atom exists (un-minimized), put label on P. */
         /* If P atom missing (minimized/stripped), put label on sidechain oxygen/carbon. */
-        
+
         /* SEP */
         viewer.addLabel("SEP", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'SEP', atom:'P'});
         viewer.addLabel("SEP", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'SEP', atom:'OG', not:{atom:'P'}}); /* Fallback */
-        
+
         /* TPO */
         viewer.addLabel("TPO", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'TPO', atom:'P'});
         viewer.addLabel("TPO", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'TPO', atom:'OG1', not:{atom:'P'}}); /* Fallback */
-        
+
         /* PTR */
         viewer.addLabel("PTR", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'PTR', atom:'P'});
         viewer.addLabel("PTR", {fontSize:10, fontColor:'black', backgroundColor:'orange'}, {resn:'PTR', atom:'OH', not:{atom:'P'}}); /* Fallback */
 
         /* Ensure PTMs serve as spheres too */
         viewer.addStyle({resn:['SEP','TPO','PTR']}, {stick:{radius:0.2}});
-        
+
         /* Orange Sphere on P if present */
         viewer.addStyle({resn:['SEP','TPO','PTR'], atom:'P'}, {sphere:{radius:1.0, color:'orange'}});
-        
+
         /* Orange Sphere on Oxygen if P missing (to simulate modified state) */
         /* Note: This might overlap with normal oxygen, but creates the visual cue requested by user */
         /* SEP -> OG */
@@ -328,7 +329,7 @@ def _create_3dmol_html(
                         let drawnCount = 0;
                         for(let i=0; i<restraints.length; i++) {
                             let r = restraints[i];
-                            
+
                             // Robustness: Trim strings and try fallback if chain is missing
                             let c1 = r.c1 ? r.c1.trim() : '';
                             let c2 = r.c2 ? r.c2.trim() : '';
@@ -338,7 +339,7 @@ def _create_3dmol_html(
                             // Try Strict Selection first
                             let sel1 = {chain: c1, resi: r.s1, atom: a1};
                             let sel2 = {chain: c2, resi: r.s2, atom: a2};
-                            
+
                             let atoms1 = viewer.selectedAtoms(sel1);
                             let atoms2 = viewer.selectedAtoms(sel2);
 
@@ -349,11 +350,11 @@ def _create_3dmol_html(
                             if (atoms2.length === 0) {
                                 atoms2 = viewer.selectedAtoms({resi: r.s2, atom: a2});
                             }
-                            
+
                             if(atoms1 && atoms1.length > 0 && atoms2 && atoms2.length > 0) {
                                 let atom1 = atoms1[0];
                                 let atom2 = atoms2[0];
-                                
+
                                 viewer.addCylinder({
                                     start: {x: atom1.x, y: atom1.y, z: atom1.z},
                                     end:   {x: atom2.x, y: atom2.y, z: atom2.z},
@@ -551,7 +552,7 @@ def _create_3dmol_html(
 
                 // Load PDB data
                 let pdbData = `{pdb_escaped}`;
-                
+
                 if (!pdbData || pdbData.trim().length === 0) {{
                     throw new Error("No PDB data provided to viewer.");
                 }}
@@ -561,13 +562,13 @@ def _create_3dmol_html(
 
                 // Set initial style and render
                 applyStyle();
-                
+
                 // Draw initial restraints
                 drawRestraints();
-                
+
                 viewer.zoomTo();
                 viewer.render();
-                
+
                 // Hide loading message if we got this far
                 if (loadingMsg) loadingMsg.style.display = 'none';
 
@@ -584,7 +585,7 @@ def _create_3dmol_html(
                 }}
             }}
         }});
-        
+
         // Define Restraints Data
         {js_restraints}
 
@@ -618,17 +619,17 @@ def _create_3dmol_html(
 
                             let sel1 = {{chain: c1, resi: r.s1, atom: a1}};
                             let sel2 = {{chain: c2, resi: r.s2, atom: a2}};
-                            
+
                             let atoms1 = viewer.selectedAtoms(sel1);
                             let atoms2 = viewer.selectedAtoms(sel2);
 
                             if (atoms1.length === 0) atoms1 = viewer.selectedAtoms({{resi: r.s1, atom: a1}});
                             if (atoms2.length === 0) atoms2 = viewer.selectedAtoms({{resi: r.s2, atom: a2}});
-                            
+
                             if(atoms1 && atoms1.length > 0 && atoms2 && atoms2.length > 0) {{
                                 let atom1 = atoms1[0];
                                 let atom2 = atoms2[0];
-                                
+
                                 let shape = viewer.addCylinder({{
                                     start: {{x: atom1.x, y: atom1.y, z: atom1.z}},
                                     end:   {{x: atom2.x, y: atom2.y, z: atom2.z}},
@@ -651,7 +652,7 @@ def _create_3dmol_html(
             viewer.removeAllShapes(); // Clear all shapes (H-bonds, arrows, etc)
             viewer.removeAllLabels(); // Clear all labels
             allShapes = []; // Reset tracked restraints
-            
+
             viewer.setStyle({{}}, {{}}); // Clear style
 
             let styleObj = {{}};
@@ -684,9 +685,9 @@ def _create_3dmol_html(
             {hbond_cmds}
             {ssbond_cmds}
             {conect_cmds}
-            
+
             drawRestraints(); // Re-draw restraints (if enabled)
-            
+
             viewer.render();
         }}
 
@@ -741,7 +742,7 @@ def _create_3dmol_html(
 
             let colorBtn = document.getElementById('color-' + currentColor);
             if (colorBtn) colorBtn.classList.add('active');
-            
+
             // Toggle buttons state
             if (ghostMode) document.getElementById('btn-ghost').classList.add('active');
             if (showRestraints) document.getElementById('btn-restraints').classList.add('active');
@@ -819,7 +820,7 @@ def _find_hbonds(pdb_content: str) -> list:
 
         if len(triplets) > 0:
             # Strict mode worked
-            for donor_idx, h_idx, acceptor_idx in triplets:
+            for donor_idx, _h_idx, acceptor_idx in triplets:
                 donor = structure[donor_idx]
                 acceptor = structure[acceptor_idx]
                 hbonds.append({

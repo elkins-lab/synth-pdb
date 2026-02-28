@@ -22,14 +22,14 @@ class DockingPrep:
     def write_pqr(self, input_pdb: str, output_pqr: str) -> bool:
         """
         Converts a PDB file to PQR format (adding partial charges and radii).
-        
+
         Uses OpenMM to assign charges based on the selected forcefield.
         Radii are derived from Lennard-Jones sigma (sigma / 2).
-        
+
         Args:
             input_pdb: Path to input PDB.
             output_pqr: Path to output PQR.
-            
+
         Returns:
             bool: True if successful.
         """
@@ -59,7 +59,8 @@ class DockingPrep:
                         line = line[:17] + f"{new_name: >3}" + line[20:]
                         if res_name in ['SEP', 'TPO', 'PTR']:
                             atom_name = line[12:16].strip()
-                            if atom_name in ptm_atom_names: continue
+                            if atom_name in ptm_atom_names:
+                                continue
                 modified_lines.append(line)
 
             with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as tf:
@@ -75,8 +76,10 @@ class DockingPrep:
             topology.createDisulfideBonds(positions)
 
             # Cleanup
-            try: os.unlink(temp_input_path)
-            except: pass
+            try:
+                os.unlink(temp_input_path)
+            except Exception:
+                pass
 
             # 2. Add Hydrogens (Crucial for correct charge assignment)
             modeller = app.Modeller(topology, positions)

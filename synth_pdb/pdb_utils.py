@@ -12,7 +12,7 @@ from typing import Optional
 def get_current_date_pdb_format() -> str:
     """
     Returns the current date formatted for PDB HEADER record (DD-MON-YY).
-    
+
     Returns:
         str: Date string in PDB format (e.g., "21-JAN-26")
     """
@@ -24,10 +24,10 @@ def get_current_date_pdb_format() -> str:
 def extract_atomic_content(full_pdb_content: str) -> str:
     """
     Extracts only ATOM, HETATM, and TER lines from a full PDB content string.
-    
+
     Args:
         full_pdb_content: Complete PDB file content including headers
-        
+
     Returns:
         str: PDB content containing only atomic coordinate lines
     """
@@ -45,12 +45,12 @@ def create_pdb_header(
 ) -> str:
     """
     Creates standardized PDB header records.
-    
+
     Args:
         sequence_length: Number of residues in the peptide
         date: Date string in PDB format (DD-MON-YY). If None, uses current date.
         command_args: Command-line arguments used for generation (for reproducibility)
-        
+
     Returns:
         str: PDB header records (HEADER through MODEL)
     """
@@ -98,7 +98,7 @@ def create_pdb_header(
 def create_pdb_footer() -> str:
     """
     Creates standardized PDB footer records.
-    
+
     Returns:
         str: PDB footer records (ENDMDL and END)
     """
@@ -112,11 +112,11 @@ def create_pdb_footer() -> str:
 def extract_header_records(full_pdb_content: str, record_type: str = "SSBOND") -> str:
     """
     Extracts specific header records (e.g. SSBOND) from a full PDB content string.
-    
+
     Args:
         full_pdb_content: Complete PDB file content
         record_type: Record type to extract (default: SSBOND)
-        
+
     Returns:
         str: Extracted records joined by newlines
     """
@@ -137,7 +137,7 @@ def assemble_pdb_content(
 ) -> str:
     """
     Assembles complete PDB file content from atomic coordinates and metadata.
-    
+
     Args:
         atomic_content: PDB content containing only ATOM/HETATM/TER lines
         sequence_length: Number of residues in the peptide
@@ -145,7 +145,7 @@ def assemble_pdb_content(
         command_args: Command-line arguments for reproducibility
         extra_records: Optional string of extra header records (e.g. SSBONDs) to insert
         conect_records: Optional string of CONECT records to insert at the end
-        
+
     Returns:
         str: Complete PDB file content with headers and footers
     """

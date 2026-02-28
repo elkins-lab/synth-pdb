@@ -1,7 +1,6 @@
 import io
-import io
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -37,52 +36,52 @@ class DecoyGenerator:
     ) -> list[str]:
         """
         Generates N unique decoys for a given sequence within a target RMSD range.
-        
+
         EDUCATIONAL NOTE - RMSD (Root Mean Square Deviation):
         -----------------------------------------------------
         RMSD is the standard metric for comparing two protein structures.
         It measures the average distance between corresponding atoms (usually C-alpha)
         after the structures have been optimally superimposed (rotated/translated).
-        
+
         Formula: RMSD = sqrt( sum(dist_i^2) / N )
 
         Interpretation:
         *   RMSD < 2.0 A: Very similar structures (within experimental error).
         *   RMSD 2-5 A:   Similar fold, but distinct local conformation.
         *   RMSD > 5 A:   Different folds or very unfolded states.
-        
+
         RMSD is calculated against the first generated decoy (the 'reference').
-        
+
         EDUCATIONAL NOTE - "Decoys" vs "NMR Ensembles":
         -----------------------------------------------
         *   **NMR Ensemble**: A set of structures that all satisfy experimental restraints (NOEs)
             and converge to a similar fold (low RMSD). They represent PRECISION.
         *   **Decoys**: Independent random conformations generated to sample the conformational space.
             They often have high RMSD (diversity) and represent the SEARCH SPACE.
-            
+
         This generator produces *Decoys* (independent samples). To mimic an NMR ensemble,
         one would need to filter these by RMSD or use simulated annealing refinement.
 
         EDUCATIONAL NOTE - "Hard Decoys" for AI Models:
         ----------------------------------------------
-        In AI protein scoring (e.g., training AlphaFold or Rosetta), "Hard Decoys" 
-        are negative samples that look physically realistic but are biologically 
+        In AI protein scoring (e.g., training AlphaFold or Rosetta), "Hard Decoys"
+        are negative samples that look physically realistic but are biologically
         impossible or topologically incorrect.
-        
+
         Why they matter:
-        *   **Contrastive Learning**: AI models need to learn why one structure is 
-            "better" than another. Simple random noise (Soft Decoys) is too easy 
-            for modern models to distinguish. 
+        *   **Contrastive Learning**: AI models need to learn why one structure is
+            "better" than another. Simple random noise (Soft Decoys) is too easy
+            for modern models to distinguish.
         *   **The Mismatch Problem**: Hard decoys test if a model can detect:
             - **Threading Mismatch**: A sequence forced into a fold it shouldn't adopt.
-            - **Label Shuffling**: A valid backbone where the sidechain identities 
+            - **Label Shuffling**: A valid backbone where the sidechain identities
               don't match the chemical environment.
-            - **Near-Native Noise**: Structures that are *almost* right but have 
+            - **Near-Native Noise**: Structures that are *almost* right but have
               subtle torsion errors (Drift).
-        
-        These decoys help AI avoid "memorizing" what a protein looks like and 
+
+        These decoys help AI avoid "memorizing" what a protein looks like and
         force it to learn the underlying physics of fold-sequence compatibility.
-        
+
         Args:
             sequence: Amino acid sequence.
             n_decoys: Number of decoys to generate.

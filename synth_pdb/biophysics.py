@@ -36,11 +36,11 @@ logger = logging.getLogger(__name__)
 def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.AtomArray:
     """
     Apply global pH settings to titratable residues (mainly Histidine).
-    
+
     Args:
         structure: The atom array.
         ph: The pH value (default 7.4).
-        
+
     Returns:
         Modified atom array with updated residue names (HIS -> HIE/HID/HIP).
     """
@@ -70,7 +70,7 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
 
         # Get all HIS residue IDs
         his_mask = structure.res_name == "HIS"
-        his_res_ids = sorted(list(set(structure.res_id[his_mask])))
+        his_res_ids = sorted(set(structure.res_id[his_mask]))
 
         for res_id in his_res_ids:
             # 80% chance HIE, 20% chances HID
@@ -91,12 +91,12 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
 def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     """
     Add terminal capping groups (ACE/NME) to the peptide.
-    
+
     EDUCATIONAL NOTE - Terminal Capping:
     ====================================
     Biological proteins are usually long chains. However, simulation and experiments
     often use shorter peptide fragments.
-    
+
     Uncapped termini (NH3+ and COO-) introduce strong charges that are often unrealistic
     for an internal fragment of a protein.
     - N-terminus cap: Acetyl (ACE) -> replaces H with CH3-CO-
@@ -105,19 +105,19 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     - C-terminus cap: N-Methylamide (NME) -> replaces O with NH-CH3
       Eliminates negative charge at C-term.
       Structure: ...-CO-NH-CH3
-      
+
     This function geometrically constructs these caps attached to the start and end residues.
-    
+
     Args:
         structure: Input peptide structure
-        
+
     Returns:
         Structure with ACE and NME residues added.
     """
     logger.info("Adding terminal caps (ACE/NME)...")
 
     # 1. Identify Termini
-    res_ids = sorted(list(set(structure.res_id)))
+    res_ids = sorted(set(structure.res_id))
     if not res_ids:
         return structure
 
@@ -283,14 +283,14 @@ BASIC_ATOMS = ["NZ", "NH1", "NH2", "ND1", "NE2"]
 def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]:
     """
     Automatically detects potential salt bridges in a protein structure.
-    
-    A salt bridge is defined here as a pair of acidic and basic residues 
+
+    A salt bridge is defined here as a pair of acidic and basic residues
     where any of their side-chain charged atoms are within the specified cutoff.
-    
+
     Args:
         structure: Biotite AtomArray (should include side chains).
         cutoff: Distance threshold in Angstroms (default 4.0).
-        
+
     Returns:
         list of dict: Each dict contains:
             - res_ia: Residue ID of the first residue

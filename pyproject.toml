@@ -98,7 +98,6 @@ Changelog = "https://github.com/elkins/synth-pdb/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["synth_pdb*"]
 
 [tool.setuptools.package-data]
 synth_pdb = ["py.typed"]

@@ -11,13 +11,13 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
     """
     Calculate a simple clash score based on Van der Waals overlaps.
     Lower is better.
-    
+
     Args:
         atom_array: Biotite AtomArray containing the structure
-        
+
     Returns:
         float: Systematic score representing the severity of steric clashes
-    
+
     # EDUCATIONAL NOTE - Steric Repulsion and Forces
     # Atoms are not hard billiard balls, but they do have a "Van der Waals radius".
     # When two atoms get too close, their electron clouds repel each other.

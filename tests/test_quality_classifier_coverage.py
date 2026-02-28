@@ -19,7 +19,8 @@ import pytest
 
 class TestClassifierInit:
 
-    def test_no_model_file_logs_warning(self, tmp_path, caplog):
+    @patch("synth_pdb.quality.classifier.os.path.exists", return_value=False)
+    def test_no_model_file_logs_warning(self, mock_exists, tmp_path, caplog):
         """
         When no default model exists, __init__ should log a warning and leave
         self.model as None.

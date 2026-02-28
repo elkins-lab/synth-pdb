@@ -184,7 +184,8 @@ class TestPhysicsCoverage:
         assert "Restoring lost HETATM: ZN" in caplog.text
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
-    def test_minimize_calls_run_simulation(self):
+    @patch("synth_pdb.physics.app")
+    def test_minimize_calls_run_simulation(self, mock_app):
         """
         Test that minimize() correctly calls _run_simulation with add_hydrogens=False.
         """
@@ -343,7 +344,8 @@ class TestPhysicsCoverage:
 
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
-    def test_wrapper_methods(self):
+    @patch("synth_pdb.physics.app")
+    def test_wrapper_methods(self, mock_app):
         """
         Test utility wrappers add_hydrogens_and_minimize and equilibrate steps.
         """

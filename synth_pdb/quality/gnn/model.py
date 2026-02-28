@@ -121,8 +121,7 @@ logger = logging.getLogger(__name__)
 def _check_pyg() -> None:
     """Raise a clear ImportError if torch_geometric is not installed."""
     try:
-        import torch
-        import torch_geometric
+        import torch_geometric  # noqa: F401
     except ImportError as exc:
         raise ImportError(
             "torch and torch_geometric are required. "
@@ -158,7 +157,7 @@ class ProteinGNN:
                 hidden_dim: int = 64, num_classes: int = 2) -> Any:
         _check_pyg()
         import torch.nn as nn
-        import torch.nn.functional as F
+        import torch.nn.functional as functional
         from torch_geometric.nn import GATConv, global_mean_pool
 
         class _ProteinGNNModule(nn.Module):
@@ -269,7 +268,7 @@ class ProteinGNN:
                 #   • ELU has non-zero gradient for negative inputs → avoids
                 #     "dying neuron" problem common in deep GNNs
                 #   • Smooth at 0, unlike ReLU's sharp kink
-                x = F.elu(x)
+                x = functional.elu(x)
 
                 # ── Layer 2: neighbourhood of neighbourhoods ───────────────
                 # Each node now has information from nodes 2 hops away, i.e.
@@ -277,7 +276,7 @@ class ProteinGNN:
                 # patterns (e.g. helix turns) and local packing.
                 x = self.conv2(x, edge_index, edge_attr)
                 x = self.bn2(x)
-                x = F.elu(x)
+                x = functional.elu(x)
 
                 # ── Layer 3: medium-range interactions ─────────────────────
                 # 3-hop receptive field.  For small peptides (≤ 20 residues)
@@ -285,7 +284,7 @@ class ProteinGNN:
                 # each node's embedding.
                 x = self.conv3(x, edge_index, edge_attr)
                 x = self.bn3(x)
-                x = F.elu(x)
+                x = functional.elu(x)
 
                 # ── Readout: node embeddings → graph embedding ─────────────
                 # global_mean_pool sums node embeddings per graph and divides
@@ -297,7 +296,7 @@ class ProteinGNN:
 
                 # ── MLP classification head ────────────────────────────────
                 x = self.lin1(x)
-                x = F.elu(x)
+                x = functional.elu(x)
                 # Dropout is only active during .train() mode; disabled in
                 # .eval() mode (inference), which is the correct behaviour.
                 x = self.dropout(x)
@@ -308,6 +307,6 @@ class ProteinGNN:
                 # nn.CrossEntropyLoss (which takes raw logits).
                 # We use log_softmax + NLLLoss to make the probability extraction
                 # step (.exp()) explicit and readable in gnn_classifier.py.
-                return F.log_softmax(x, dim=-1)
+                return functional.log_softmax(x, dim=-1)
 
         return _ProteinGNNModule()

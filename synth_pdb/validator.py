@@ -58,22 +58,22 @@ class PDBValidator:
     def _parse_pdb_atoms(pdb_content: str) -> List[Dict[str, Any]]:
         """
         Parses the PDB content and extracts atom information, specifically coordinates.
-        
+
         EDUCATIONAL NOTE - Physics of the Ramachandran Plot:
         ---------------------------------------------------
-        The Ramachandran plot (Phi vs Psi) is the "map of allowed protein shapes". 
+        The Ramachandran plot (Phi vs Psi) is the "map of allowed protein shapes".
         It is NOT based on complex quantum mechanics, but on simple HARD-SPHERE STERICS.
-        
+
         1. The Clash: For most Phi/Psi angles, the Carbonyl Oxygen (O) of residue i
-           clashes with the amide Hydrogen (H) of residue i+1, or the sidechain 
+           clashes with the amide Hydrogen (H) of residue i+1, or the sidechain
            C-beta atom clashes with the backbone.
         2. The Exceptions:
-           - Glycine: Has no C-beta (just H), so it can access much more "illegal" 
+           - Glycine: Has no C-beta (just H), so it can access much more "illegal"
              territory. It is the "flexible hinge" of proteins.
-           - Proline: Its sidechain is cyclic and bonded back to the Nitrogen. This 
+           - Proline: Its sidechain is cyclic and bonded back to the Nitrogen. This
              locks its Phi angle to ~ -65 deg, making it the "structural stiffener".
-        
-        This validator checks if your synthetic structure resides in these energetically 
+
+        This validator checks if your synthetic structure resides in these energetically
         favorable "Polygons of Life".
 
         Returns a list of dictionaries, each representing an atom with residue and chain info.
@@ -161,14 +161,13 @@ class PDBValidator:
             chains[chain_id].append(atom)
 
         pdb_lines = []
-        last_atom_number = 0
 
         # Process chains in sorted order of their IDs for consistent output
         for chain_id in sorted(chains.keys()):
             chain_atoms = chains[chain_id]
             for atom in chain_atoms:
                 pdb_lines.append(PDBValidator.atoms_to_pdb_line(atom))
-                last_atom_number = atom["atom_number"]
+                atom["atom_number"]
 
             # Add a TER record after the last atom of the chain, but only if it's a polymer (contains ATOMs)
             if chain_atoms:
@@ -265,12 +264,12 @@ class PDBValidator:
     ) -> float:
         """
         Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
-        
+
         IMPORTANT NOTE - Dihedral Conventions:
         It was discovered that simple projection math can accidentally swap
         Cis and Trans conventions.  Instead, the robust vector-based normal
         approach used in professional structural biology (IUPAC) is used.
-        
+
         Standard IUPAC convention:
         - Cis-Peptide (eclipsed): ~0 degrees
         - Trans-Peptide (anti-planar): ~180 degrees
@@ -502,19 +501,19 @@ class PDBValidator:
         """
         Validates Ramachandran angles (Phi, Psi) against MolProbity-defined polygonal regions.
         Checks if angles fall within simplified "Favored" (98%) or "Allowed" (99.8%) polygons.
-        
+
         ### Educational Note - Computational Efficiency & Convergence:
         -----------------------------------------------
         Checking Ramachandran angles isn't just about "correctness" — it's a critical
         performance optimization for Energy Minimization (OpenMM).
-        
-        1. **Better Starting Points**: A structure with valid angles is much closer 
-           to the global energy minimum. Minimization starting from a "Favored" 
-           conformation converges significantly faster than one starting from a 
+
+        1. **Better Starting Points**: A structure with valid angles is much closer
+           to the global energy minimum. Minimization starting from a "Favored"
+           conformation converges significantly faster than one starting from a
            high-energy "Outlier", saving expensive compute cycles.
-           
-        2. **Filtering**: By rejecting outliers *before* sending them to the 
-           physics engine, we avoid wasting GPU/CPU time minimizing structures 
+
+        2. **Filtering**: By rejecting outliers *before* sending them to the
+           physics engine, we avoid wasting GPU/CPU time minimizing structures
            that are likely trapped in local minima or effectively "broken".
         """
         logger.info("Performing Ramachandran angle validation (MolProbity-style polygons).")
@@ -670,8 +669,10 @@ class PDBValidator:
                 bonded_pairs.add(tuple(sorted((idx1, idx2))))
 
                 # Build adjacency for 1-3
-                if idx1 not in adj_list: adj_list[idx1] = []
-                if idx2 not in adj_list: adj_list[idx2] = []
+                if idx1 not in adj_list:
+                    adj_list[idx1] = []
+                if idx2 not in adj_list:
+                    adj_list[idx2] = []
                 adj_list[idx1].append(idx2)
                 adj_list[idx2].append(idx1)
 
@@ -687,15 +688,15 @@ class PDBValidator:
 
             # Intra-residue backbone bonds (N-CA, CA-C, C-O)
             # Inter-residue peptide bond (C(i)-N(i+1))
-            for chain_id, residues_in_chain in self.grouped_atoms.items():
+            for _chain_id, residues_in_chain in self.grouped_atoms.items():
                 sorted_res_numbers = sorted(residues_in_chain.keys())
-                for i, res_num in enumerate(sorted_res_numbers):
+                for _i, res_num in enumerate(sorted_res_numbers):
                     current_res_atoms = residues_in_chain[res_num]
 
-                    n_atom = current_res_atoms.get("N")
-                    ca_atom = current_res_atoms.get("CA")
-                    c_atom = current_res_atoms.get("C")
-                    o_atom = current_res_atoms.get("O")
+                    current_res_atoms.get("N")
+                    current_res_atoms.get("CA")
+                    current_res_atoms.get("C")
+                    current_res_atoms.get("O")
 
                     # Note: We need INDICES into self.atoms list, not atom_numbers (serial).
                     # My previous code used atom_numbers for bonded_pairs, but loop used indices?
@@ -720,7 +721,7 @@ class PDBValidator:
              # Map atom_number to index for lookup
              atom_num_to_idx = {a['atom_number']: i for i, a in enumerate(self.atoms)}
 
-             for chain_id, residues_in_chain in self.grouped_atoms.items():
+             for _chain_id, residues_in_chain in self.grouped_atoms.items():
                 sorted_res_numbers = sorted(residues_in_chain.keys())
                 for i, res_num in enumerate(sorted_res_numbers):
                     current_res_atoms = residues_in_chain[res_num]
@@ -1063,7 +1064,7 @@ class PDBValidator:
             temp_grouped_atoms[chain_id][residue_number][atom_name] = atom
 
         bonded_pairs = set()
-        for chain_id, residues_in_chain in temp_grouped_atoms.items():
+        for _chain_id, residues_in_chain in temp_grouped_atoms.items():
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]
@@ -1145,16 +1146,16 @@ class PDBValidator:
     def validate_side_chain_rotamers(self, tolerance: float = 40.0) -> None:
         """
         Validates side-chain rotamers against the Backbone-Dependent Library.
-        
+
         Educational Note - Side Chain Packing:
         --------------------------------------
         Side chains are not free to rotate continuously. They prefer specific discrete
         conformations (Rotamers) to avoid steric clashes with the backbone and other atoms.
         These are typically staggered conformations (gauche+, gauche-, trans).
         A "Rotamer Outlier" usually indicates a high-energy, eclipsed state that is physically unlikely.
-        
+
         The library provides valid (chi1, chi2...) clusters for Alpha and Beta backbones.
-        We check if the side-chain dihedral angles match any of the allowed low-energy 
+        We check if the side-chain dihedral angles match any of the allowed low-energy
         conformations defined in `BACKBONE_DEPENDENT_ROTAMER_LIBRARY`.
         """
         logger.info("Performing side-chain rotamer validation.")
@@ -1278,10 +1279,10 @@ class PDBValidator:
     def validate_chirality(self) -> None:
         """
         Validate L-amino acid chirality at C-alpha.
-        
+
         Uses improper dihedral N-CA-C-CB to check stereochemistry.
         L-amino acids should have negative improper dihedral (~-120° to -60°).
-        
+
         Glycine is exempt (no CB atom, therefore no chirality).
         """
         logger.info("Performing chirality validation.")
@@ -1364,11 +1365,11 @@ class PDBValidator:
     def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
         """
         Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
-        
+
         Args:
             input_data: Optional. If provided, uses this as the source (can be PDB content,
                        PeptideResult, or AtomArray). If None, uses the validator's initial content.
-        
+
         Returns:
             Dict[str, List[float]]: Dictionary with 'phi', 'psi', 'omega' keys mapping to degree lists.
         """

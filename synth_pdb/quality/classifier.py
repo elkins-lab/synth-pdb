@@ -55,7 +55,7 @@ class ProteinQualityClassifier:
     def predict(self, pdb_content: str) -> Tuple[bool, float, dict]:
         """
         Predicts quality of a PDB structure.
-        
+
         Returns:
             is_good (bool): True if probability > 0.5
             probability (float): Confidence score (0.0 - 1.0)

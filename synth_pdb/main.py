@@ -12,8 +12,8 @@ import datetime
 import logging
 import os
 import sys
-import time
-from typing import Optional, List
+from typing import List, Optional
+
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
 from .generator import generate_pdb_content
@@ -993,7 +993,7 @@ def main() -> None:
                         structure = pdb_file.get_structure(model=1)
 
                         # Sequence inference
-                        res_names = [structure[structure.res_id == i][0].res_name for i in sorted(list(set(structure.res_id)))]
+                        res_names = [structure[structure.res_id == i][0].res_name for i in sorted(set(structure.res_id))]
                         from .data import ONE_TO_THREE_LETTER_CODE
                         three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
                         seq_str = "".join([three_to_one.get(r, "X") for r in res_names])

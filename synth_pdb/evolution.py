@@ -38,15 +38,15 @@ ALL_AMINO_ACIDS = list("ACDEFGHIKLMNPQRSTVWY")
 def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     """
     Calculate the Relative Solvent Accessible Surface Area (rSASA) for each residue.
-    
+
     Why Relative?
     - Absolute SASA (in Å²) depends on the size of the amino acid.
     - rSASA gives the fraction of the residue exposed, normalized by its theoretical max exposure in a tripeptide (Gly-X-Gly).
     - Rule of thumb: rSASA < 0.2 is "Buried".
-    
+
     Args:
         atom_array: The full atomic structure.
-        
+
     Returns:
         np.array: Array of rSASA values (0.0 to 1.0) for each residue.
     """
@@ -77,7 +77,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     # Let's map strict "Buried" threshold to return binary-like logic for the mutator,
     # or implement real max values.
     # Implementing approximate Max SASA (in Å²) for X in G-X-G
-    MAX_SASA = {
+    max_sasa = {
         'A': 121, 'R': 265, 'N': 187, 'D': 187, 'C': 148, 'Q': 214, 'E': 214,
         'G': 97,  'H': 216, 'I': 195, 'L': 191, 'K': 230, 'M': 203, 'F': 228,
         'P': 154, 'S': 143, 'T': 163, 'W': 264, 'Y': 255, 'V': 165
@@ -93,7 +93,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     for i, area in enumerate(res_sasa):
         res_3 = res_names[i]
         res_1 = three_to_one.get(res_3, 'A')
-        max_area = MAX_SASA.get(res_1, 200.0)
+        max_area = max_sasa.get(res_1, 200.0)
         rel_sasa.append(min(1.0, area / max_area))
 
     return np.array(rel_sasa)
@@ -107,13 +107,13 @@ def generate_msa_sequences(
 ) -> List[str]:
     """
     Generate synthetic homologs via simulated neutral drift.
-    
+
     Args:
         structure: Source structure.
         n_seqs: Number of sequences to generate.
         mutation_rate: Probability of mutation per position per sequence.
         conservation_threshold: rSASA below which a residue is considered BURIED.
-        
+
     Returns:
         List of sequence strings.
     """
@@ -137,7 +137,7 @@ def generate_msa_sequences(
 
         new_seq = list(initial_seq)
 
-        for i, ref_aa in enumerate(initial_seq):
+        for i, _ref_aa in enumerate(initial_seq):
             # Roll for mutation
             if random.random() < mutation_rate:
                 # Decide allowed mutations based on structure

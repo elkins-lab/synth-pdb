@@ -66,7 +66,7 @@ The PyTorch approach is more portable across Python / PyTorch versions.
 
 import logging
 import os
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
@@ -242,7 +242,7 @@ class GNNQualityClassifier:
             raise ImportError("torch is required to save a GNN checkpoint.") from exc
 
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-        
+
         assert self.model is not None, "Model not loaded"
         torch.save(
             {
@@ -324,7 +324,8 @@ class GNNQualityClassifier:
         are close to log(0.5) ≈ -0.693 for both classes (random guessing),
         because the weights are initialised near zero by PyTorch's defaults.
         """
-        from .model import ProteinGNN
         import typing
+
+        from .model import ProteinGNN
         self.model = typing.cast(Any, ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2))
         self.model.eval()

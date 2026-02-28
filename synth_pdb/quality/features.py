@@ -27,7 +27,7 @@ def get_feature_names() -> List[str]:
 def extract_quality_features(pdb_content: str) -> np.ndarray:
     """
     Extracts a feature vector for the Protein Structure Quality Classifier.
-    
+
     Features:
     0. Ramachandran Favored %
     1. Ramachandran Outliers %
@@ -37,7 +37,7 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
     5. Peptide Bond Planarity Violation Count
     6. Radius of Gyration (Compactness)
     7. Mean B-factor (Flexibility)
-    
+
     Returns:
         np.ndarray: A 1D array of floats (shape: 8,)
     """
@@ -115,7 +115,7 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
     phi_list = []
     psi_list = []
 
-    for chain_id, residues_in_chain in validator.grouped_atoms.items():
+    for _chain_id, residues_in_chain in validator.grouped_atoms.items():
         sorted_res_numbers = sorted(residues_in_chain.keys())
         for i, res_num in enumerate(sorted_res_numbers):
             current_res_atoms = residues_in_chain[res_num]

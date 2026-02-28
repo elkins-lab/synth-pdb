@@ -199,7 +199,7 @@ class BatchedGenerator:
     def generate_batch(self, seed: Optional[int] = None, conformation: str = 'alpha', drift: float = 0.0) -> BatchedPeptide:
         """
         Generates B structures in parallel.
-        
+
         This method replaces the traditional per-residue loop with a "Batch Walk".
         Instead of placing atoms for structure 1, then structure 2... it places
         atom 'N' for ALL structures, then 'CA' for ALL structures, and so on.
@@ -214,12 +214,13 @@ class BatchedGenerator:
             np.random.seed(seed)
             random.seed(seed)
 
-        B = self.n_batch
-        L = self.n_res
+
+        b = self.n_batch
+        length = self.n_res
 
         # We only generate backbone for now (N, CA, C, O) - 4 atoms per residue
-        n_atoms = L * 4
-        coords = np.zeros((B, n_atoms, 3))
+        n_atoms = length * 4
+        coords = np.zeros((b, n_atoms, 3))
 
         # 1. Place first residue (N, CA, C) at origin frame
         coords[:, 0] = [0, 0, 0] # N
@@ -236,15 +237,15 @@ class BatchedGenerator:
         p_phi = preset['phi']
         p_psi = preset['psi']
 
-        # Sample torsions for the entire batch (B, L)
-        phi = np.full((B, L), p_phi)
-        psi = np.full((B, L), p_psi)
-        omega = np.full((B, L), 180.0)
+        # Sample torsions for the entire batch (b, length)
+        phi = np.full((b, length), p_phi)
+        psi = np.full((b, length), p_psi)
+        omega = np.full((b, length), 180.0)
 
         if drift > 0:
-            phi += np.random.normal(0, drift, (B, L))
-            psi += np.random.normal(0, drift, (B, L))
-            omega += np.random.normal(0, 2.0, (B, L)) # Fixed small omega drift
+            phi += np.random.normal(0, drift, (b, length))
+            psi += np.random.normal(0, drift, (b, length))
+            omega += np.random.normal(0, 2.0, (b, length)) # Fixed small omega drift
 
         # EDUCATIONAL NOTE - Peptidyl Chain Walk:
         # We construct the chain N -> CA -> C iteratively.
@@ -252,51 +253,51 @@ class BatchedGenerator:
 
         from .data import ANGLE_CA_C_O, BOND_LENGTH_C_O
 
-        for i in range(L):
+        for i in range(length):
             idx = i * 4
             if i == 0:
                 # Place O(0) using N(0), CA(0), C(0)
                 p1, p2, p3 = coords[:, 0], coords[:, 1], coords[:, 2]
-                bl, ba, di = np.full(B, BOND_LENGTH_C_O), np.full(B, ANGLE_CA_C_O), np.full(B, 180.0)
+                bl, ba, di = np.full(b, BOND_LENGTH_C_O), np.full(b, ANGLE_CA_C_O), np.full(b, 180.0)
                 coords[:, 3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
             else:
                 # Place N(i) using N(i-1), CA(i-1), C(i-1)
                 p1, p2, p3 = coords[:, (i-1)*4], coords[:, (i-1)*4+1], coords[:, (i-1)*4+2]
-                bl, ba, di = np.full(B, BOND_LENGTH_C_N), np.full(B, ANGLE_CA_C_N), psi[:, i-1]
+                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i-1]
                 coords[:, idx] = position_atoms_batch(p1, p2, p3, bl, ba, di)
 
                 # Place CA(i) using CA(i-1), C(i-1), N(i)
                 p1, p2, p3 = coords[:, (i-1)*4+1], coords[:, (i-1)*4+2], coords[:, idx]
-                bl, ba, di = np.full(B, BOND_LENGTH_N_CA), np.full(B, ANGLE_C_N_CA), omega[:, i-1]
+                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i-1]
                 coords[:, idx+1] = position_atoms_batch(p1, p2, p3, bl, ba, di)
 
                 # Place C(i) using C(i-1), N(i), CA(i)
                 p1, p2, p3 = coords[:, (i-1)*4+2], coords[:, idx], coords[:, idx+1]
-                bl, ba, di = np.full(B, BOND_LENGTH_CA_C), np.full(B, ANGLE_N_CA_C), phi[:, i]
+                bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]
                 coords[:, idx+2] = position_atoms_batch(p1, p2, p3, bl, ba, di)
 
                 # Place O(i) using N(i), CA(i), C(i)
                 p1, p2, p3 = coords[:, idx], coords[:, idx+1], coords[:, idx+2]
-                bl, ba, di = np.full(B, BOND_LENGTH_C_O), np.full(B, ANGLE_CA_C_O), np.full(B, 180.0)
+                bl, ba, di = np.full(b, BOND_LENGTH_C_O), np.full(b, ANGLE_CA_C_O), np.full(b, 180.0)
                 coords[:, idx+3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
 
         # 3. Full-Atom Superimposition
         if self.full_atom:
             # Allocate full-atom coords
-            fa_coords = np.zeros((B, self.total_atoms, 3))
+            fa_coords = np.zeros((b, self.total_atoms, 3))
 
-            for i in range(L):
-                # Target backbone frame (B, 3, 3) from the NeRF backbone
+            for i in range(length):
+                # Target backbone frame (b, 3, 3) from the NeRF backbone
                 # NeRF backbone order: N(0), CA(1), C(2), O(3)
                 target_n = coords[:, i*4]
                 target_ca = coords[:, i*4+1]
                 target_c = coords[:, i*4+2]
-                target_bb = np.stack([target_n, target_ca, target_c], axis=1) # (B, 3, 3)
+                target_bb = np.stack([target_n, target_ca, target_c], axis=1) # (b, 3, 3)
 
                 # Source backbone frame (3, 3)
                 template_bb = self.template_backbones[i]
-                # Broadcast template to batch: (B, 3, 3)
-                source_bb = np.repeat(template_bb[np.newaxis, :, :], B, axis=0)
+                # Broadcast template to batch: (b, 3, 3)
+                source_bb = np.repeat(template_bb[np.newaxis, :, :], b, axis=0)
 
                 # Align template to target
                 trans, rot = superimpose_batch(source_bb, target_bb)
@@ -305,8 +306,8 @@ class BatchedGenerator:
                 # template.coord: (N_res_atoms, 3)
                 template_coords = self.templates[i].coord
 
-                # (B, 3, 3) @ (N_res_atoms, 3)^T -> (B, 3, N_res_atoms)
-                # Then transpose back to (B, N_res_atoms, 3)
+                # (b, 3, 3) @ (N_res_atoms, 3)^T -> (b, 3, N_res_atoms)
+                # Then transpose back to (b, N_res_atoms, 3)
                 rotated = np.matmul(rot, template_coords.T).transpose(0, 2, 1)
                 aligned = rotated + trans[:, np.newaxis, :]
 
@@ -317,4 +318,4 @@ class BatchedGenerator:
 
             return BatchedPeptide(fa_coords, self.sequence, self.atom_names, self.residue_indices)
 
-        return BatchedPeptide(coords, self.sequence, ["N", "CA", "C", "O"] * L, self.residue_indices)
+        return BatchedPeptide(coords, self.sequence, ["N", "CA", "C", "O"] * length, self.residue_indices)

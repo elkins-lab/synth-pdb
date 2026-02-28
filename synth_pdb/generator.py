@@ -9,12 +9,19 @@
 # 5. Metadata: Fill in B-factors and Occupancy.
 #    - X-ray: Represents thermal motion.
 #    - NMR: Often used to represent local RMSD across the ensemble.
+# Re-export for backward compatibility with tests
+import io
 import logging
+import os
 import random
+import tempfile
 from typing import Any, Dict, List, Optional, Tuple
 
+import biotite.structure as struc
+import biotite.structure.io.pdb as pdb
 import numpy as np
 
+from . import biophysics  # New Module
 from .data import (
     ALL_VALID_AMINO_ACIDS,
     AMINO_ACID_FREQUENCIES,
@@ -38,24 +45,16 @@ from .geometry import (
     calculate_dihedral_angle,
     position_atom_3d_from_internal_coords,
 )
+from .packing import optimize_sidechains as run_optimization
 from .pdb_utils import (
     assemble_pdb_content,
     extract_atomic_content,
 )
+from .physics import EnergyMinimizer
+from .relaxation import predict_order_parameters
 
 # Re-export for backward compatibility with tests
 _position_atom_3d_from_internal_coords = position_atom_3d_from_internal_coords
-
-import io
-import os
-import tempfile
-
-import biotite.structure as struc
-import biotite.structure.io.pdb as pdb
-
-from . import biophysics  # New Module
-from .packing import optimize_sidechains as run_optimization
-from .physics import EnergyMinimizer
 
 # Convert angles to radians for numpy trigonometric functions
 ANGLE_N_CA_C_RAD = np.deg2rad(ANGLE_N_CA_C)
@@ -80,7 +79,7 @@ CA_DISTANCE = (
 PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_name: >3} {chain_id: <1}{residue_number: >4}{insertion_code: <1}   {x_coord: >8.3f}{y_coord: >8.3f}{z_coord: >8.3f}{occupancy: >6.2f}{temp_factor: >6.2f}          {element: >2}{charge: >2}"
 
 
-from .relaxation import predict_order_parameters
+
 
 
 def _calculate_bfactor(
@@ -92,12 +91,12 @@ def _calculate_bfactor(
 ) -> float:
     """
     Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
-    
+
     EDUCATIONAL NOTE - B-factors (Temperature Factors):
     ===================================================
     B-factors represent atomic displacement due to thermal motion and static disorder.
     They are measured in Ų (square Angstroms) and indicate atomic mobility.
-    
+
     Physical Interpretation:
     - B = 8π²<u²> where <u²> is mean square displacement
     - Higher B-factor = more mobile/flexible atom
@@ -107,13 +106,13 @@ def _calculate_bfactor(
     1. Backbone vs Side Chains:
        - Backbone atoms (N, CA, C, O): 15-25 Ų (constrained by peptide bonds)
        - Side chain atoms (CB, CG, etc.): 20-35 Ų (more conformational freedom)
-    
+
     2. Position Along Chain:
        In this synthetic generator, we simulate B-factors that follow these
        universal patterns of rigidity vs. flexibility.
        - Core residues: 10-20 Ų (buried, constrained)
        - Terminal residues: 30-50 Ų ("terminal fraying" - fewer constraints)
-    
+
     3. Residue-Specific Effects:
        - Glycine: Higher (no side chain constraints, more flexible)
        - Proline: Lower (cyclic structure, rigid backbone)
@@ -130,22 +129,22 @@ def _calculate_bfactor(
        - $S^2$ (from Lipari-Szabo) measures rigidity on ps-ns timescales.
        - $S^2 = 1.0 \rightarrow$ Rigid (Low B-factor).
        - $S^2 \approx 0.5 \rightarrow$ Flexible (High B-factor).
-    
+
     In this generator, we explicitly link the geometric flexibility ($S^2$)
     to the crystallographic observable ($B$), creating a unified biophysical model.
-    
+
     Args:
         atom_name: Atom name (e.g., 'N', 'CA', 'CB', 'CG')
         residue_number: Residue number (1-indexed)
         total_residues: Total number of residues in chain
         residue_name: Three-letter residue code (e.g., 'ALA', 'GLY')
         s2: Lipari-Szabo Order Parameter (0.0=Random, 1.0=Rigid). Default 0.85.
-        
+
     Returns:
         B-factor value in Ų, rounded to 2 decimal places
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
-    BACKBONE_ATOMS = {'N', 'CA', 'C', 'O', 'H', 'HA'}
+    backbone_atoms = {'N', 'CA', 'C', 'O', 'H', 'HA'}
 
     # Base physics: B-factor inversely related to Order Parameter
     # Calibration:
@@ -162,7 +161,7 @@ def _calculate_bfactor(
     base_bfactor = 100.0 * (1.0 - s2) + 5.0
 
     # Atom type adjustments
-    if atom_name not in BACKBONE_ATOMS:
+    if atom_name not in backbone_atoms:
         base_bfactor *= 1.5  # Side chains are more mobile than backbone
 
     # Residue-specific adjustments
@@ -191,10 +190,10 @@ def _calculate_occupancy(
     bfactor: float
 ) -> float:
     """Calculate realistic occupancy for an atom (0.85-1.00)."""
-    BACKBONE_ATOMS = {'N', 'CA', 'C', 'O', 'H', 'HA'}
+    backbone_atoms = {'N', 'CA', 'C', 'O', 'H', 'HA'}
 
     # Base occupancy
-    base_occupancy = 0.98 if atom_name in BACKBONE_ATOMS else 0.95
+    base_occupancy = 0.98 if atom_name in backbone_atoms else 0.95
 
     # Terminal disorder
     dist_from_n_term = (residue_number - 1) / max(total_residues - 1, 1)
@@ -241,7 +240,7 @@ def create_atom_line(
 ) -> str:
     """
     Create a PDB ATOM line.
-    
+
     EDUCATIONAL NOTE - PDB ATOM Record Format:
     - temp_factor (columns 61-66): Atomic mobility/flexibility
     - occupancy (columns 55-60): Fraction of molecules with atom at this position
@@ -264,7 +263,7 @@ def _place_atom_with_dihedral(
 ) -> np.ndarray:
     """
     Place a new atom using bond length, angle, and dihedral.
-    
+
     Wrapper around position_atom_3d_from_internal_coords with clearer naming.
     """
     import typing
@@ -295,35 +294,35 @@ def _generate_random_amino_acid_sequence(
 def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
     """
     Detect potential disulfide bonds between cysteine residues.
-    
+
     EDUCATIONAL NOTE - Disulfide Bond Detection:
     ============================================
     Disulfide bonds form between two cysteine (CYS) residues when their
     sulfur atoms (SG) are close enough to form a covalent S-S bond.
-    
+
     Detection Criteria:
     - Both residues must be CYS
     - SG-SG distance: 2.0-2.2 Å (slightly relaxed from ideal 2.0-2.1 Å)
     - Only report each pair once (avoid duplicates)
-    
+
     Why Distance Matters:
     - < 2.0 Å: Too close (steric clash, not realistic)
     - 2.0-2.1 Å: Ideal disulfide bond distance
     - 2.1-2.2 Å: Acceptable (allows for flexibility)
     - > 2.2 Å: Too far (no covalent bond possible)
-    
+
     Biological Context:
     - Disulfides stabilize protein structure
     - Common in extracellular proteins
     - Rare in cytoplasm (reducing environment)
     - Important for protein folding and stability
-    
+
     Args:
         peptide: Biotite AtomArray structure
-        
+
     Returns:
         List of tuples (res_id1, res_id2) representing disulfide bonds
-        
+
     Example:
         >>> disulfides = _detect_disulfide_bonds(structure)
         >>> print(disulfides)
@@ -367,14 +366,14 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 def _generate_ssbond_records(disulfides: list, chain_id: str = 'A') -> str:
     """
     Generate SSBOND records for PDB header.
-    
+
     EDUCATIONAL NOTE - PDB SSBOND Format:
     ====================================
     SSBOND records annotate disulfide bonds in PDB files.
-    
+
     Format (PDB specification):
     SSBOND   1 CYS A    6    CYS A   11
-    
+
     Columns:
     1-6:   "SSBOND"
     8-10:  Serial number (1, 2, 3, ...)
@@ -384,20 +383,20 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = 'A') -> str:
     26-28: Residue name 2 (always "CYS")
     30:    Chain ID 2
     32-35: Residue number 2 (right-justified)
-    
+
     Why This Matters:
     - Structure viewers use this to display bonds
     - Analysis tools use this for stability calculations
     - Essential for understanding protein structure
     - Part of standard PDB format
-    
+
     Args:
         disulfides: List of (res_id1, res_id2) tuples
         chain_id: Chain identifier (default 'A')
-        
+
     Returns:
         String containing SSBOND records (one per line)
-        
+
     Example:
         >>> records = _generate_ssbond_records([(3, 8), (12, 20)], 'A')
         >>> print(records)
@@ -484,22 +483,22 @@ def _resolve_sequence(
 def _sample_ramachandran_angles(res_name: str, next_res_name: Optional[str] = None) -> Tuple[float, float]:
     """
     Sample phi/psi angles from Ramachandran probability distribution.
-    
+
     Uses residue-specific distributions for GLY and PRO, general distribution
     for all other amino acids. Samples from favored regions using weighted
     Gaussian distributions.
-    
+
     New Feature: Pre-Proline Bias
     If next_res_name is 'PRO' and current residue is not GLY or PRO,
     uses a specific 'PRE_PRO' distribution (favors beta/extended).
-    
+
     Args:
         res_name: Three-letter amino acid code
         next_res_name: (Optional) Code of the next residue
-        
+
     Returns:
         Tuple of (phi, psi) angles in degrees
-        
+
     Reference:
         Lovell et al. (2003) Proteins: Structure, Function, and Bioinformatics
     """
@@ -536,17 +535,17 @@ def _sample_ramachandran_angles(res_name: str, next_res_name: Optional[str] = No
 def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[int, str]:
     """
     Parse structure region specification into per-residue conformations.
-    
+
     This function enables users to specify different secondary structure conformations
     for different regions of their peptide. This is crucial for creating realistic
     protein-like structures that have mixed secondary structures (e.g., helix-turn-sheet).
-    
+
     EDUCATIONAL NOTE - Why This Matters:
     Real proteins don't have uniform secondary structure throughout. They typically
     have regions of alpha helices, beta sheets, turns, and loops. This function
     allows users to specify these regions explicitly, making the generated structures
     much more realistic and useful for educational demonstrations.
-    
+
     Args:
         structure_str: Region specification string in format "start-end:conformation,..."
                       Example: "1-10:alpha,11-20:beta,21-30:random"
@@ -554,27 +553,27 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
                       - Conformations: alpha, beta, ppii, extended, random
                       - Multiple regions separated by commas
         sequence_length: Total number of residues in the sequence
-        
+
     Returns:
         Dictionary mapping residue index (0-based) to conformation name.
         Only includes explicitly specified residues (gaps are allowed).
-        
+
         EDUCATIONAL NOTE - Return Format:
         We use 0-based indexing internally (Python convention) even though
         the input uses 1-based indexing (PDB/biology convention). This is
         a common pattern in bioinformatics software.
-        
+
     Raises:
         ValueError: If syntax is invalid, regions overlap, or ranges are out of bounds
-        
+
     Examples:
         >>> _parse_structure_regions("1-10:alpha,11-20:beta", 20)
         {0: 'alpha', 1: 'alpha', ..., 9: 'alpha', 10: 'beta', ..., 19: 'beta'}
-        
+
         >>> _parse_structure_regions("1-5:alpha,10-15:beta", 20)
         {0: 'alpha', ..., 4: 'alpha', 9: 'beta', ..., 14: 'beta'}
         # Note: Residues 6-9 and 16-20 are not in the dictionary (gaps allowed)
-    
+
     EDUCATIONAL NOTE - Design Decisions:
     1. We allow gaps in coverage - unspecified residues will use the default conformation
     2. We strictly forbid overlaps - each residue can only have one conformation
@@ -639,11 +638,11 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
         try:
             start = int(start_str)
             end = int(end_str)
-        except ValueError:
+        except ValueError as err:
             raise ValueError(
                 f"Invalid range numbers: '{range_part}'. "
                 f"Start and end must be integers (e.g., '1-10')"
-            )
+            ) from err
 
         # Special Check for Beta-Turns
         if conformation in BETA_TURN_TYPES:
@@ -1476,12 +1475,12 @@ def generate_pdb_content(
 ) -> str:
     """
     Generates PDB content for a linear or cyclic peptide chain.
-    
+
     EDUCATIONAL NOTE - New Feature: Cyclic Peptides
-    Cyclic peptides have their N-terminus bonded to their C-terminus. 
-    This modification increases metabolic stability and is common in 
+    Cyclic peptides have their N-terminus bonded to their C-terminus.
+    This modification increases metabolic stability and is common in
     therapeutic peptides (e.g., Cyclosporin).
-    
+
     Args:
         length: Number of residues (ignored if sequence_str provided)
         sequence_str: Explicit amino acid sequence (1-letter or 3-letter codes)
@@ -1512,13 +1511,13 @@ def generate_pdb_content(
         cis_proline_frequency: Frequency of cis-proline
         phosphorylation_rate: Frequency of phosphorylation
         cyclic: Whether to generate a cyclic peptide (Head-to-Tail)
-    
+
     Returns:
         str: Complete PDB file content
-        
+
     Raises:
         ValueError: If invalid conformation name or structure syntax provided
-        
+
     EDUCATIONAL NOTE - Why Per-Region Conformations Matter:
     Real proteins have mixed secondary structures. For example:
     - Zinc fingers: beta sheets + alpha helices
@@ -1528,10 +1527,10 @@ def generate_pdb_content(
 
     EDUCATIONAL NOTE - Macrocyclization (Cyclic Peptides):
     -----------------------------------------------------
-    Cyclic peptides (macrocycles) are chains where the N-terminus and C-terminus 
+    Cyclic peptides (macrocycles) are chains where the N-terminus and C-terminus
     are covalently linked. This has profound biological implications:
     1. Metabolic Stability: Resistance to exopeptidases that chew protein ends.
-    2. Binding Affinity: By "locking" the molecule into a specific shape, 
+    2. Binding Affinity: By "locking" the molecule into a specific shape,
        the entropic penalty of binding to a target is greatly reduced.
     3. Bioavailability: Many legendary drugs (like Cyclosporine A) are macrocycles.
 
@@ -1539,10 +1538,10 @@ def generate_pdb_content(
     ---------------------------------------------------
     This generator includes specialized parameters for "Hard Decoy" generation:
     1. **Torsion Drift (`drift`)**: Adds controlled Gaussian noise to ideal $\\phi/\\psi$
-       angles. This simulates "near-native" local structural errors that 
+       angles. This simulates "near-native" local structural errors that
        challenge the resolution of AI scoring functions.
-    2. **Threading (`phi_list`, `psi_list`, `omega_list`)**: Allows constructing 
-       one sequence using the backbone torsion angles of another. This maps a 
+    2. **Threading (`phi_list`, `psi_list`, `omega_list`)**: Allows constructing
+       one sequence using the backbone torsion angles of another. This maps a
        "wrong" sequence to a "right" fold, a key test for discriminative models.
     """
 
@@ -1619,7 +1618,7 @@ class PeptideGenerator:
     def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs: Any) -> None:
         self.sequence = sequence
         self.config = kwargs
-        self._last_result: Optional["PeptideResult"] = None
+        self._last_result: Optional[PeptideResult] = None
 
     def generate(self, **overrides: Any) -> "PeptideResult":
         """Generates the protein structure and returns a Result object."""
@@ -1639,7 +1638,7 @@ class PeptideGenerator:
 
 class PeptideResult:
     """
-    Container for generation outputs, providing easy access to 
+    Container for generation outputs, providing easy access to
     PDB strings, Biotite structures, and metadata.
     """
     def __init__(self, pdb_content: str) -> None:

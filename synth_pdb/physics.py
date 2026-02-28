@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple, cast, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 try:
     import openmm as mm
@@ -27,13 +27,13 @@ logger = logging.getLogger(__name__)
 class EnergyMinimizer:
     """
     Performs energy minimization on molecular structures using OpenMM.
-    
+
     ### Educational Note: What is Energy Minimization?
     --------------------------------------------------
     Proteins fold into specific 3D shapes to minimize their "Gibbs Free Energy".
     A generated structure (like one built from simple geometry) often has "clashes"
     where atoms are too close (high Van der Waals repulsion) or bond angles are strained.
-    
+
     Energy Minimization is like rolling a ball down a hill. The "Energy Landscape"
     represents the potential energy of the protein as a function of all its atom coordinates.
     The algorithm moves atoms slightly to reduce this energy, finding a local minimum
@@ -41,15 +41,15 @@ class EnergyMinimizer:
 
     ### Educational Note - Metal Coordination in Physics:
     -----------------------------------------------------
-    Metal ions like Zinc (Zn2+) are not "bonded" in the same covalent sense as Carbon-Carbon 
-    bonds in classical forcefields. Instead, they are typically modeled as point charges 
+    Metal ions like Zinc (Zn2+) are not "bonded" in the same covalent sense as Carbon-Carbon
+    bonds in classical forcefields. Instead, they are typically modeled as point charges
     held by electrostatics and Van der Waals forces.
-    
+
     In this tool, we automatically detect potential coordination sites (like Zinc Fingers).
-    To maintain the geometry during minimization, we apply Harmonic Constraints 
-    that act like springs, tethering the Zinc to its ligands (Cys/His). 
+    To maintain the geometry during minimization, we apply Harmonic Constraints
+    that act like springs, tethering the Zinc to its ligands (Cys/His).
     We also deprotonate coordinating Cysteines to represent the thiolate state.
-    
+
     ### NMR Perspective:
     In NMR structure calculation (e.g., CYANA, XPLOR-NIH), minimization is often part of
     "Simulated Annealing". Structures are calculated to satisfy experimental restraints
@@ -60,38 +60,39 @@ class EnergyMinimizer:
     def __init__(self, forcefield_name: str = 'amber14-all.xml', solvent_model: str = 'app.OBC2', box_size: float = 1.0) -> None:
         """
         Initialize the Minimizer with a Forcefield and Solvent Model.
-        
+
         Args:
             forcefield_name: The "rulebook" for how atoms interact.
                              'amber14-all.xml' describes protein atoms (parameters for bond lengths,
                              angles, charges, and VdW radii).
-            solvent_model:   How water is simulated. 
+            solvent_model:   How water is simulated.
                              'explicit' will use a TIP3P water box (High Fidelity).
                              'app.OBC2' is an "Implicit Solvent" model (High Performance).
             box_size:        The padding distance (in nm) for the explicit solvent box.
                              Default 1.0 nm ensures the protein doesn't see its own image.
-        
+
         ### EDUCATIONAL NOTE - Explicit vs. Implicit Solvent:
         ---------------------------------------------------
         1. **Explicit Solvent (TIP3P)**:
-           Every water molecule (H2O) is simulated as a rigid 3-site model. This captures the 
+           Every water molecule (H2O) is simulated as a rigid 3-site model. This captures the
            "Enthalpic" and "Entropic" costs of cavity formation and hydrogen bonding.
-           
+
            *Deep Dive*: TIP3P is the "standard" but modern simulations often use TIP4P/Ew
            for better electrostatic performance.
-           
+
         2. **Implicit Solvent (Generalized Born / OBC)**:
-           Also known as "Born Solvation". The cost of moving an ion from vacuum (ε=1) 
+           Also known as "Born Solvation". The cost of moving an ion from vacuum (ε=1)
            to water (ε=80) is estimated by the **Born Equation**:
-           
+
            ΔG_solv = - (q^2 / 2r) * (1 - 1/ε)
-           
-           In proteins, each atom has a unique "Effective Born Radius" based on how buried 
-           it is. Surface atoms feel the full ε=80, while core atoms are shielded. 
-           The **OBC2 (Onufriev-Bashford-Case)** model is a refined version that 
+
+           In proteins, each atom has a unique "Effective Born Radius" based on how buried
+           it is. Surface atoms feel the full ε=80, while core atoms are shielded.
+           The **OBC2 (Onufriev-Bashford-Case)** model is a refined version that
            parameterizes these radii to match explicit solvent behavior closely.
         """
-        if not HAS_OPENMM: return
+        if not HAS_OPENMM:
+            return
 
         # Robust Validation
         valid_implicit = ['app.OBC2', 'app.OBC1', 'app.GBn', 'app.GBn2', 'app.HCT']
@@ -126,34 +127,35 @@ class EnergyMinimizer:
         try:
             self.forcefield = app.ForceField(*ff_files)
         except Exception as e:
-            logger.error(f"Failed to load forcefield: {e}"); raise
+            logger.error(f"Failed to load forcefield: {e}")
+            raise
 
     def minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Run energy minimization to regularize geometry and resolve clashes.
-        
+
         Uses OpenMM with implicit solvent (OBC2) and the AMBER forcefield.
-        This provides a "physically valid" structure by moving atoms into their 
+        This provides a "physically valid" structure by moving atoms into their
         local energy minimum.
-        
+
         ### EDUCATIONAL NOTE - Anatomy of a Forcefield:
         -------------------------------------------
-        A forcefield (like Amber14) approximates the potential energy (U) of a 
+        A forcefield (like Amber14) approximates the potential energy (U) of a
         molecule as a sum of four main terms:
-        
+
         U = U_bond + U_angle + U_torsion + [U_vdw + U_elec]
-        
+
         1. Bonded Terms (Springs):
-           - U_bond/U_angle: Atoms behave like balls on springs. Pushing them 
+           - U_bond/U_angle: Atoms behave like balls on springs. Pushing them
              away from ideal (equilibrium) lengths/angles costs energy.
-           - U_torsion: Rotation around bonds is restricted by periodic potential 
+           - U_torsion: Rotation around bonds is restricted by periodic potential
              wells (e.g., the preference for trans vs cis).
         2. Non-Bonded Terms (Distant Neighbors):
-           - U_vdw (Lennard-Jones): Models Steric Repulsion (don't overlap!) and 
+           - U_vdw (Lennard-Jones): Models Steric Repulsion (don't overlap!) and
              London Dispersion (subtle attraction).
-           - U_elec (Coulomb): Attraction between opposite charges (e.g., a 
+           - U_elec (Coulomb): Attraction between opposite charges (e.g., a
              Salt Bridge) and repulsion between like charges.
-        
+
         Minimization is the process of finding the coordinate set where $dU/dX = 0$.
 
         Args:
@@ -170,9 +172,9 @@ class EnergyMinimizer:
         Energy Minimization is an O(N^2) or O(N log N) operation depending on the method.
         Starting with a structure that satisfies Ramachandran constraints (from `validator.py`)
         can reduce convergence time by 10-50x compared to minimizing a random coil.
-        
-        Effectively, the validator acts as a "pre-minimizer", placing atoms in the 
-        correct basin of attraction so the expensive physics engine only needs to 
+
+        Effectively, the validator acts as a "pre-minimizer", placing atoms in the
+        correct basin of attraction so the expensive physics engine only needs to
         perform local optimization.
 
         ### NMR Realism:
@@ -180,7 +182,7 @@ class EnergyMinimizer:
         to find low energy states. `minimize` is a simpler, gradient-based version
         of this process. It ensures bond lengths and angles are correct before
         performing more complex MD.
-        
+
         Returns:
             True if successful.
         """
@@ -193,7 +195,7 @@ class EnergyMinimizer:
     def equilibrate(self, pdb_file_path: str, output_path: str, steps: int = 1000, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Run Thermal Equilibration (MD) at 300K.
-        
+
         Args:
             pdb_file_path: Input PDB/File path.
             output_path: Output PDB path.
@@ -213,12 +215,12 @@ class EnergyMinimizer:
     def add_hydrogens_and_minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
         """
         Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
-        
+
         ### Why Add Hydrogens?
         X-ray crystallography often doesn't resolve hydrogen atoms because they have very few electrons.
         However, Molecular Dynamics forcefields (like Amber) are explicitly "All-Atom". They REQUIRE
         hydrogens to calculate bond angles and electrostatics (h-bonds) correctly.
-        
+
         ### NMR Perspective:
         Unlike X-ray, NMR relies entirely on the magnetic spin of protons (H1). Hydrogens are
         the "eyes" of NMR. Correctly placing them is critical not just for physics but for
@@ -246,11 +248,11 @@ class EnergyMinimizer:
     def calculate_energy(self, input_data: Union[str, Any], cyclic: bool = False) -> Optional[float]:
         """
         Calculates the potential energy of a structure.
-        
+
         Args:
             input_data: Can be a PDB file path, a PDB string, or a PeptideResult object.
             cyclic: Whether the peptide is cyclic.
-            
+
         Returns:
             float: Potential energy in kJ/mol.
         """
@@ -288,8 +290,10 @@ class EnergyMinimizer:
                 return self._run_simulation(pdb_path, out_path, max_iterations=-1, cyclic=cyclic)
         finally:
             if temp_file:
-                try: os.unlink(temp_file.name)
-                except: pass
+                try:
+                    os.unlink(temp_file.name)
+                except Exception:
+                    pass
 
     def _create_system_robust(self, topology: Any, constraints: Any, modeller: Optional[Any] = None) -> Tuple[Any, Any, Any]:
         """
@@ -407,7 +411,7 @@ class EnergyMinimizer:
             with open(input_path) as f:
                 pdb_lines = f.readlines()
 
-            atom_lines = [l for l in pdb_lines if l.startswith("ATOM")]
+            atom_lines = [line for line in pdb_lines if line.startswith("ATOM")]
             first_res_id = atom_lines[0][22:26].strip() if atom_lines else None
             last_res_id  = atom_lines[-1][22:26].strip() if atom_lines else None
 
@@ -603,9 +607,9 @@ class EnergyMinimizer:
         # Heuristic backbone stitching
         try:
             residues = list(modeller.topology.residues())
-            existing_bonds = set(
+            existing_bonds = {
                 frozenset([b[0].index, b[1].index]) for b in modeller.topology.bonds()
-            )
+            }
             for i in range(len(residues) - 1):
                 res1, res2 = residues[i], residues[i + 1]
                 c_s = next((a for a in res1.atoms() if a.name == 'C'), None)
@@ -666,7 +670,7 @@ class EnergyMinimizer:
                         potential_bonds.append((d_a, r1, r2, s1, s2))
             potential_bonds.sort(key=lambda x: x[0])
             bonded_indices: set = set()
-            for d, r1, r2, s1, s2 in potential_bonds:
+            for _d, r1, r2, s1, s2 in potential_bonds:
                 if r1.index in bonded_indices or r2.index in bonded_indices:
                     continue
                 modeller.topology.addBond(s1, s2)
@@ -771,17 +775,17 @@ class EnergyMinimizer:
             try:
                 res = list(modeller.topology.residues())
                 if len(res) >= 2:
-                    res1, resN = res[0], res[-1]
-                    c_at = next((a for a in resN.atoms() if a.name == 'C'), None)
+                    res1, res_n = res[0], res[-1]
+                    c_at = next((a for a in res_n.atoms() if a.name == 'C'), None)
                     n_at = next((a for a in res1.atoms() if a.name == 'N'), None)
                     if c_at and n_at:
                         modeller.topology.addBond(c_at, n_at)
                         logger.info(
                             f"Welded cyclic link in Topology: "
-                            f"{resN.name}{resN.id} -> {res1.name}{res1.id}"
+                            f"{res_n.name}{res_n.id} -> {res1.name}{res1.id}"
                         )
                         to_delete = []
-                        for a in resN.atoms():
+                        for a in res_n.atoms():
                             if a.name in ["OXT", "OT1", "OT2", "HXT"]:
                                 to_delete.append(a)
                         n_hyds = [
@@ -916,12 +920,12 @@ class EnergyMinimizer:
                 residues = list(topology.residues())
                 if len(residues) >= 2:
                     res1 = residues[0]
-                    resN = residues[-1]
+                    res_n = residues[-1]
                     ats_first = list(res1.atoms())
-                    ats_last  = list(resN.atoms())
+                    ats_last  = list(res_n.atoms())
                     logger.info(
                         f"Ghosting entire residues {res1.name}{res1.id} and "
-                        f"{resN.name}{resN.id} for closure."
+                        f"{res_n.name}{res_n.id} for closure."
                     )
                     for a1 in ats_first:
                         for a2 in ats_last:
@@ -1175,7 +1179,7 @@ class EnergyMinimizer:
                         ]
 
                         if amino_residues:
-                            res1, resN = amino_residues[0], amino_residues[-1]
+                            res1, res_n = amino_residues[0], amino_residues[-1]
                             to_prune = []
 
                             n1 = next((a for a in res1.atoms() if a.name == 'N'), None)
@@ -1192,8 +1196,7 @@ class EnergyMinimizer:
                                 ]
                                 if len(h_on_n1) == 1:
                                     h_on_n1[0].name = 'H'
-
-                            oxt = next((a for a in resN.atoms() if a.name == 'OXT'), None)
+                            oxt = next((a for a in res_n.atoms() if a.name == 'OXT'), None)
                             if oxt:
                                 to_prune.append(oxt)
                             if to_prune:
@@ -1266,8 +1269,8 @@ class EnergyMinimizer:
             # Restore SSBOND records (after HEADER/TITLE)
             if added_bonds:
                 insert_idx = 0
-                for idx, l in enumerate(final_lines):
-                    if l.startswith(("HEADER", "TITLE", "COMPND")):
+                for idx, line in enumerate(final_lines):
+                    if line.startswith(("HEADER", "TITLE", "COMPND")):
                         insert_idx = idx + 1
                 for s, (id1, id2) in enumerate(added_bonds, 1):
                     final_lines.insert(

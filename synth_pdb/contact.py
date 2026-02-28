@@ -6,7 +6,7 @@ import numpy as np
 def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:
     """
     Computes a residue-residue contact map.
-    
+
     Parameters:
     -----------
     structure : AtomArray
@@ -20,7 +20,7 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
         If None, returns raw distances.
         If 6, returns 1/r^6 (NOE Intensity proxy).
         If 0, returns binary contact map (1 if r < threshold, else 0).
-        
+
     Returns:
     --------
     matrix : np.ndarray (N_res x N_res)
@@ -42,7 +42,7 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
         raise ValueError("Method must be 'ca' or 'noe'")
 
     coords = atoms.coord
-    n_res = coords.shape[0]
+    coords.shape[0]
 
     # Compute Distance Matrix (Broadcasting)
     # dist[i, j] = ||r_i - r_j||

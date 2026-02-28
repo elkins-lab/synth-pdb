@@ -7,6 +7,8 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)
 [![Documentation](https://img.shields.io/badge/docs-live-brightgreen)](https://elkins.github.io/synth-pdb/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 
 📚 **[Read the full documentation](https://elkins.github.io/synth-pdb/)** | [Getting Started](https://elkins.github.io/synth-pdb/getting-started/quickstart/) | [API Reference](https://elkins.github.io/synth-pdb/api/overview/) | [Tutorials](https://elkins.github.io/synth-pdb/tutorials/gfp_molecular_forge/)
 

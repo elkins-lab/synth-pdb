@@ -100,32 +100,32 @@ def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
 class DatasetGenerator:
     """
     Orchestrates the generation of large-scale synthetic protein datasets for AI model training.
-    
+
     EDUCATIONAL NOTE - The Balanced Dataset Problem:
     -----------------------------------------------
-    When training an AI model (like AlphaFold or a Forcefield predictor), the 
+    When training an AI model (like AlphaFold or a Forcefield predictor), the
     quality and BALANCE of the data are often more important than the quantity.
-    
-    1. The Alpha-Helix Trap: If you only generate structures using the 'alpha' 
-       preset, your AI will learn that *all* biology looks like a helix. This 
-       leads to "Halls of Mirrors" where the model fails on Beta sheets or 
+
+    1. The Alpha-Helix Trap: If you only generate structures using the 'alpha'
+       preset, your AI will learn that *all* biology looks like a helix. This
+       leads to "Halls of Mirrors" where the model fails on Beta sheets or
        intrinsically disordered regions (IDRs).
-    2. Mixed Conformations: This generator encourages specifying a mix of 
-       'alpha', 'beta', and 'random' conformations. A dataset that "covers" 
-       the Ramachandran plot uniformly ensures the AI learns both the rules 
+    2. Mixed Conformations: This generator encourages specifying a mix of
+       'alpha', 'beta', and 'random' conformations. A dataset that "covers"
+       the Ramachandran plot uniformly ensures the AI learns both the rules
        and the exceptions of protein geometry.
-    3. Structural Diversity: By varying 'length' and 'conformation', we minimize 
+    3. Structural Diversity: By varying 'length' and 'conformation', we minimize
        "Selection Bias", making the resulting AI model more robust and generalizable.
 
     Data Factory Overview:
     ----------------------
-    AI models for protein folding (like AlphaFold, RoseTTAFold) require massive datasets 
+    AI models for protein folding (like AlphaFold, RoseTTAFold) require massive datasets
     of (Structure, Sequence) pairs to learn the patterns of protein physics.
     Real PDB data is limited (~200k structures). Synthetic data allows us to:
     1. Augment training data with unlimited diversity.
     2. Balance the dataset (e.g., more examples of rare secondary structures).
     3. Create "uncurated" datasets to test model robustness.
-    
+
     This generator produces:
     - PDB files (coordinates)
     - Contact Maps (distance constraints)
@@ -284,11 +284,11 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
         # 3.1 Sequence (One-Hot)
         # Filter for CA to get unique residues
         ca = structure[structure.atom_name == "CA"]
-        L = len(ca)
+        length = len(ca)
 
         # Standard AA mapping (alphabetical usually, or fixed order)
         # We need a robust mapping.
-        aa_list = sorted(list(ONE_TO_THREE_LETTER_CODE.values())) # 'ALA', 'ARG', ...
+        aa_list = sorted(ONE_TO_THREE_LETTER_CODE.values()) # 'ALA', 'ARG', ...
         aa_to_idx = {aa: i for i, aa in enumerate(aa_list)}
 
         # Mapping for variants
@@ -299,7 +299,7 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
             'LYN': 'LYS'
         }
 
-        sequence_one_hot = np.zeros((L, 20), dtype=np.float32)
+        sequence_one_hot = np.zeros((length, 20), dtype=np.float32)
         for i, res_name in enumerate(ca.res_name):
             # Normalize variant
             canon_name = variant_map.get(res_name, res_name)
@@ -311,8 +311,8 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
                  # If we encounter UNK, it will fail test.
                  logger.warning(f"Unknown residue {res_name} in {sample_id}. Skipping one-hot.")
 
-        # 3.2 Coordinates (L, 5, 3) -> N, CA, C, O, CB
-        coords = np.zeros((L, 5, 3), dtype=np.float32)
+        # 3.2 Coordinates (length, 5, 3) -> N, CA, C, O, CB
+        coords = np.zeros((length, 5, 3), dtype=np.float32)
         atom_types = ['N', 'CA', 'C', 'O', 'CB']
 
         for i, res_id in enumerate(ca.res_id):

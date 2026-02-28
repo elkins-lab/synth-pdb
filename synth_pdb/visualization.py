@@ -15,7 +15,7 @@ def generate_pymol_script(
 ) -> None:
     """
     Generate a PyMOL script (.pml) to visualize NEF restraints on a PDB structure.
-    
+
     Args:
         pdb_file: Path to the PDB structure file (relative to where script runs).
         restraints: List of restraint dictionaries (from nmr.calculate_synthetic_noes or read_nef_restraints).

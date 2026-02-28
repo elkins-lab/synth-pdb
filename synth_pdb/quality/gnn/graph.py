@@ -375,7 +375,7 @@ def _dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) ->
 
     n1 = n1 / n1_norm
     n2 = n2 / n2_norm
-    b2_unit = b2 / np.linalg.norm(b2)
+    b2 / np.linalg.norm(b2)
 
     # Clamp to [-1, 1] to guard against floating-point drift before arccos
     cos_angle = np.clip(np.dot(n1, n2), -1.0, 1.0)

@@ -45,10 +45,10 @@ class SideChainPacker:
         """
         Run the optimization protocol on the given peptide structure.
         Modifies the structure in-place.
-        
+
         Args:
             peptide: The input structure to optimize.
-            
+
         Returns:
             The optimized structure (reference to input).
         """
@@ -56,7 +56,7 @@ class SideChainPacker:
 
         # 1. Identify valid residues for optimization
         # (Those that have rotamer options in our library)
-        residue_ids = sorted(list(set(peptide.res_id)))
+        residue_ids = sorted(set(peptide.res_id))
         optimizable_residues = []
 
         # Build map of resid -> res_name
@@ -89,7 +89,7 @@ class SideChainPacker:
 
         accepted_moves = 0
 
-        for step in range(self.steps):
+        for _step in range(self.steps):
             # Pick random residue
             target_res_id, target_res_name = optimizable_residues[np.random.randint(len(optimizable_residues))]
 

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def interpolate_structures(start_pdb_path: str, end_pdb_path: str, steps: int, output_prefix: str) -> None:
     """
     Interpolates between two structures by morphing their backbone torsion angles.
-    
+
     Args:
         start_pdb_path: Path to start PDB.
         end_pdb_path: Path to end PDB.
@@ -108,10 +108,9 @@ def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -
     )
     from synth_pdb.geometry import position_atoms_batch
 
-    L = len(phi)
-    coords = np.zeros((L*3, 3)) # N, CA, C only for now (simplified)
-    # Actually we want N, CA, C, O
-    coords = np.zeros((L*4, 3))
+    length = len(phi)
+    coords = np.zeros((length*3, 3)) # N, CA, C only for now (simplified)
+    coords = np.zeros((length*4, 3))
 
     # 1. First residue
     coords[0] = [0, 0, 0] # N
@@ -134,8 +133,7 @@ def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -
         return cast(np.ndarray, res[0])
 
     coords[3] = pos(coords[0], coords[1], coords[2], BOND_LENGTH_C_O, ANGLE_CA_C_O, np.pi)
-
-    for i in range(1, L):
+    for i in range(1, length):
         idx = i * 4
         prev_idx = (i-1) * 4
 
