@@ -357,7 +357,7 @@ class ESM2Embedder:
         # HuggingFace caches the weights at ~/.cache/huggingface/ after the
         # first download (~30 MB for t6_8M).
         self._tokenizer = EsmTokenizer.from_pretrained(self.model_name)
-        self._model = EsmModel.from_pretrained(self.model_name) # type: ignore[assignment]
+        self._model = EsmModel.from_pretrained(self.model_name)  # type: ignore[assignment]
 
         assert self._tokenizer is not None
         assert self._model is not None
