@@ -110,7 +110,7 @@ BENCHMARK (measured 2026-02-19, CPU, esm2_t6_8M_UR50D)
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import numpy as np
 
@@ -257,7 +257,7 @@ class ESM2Embedder:
         Returns:
             np.ndarray of shape (D,), float32.
         """
-        return self.embed(sequence).mean(axis=0)
+        return cast(np.ndarray, self.embed(sequence).mean(axis=0))
 
     def sequence_similarity(self, seq_a: str, seq_b: str) -> float:
         """
@@ -397,7 +397,7 @@ class ESM2Embedder:
         hidden = outputs.last_hidden_state[:, 1:-1, :]   # remove special tokens
         embeddings = hidden.squeeze(0)                   # (L, D)
 
-        return embeddings.cpu().numpy().astype(np.float32)
+        return cast(np.ndarray, embeddings.cpu().numpy().astype(np.float32))
 
 
 # ──────────────────────────────────────────────────────────────────────────

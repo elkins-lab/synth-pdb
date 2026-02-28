@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, cast
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -130,7 +130,8 @@ def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -
         return position_atoms_batch(
             p1.reshape(1,3), p2.reshape(1,3), p3.reshape(1,3),
             np.array([bl]), np.array([ba]), np.array([np.degrees(di)])
-        )[0]
+        )
+        return cast(np.ndarray, res[0])
 
     coords[3] = pos(coords[0], coords[1], coords[2], BOND_LENGTH_C_O, ANGLE_CA_C_O, np.pi)
 
@@ -157,7 +158,7 @@ def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -
         coords[idx+3] = pos(coords[idx], coords[idx+1], coords[idx+2],
                             BOND_LENGTH_C_O, ANGLE_CA_C_O, np.pi)
 
-    return coords
+    return cast(np.ndarray, coords)
 
 def _write_simple_pdb(coords: np.ndarray, res_names: List[str], path: str) -> None:
     """Write minimal PDB."""

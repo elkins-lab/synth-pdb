@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, cast, Union
 
 try:
     import openmm as mm
@@ -323,7 +323,7 @@ class EnergyMinimizer:
                             logger.warning(f"Forcefield does not support {arg}. Retrying without it and suppressing for future calls...")
                             self._suppressed_args.add(arg)
                             del kwargs[arg]
-                            return _try_create(topo, **kwargs)
+                            return cast(Tuple[Any, Any, Any], _try_create(topo, **kwargs))
 
                 # Fallback 2: Template mismatch (Hydrogen issues)
                 if "No template found" in msg and modeller is not None:
@@ -336,18 +336,18 @@ class EnergyMinimizer:
                         modeller.addHydrogens(self.forcefield)
                         current_topo = modeller.topology
                         current_pos = modeller.positions
-                        return _try_create(current_topo, **kwargs)
+                        return cast(Tuple[Any, Any, Any], _try_create(current_topo, **kwargs))
                     except Exception as repair_e:
                         logger.warning(f"Repair failed: {repair_e}")
 
                 raise e
 
         try:
-            return _try_create(current_topo, **sys_kwargs)
+            return cast(Tuple[Any, Any, Any], _try_create(current_topo, **sys_kwargs))
         except Exception as final_e:
             logger.warning(f"Robust system creation failed, final fallback to no constraints: {final_e}")
             sys = self.forcefield.createSystem(current_topo, nonbondedMethod=app.NoCutoff, constraints=None)
-            return sys, current_topo, current_pos
+            return cast(Tuple[Any, Any, Any], (sys, current_topo, current_pos))
 
 
     def _preprocess_pdb_for_simulation(self, input_path: str, cyclic: bool, disulfides_param: Optional[List]) -> Tuple[Any, Any, List[str], Dict[Any, Any]]:
@@ -1336,7 +1336,7 @@ class EnergyMinimizer:
                     "Skipping minimization."
                 )
                 state = simulation.context.getState(getEnergy=True)
-                return state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
+                return float(state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole))
 
             # ── Stage 4: Minimization / equilibration ───────────────────────
             logger.info(f"Minimizing (Tolerance={tolerance} kJ/mol, MaxIter={max_iterations})...")
@@ -1476,7 +1476,7 @@ class EnergyMinimizer:
             )
             if write_ok is False:
                 return None
-            return final_energy
+            return float(final_energy)
 
         except Exception as e:
             logger.error(f"Simulation failed: {e}", exc_info=True)

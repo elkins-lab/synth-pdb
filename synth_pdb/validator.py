@@ -257,7 +257,7 @@ class PDBValidator:
         # Ensure cosine_angle is within [-1, 1] to avoid issues with arccos due to floating point inaccuracies
         cosine_angle = np.clip(cosine_angle, -1.0, 1.0)
         angle_rad = np.arccos(cosine_angle)
-        return np.degrees(angle_rad)
+        return float(np.degrees(angle_rad))
 
     @staticmethod
     def _calculate_dihedral_angle(
@@ -305,7 +305,7 @@ class PDBValidator:
         # EDUCATIONAL NOTE:
         # Standard atan2 returns values in (-180, 180].
         # This matches the IUPAC convention for protein dihedrals.
-        return -np.degrees(np.arctan2(y, x))
+        return float(-np.degrees(np.arctan2(y, x)))
 
     def get_violations(self) -> List[str]:
         """

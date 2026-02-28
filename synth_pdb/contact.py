@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import numpy as np
 
@@ -52,14 +52,14 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
     if power == 0:
         # Binary Map (AI style)
         contact_map = (dist_matrix < threshold).astype(float)
-        return contact_map
+        return cast(np.ndarray, contact_map)
     elif power == 6:
         # NOE Intensity (Physics style)
         # Avoid division by zero diagonal
         with np.errstate(divide='ignore'):
             intensity = 1.0 / (dist_matrix ** 6)
         np.fill_diagonal(intensity, 0.0) # Self-peaks are irrelevant here
-        return intensity
+        return cast(np.ndarray, intensity)
     else:
         # Raw Distances (Heatmap style)
-        return dist_matrix
+        return cast(np.ndarray, dist_matrix)

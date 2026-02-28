@@ -66,7 +66,8 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
     delta = coords[:, np.newaxis, :] - coords[np.newaxis, :, :] # (N, N, 3)
     dist_matrix = np.sqrt(np.sum(delta**2, axis=-1)) # (N, N)
 
-    return dist_matrix
+    from typing import cast
+    return cast(np.ndarray, dist_matrix)
 
 def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
     """

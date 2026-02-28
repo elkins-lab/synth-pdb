@@ -1,5 +1,5 @@
+from typing import Dict, List, Optional, Tuple, Union, cast
 import logging
-from typing import Dict, List, Optional, Tuple, Union
 
 import biotite.structure as struc
 import numpy as np
@@ -100,7 +100,7 @@ def position_atom_3d_from_internal_coords(
         + d * np.sin(bond_angle_rad) * np.cos(dihedral_angle_rad)
         + c * np.sin(bond_angle_rad) * np.sin(dihedral_angle_rad)
     )
-    return p4
+    return p4  # type: ignore[no-any-return]
 
 
 # EDUCATIONAL NOTE - SIMD & Parallel Geometry:
@@ -233,7 +233,7 @@ def position_atoms_batch(
         norm = np.linalg.norm(v, axis=-1, keepdims=True)
         # Avoid division by zero
         norm = np.where(norm == 0, 1.0, norm)
-        return v / norm
+        return cast(np.ndarray, v / norm)
 
     b = normalize(b)
     c = normalize(c)
@@ -250,7 +250,7 @@ def position_atoms_batch(
         + c * (np.sin(angles_rad) * np.sin(dihedrals_rad)).reshape(-1, 1)
     )
 
-    return p4
+    return cast(np.ndarray, p4)
 
 
 @njit
@@ -275,7 +275,7 @@ def calculate_angle(
     cosine_angle = dot_prod / denominator
     cosine_angle = max(-1.0, min(1.0, cosine_angle))
     angle_rad = np.arccos(cosine_angle)
-    return np.degrees(angle_rad)
+    return float(np.degrees(angle_rad))
 
 
 @njit
@@ -323,7 +323,7 @@ def calculate_dihedral_angle(
     x = np.sum(n1 * n2)
     y = np.sum(m1 * n2)
 
-    return -np.degrees(np.arctan2(y, x))
+    return float(-np.degrees(np.arctan2(y, x)))
 
 
 def batched_angle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> np.ndarray:
@@ -348,7 +348,7 @@ def batched_angle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> np.ndarray:
     cos = dot / (norm1 * norm2 + 1e-9)
     cos = np.clip(cos, -1.0, 1.0)
 
-    return np.degrees(np.arccos(cos))
+    return np.degrees(np.arccos(cos))  # type: ignore[no-any-return]
 
 
 def batched_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) -> np.ndarray:
@@ -375,7 +375,7 @@ def batched_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndar
     x = np.sum(v * w, axis=-1)
     y = np.sum(np.cross(b1, v, axis=-1) * w, axis=-1)
 
-    return np.degrees(np.arctan2(y, x))
+    return np.degrees(np.arctan2(y, x))  # type: ignore[no-any-return]
 
 def reconstruct_sidechain(
     peptide: struc.AtomArray,
