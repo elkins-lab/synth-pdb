@@ -595,7 +595,8 @@ def reconstruct_sidechain(
                 curr_chi1 = struc.dihedral(n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord) # Radians
                 curr_chi1_deg = np.rad2deg(curr_chi1)
 
-                target_chi1 = rotamer['chi1'][0]
+                _chi1_val_r = rotamer['chi1']
+                target_chi1 = _chi1_val_r[0] if isinstance(_chi1_val_r, list) else float(_chi1_val_r)
                 delta_deg = target_chi1 - curr_chi1_deg
 
                 # Rotate sidechain atoms about CA-CB axis
