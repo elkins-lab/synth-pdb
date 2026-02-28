@@ -21,6 +21,37 @@ class TestPhysicsCoverage:
             assert minimizer.equilibrate("dummy.pdb", "out.pdb") is False
             assert minimizer.add_hydrogens_and_minimize("dummy.pdb", "out.pdb") is False
 
+    def test_init_missing_openmm_returns_early(self):
+        """When HAS_OPENMM is False, __init__ returns early without setting attrs."""
+        # Use patch to mock HAS_OPENMM at the module level
+        with patch('synth_pdb.physics.HAS_OPENMM', False):
+            from synth_pdb.physics import EnergyMinimizer
+            minimizer = EnergyMinimizer()
+            # If it returned early, it didn't set self.forcefield_name
+            assert not hasattr(minimizer, 'forcefield_name')
+
+    def test_init_unknown_solvent_model_falls_back_to_explicit(self, caplog):
+        """Unknown implicit solvent model logs a warning and defaults to 'explicit'."""
+        from synth_pdb.physics import EnergyMinimizer
+        import logging
+        
+        with caplog.at_level(logging.WARNING, logger="synth_pdb.physics"):
+            minimizer = EnergyMinimizer(solvent_model="app.UnknownModel123")
+            
+        assert minimizer.solvent_model == "explicit"
+        assert "Unknown solvent model 'app.UnknownModel123'" in caplog.text
+        assert "Defaulting to 'explicit'" in caplog.text
+
+    def test_init_invalid_box_size_raises_valueerror(self):
+        """box_size <= 0 must raise ValueError."""
+        from synth_pdb.physics import EnergyMinimizer
+        
+        with pytest.raises(ValueError, match="box_size must be positive"):
+            EnergyMinimizer(box_size=0.0)
+            
+        with pytest.raises(ValueError, match="box_size must be positive"):
+            EnergyMinimizer(box_size=-1.5)
+
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_forcefield_loading_error(self, mock_app):

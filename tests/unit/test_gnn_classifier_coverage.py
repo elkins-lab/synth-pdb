@@ -48,7 +48,7 @@ class TestGNNPredictImportError:
         pdb_str = _make_helix_pdb()
 
         # Hide torch inside the gnn_classifier module scope
-        with patch.dict("sys.modules", {"torch": None}):
+        with patch.dict("sys.modules", {"torch": None, "torch_geometric": None, "torch_geometric.data": None}):
             with pytest.raises(ImportError, match="torch"):
                 clf.predict(pdb_str)
 

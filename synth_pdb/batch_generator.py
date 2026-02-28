@@ -263,17 +263,17 @@ class BatchedGenerator:
             else:
                 # Place N(i) using N(i-1), CA(i-1), C(i-1)
                 p1, p2, p3 = coords[:, (i-1)*4], coords[:, (i-1)*4+1], coords[:, (i-1)*4+2]
-                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i-1]
+                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i-1]  # type: ignore[assignment]
                 coords[:, idx] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place CA(i) using CA(i-1), C(i-1), N(i)
                 p1, p2, p3 = coords[:, (i-1)*4+1], coords[:, (i-1)*4+2], coords[:, idx]
-                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i-1]
+                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i-1]  # type: ignore[assignment]
                 coords[:, idx+1] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place C(i) using C(i-1), N(i), CA(i)
                 p1, p2, p3 = coords[:, (i-1)*4+2], coords[:, idx], coords[:, idx+1]
-                bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]
+                bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]  # type: ignore[assignment]
                 coords[:, idx+2] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place O(i) using N(i), CA(i), C(i)

@@ -156,11 +156,11 @@ class TestPredictHappyPath:
 
         is_good, prob, feat_dict = clf.predict(pdb_str)
 
-        assert isinstance(bool(is_good), bool)
+        assert isinstance(is_good, (bool, np.bool_))
         assert isinstance(prob, float)
         assert isinstance(feat_dict, dict)
         assert 0.0 <= prob <= 1.0
-        assert bool(is_good) == True   # 0.7 > 0.5
+        assert is_good == True   # 0.7 > 0.5
 
     def test_predict_low_score_is_bad(self, tmp_path):
         """When model gives P(good)=0.2, is_good should be False."""
@@ -180,7 +180,7 @@ class TestPredictHappyPath:
         clf.model = mock_model
 
         is_good, prob, _ = clf.predict(pdb_str)
-        assert not bool(is_good)
+        assert not is_good
         assert pytest.approx(prob) == 0.2
 
     def test_load_model_success(self, tmp_path):
