@@ -70,7 +70,7 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
     logger.info(f"Calculated angles for {len(results)} residues.")
     return results
 
-def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str = "csv"):
+def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str = "csv") -> None:
     """
     Export calculated torsion angles to a file.
     

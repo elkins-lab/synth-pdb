@@ -9,7 +9,7 @@ from synth_pdb.validator import PDBValidator
 
 logger = logging.getLogger(__name__)
 
-def interpolate_structures(start_pdb_path: str, end_pdb_path: str, steps: int, output_prefix: str):
+def interpolate_structures(start_pdb_path: str, end_pdb_path: str, steps: int, output_prefix: str) -> None:
     """
     Interpolates between two structures by morphing their backbone torsion angles.
     

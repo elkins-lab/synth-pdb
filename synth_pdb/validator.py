@@ -728,7 +728,7 @@ class PDBValidator:
                     c = current_res_atoms.get("C")
                     o = current_res_atoms.get("O")
                     
-                    def add_pair(a1, a2):
+                    def add_pair(a1: Any, a2: Any) -> None:
                         if a1 and a2:
                             idx1 = atom_num_to_idx.get(a1['atom_number'])
                             idx2 = atom_num_to_idx.get(a2['atom_number'])

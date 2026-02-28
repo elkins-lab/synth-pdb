@@ -56,14 +56,14 @@ GRAPH STRUCTURE
 import logging
 import math
 import io
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
 
-def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0):
+def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) -> Any:
     """
     Parse *pdb_content* and return a :class:`torch_geometric.data.Data` object
     representing the protein as a residue-level contact graph.

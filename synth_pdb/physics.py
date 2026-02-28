@@ -309,7 +309,7 @@ class EnergyMinimizer:
         current_topo = topology
         current_pos = modeller.positions if modeller else None
 
-        def _try_create(topo, **kwargs):
+        def _try_create(topo: Any, **kwargs: Any) -> Any:
             nonlocal current_topo, current_pos
             try:
                 system = self.forcefield.createSystem(topo, **kwargs)

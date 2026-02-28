@@ -68,7 +68,7 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
     
     return dist_matrix
 
-def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json"):
+def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
     """
     Export the distance matrix to a file.
     

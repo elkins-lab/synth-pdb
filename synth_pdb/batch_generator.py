@@ -54,10 +54,10 @@ class BatchedPeptide:
         self.n_atoms = self.coords.shape[1]
         self.n_residues = len(sequence)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.n_structures
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> 'BatchedPeptide':
         if isinstance(index, int):
             return BatchedPeptide(self.coords[index:index+1], self.sequence, self.atom_names, self.residue_indices)
         return BatchedPeptide(self.coords[index], self.sequence, self.atom_names, self.residue_indices)

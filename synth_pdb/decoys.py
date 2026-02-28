@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 import logging
 import numpy as np
 import biotite.structure as struc
@@ -29,11 +29,11 @@ class DecoyGenerator:
         minimize: bool = False,
         forcefield: str = 'amber14-all.xml',
         hard_mode: bool = False,
-        template_sequence: str = None,
+        template_sequence: Optional[str] = None,
         shuffle_sequence: bool = False,
         drift: float = 0.0,
-        seed: int = None
-    ):
+        seed: Optional[int] = None
+    ) -> list[str]:
         """
         Generates N unique decoys for a given sequence within a target RMSD range.
         

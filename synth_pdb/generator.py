@@ -1617,7 +1617,7 @@ class PeptideGenerator:
         self.config = kwargs
         self._last_result = None
 
-    def generate(self, **overrides) -> "PeptideResult":
+    def generate(self, **overrides: Any) -> "PeptideResult":
         """Generates the protein structure and returns a Result object."""
         # Merge init config with call-time overrides
         call_config = {**self.config, **overrides}
@@ -1670,5 +1670,5 @@ class PeptideResult:
         with open(path, 'w') as f:
             f.write(self.pdb)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<PeptideResult: {len(self.pdb)} chars, {self.structure.array_length()} atoms>"

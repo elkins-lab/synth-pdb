@@ -113,6 +113,7 @@ Loss: Negative Log-Likelihood (NLLLoss), equivalent to cross-entropy
 """
 
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +155,7 @@ class ProteinGNN:
     """
 
     def __new__(cls, node_features: int = 8, edge_features: int = 2,
-                hidden_dim: int = 64, num_classes: int = 2):
+                hidden_dim: int = 64, num_classes: int = 2) -> Any:
         _check_pyg()
         import torch
         import torch.nn as nn
@@ -179,7 +180,7 @@ class ProteinGNN:
                 Output classes. 2 for binary (Bad / Good) classification.
             """
 
-            def __init__(self):
+            def __init__(self) -> None:
                 super().__init__()
 
                 # ── Message-passing layers ─────────────────────────────────
@@ -234,7 +235,7 @@ class ProteinGNN:
                 self.hidden_dim = hidden_dim
                 self.num_classes = num_classes
 
-            def forward(self, x, edge_index, edge_attr, batch):
+            def forward(self, x: Any, edge_index: Any, edge_attr: Any, batch: Any) -> Any:
                 """
                 Forward pass.
 
