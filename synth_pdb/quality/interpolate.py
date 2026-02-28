@@ -127,7 +127,7 @@ def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -
     # position_atoms_batch expects arrays (B, ...)
     # adapt single to batch
     def pos(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, bl: float, ba: float, di: float) -> np.ndarray:
-        return position_atoms_batch(
+        res = position_atoms_batch(
             p1.reshape(1,3), p2.reshape(1,3), p3.reshape(1,3),
             np.array([bl]), np.array([ba]), np.array([np.degrees(di)])
         )

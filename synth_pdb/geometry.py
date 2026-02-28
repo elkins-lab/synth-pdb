@@ -11,7 +11,7 @@ try:
     from numba import njit
 except ImportError:
     # Fallback to no-op decorator if numba is not installed
-    def njit(func=None, **kwargs):  # type: ignore[no-redef, no-untyped-def]
+    def njit(func=None, **kwargs):  # type: ignore[no-untyped-def]
         if func is None:
             return lambda f: f
         return func
@@ -28,6 +28,7 @@ except ImportError:
 # This algorithm is the engine of our protein builder, allowing us to
 # "walk down" the chain atom-by-atom with mathematical precision.
 
+@njit
 def position_atom_3d_from_internal_coords(
     p1: np.ndarray,
     p2: np.ndarray,
@@ -74,15 +75,6 @@ def position_atom_3d_from_internal_coords(
     #    to avoid discontinuities at the -180/180 boundary.
     # @njit increases speed by 50-100x for this specific loop.
     """
-@njit
-def position_atom_3d_from_internal_coords(
-    p1: np.ndarray,
-    p2: np.ndarray,
-    p3: np.ndarray,
-    bond_length: float,
-    bond_angle_deg: float,
-    dihedral_angle_deg: float,
-) -> np.ndarray:
     bond_angle_rad = np.deg2rad(bond_angle_deg)
     dihedral_angle_rad = np.deg2rad(dihedral_angle_deg)
 

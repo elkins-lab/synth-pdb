@@ -18,7 +18,7 @@ Biological function depends on pH. The most sensitive residue near physiological
 
 import logging
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import biotite.structure as struc
 import numpy as np
@@ -318,7 +318,7 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
     # Find pairs within cutoff
     indices = np.where(dists < cutoff)
 
-    found_pairs = {} # (res_ia, res_ib) -> bridge_dict
+    found_pairs: Dict[Tuple[int, int], Dict[str, Any]] = {} # (res_ia, res_ib) -> bridge_dict
 
     for acid_idx, base_idx in zip(*indices):
         a_atom = acids[acid_idx]

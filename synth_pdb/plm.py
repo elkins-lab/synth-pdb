@@ -357,7 +357,11 @@ class ESM2Embedder:
         # HuggingFace caches the weights at ~/.cache/huggingface/ after the
         # first download (~30 MB for t6_8M).
         self._tokenizer = EsmTokenizer.from_pretrained(self.model_name)
-        self._model = EsmModel.from_pretrained(self.model_name)
+        self._model = EsmModel.from_pretrained(self.model_name) # type: ignore[assignment]
+        
+        assert self._tokenizer is not None
+        assert self._model is not None
+
         self._model = self._model.to(device)
         self._model.eval()  # Disable dropout — we need deterministic inference
 
@@ -380,6 +384,9 @@ class ESM2Embedder:
         Gradient computation is disabled (torch.no_grad) for speed and memory.
         """
         import torch
+
+        assert self._tokenizer is not None, "Tokenizer not loaded"
+        assert self._model is not None, "Model not loaded"
 
         # Tokenize: "ACDEF" → tensor of integer token IDs, shape (1, L+2)
         inputs = self._tokenizer(

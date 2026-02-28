@@ -1,6 +1,7 @@
 import io
+import io
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -99,7 +100,7 @@ class DecoyGenerator:
         import os
         os.makedirs(out_dir, exist_ok=True)
 
-        generated_decoys = []
+        generated_decoys: List[str] = []
         reference_structure = None
 
         attempts = 0
@@ -117,7 +118,9 @@ class DecoyGenerator:
             try:
                 # 1. Determine local generation parameters
                 gen_sequence = sequence
-                phi_list, psi_list, omega_list = None, None, None
+                phi_list: Optional[List[float]] = None
+                psi_list: Optional[List[float]] = None
+                omega_list: Optional[List[float]] = None
 
                 # Handling Threading (Hard Decoy)
                 if hard_mode and template_sequence:
@@ -191,7 +194,7 @@ class DecoyGenerator:
         logger.info(f"Finished. Generated {len(generated_decoys)} decoys.")
         return generated_decoys
 
-    def _extract_backbone_dihedrals(self, pdb_content: str) -> Dict[str, List[float]]:
+    def _extract_backbone_dihedrals(self, pdb_content: str) -> Tuple[List[float], List[float], List[float]]:
         """Extracts phi, psi, omega lists from PDB content."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)

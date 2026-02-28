@@ -6,6 +6,7 @@ Based on pdbstat's molecular viewer implementation.
 """
 
 import io
+from typing import Any, List, Optional
 import logging
 import tempfile
 import traceback
@@ -23,8 +24,8 @@ def view_structure_in_browser(
     filename: str = "structure.pdb",
     style: str = "cartoon",
     color: str = "spectrum",
-    restraints: list = None,
-    highlights: list = None,
+    restraints: Optional[List[Any]] = None,
+    highlights: Optional[List[Any]] = None,
     show_hbonds: bool = True,
 
 ) -> None:
@@ -74,8 +75,8 @@ def _create_3dmol_html(
     filename: str,
     style: str,
     color: str,
-    restraints: list = None,
-    highlights: list = None,
+    restraints: Optional[List[Any]] = None,
+    highlights: Optional[List[Any]] = None,
     show_hbonds: bool = False
 ) -> str:
     """

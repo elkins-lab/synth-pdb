@@ -66,7 +66,7 @@ The PyTorch approach is more portable across Python / PyTorch versions.
 
 import logging
 import os
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 import numpy as np
 
@@ -123,7 +123,7 @@ class GNNQualityClassifier:
                         If no checkpoint is found, initialises a random-weight model
                         (useful for testing graph construction without training).
         """
-        self.model = None
+        self.model: Optional[Any] = None
         self._model_path: Optional[str] = None
 
         if model_path:
@@ -200,6 +200,7 @@ class GNNQualityClassifier:
         batch = Batch.from_data_list([graph])
 
         # Step 3 — Forward pass (no gradient needed at inference time)
+        assert self.model is not None, "Model not loaded"
         self.model.eval()
         with torch.no_grad():
             log_probs = self.model(
@@ -241,6 +242,8 @@ class GNNQualityClassifier:
             raise ImportError("torch is required to save a GNN checkpoint.") from exc
 
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+        
+        assert self.model is not None, "Model not loaded"
         torch.save(
             {
                 # state_dict: OrderedDict mapping parameter names → tensors
@@ -289,12 +292,13 @@ class GNNQualityClassifier:
             checkpoint = torch.load(path, map_location="cpu", weights_only=False)
 
             # Re-create the model architecture from stored metadata
-            self.model = ProteinGNN(
+            import typing
+            self.model = typing.cast(Any, ProteinGNN(
                 node_features=checkpoint["node_features"],
                 edge_features=checkpoint["edge_features"],
                 hidden_dim=checkpoint["hidden_dim"],
                 num_classes=checkpoint["num_classes"],
-            )
+            ))
             # Copy the trained weights into the fresh model skeleton
             self.model.load_state_dict(checkpoint["state_dict"])
             self.model.eval()
@@ -321,5 +325,6 @@ class GNNQualityClassifier:
         because the weights are initialised near zero by PyTorch's defaults.
         """
         from .model import ProteinGNN
-        self.model = ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2)
+        import typing
+        self.model = typing.cast(Any, ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2))
         self.model.eval()

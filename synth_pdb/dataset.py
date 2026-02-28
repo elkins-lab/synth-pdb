@@ -25,7 +25,7 @@ from .generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
-def _generate_single_sample_task(args: tuple) -> Optional[Dict[str, Any]]:
+def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
     """
     Helper function to generate a single sample.
     Arguments are passed as a tuple to be compatible with map/submit if needed,
@@ -258,7 +258,7 @@ class DatasetGenerator:
 
         logger.info(f"Bulk generation complete. Generated {completed_count}/{self.num_samples} samples.")
 
-def _generate_single_sample_npz_task(args: tuple) -> Optional[Dict[str, Any]]:
+def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
     """
     Generate a single sample in NPZ format (AI-Ready).
     Does NOT write intermediate PDB files.

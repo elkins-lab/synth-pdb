@@ -193,7 +193,7 @@ class PDBValidator:
         Groups parsed atoms by chain ID, then by residue number, then by atom name.
         Structure: {chain_id: {residue_number: {atom_name: atom_data}}}
         """
-        grouped_atoms = {}
+        grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]] = {}
         for atom in self.atoms:
             chain_id = atom["chain_id"]
             residue_number = atom["residue_number"]
@@ -234,7 +234,7 @@ class PDBValidator:
         """
         Calculates the Euclidean distance between two 3D coordinates.
         """
-        return np.linalg.norm(coord1 - coord2)
+        return float(np.linalg.norm(coord1 - coord2))
 
     @staticmethod
     def _calculate_angle(
@@ -661,7 +661,7 @@ class PDBValidator:
 
             bond_array = bonds.as_array() # Shape (M, 2) or (M, 3) depending on version/args
 
-            adj_list = {} # for finding 1-3
+            adj_list: Dict[int, List[int]] = {} # for finding 1-3
 
             for row in bond_array:
                 # Handle potential 3rd column (bond type)
@@ -836,42 +836,43 @@ class PDBValidator:
                 current_res_atoms = residues_in_chain.get(current_res_num)
                 prev_res_atoms = residues_in_chain.get(prev_res_num)
 
-                # Atoms for omega: CA(i-1) - C(i-1) - N(i) - CA(i)
-                p1_ca_prev = prev_res_atoms.get("CA")
-                p2_c_prev = prev_res_atoms.get("C")
-                p3_n_curr = current_res_atoms.get("N")
-                p4_ca_curr = current_res_atoms.get("CA")
+                if current_res_atoms and prev_res_atoms:
+                    # Atoms for omega: CA(i-1) - C(i-1) - N(i) - CA(i)
+                    p1_ca_prev = prev_res_atoms.get("CA")
+                    p2_c_prev = prev_res_atoms.get("C")
+                    p3_n_curr = current_res_atoms.get("N")
+                    p4_ca_curr = current_res_atoms.get("CA")
 
-                if p1_ca_prev and p2_c_prev and p3_n_curr and p4_ca_curr:
-                    logger.debug(f"Omega dihedral calculation for Chain {chain_id}, Residue {prev_res_num}-{current_res_num}:")
-                    logger.debug(f"  P1 (CA(i-1)):{p1_ca_prev['coords']}")
-                    logger.debug(f"  P2 (C(i-1)): {p2_c_prev['coords']}")
-                    logger.debug(f"  P3 (N(i)):   {p3_n_curr['coords']}")
-                    logger.debug(f"  P4 (CA(i)):  {p4_ca_curr['coords']}")
+                    if p1_ca_prev and p2_c_prev and p3_n_curr and p4_ca_curr:
+                        logger.debug(f"Omega dihedral calculation for Chain {chain_id}, Residue {prev_res_num}-{current_res_num}:")
+                        logger.debug(f"  P1 (CA(i-1)):{p1_ca_prev['coords']}")
+                        logger.debug(f"  P2 (C(i-1)): {p2_c_prev['coords']}")
+                        logger.debug(f"  P3 (N(i)):   {p3_n_curr['coords']}")
+                        logger.debug(f"  P4 (CA(i)):  {p4_ca_curr['coords']}")
 
-                    omega_angle = self._calculate_dihedral_angle(
-                        p1_ca_prev["coords"],  # P1 = CA(i-1)
-                        p2_c_prev["coords"],   # P2 = C(i-1)
-                        p3_n_curr["coords"],   # P3 = N(i)
-                        p4_ca_curr["coords"],  # P4 = CA(i)
-                    )
-                    logger.debug(f"  Calculated Omega Angle: {omega_angle:.2f}°")
-
-                    # Check for planarity (close to 180 or 0 degrees)
-                    is_trans = abs(abs(omega_angle) - 180.0) < tolerance_deg
-                    is_cis = abs(omega_angle) < tolerance_deg
-
-                    if not is_trans and not is_cis:
-                        self.violations.append(
-                            f"Peptide plane violation: Chain {chain_id}, "
-                            f"Peptide bond between Residue {prev_res_num} ({p2_c_prev['residue_name']}) and "
-                            f"Residue {current_res_num} ({p3_n_curr['residue_name']}). "
-                            f"Omega angle ({omega_angle:.2f}°) deviates significantly from ideal trans/cis planarity."
+                        omega_angle = self._calculate_dihedral_angle(
+                            p1_ca_prev["coords"],  # P1 = CA(i-1)
+                            p2_c_prev["coords"],   # P2 = C(i-1)
+                            p3_n_curr["coords"],   # P3 = N(i)
+                            p4_ca_curr["coords"],  # P4 = CA(i)
                         )
-                    else:
-                        logger.debug(
-                            f"Peptide bond between {prev_res_num}-{p2_c_prev['residue_name']} and {current_res_num}-{p3_n_curr['residue_name']}: Omega={omega_angle:.2f}° (planar)"
-                        )
+                        logger.debug(f"  Calculated Omega Angle: {omega_angle:.2f}°")
+
+                        # Check for planarity (close to 180 or 0 degrees)
+                        is_trans = abs(abs(omega_angle) - 180.0) < tolerance_deg
+                        is_cis = abs(omega_angle) < tolerance_deg
+
+                        if not is_trans and not is_cis:
+                            self.violations.append(
+                                f"Peptide plane violation: Chain {chain_id}, "
+                                f"Peptide bond between Residue {prev_res_num} ({p2_c_prev['residue_name']}) and "
+                                f"Residue {current_res_num} ({p3_n_curr['residue_name']}). "
+                                f"Omega angle ({omega_angle:.2f}°) deviates significantly from ideal trans/cis planarity."
+                            )
+                        else:
+                            logger.debug(
+                                f"Peptide bond between {prev_res_num}-{p2_c_prev['residue_name']} and {current_res_num}-{p3_n_curr['residue_name']}: Omega={omega_angle:.2f}° (planar)"
+                            )
 
     def validate_sequence_improbabilities(
         self,
@@ -1049,7 +1050,7 @@ class PDBValidator:
 
         # Reconstruct bonded_pairs for this iteration (simplified, as in validate_steric_clashes)
         # This is a bit inefficient but avoids deep refactoring for now.
-        temp_grouped_atoms = {}
+        temp_grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]] = {}
         for atom in modified_atoms:
             chain_id = atom["chain_id"]
             residue_number = atom["residue_number"]
@@ -1302,7 +1303,7 @@ class PDBValidator:
                 cb_atom = current_res_atoms.get("CB")
 
                 # Skip if any required atoms are missing
-                if not all([n_atom, ca_atom, c_atom, cb_atom]):
+                if not (n_atom and ca_atom and c_atom and cb_atom):
                     logger.debug(
                         f"Skipping chirality check for Chain {chain_id}, Residue {res_num} {res_name}: "
                         f"Missing required atoms (N, CA, C, or CB)"

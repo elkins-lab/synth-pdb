@@ -80,9 +80,7 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
         b_factors = np.array([atom['temp_factor'] for atom in validator.atoms])
 
         # Number of residues used for per-residue normalisation of violation counts.
-        num_residues = sum(len(res_dict) for res_dict in validator.grouped_atoms.values())
-        if num_residues == 0:
-            num_residues = 1.0
+        num_residues: float = float(max(1, sum(len(res_dict) for res_dict in validator.grouped_atoms.values())))
 
         # Radius of Gyration
         rg = 0.0
@@ -127,24 +125,34 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
             if i > 0:
                 prev_res_num = sorted_res_numbers[i - 1]
                 prev_res_atoms = residues_in_chain.get(prev_res_num)
-                if prev_res_atoms and prev_res_atoms.get("C") and current_res_atoms.get("N") and current_res_atoms.get("CA") and current_res_atoms.get("C"):
-                    p1 = prev_res_atoms["C"]["coords"]
-                    p2 = current_res_atoms["N"]["coords"]
-                    p3 = current_res_atoms["CA"]["coords"]
-                    p4 = current_res_atoms["C"]["coords"]
-                    phi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
+                if prev_res_atoms:
+                    c_prev = prev_res_atoms.get("C")
+                    n_curr = current_res_atoms.get("N")
+                    ca_curr = current_res_atoms.get("CA")
+                    c_curr = current_res_atoms.get("C")
+                    if c_prev and n_curr and ca_curr and c_curr:
+                        p1 = c_prev["coords"]
+                        p2 = n_curr["coords"]
+                        p3 = ca_curr["coords"]
+                        p4 = c_curr["coords"]
+                        phi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
 
             # Psi
             psi = None
             if i < len(sorted_res_numbers) - 1:
                 next_res_num = sorted_res_numbers[i + 1]
                 next_res_atoms = residues_in_chain.get(next_res_num)
-                if current_res_atoms.get("N") and current_res_atoms.get("CA") and current_res_atoms.get("C") and next_res_atoms.get("N"):
-                    p1 = current_res_atoms["N"]["coords"]
-                    p2 = current_res_atoms["CA"]["coords"]
-                    p3 = current_res_atoms["C"]["coords"]
-                    p4 = next_res_atoms["N"]["coords"]
-                    psi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
+                if next_res_atoms:
+                    n_curr = current_res_atoms.get("N")
+                    ca_curr = current_res_atoms.get("CA")
+                    c_curr = current_res_atoms.get("C")
+                    n_next = next_res_atoms.get("N")
+                    if n_curr and ca_curr and c_curr and n_next:
+                        p1 = n_curr["coords"]
+                        p2 = ca_curr["coords"]
+                        p3 = c_curr["coords"]
+                        p4 = n_next["coords"]
+                        psi = validator._calculate_dihedral_angle(p1, p2, p3, p4)
 
             if phi is not None and psi is not None:
                 phi_list.append(phi)

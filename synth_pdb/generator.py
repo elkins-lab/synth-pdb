@@ -267,9 +267,10 @@ def _place_atom_with_dihedral(
     
     Wrapper around position_atom_3d_from_internal_coords with clearer naming.
     """
-    return position_atom_3d_from_internal_coords(
+    import typing
+    return typing.cast(np.ndarray, position_atom_3d_from_internal_coords(
         atom1, atom2, atom3, bond_length, bond_angle, dihedral
-    )
+    ))
 
 
 def _generate_random_amino_acid_sequence(
@@ -329,7 +330,7 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
         [(3, 8), (12, 20)]  # CYS 3-8 and CYS 12-20 are bonded
     """
 
-    disulfides = []
+    disulfides: List[Tuple[int, int]] = []
 
     # Find all CYS/CYX residues
     cys_residues = peptide[(peptide.res_name == 'CYS') | (peptide.res_name == 'CYX')]
@@ -474,8 +475,9 @@ def _resolve_sequence(
                 amino_acids.append(ONE_TO_THREE_LETTER_CODE[one_letter_code])
             return amino_acids
     else:
+        actual_length = length if length is not None else 20
         return _generate_random_amino_acid_sequence(
-            length, use_plausible_frequencies=use_plausible_frequencies
+            actual_length, use_plausible_frequencies=use_plausible_frequencies
         )
 
 
@@ -970,7 +972,7 @@ def _build_peptide_chain(
         }
 
         # Store Psi for next iteration (kept for readability; recomputed in loop)
-        prev_psi = current_psi
+        prev_psi = current_psi  # type: ignore[assignment]
 
         # ── Biotite reference template ───────────────────────────────────────
         # CRITICAL FIX: Always use .copy() — residue() returns a cached template.
@@ -1017,7 +1019,7 @@ def _build_peptide_chain(
             rotamers = ROTAMER_LIBRARY[res_name]
 
         if rotamers:
-            weights = [float(r.get('prob', 0.0)) for r in rotamers]
+            weights = [float(r.get('prob', 0.0)) for r in rotamers] # type: ignore[arg-type]
             selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
 
             if 'chi1' in selected_rotamer:
@@ -1617,7 +1619,7 @@ class PeptideGenerator:
     def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs: Any) -> None:
         self.sequence = sequence
         self.config = kwargs
-        self._last_result = None
+        self._last_result: Optional["PeptideResult"] = None
 
     def generate(self, **overrides: Any) -> "PeptideResult":
         """Generates the protein structure and returns a Result object."""

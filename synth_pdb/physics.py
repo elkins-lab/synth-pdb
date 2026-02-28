@@ -297,7 +297,7 @@ class EnergyMinimizer:
         and incompatible forcefield arguments. Returns (system, topology, positions).
         """
         if not hasattr(self, '_suppressed_args'):
-            self._suppressed_args = set()
+            self._suppressed_args: set[str] = set()
 
         sys_kwargs = {
             "nonbondedMethod": app.NoCutoff,
@@ -480,7 +480,7 @@ class EnergyMinimizer:
                 for idx, line in enumerate(modified_lines):
                     if line.startswith("ATOM") and line[22:26].strip() == last_res_id:
                         insert_idx = idx + 1
-                if insert_idx != -1:
+                if insert_idx != -1 and c_coords is not None:
                     x, y, z = c_coords
                     res_name_c = c_line_template[17:20]
                     res_id_full = c_line_template[21:26]
@@ -810,10 +810,10 @@ class EnergyMinimizer:
             res_map = {str(r.id).strip(): r for r in modeller.topology.residues()}
             for id1, id2 in added_bonds:
                 for rid in [id1, id2]:
-                    res = res_map.get(rid)
-                    if res and res.name == 'CYS':
-                        res.name = 'CYX'
-                        hg_to_delete.extend([a for a in res.atoms() if a.name == 'HG'])
+                    residue_obj = res_map.get(rid)
+                    if residue_obj and residue_obj.name == 'CYS':
+                        residue_obj.name = 'CYX'
+                        hg_to_delete.extend([a for a in residue_obj.atoms() if a.name == 'HG'])
             if hg_to_delete:
                 modeller.delete(hg_to_delete)
 

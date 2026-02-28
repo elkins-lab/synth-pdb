@@ -12,7 +12,8 @@ import datetime
 import logging
 import os
 import sys
-
+import time
+from typing import Optional, List
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
 from .generator import generate_pdb_content
@@ -570,9 +571,14 @@ def main() -> None:
         if not args.input_pdb:
              logger.error("Docking mode requires --input-pdb.")
              sys.exit(1)
-        prep = DockingPrep(args.input_pdb)
-        pqr_file = prep.generate_pqr()
-        logger.info(f"Docking preparation complete. PQR file: {pqr_file}")
+        prep = DockingPrep(args.forcefield)
+        pqr_file = args.output if args.output else "docking_prep.pqr"
+        success = prep.write_pqr(args.input_pdb, pqr_file)
+        if success:
+            logger.info(f"Docking preparation complete. PQR file: {pqr_file}")
+        else:
+            logger.error("Docking preparation failed.")
+            sys.exit(1)
         return
 
     if args.mode == "pymol":
@@ -654,7 +660,7 @@ def main() -> None:
         out_dir = args.output if args.output else "dataset"
 
         logger.info(f"Starting bulk dataset generation in '{out_dir}'...")
-        generator = DatasetGenerator(
+        dataset_generator = DatasetGenerator(
             output_dir=out_dir,
             num_samples=args.num_samples,
             min_length=args.min_length,
@@ -663,7 +669,7 @@ def main() -> None:
             seed=args.seed,
             dataset_format=args.dataset_format
         )
-        generator.generate()
+        dataset_generator.generate()
         logger.info(f"Dataset generation complete. Output directory: {os.path.abspath(out_dir)}")
         return
 
@@ -695,8 +701,8 @@ def main() -> None:
 
     length_for_generator = args.length if args.sequence is None else None
 
-    final_pdb_content = None
-    final_violations = None
+    final_pdb_content: Optional[str] = None
+    final_violations: List[str] = []
     min_violations_count = float('inf')
 
     generation_attempts = 1 if not args.guarantee_valid and args.best_of_N <= 1 else args.max_attempts
