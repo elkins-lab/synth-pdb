@@ -171,8 +171,6 @@ disable_error_code = ["import-untyped"]
 
 [[tool.mypy.overrides]]
 module = [
-    "synth_nmr.*",
-    "torch_geometric.*",
     "joblib",
     "biotite.*",
     "numpy.*",
