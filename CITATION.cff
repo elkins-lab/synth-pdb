@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it as below."
+authors:
+- family-names: "Elkins"
+  given-names: "George"
+title: "synth-pdb: Realistic Protein Structure Generator"
+version: 1.21.0
+abstract: "A command-line tool and API for generating realistic PDB files with mixed secondary structures, biophysically-inspired conformations, and comprehensive geometric validation. Supports per-region conformation control, Ramachandran-based sampling, macrocyclization, metal coordination, and generation of multi-modal machine learning training datasets (NPZ, Distograms)."
+url: "https://github.com/elkins/synth-pdb"
+repository-code: "https://github.com/elkins/synth-pdb"
+license: "MIT"
+keywords:
+  - "protein-structure"
+  - "structural-biology"
+  - "bioinformatics"
+  - "machine-learning"
+  - "peptide-generation"
+  - "ramachandran"
+  - "testing"
+  - "educational"
