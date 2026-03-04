@@ -44,15 +44,20 @@ jobs:
       run: |
         # protein_quality_assessment.ipynb: runs minimize_energy=True on a 53-residue
         # protein — consistently times out on shared CI CPUs. Skipped; test locally.
+        #
+        # Plotly fig.show() pattern: notebooks use fig.show(renderer='json' if os.getenv('CI') else None)
+        # This serialises the figure to stdout immediately in headless CI instead of
+        # trying to open a browser window, which would block indefinitely.
         # All google.colab imports in interactive_tutorials use try/except guards and
         # correctly detect non-Colab environments without any mocking needed.
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
-          --ExecutePreprocessor.timeout=1800 \
+          --ExecutePreprocessor.timeout=900 \
           examples/interactive_tutorials/folding_landscape.ipynb \
           examples/interactive_tutorials/gfp_molecular_forge.ipynb \
           examples/interactive_tutorials/latent_space_explorer.ipynb \
           examples/interactive_tutorials/nerf_geometry_lab.ipynb \
-          examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb
+          examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb \
+          examples/interactive_tutorials/rdc_alignment_explorer.ipynb
 
     - name: Test ML Integration Examples
       run: |
