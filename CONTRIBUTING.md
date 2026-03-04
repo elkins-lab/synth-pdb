@@ -1,8 +1,8 @@
 # Contributing to `synth-pdb`
 
-First off, thanks for taking the time to contribute! Academic and open-source software relies on community collaboration.
+Academic and open-source software relies on community collaboration.  Any suggestions or contributions are encouraged and appreciated.  Thanks for considering taking the time to contribute.
 
-The following is a set of guidelines for contributing to `synth-pdb` on GitHub. These are mostly guidelines, not strict rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+The following are guidelines for contributing to `synth-pdb` on GitHub. These are guidelines, not strict rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 ## How Can I Contribute?
 
