@@ -5,7 +5,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 [![PyPI version](https://img.shields.io/badge/pypi-v1.21.0-blue)](https://pypi.org/project/synth-pdb/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PENDING.svg)](https://doi.org/10.5281/zenodo.PENDING)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18856249.svg)](https://doi.org/10.5281/zenodo.18856249)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/elkins/synth-pdb/branch/master/graph/badge.svg)](https://codecov.io/gh/elkins/synth-pdb)
 [![Documentation](https://img.shields.io/badge/docs-live-brightgreen)](https://elkins.github.io/synth-pdb/)
@@ -194,8 +194,6 @@ The preferred shape of a side chain strongly depends on the shape of the backbon
 #### 🧪 Residue-Specific Ramachandran Validation (MolProbity-Style)
 > [!TIP]
 > **Realism Equals Efficiency**: By using valid backbone angles (Pre-Proline bias) and correct side-chain rotamers, `synth-pdb` structures start much closer to a physical energy minimum. Validation experiments show this reduces Energy Minimization time by **>60%** due to fewer initial steric clashes.
-
-**Status**: Fully Implemented ✅
 **What**: Realistic backbone geometry validation based on amino acid type using MolProbity/Top8000 data.
 - **Glycine (GLY)**: Correctly allowed in left-handed alpha region (phi > 0).
 - **Proline (PRO)**: Checks against restricted phi angles.
@@ -618,9 +616,6 @@ my_training_data/
 - `--min-length <N>`, `--max-length <N>`: Range for random sequence lengths (default 10-50).
 - `--train-ratio <FLOAT>`: Fraction of samples for the training set (default 0.8).
 - `--output <DIR>`: Directory to save the dataset.
-
-
-
 
 
 
