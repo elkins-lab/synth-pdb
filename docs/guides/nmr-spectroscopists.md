@@ -128,6 +128,6 @@ any researcher can exactly reproduce the generation from the REMARK block alone.
 ## Further Reading
 
 - [NMR Theory: Residual Dipolar Couplings](../science/nmr-theory.md#residual-dipolar-couplings) — physics, derivation, literature
-- [API: synth_pdb.rdc](../api/nmr.md#synth_pdbrdc--residual-dipolar-couplings) — module reference
+- [API: synth_pdb.rdc](../api/nmr.md#synth-pdbrdc-residual-dipolar-couplings) — module reference
 - Han, B. et al. (2011). SHIFTX2. *J Biomol NMR*, 50, 43–57. DOI: [10.1007/s10858-011-9478-4](https://doi.org/10.1007/s10858-011-9478-4)
 - Tjandra, N. & Bax, A. (1997). RDC measurement in liquid crystals. *Science*, 278, 1111. DOI: [10.1126/science.278.5340.1111](https://doi.org/10.1126/science.278.5340.1111)
