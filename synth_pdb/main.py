@@ -73,6 +73,29 @@ def _build_command_string(args: argparse.Namespace) -> str:
         cmd_parts.append("--gen-shifts")
         if args.shift_output:
             cmd_parts.append(f"--shift-output {args.shift_output}")
+        # Record the chosen predictor so the REMARK block captures it for reproducibility.
+        # EDUCATIONAL NOTE — Scientific Reproducibility:
+        # The PDB REMARK 3 block records all generation parameters.
+        # Researchers reading a synth-pdb file can therefore re-run the exact same
+        # command and obtain an identical structure, satisfying the FAIR data principles
+        # (Findable, Accessible, Interoperable, Reusable).
+        # We use getattr with a default so that bare argparse.Namespace objects created by
+        # older tests that predate this flag do not raise AttributeError.
+        shift_predictor = getattr(args, "shift_predictor", "shiftx2")
+        if shift_predictor != "shiftx2":  # Only add if non-default to keep REMARKs concise
+            cmd_parts.append(f"--shift-predictor {shift_predictor}")
+
+    # Use getattr for all new Phase 9.6 attributes for backward compatibility with code
+    # that creates bare Namespace objects (e.g. existing test_main_coverage.py tests).
+    output_rdcs = getattr(args, "output_rdcs", None)
+    if output_rdcs:
+        cmd_parts.append(f"--output-rdcs {output_rdcs}")
+        rdc_da = getattr(args, "rdc_da", 10.0)
+        rdc_r = getattr(args, "rdc_r", 0.1)
+        if rdc_da != 10.0:
+            cmd_parts.append(f"--rdc-da {rdc_da}")
+        if rdc_r != 0.1:
+            cmd_parts.append(f"--rdc-r {rdc_r}")
 
     if args.output:
         cmd_parts.append(f"--output {args.output}")
@@ -295,12 +318,27 @@ def main() -> None:
     parser.add_argument(
         "--gen-shifts",
         action="store_true",
-        help="Generate synthetic Chemical Sshift data (H, N, CA, CB, C) based on secondary structure.",
+        help="Generate synthetic Chemical Shift data (H, N, CA, CB, C) based on secondary structure.",
     )
     parser.add_argument(
         "--shift-output",
         type=str,
         help="Optional: Output NEF filename for chemical shifts.",
+    )
+    parser.add_argument(
+        "--shift-predictor",
+        type=str,
+        default="shiftx2",
+        choices=["shiftx2", "empirical"],
+        help=(
+            "Chemical shift predictor to use with --gen-shifts. "
+            "'shiftx2' (default): prefers the SHIFTX2 external binary (Han et al., 2011, "
+            "J Biomol NMR 50:43), falls back automatically to the empirical method if the "
+            "SHIFTX2 binary is not installed. "
+            "'empirical': uses the SPARTA+-style empirical table method directly (Shen & Bax, "
+            "2010, J Biomol NMR 48:13), always available with no external dependencies. "
+            "Use 'empirical' for reproducible CI/CD runs where SHIFTX2 may not be present."
+        ),
     )
 
     # Phase 9.5: J-Couplings
@@ -313,6 +351,57 @@ def main() -> None:
         "--coupling-output",
         type=str,
         help="Optional: Output CSV filename for J-couplings.",
+    )
+
+    # Phase 9.6: Residual Dipolar Couplings (RDCs)
+    # EDUCATIONAL NOTE — RDC Background:
+    # RDCs encode the orientation of bondvectors (e.g., backbone N-H) relative to a
+    # global alignment frame. They are fundamentally different from NOE distance
+    # restraints: NOEs are local (short-range r^-6 distance contacts) while RDCs are
+    # global (orientational information vs. the alignment tensor). The two observables
+    # are therefore complementary — combining them dramatically improves NMR structure
+    # accuracy. A groundbreaking study showed RDC-constrained calculations refined a
+    # 100-ns MD ensemble to within 0.4 Å of the crystal structure without additional NOEs
+    # (Bewley & Clore, 2000, J Am Chem Soc, 122, 6009).
+    #
+    # The RDC formula (Tjandra & Bax, 1997, Science 278:1111):
+    #   D(θ, φ) = Da · [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
+    # where Da is the axial component and R is the rhombicity of the alignment tensor.
+    parser.add_argument(
+        "--output-rdcs",
+        type=str,
+        help=(
+            "Generate synthetic backbone N-H Residual Dipolar Coupling (RDC) data and "
+            "export to a CSV file (columns: res_id, residue, RDC_NH_Hz). "
+            "The structure must contain amide H atoms — use --minimize to add protons "
+            "via OpenMM. Alignment tensor defaults: Da=10 Hz, R=0.1. "
+            "Based on: Tjandra & Bax (1997), Science 278:1111."
+        ),
+    )
+    parser.add_argument(
+        "--rdc-da",
+        type=float,
+        default=10.0,
+        help=(
+            "Axial component of the alignment tensor Da in Hz (default: 10.0). "
+            "Da controls the overall magnitude of the RDC values. "
+            "Typical experimental range: 5–25 Hz for dilute liquid crystal or "
+            "phage-based alignment media (Tjandra & Bax, 1997; Hansen et al., 2000, "
+            "J Biomol NMR 14:85)."
+        ),
+    )
+    parser.add_argument(
+        "--rdc-r",
+        type=float,
+        default=0.1,
+        help=(
+            "Rhombicity R of the alignment tensor, 0 ≤ R ≤ 2/3 (default: 0.1). "
+            "R=0 = axially symmetric tensor (simplest case; measurement in rod-like media). "
+            "R=2/3 = maximum rhombicity. "
+            "Increasing R breaks the degeneracy between bond vectors related by rotation "
+            "about the tensor Z-axis, providing additional orientational information. "
+            "Reference: Clore et al. (1998), J Magn Reson, 133, 216–221."
+        ),
     )
 
     # Phase 10: Constraint Export
@@ -961,7 +1050,7 @@ def main() -> None:
                 # We perform calculations first, so we can capture data (like restraints) for visualization if needed.
                 generated_restraints = None # To hold restraints for viewer
 
-                if args.gen_nef or args.gen_relax or args.gen_shifts or args.gen_couplings or args.export_constraints or args.export_torsion or args.gen_msa or args.export_distogram:
+                if args.gen_nef or args.gen_relax or args.gen_shifts or args.gen_couplings or args.output_rdcs or args.export_constraints or args.export_torsion or args.gen_msa or args.export_distogram:
                     if args.mode != "generate":
                         logger.warning("Synthetic Data Generation is currently only supported in single structure 'generate' mode.")
                     else:
@@ -1029,9 +1118,19 @@ def main() -> None:
 
                             # 3. Chemical Shifts (Phase 9)
                             if args.gen_shifts:
-                                shifts = predict_chemical_shifts(structure)
-                                shift_filename = args.shift_output if args.shift_output else output_filename.replace(".pdb", "_shifts.nef")
-                                write_nef_chemical_shifts(shift_filename, seq_str, shifts)
+                                # EDUCATIONAL NOTE — Predictor Selection:
+                                # --shift-predictor controls which backend synth-nmr uses:
+                                #   'shiftx2' (default): SHIFTX2 hybrid ML/empirical method
+                                #     (Han et al., 2011, J Biomol NMR 50:43). Achieves
+                                #     RMSD ~0.04 ppm (1H), ~0.44 ppm (13C) from experiment.
+                                #     Requires the SHIFTX2 binary; falls back to empirical
+                                #     automatically if the binary is not found.
+                                #   'empirical': SPARTA+-style neural network / empirical tables
+                                #     (Shen & Bax, 2010, J Biomol NMR 48:13). Always available
+                                #     (pure Python, no external binary). RMSD ~0.05 ppm (1H),
+                                #     ~0.55 ppm (13C). Recommended for CI/CD pipelines.
+                                use_shiftx2 = (args.shift_predictor == "shiftx2")
+                                shifts = predict_chemical_shifts(structure, use_shiftx2=use_shiftx2)
                                 shift_filename = args.shift_output if args.shift_output else output_filename.replace(".pdb", "_shifts.nef")
                                 write_nef_chemical_shifts(shift_filename, seq_str, shifts)
                                 logger.info(f"NEF Chemical Shift Data generated: {os.path.abspath(shift_filename)}")
@@ -1065,6 +1164,38 @@ def main() -> None:
                                         f.write(f"{rid},{res},{jval:.4f}\n")
 
                                 logger.info(f"J-Couplings exported: {os.path.abspath(coupling_csv)}")
+
+                            # 3.6 RDC Output (Phase 9.6)
+                            if args.output_rdcs:
+                                # EDUCATIONAL NOTE — RDC Calculation:
+                                # We compute backbone N-H Residual Dipolar Couplings by:
+                                #   1. Locating every backbone amide nitrogen (N) and its
+                                #      associated amide proton (H) in the structure.
+                                #   2. Computing the unit vector along each N-H bond.
+                                #   3. Projecting that vector onto the alignment tensor
+                                #      principal axis system (PAS) to get (θ, φ).
+                                #   4. Applying the full RDC formula:
+                                #        D = Da · [(3cos²θ − 1) + 1.5·R·sin²θ·cos(2φ)]
+                                #      (Tjandra & Bax, 1997, Science 278:1111)
+                                #
+                                # Proline residues are automatically skipped because they
+                                # lack a backbone amide proton (their nitrogen is a
+                                # tertiary/secondary amine in the pyrrolidine ring).
+                                from .rdc import calculate_rdcs
+                                rdcs = calculate_rdcs(
+                                    structure, Da=args.rdc_da, R=args.rdc_r
+                                )
+                                rdc_csv = args.output_rdcs
+                                # Build a lookup from res_id (1-indexed) to one-letter code.
+                                # res_names is already built above as a list of 3-letter codes.
+                                with open(rdc_csv, "w") as f:
+                                    f.write("res_id,residue,RDC_NH_Hz\n")
+                                    for rid, val in sorted(rdcs.items()):
+                                        # res_id is 1-based; res_names list is 0-based.
+                                        res_3letter = res_names[rid - 1] if rid - 1 < len(res_names) else "UNK"
+                                        res_1letter = three_to_one.get(res_3letter, "X")
+                                        f.write(f"{rid},{res_1letter},{val:.4f}\n")
+                                logger.info(f"RDC data exported to: {os.path.abspath(rdc_csv)}")
 
                             # 4. Constraint Export (Phase 10)
                             if args.export_constraints:
