@@ -2,7 +2,7 @@
 
 API reference for the `synth_pdb` NMR-data modules.
 
-## `synth_pdb.rdc` — Residual Dipolar Couplings
+## `synth_pdb.rdc` — Residual Dipolar Couplings { #rdc }
 
 ### Overview
 
