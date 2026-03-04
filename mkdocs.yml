@@ -56,6 +56,7 @@ nav:
       - Folding Landscape: tutorials/folding_landscape.ipynb
       - Latent Space Explorer: tutorials/latent_space_explorer.ipynb
       - NeRF Geometry Lab: tutorials/nerf_geometry_lab.ipynb
+      - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
     - ML Integration:
       - ML Handover Demo: tutorials/ml_handover_demo.ipynb
       - Hard Decoy Challenge: tutorials/hard_decoy_challenge.ipynb

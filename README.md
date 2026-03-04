@@ -32,6 +32,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | **💊 Bio-Active Hormone Lab** | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hormone_lab.ipynb) |
 | **🔍 Protein Quality Assessment** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/protein_quality_assessment.ipynb) |
 | **🔬 The Virtual NMR Spectrometer** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
+| **🧲 RDC Alignment Tensor Explorer** | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
 | **📡 Neural NMR Pipeline** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/neural_nmr_pipeline.ipynb) |
 | **🔗 The NeRF Geometry Lab** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nerf_geometry_lab.ipynb) |
 | **🧪 The GFP Molecular Forge** | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
@@ -61,11 +62,12 @@ Choose a path based on your background and goals:
 
 1. **🔗 NeRF Geometry Lab** (25 min) - Learn internal coordinate systems
 2. **🔬 Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts
-3. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
-4. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
-5. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
-6. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
-7. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
+3. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualise the alignment tensor and RDC physics interactively
+4. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
+5. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
+6. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
+7. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
+8. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*
