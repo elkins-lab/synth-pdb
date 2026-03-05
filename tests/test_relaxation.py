@@ -63,12 +63,12 @@ def test_relaxation_trends():
     # R2 ~ S2 * tau_m
     assert rates[3]['R2'] > rates[1]['R2']
     
-    # PHYSICS CORRECTION:
-    # In the simple Model-Free limit (tau_e ~ 0), NOE is independent of S2 because
-    # S2 cancels out in the ratio of Cross-Relaxation / Auto-Relaxation.
-    # So NOE should be roughly constant even if S2 changes, unless we model tau_e.
-    # We verify they are close.
-    assert abs(noe_core - noe_term) < 0.01
+    # PHYSICS (fixed):
+    # With per-residue tau_f, the fast-motion (1-S2) term breaks the S2 cancellation in
+    # the NOE ratio. Flexible termini (low S2, longer tau_f) now correctly produce a
+    # lower HetNOE than rigid core residues.
+    # Reference: Lipari & Szabo (1982) J Am Chem Soc 104:4546.
+    assert noe_core > noe_term
 
 def test_proline_exclusion():
     """Ensure Prolines are skipped (no amide proton)."""
