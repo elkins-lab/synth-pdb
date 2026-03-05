@@ -5,7 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.22.0] - 2026-03-05
+
+### Added
+
+- **Residual Dipolar Coupling (RDC) module** (`synth_pdb/rdc.py`): New `calculate_rdcs()`
+  function implementing the Saupe-matrix formalism for computing backbone N–H RDCs given
+  an alignment tensor defined by axial component `Da` and rhombicity `R`.
+- **RDC tutorial notebook** (`examples/interactive_tutorials/rdc_tutorial.ipynb`):
+  Standalone Colab-compatible notebook demonstrating RDC calculation, Q-factor
+  validation against published ubiquitin data (1D3Z), and interactive alignment-tensor
+  exploration.
+- **Virtual NMR Spectrometer — RDC section** (`virtual_nmr_spectrometer.ipynb` cells
+  13–14): Interactive RDC fingerprint panel with `ipywidgets` sliders for `Da` and `R`,
+  and a `py3Dmol` 3D view coloured by RDC sign and magnitude.
+- **Virtual NMR Spectrometer — Shift Predictor Comparison** (cells 15–16): Side-by-side
+  HSQC scatter plots (empirical vs SHIFTX2), per-residue Δδ(¹H) bar chart, and a
+  summary statistics table with literature RMSD benchmarks. Graceful fallback when
+  SHIFTX2 is not installed.
+
+### Fixed
+
+- **`synth_pdb/physics.py` — `EnergyMinimizer`**: Eliminated a spurious
+  `WARNING: Forcefield does not support implicitSolvent` log message that fired on
+  every run. Root cause: the OBC2 implicit-solvent XML was correctly loaded at
+  construction time, but `_create_system_robust` also passed `implicitSolvent=app.OBC2`
+  as a `createSystem()` kwarg — which modern OpenMM rejects as unused. Fix: clear
+  `self.implicit_solvent_enum` after the XML is appended so the kwarg path is never
+  exercised.
+- **`synth_pdb/relaxation.py` (via `synth-nmr>=0.7.2`)**: Heteronuclear NOE values
+  were identical for every residue (a flat horizontal line) because S² cancelled
+  exactly in the ratio cross-relaxation/R₁ when `tau_f=0`. Fix in `synth-nmr 0.7.2`:
+  a per-residue fast internal motion timescale `tau_f = (1−S²)×500 ps + 50 ps` now
+  breaks the cancellation. Flexible termini correctly give low/negative HetNOE; rigid
+  helices give HetNOE ≈ 0.5–0.8. Ref: Lipari & Szabo (1982) *J Am Chem Soc* 104:4546.
+- **`virtual_nmr_spectrometer.ipynb` Colab setup**: Added explicit
+  `pip install synth-nmr>=0.7.2` to the setup cell (was silently skipped because
+  `synth-pdb` was installed with `--no-deps`), fixing a `ModuleNotFoundError: No module named 'synth_nmr'` crash on every fresh Colab runtime.
+- **`virtual_nmr_spectrometer.ipynb` Neural Shift cell**: Added a `torch_geometric`
+  availability check with a clear install hint (`pip install synth-nmr[ml]`). Previously
+  the cell crashed with `ImportError: torch_geometric is required` when the ML extras
+  were absent (the default in Colab).
+
+### Changed
+
+- **Dependency**: Tightened `synth-nmr` lower bound from `>=0.6.1` to `>=0.7.2` to
+  ensure the HetNOE bug fix and all NMR accuracy improvements are always present.
+
+---
+
 ## [1.20.0] - 2026-02-21
+
 
 ### Changed
 - **Numpy Compatibility**: Relaxed numpy dependency pin to `<3.0.0` to resolve binary incompatibility errors (`numpy.dtype size changed`) in Google Colab and other environments using `numpy 2.x`.
