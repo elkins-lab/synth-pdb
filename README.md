@@ -62,7 +62,7 @@ Choose a path based on your background and goals:
 
 1. **🔗 NeRF Geometry Lab** (25 min) - Learn internal coordinate systems
 2. **🔬 Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts
-3. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualise the alignment tensor and RDC physics interactively
+3. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualize the alignment tensor and RDC physics interactively
 4. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
 5. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
 6. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
