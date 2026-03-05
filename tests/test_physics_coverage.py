@@ -399,40 +399,38 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.app")
     def test_create_system_exception_fallback(self, mock_app, caplog):
         """
-        Test that we fallback if createSystem fails (e.g., due to implicit solvent issues).
+        Test that createSystem() succeeds on the first call now that the implicit
+        solvent is configured exclusively via the XML file loaded at construction
+        time (not as a redundant kwarg to createSystem).  The old retry-and-warn
+        loop should no longer be exercised under normal operation.
         """
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Standard Setup
         mock_pdb = MagicMock()
-        mock_pdb.topology.atoms.return_value = iter([MagicMock()]) 
+        mock_pdb.topology.atoms.return_value = iter([MagicMock()])
         mock_app.PDBFile.return_value = mock_pdb
-        
+
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
-        mock_modeller.topology.atoms.side_effect = lambda: iter([MagicMock()]) # Fresh iterator
+        mock_modeller.topology.atoms.side_effect = lambda: iter([MagicMock()])
         mock_modeller.positions = [0]
-        
+
         mock_simulation = MagicMock()
         mock_app.Simulation.return_value = mock_simulation
         mock_simulation.context.getState.return_value.getPositions.return_value = [1]
-        
+
         minimizer.forcefield = MagicMock()
-        
-        # Mock createSystem to fail ONCE then succeed
-        # First call has implicitSolvent arg
-        def create_system_side_effect(*args, **kwargs):
-            if 'implicitSolvent' in kwargs:
-                raise Exception("Implicit solvent not supported")
-            return MagicMock() # Second call succeeds
-            
-        minimizer.forcefield.createSystem.side_effect = create_system_side_effect
-        
+
         with patch.dict(sys.modules, {"biotite": MagicMock(), "synth_pdb.cofactors": MagicMock(), "synth_pdb.biophysics": MagicMock()}):
             result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
-            
+
         assert result is not None
-        # Verify createSystem was called twice
-        assert minimizer.forcefield.createSystem.call_count == 2
+        # With the fix, the solvent is configured via XML — createSystem() is called
+        # exactly once (no retry needed) and never receives implicitSolvent= as a kwarg.
+        assert minimizer.forcefield.createSystem.call_count == 1
+        called_kwargs = minimizer.forcefield.createSystem.call_args[1]
+        assert "implicitSolvent" not in called_kwargs
+
 
 

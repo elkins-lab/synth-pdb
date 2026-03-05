@@ -123,6 +123,11 @@ class EnergyMinimizer:
             self.implicit_solvent_enum = solvent_model if not isinstance(solvent_model, str) else getattr(app, str(solvent_model).split('.')[-1], None)
             if self.implicit_solvent_enum in solvent_xml_map:
                 ff_files.append(solvent_xml_map[self.implicit_solvent_enum])
+                # The solvent is fully configured via the XML file above.
+                # Setting implicit_solvent_enum to None prevents _create_system_robust
+                # from also passing it as a createSystem() kwarg, which modern OpenMM
+                # rejects as an unused argument (triggering a warning + retry every run).
+                self.implicit_solvent_enum = None
 
         try:
             self.forcefield = app.ForceField(*ff_files)
