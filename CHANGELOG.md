@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.23.0] - 2026-03-07
+
+### Added
+
+- **IDP Conformational Ensembles Tutorial** (`examples/interactive_tutorials/idp_ensemble_validation.ipynb`): New interactive notebook validating synthetic IDP ensembles mathematically and visually against $1/r^6$ Paramagnetic Relaxation Enhancement (PRE) NMR phenomena.
+- **AlphaFold pLDDT vs NMR S² Tutorial** (`examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb`): New interactive notebook modeling an unstructured loop to demonstrate the inverse correlation between static AI prediction confidence (pLDDT) and physical NMR flexibility.
+- **IDP Theoretical Physics Documentation** (`docs/science/idp-dynamics.md`): Added comprehensive biophysical theory documentation explaining how the `BatchedGenerator` successfully handles intrinsically disordered regions compared to rigid crystalline tools.
+
+### Fixed
+
+- **Py3Dmol Widget Crash on Local Jupyter**: Replaced IPyWidgets `HBox` layout with Py3Dmol's native `viewergrid=(1,2)` API across tutorials. This stops localized browser javascript injection blocks from breaking dual-viewer structures (fixing "3Dmol.js failed to load" spam).
+- **GitHub Actions Formatting CI**: Ran `ruff check --fix .` across the codebase, fixing un-sorted imports and line-length breakages introduced by `physics.py` trajectory logging features, restoring a completely 'green' `test.yml` CI workflow.
+
+---
+
 ## [1.22.0] - 2026-03-05
 
 ### Added
