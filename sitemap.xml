@@ -173,6 +173,10 @@
          <lastmod>2026-03-07</lastmod>
     </url>
     <url>
+         <loc>https://elkins.github.io/synth-pdb/science/idp-dynamics/</loc>
+         <lastmod>2026-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://elkins.github.io/synth-pdb/science/nerf-geometry/</loc>
          <lastmod>2026-03-07</lastmod>
     </url>
@@ -193,6 +197,10 @@
          <lastmod>2026-03-07</lastmod>
     </url>
     <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/alphafold_vs_nmr_dynamics/</loc>
+         <lastmod>2026-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/dataset_factory/</loc>
          <lastmod>2026-03-07</lastmod>
     </url>
@@ -210,6 +218,10 @@
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/hormone_lab/</loc>
+         <lastmod>2026-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/idp_ensemble_validation/</loc>
          <lastmod>2026-03-07</lastmod>
     </url>
     <url>
@@ -241,7 +253,15 @@
          <lastmod>2026-03-07</lastmod>
     </url>
     <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/protein_quality_assessment/</loc>
+         <lastmod>2026-03-07</lastmod>
+    </url>
+    <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/rdc_alignment_explorer/</loc>
+         <lastmod>2026-03-07</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/virtual_nmr_spectrometer/</loc>
          <lastmod>2026-03-07</lastmod>
     </url>
 </urlset>
