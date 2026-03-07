@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-import time
 import argparse
 import csv
 import os
+import platform
 import sys
+import time
 from pathlib import Path
-import numpy as np
 
 import psutil
-import platform
 
 # Ensure local synth_pdb is prioritized
 current_path = Path(__file__).resolve().parent
@@ -16,8 +15,9 @@ repo_root = current_path.parent
 if (repo_root / "synth_pdb").exists():
     sys.path.insert(0, str(repo_root))
 
-from synth_pdb.generator import generate_pdb_content
 from synth_pdb.batch_generator import BatchedGenerator
+from synth_pdb.generator import generate_pdb_content
+
 
 def get_hardware_info():
     """Gathers detailed hardware and platform information."""
@@ -46,7 +46,7 @@ def benchmark_batched(sequence, n_samples):
     # Warm up
     bg_warm = BatchedGenerator(sequence, n_batch=10, full_atom=False)
     _ = bg_warm.generate_batch()
-    
+
     start_time = time.time()
     bg = BatchedGenerator(sequence, n_batch=n_samples, full_atom=False)
     _ = bg.generate_batch()
@@ -72,20 +72,20 @@ def main():
     results = []
 
     print(f"\n🚀 Starting Benchmarks (Sequence Length: {len(args.seq.split('-'))})")
-    
+
     for n in test_sizes:
         print(f"\nTesting N={n}")
         serial_time = benchmark_serial(args.seq, n)
         batched_time = benchmark_batched(args.seq, n)
-        
+
         speedup = serial_time / batched_time
         throughput_serial = n / serial_time
         throughput_batched = n / batched_time
-        
+
         print(f"  Serial:  {serial_time:.3f}s ({throughput_serial:.1f} struct/sec)")
         print(f"  Batched: {batched_time:.3f}s ({throughput_batched:.1f} struct/sec)")
         print(f"  💪 Speedup: {speedup:.1f}x")
-        
+
         result_row = {
             "N": n,
             "serial_time": serial_time,

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-import pandas as pd
-import matplotlib.pyplot as plt
 import argparse
 import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+
 
 def main():
     parser = argparse.ArgumentParser(description="Plot multi-hardware synth-pdb Benchmark Results")
@@ -53,7 +55,7 @@ def main():
     ax2.set_title('Relative Speedup Scaling')
     ax2.legend(title='Hardware')
     ax2.grid(True, linestyle='--', alpha=0.7)
-    
+
     # Customizing the plot for clarity
     plt.tight_layout(rect=[0, 0, 1, 0.98])
     plt.savefig(args.output, dpi=150)
