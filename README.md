@@ -42,6 +42,8 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | **💊 Drug Discovery Pipeline** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/drug_discovery_pipeline.ipynb) |
 | **🌌 AI Latent Space Explorer** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/latent_space_explorer.ipynb) |
 | **🏔️ The Live Folding Landscape** | ⭐⭐⭐ Advanced | 40 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/folding_landscape.ipynb) |
+| **☁️ IDP Conformational Ensembles** | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb) |
+| **🤖 AlphaFold pLDDT vs NMR S²** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb) |
 
 ### 🎓 Learning Paths
 
@@ -68,6 +70,8 @@ Choose a path based on your background and goals:
 6. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
 7. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
 8. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
+9. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
+10. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*

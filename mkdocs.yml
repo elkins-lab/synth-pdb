@@ -52,11 +52,15 @@ nav:
     - Command-Line Reference: guides/cli-reference.md
   - Tutorials:
     - Interactive Tutorials:
+      - IDP Conformational Ensembles: tutorials/idp_ensemble_validation.ipynb
+      - AlphaFold Confidence vs NMR S²: tutorials/alphafold_vs_nmr_dynamics.ipynb
       - GFP Molecular Forge: tutorials/gfp_molecular_forge.ipynb
       - Folding Landscape: tutorials/folding_landscape.ipynb
       - Latent Space Explorer: tutorials/latent_space_explorer.ipynb
       - NeRF Geometry Lab: tutorials/nerf_geometry_lab.ipynb
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
+      - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
+      - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
     - ML Integration:
       - ML Handover Demo: tutorials/ml_handover_demo.ipynb
       - Hard Decoy Challenge: tutorials/hard_decoy_challenge.ipynb
@@ -87,6 +91,7 @@ nav:
       - dataset: api/dataset.md
   - Scientific Background:
     - Biophysics Fundamentals: science/biophysics.md
+    - Intrinsically Disordered Proteins: science/idp-dynamics.md
     - Ramachandran Plots: science/ramachandran.md
     - Rotamer Libraries: science/rotamers.md
     - NeRF Geometry: science/nerf-geometry.md
