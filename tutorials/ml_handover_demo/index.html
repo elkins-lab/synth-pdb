@@ -3767,7 +3767,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="c1"># Ensure the local synth_pdb source code is prioritized if running from the repo</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> 
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
@@ -3779,10 +3779,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
         <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol'</span><span class="p">)</span>
-        
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY..."</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ Please wait 10 seconds, then Run All Cells again."</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
@@ -3800,7 +3800,7 @@ from pathlib import Path
 # Ensure the local synth_pdb source code is prioritized if running from the repo
 try:
     current_path = Path(".").resolve()
-    repo_root = current_path.parent.parent 
+    repo_root = current_path.parent.parent
     if (repo_root / "synth_pdb").exists():
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
@@ -3812,10 +3812,10 @@ if 'google.colab' in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
         get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol')
-        
+
         with open("installed.marker", "w") as f:
             f.write("done")
-        
+
         print("🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY...")
         print("⚠️ Please wait 10 seconds, then Run All Cells again.")
         os.kill(os.getpid(), 9)
@@ -3848,16 +3848,20 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries Loaded."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import time
+<div class="clipboard-copy-txt" id="cell-2">import time
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 from synth_pdb.batch_generator import BatchedGenerator
 
 print("Libraries Loaded.")</div>
@@ -3955,16 +3959,17 @@ print(f"Generated {n_batch} structures.")
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">run_benchmark</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="n">start_serial</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">serial_dt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_serial</span>
-    
+
     <span class="n">start_batched</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">_</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">drift</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
     <span class="n">batched_dt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_batched</span>
-    
+
     <span class="k">return</span> <span class="n">serial_dt</span><span class="p">,</span> <span class="n">batched_dt</span>
 
 <span class="n">n_test</span> <span class="o">=</span> <span class="mi">100</span>
@@ -3976,7 +3981,7 @@ print(f"Generated {n_batch} structures.")
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">bars</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="s2">"Traditional Serial"</span><span class="p">,</span> <span class="s2">"synth-pdb Batched"</span><span class="p">],</span> <span class="p">[</span><span class="n">s_1k</span><span class="p">,</span> <span class="n">b_time</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"#ff9999"</span><span class="p">,</span> <span class="s2">"#667eea"</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Seconds per 1,000 Structures"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Real-World Performance Comparison"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Real-World Performance Comparison"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">bars</span><span class="p">:</span>
@@ -3990,16 +3995,17 @@ print(f"Generated {n_batch} structures.")
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from synth_pdb.generator import generate_pdb_content
 
+
 def run_benchmark(n=100):
     start_serial = time.time()
     for _ in range(n):
         _ = generate_pdb_content(sequence_str=sequence, minimize_energy=False)
     serial_dt = time.time() - start_serial
-    
+
     start_batched = time.time()
     _ = generator.generate_batch(drift=1.0)
     batched_dt = time.time() - start_batched
-    
+
     return serial_dt, batched_dt
 
 n_test = 100
@@ -4011,7 +4017,7 @@ b_1k = b_time * (1000/n_batch) if n_batch &gt; 0 else b_time
 plt.figure(figsize=(8, 4))
 bars = plt.bar(["Traditional Serial", "synth-pdb Batched"], [s_1k, b_time], color=["#ff9999", "#667eea"])
 plt.ylabel("Seconds per 1,000 Structures")
-plt.title(f"Real-World Performance Comparison")
+plt.title("Real-World Performance Comparison")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 
 for bar in bars:
@@ -4059,9 +4065,9 @@ print(f"Theoretical throughput: {1000/b_time:.0f} structures/sec")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-    
+
     <span class="n">torch_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ PyTorch Handover successful!"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Tensor Device: </span><span class="si">{</span><span class="n">torch_tensor</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Contiguous in memory: </span><span class="si">{</span><span class="n">torch_tensor</span><span class="o">.</span><span class="n">is_contiguous</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -4070,9 +4076,9 @@ print(f"Theoretical throughput: {1000/b_time:.0f} structures/sec")</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">try:
     import torch
-    
+
     torch_tensor = torch.from_numpy(batch.coords).float()
-    
+
     print("✅ PyTorch Handover successful!")
     print(f"Tensor Device: {torch_tensor.device}")
     print(f"Contiguous in memory: {torch_tensor.is_contiguous()}")
@@ -4115,7 +4121,7 @@ except ImportError:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jnp</span>
-    
+
     <span class="n">jax_array</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ JAX Handover successful!"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"JAX Device: </span><span class="si">{</span><span class="n">jax_array</span><span class="o">.</span><span class="n">device</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -4124,7 +4130,7 @@ except ImportError:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">try:
     import jax.numpy as jnp
-    
+
     jax_array = jnp.array(batch.coords)
     print("✅ JAX Handover successful!")
     print(f"JAX Device: {jax_array.device}")
@@ -4237,67 +4243,69 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
     <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedPeptide</span>
-    
+
     <span class="n">c</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">c_clean</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-    
+
     <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_clean</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">c_clean</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="n">c_centered</span> <span class="o">=</span> <span class="n">c_clean</span> <span class="o">-</span> <span class="n">center</span>
-    
+
     <span class="n">p</span> <span class="o">=</span> <span class="n">BatchedPeptide</span><span class="p">(</span>
-        <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
-        <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> 
-        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> 
+        <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="p">)</span>
-    
+
     <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s2">"#fdfdfd"</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s2">"pdb"</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span> <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}})</span>
-    
+
     <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">1.2</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Viewer Ready. Visualizing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">c_clean</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms."</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"py3Dmol not installed."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">try:
-    import py3Dmol
     import numpy as np
+    import py3Dmol
+
     from synth_pdb.batch_generator import BatchedPeptide
-    
+
     c = batch.coords[0].copy()
     mask = np.any(c != 0, axis=1)
     c_clean = c[mask]
-    
+
     center = (c_clean.min(axis=0) + c_clean.max(axis=0)) / 2
     c_centered = c_clean - center
-    
+
     p = BatchedPeptide(
-        c_centered[np.newaxis, ...], 
-        batch.sequence, 
-        np.array(batch.atom_names)[mask].tolist(), 
+        c_centered[np.newaxis, ...],
+        batch.sequence,
+        np.array(batch.atom_names)[mask].tolist(),
         np.array(batch.residue_indices)[mask].tolist()
     )
-    
+
     view = py3Dmol.view(width=800, height=400)
     view.setBackgroundColor("#fdfdfd")
     view.addModel(p.to_pdb(0), "pdb")
     view.setStyle({"stick": {"radius": 0.15}, "cartoon": {"color": "spectrum"}})
-    
+
     view.zoomTo()
     view.center()
     view.zoom(1.2)
     view.show()
-    
+
     print(f"Viewer Ready. Visualizing {len(c_clean)} atoms.")
 except ImportError:
     print("py3Dmol not installed.")</div>

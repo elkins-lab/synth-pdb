@@ -3536,7 +3536,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> 
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
@@ -3548,10 +3548,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
         <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol biotite numpy matplotlib'</span><span class="p">)</span>
-        
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY..."</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -3567,7 +3567,7 @@ from pathlib import Path
 
 try:
     current_path = Path(".").resolve()
-    repo_root = current_path.parent.parent 
+    repo_root = current_path.parent.parent
     if (repo_root / "synth_pdb").exists():
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
@@ -3579,10 +3579,10 @@ if 'google.colab' in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
         get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol biotite numpy matplotlib')
-        
+
         with open("installed.marker", "w") as f:
             f.write("done")
-        
+
         print("🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY...")
         os.kill(os.getpid(), 9)
     else:
@@ -3614,17 +3614,17 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Molecular Pharmacopoeia: ONLINE 🧪"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import py3Dmol
-from synth_pdb.generator import generate_pdb_content
+<div class="clipboard-copy-txt" id="cell-2">import py3Dmol
+
 from synth_pdb.batch_generator import BatchedGenerator
+from synth_pdb.generator import generate_pdb_content
 
 print("Molecular Pharmacopoeia: ONLINE 🧪")</div>
 </div>
@@ -3670,8 +3670,8 @@ print("Molecular Pharmacopoeia: ONLINE 🧪")</div>
 
 <span class="c1"># We generate the structure and enable minimization to resolve the loop</span>
 <span class="n">oxy_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">oxytocin_seq</span><span class="p">,</span> 
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">oxytocin_seq</span><span class="p">,</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">cap_termini</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
@@ -3684,8 +3684,8 @@ print("💍 Synthesizing Oxytocin with Disulfide Closure...")
 
 # We generate the structure and enable minimization to resolve the loop
 oxy_pdb = generate_pdb_content(
-    sequence_str=oxytocin_seq, 
-    minimize_energy=True, 
+    sequence_str=oxytocin_seq,
+    minimize_energy=True,
     cap_termini=True
 )
 
@@ -3714,8 +3714,7 @@ print("✅ Synthesis Complete.")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
-<span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
 <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">oxy_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
 
@@ -3736,8 +3735,7 @@ print("✅ Synthesis Complete.")</div>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into proximity to satisfy the disulfide geometry."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">import py3Dmol
-view = py3Dmol.view(width=800, height=500)
+<div class="clipboard-copy-txt" id="cell-4">view = py3Dmol.view(width=800, height=500)
 view.setBackgroundColor('#fdfdfd')
 view.addModel(oxy_pdb, 'pdb')
 
@@ -3845,6 +3843,7 @@ print("✅ Cyclic Macrocycle Generated.")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
 <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
 <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">cyc_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
@@ -3864,6 +3863,7 @@ print("✅ Cyclic Macrocycle Generated.")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: The D-Alanine (red) provides a 'hinge' that helps stabilize the circular backbone."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">import py3Dmol
+
 view = py3Dmol.view(width=800, height=500)
 view.setBackgroundColor('#fdfdfd')
 view.addModel(cyc_pdb, 'pdb')
@@ -3958,6 +3958,7 @@ print("Educational Note: In a real lab, you would run MD simulations on these sa
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
 <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
 <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
 
@@ -3976,6 +3977,7 @@ print("Educational Note: In a real lab, you would run MD simulations on these sa
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8">import py3Dmol
+
 view = py3Dmol.view(width=800, height=450)
 view.setBackgroundColor('#fdfdfd')
 

@@ -3883,7 +3883,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🔧 Environment Detection &amp; Setup</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
@@ -3906,7 +3908,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Detection &amp; Setup
-import sys, os
+import os
+import sys
+
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
@@ -3951,29 +3955,31 @@ print('✅ Environment configured!')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">SelectionSlider</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBFile</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">SelectionSlider</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'✅ GFP Molecular Forge Ready!'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from IPython.display import display, HTML, clear_output
+<div class="clipboard-copy-txt" id="cell-2">import tempfile
+
 import ipywidgets as widgets
-from ipywidgets import interact, SelectionSlider
 import numpy as np
-import py3Dmol
 import plotly.graph_objects as go
-from synth_pdb import PeptideGenerator
-import biotite.structure as struc
+import py3Dmol
 from biotite.structure.io.pdb import PDBFile
-import tempfile
+from IPython.display import HTML, clear_output, display
+from ipywidgets import SelectionSlider
+
+from synth_pdb import PeptideGenerator
 
 print('✅ GFP Molecular Forge Ready!')</div>
 </div>
@@ -4250,13 +4256,13 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
     <span class="k">global</span> <span class="n">_initializing</span>
     <span class="k">if</span> <span class="n">_initializing</span> <span class="ow">and</span> <span class="n">change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
-    
+
     <span class="n">step</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">get_step_info</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-    
+
     <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        
+
         <span class="c1"># Display step information</span>
         <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">        &lt;div style='background: linear-gradient(135deg, #00C853 0%, #00796B 100%);</span>
@@ -4267,39 +4273,39 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
 <span class="s2">            &lt;b&gt;Chemistry:&lt;/b&gt; </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'chemistry'</span><span class="p">]</span><span class="si">}</span>
 <span class="s2">        &lt;/div&gt;</span>
 <span class="s2">        """</span><span class="p">))</span>
-        
+
         <span class="c1"># 3D viewer</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">native_struct</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
+
         <span class="c1"># Convert to PDB</span>
         <span class="n">temp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">".pdb"</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">PDBFile</span><span class="p">()</span>
         <span class="n">f</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
             <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">temp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        
+
         <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
         <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
-        
+
         <span class="c1"># Style: Highlight chromophore motif</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'VAL'</span><span class="p">,</span> <span class="s1">'PRO'</span><span class="p">,</span> <span class="s1">'LEU'</span><span class="p">]},</span> 
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'VAL'</span><span class="p">,</span> <span class="s1">'PRO'</span><span class="p">,</span> <span class="s1">'LEU'</span><span class="p">]},</span>
                      <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'gray'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}})</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SER'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'GLY'</span><span class="p">]},</span> 
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SER'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'GLY'</span><span class="p">]},</span>
                      <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'colorscheme'</span><span class="p">:</span> <span class="s1">'magentaCarbon'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}})</span>
-        
+
         <span class="c1"># Add glow effect for final step</span>
         <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">"4. Oxidation"</span><span class="p">:</span>
             <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'bg_color'</span><span class="p">])</span>
-            <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="s2">"💚 FLUORESCENT!"</span><span class="p">,</span> 
-                         <span class="p">{</span><span class="s1">'position'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> 
-                          <span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'#00FF00'</span><span class="p">,</span> 
+            <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="s2">"💚 FLUORESCENT!"</span><span class="p">,</span>
+                         <span class="p">{</span><span class="s1">'position'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                          <span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'#00FF00'</span><span class="p">,</span>
                           <span class="s1">'fontColor'</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span>
                           <span class="s1">'fontSize'</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'bg_color'</span><span class="p">])</span>
-        
+
         <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SER'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'GLY'</span><span class="p">]})</span>
         <span class="n">display</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">())</span>
 
@@ -4326,13 +4332,13 @@ def view_forge(change=None):
     global _initializing
     if _initializing and change is not None:
         return
-    
+
     step = slider.value
     info = get_step_info(step)
-    
+
     with out:
         clear_output(wait=True)
-        
+
         # Display step information
         display(HTML(f"""
         <div style="background: linear-gradient(135deg, #00C853 0%, #00796B 100%);
@@ -4343,39 +4349,39 @@ def view_forge(change=None):
 <b>Chemistry:</b> {info['chemistry']}
         </div>
         """))
-        
+
         # 3D viewer
         struct = native_struct.copy()
-        
+
         # Convert to PDB
         temp = tempfile.NamedTemporaryFile(suffix=".pdb", delete=False)
         f = PDBFile()
         f.set_structure(struct)
         f.write(temp.name)
-        with open(temp.name, 'r') as r:
+        with open(temp.name) as r:
             pdb_content = r.read()
         os.unlink(temp.name)
-        
+
         view = py3Dmol.view(width=700, height=450)
         view.addModel(pdb_content, "pdb")
-        
+
         # Style: Highlight chromophore motif
-        view.setStyle({'resn': ['VAL', 'PRO', 'LEU']}, 
+        view.setStyle({'resn': ['VAL', 'PRO', 'LEU']},
                      {'stick': {'color': 'gray', 'opacity': 0.4}})
-        view.setStyle({'resn': ['SER', 'TYR', 'GLY']}, 
+        view.setStyle({'resn': ['SER', 'TYR', 'GLY']},
                      {'stick': {'colorscheme': 'magentaCarbon', 'radius': 0.25}})
-        
+
         # Add glow effect for final step
         if step == "4. Oxidation":
             view.setBackgroundColor(info['bg_color'])
-            view.addLabel("💚 FLUORESCENT!", 
-                         {'position': {'x': 0, 'y': 5, 'z': 0}, 
-                          'backgroundColor': '#00FF00', 
+            view.addLabel("💚 FLUORESCENT!",
+                         {'position': {'x': 0, 'y': 5, 'z': 0},
+                          'backgroundColor': '#00FF00',
                           'fontColor': 'black',
                           'fontSize': 14})
         else:
             view.setBackgroundColor(info['bg_color'])
-        
+
         view.zoomTo({'resn': ['SER', 'TYR', 'GLY']})
         display(view.show())
 
@@ -4445,7 +4451,7 @@ view_forge()
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">absorption</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">'Absorption'</span><span class="p">,</span>
-    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
     <span class="n">fill</span><span class="o">=</span><span class="s1">'tozeroy'</span><span class="p">,</span>
     <span class="n">fillcolor</span><span class="o">=</span><span class="s1">'rgba(0,0,255,0.2)'</span>
 <span class="p">))</span>
@@ -4453,7 +4459,7 @@ view_forge()
 <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">emission</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s1">'Emission'</span><span class="p">,</span>
-    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'green'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'green'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
     <span class="n">fill</span><span class="o">=</span><span class="s1">'tozeroy'</span><span class="p">,</span>
     <span class="n">fillcolor</span><span class="o">=</span><span class="s1">'rgba(0,255,0,0.2)'</span>
 <span class="p">))</span>
@@ -4465,9 +4471,9 @@ view_forge()
     <span class="n">template</span><span class="o">=</span><span class="s1">'plotly_dark'</span><span class="p">,</span>
     <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">annotations</span><span class="o">=</span><span class="p">[</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">395</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"λ_abs = 395 nm"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrowhead</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">475</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"λ_abs = 475 nm"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrowhead</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">508</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.79</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"λ_em = 508 nm"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arrowhead</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">395</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_abs = 395 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">475</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_abs = 475 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">508</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">0.79</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_em = 508 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
@@ -4494,7 +4500,7 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(
     x=wavelengths, y=absorption,
     name='Absorption',
-    line=dict(color='blue', width=3),
+    line={'color': 'blue', 'width': 3},
     fill='tozeroy',
     fillcolor='rgba(0,0,255,0.2)'
 ))
@@ -4502,7 +4508,7 @@ fig.add_trace(go.Scatter(
 fig.add_trace(go.Scatter(
     x=wavelengths, y=emission,
     name='Emission',
-    line=dict(color='green', width=3),
+    line={'color': 'green', 'width': 3},
     fill='tozeroy',
     fillcolor='rgba(0,255,0,0.2)'
 ))
@@ -4514,9 +4520,9 @@ fig.update_layout(
     template='plotly_dark',
     width=800, height=500,
     annotations=[
-        dict(x=395, y=0.6, text="λ_abs = 395 nm", showarrow=True, arrowhead=2),
-        dict(x=475, y=1.0, text="λ_abs = 475 nm", showarrow=True, arrowhead=2),
-        dict(x=508, y=0.79, text="λ_em = 508 nm", showarrow=True, arrowhead=2)
+        {'x': 395, 'y': 0.6, 'text': "λ_abs = 395 nm", 'showarrow': True, 'arrowhead': 2},
+        {'x': 475, 'y': 1.0, 'text': "λ_abs = 475 nm", 'showarrow': True, 'arrowhead': 2},
+        {'x': 508, 'y': 0.79, 'text': "λ_em = 508 nm", 'showarrow': True, 'arrowhead': 2}
     ]
 )
 

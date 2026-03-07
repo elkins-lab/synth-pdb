@@ -3812,7 +3812,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🔧 Environment Detection &amp; Setup</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
@@ -3833,7 +3835,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Detection &amp; Setup
-import sys, os
+import os
+import sys
+
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
@@ -3876,31 +3880,31 @@ print('✅ Environment configured!')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">IntSlider</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntSlider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Latent Space Explorer Ready!'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from IPython.display import display, HTML, clear_output
-import ipywidgets as widgets
-from ipywidgets import interact, IntSlider
-import numpy as np
-import py3Dmol
+<div class="clipboard-copy-txt" id="cell-2">import ipywidgets as widgets
 import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
+import numpy as np
 import plotly.graph_objects as go
+import py3Dmol
+from IPython.display import HTML, clear_output, display
+from ipywidgets import IntSlider
+from sklearn.decomposition import PCA
+
 from synth_pdb import PeptideGenerator
 from synth_pdb.batch_generator import BatchedGenerator
-import biotite.structure as struc
 
 print('✅ Latent Space Explorer Ready!')</div>
 </div>
@@ -4173,7 +4177,7 @@ print(f"   Shape per feature: {orients['dist'].shape} (Batch, Residues, Residues
 
 <span class="c1"># Show variance explained</span>
 <span class="n">var_explained</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ PCA complete"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ PCA complete"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   PC1 variance: </span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   PC2 variance: </span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total variance captured: </span><span class="si">{</span><span class="n">var_explained</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -4194,7 +4198,7 @@ latent_points = pca.fit_transform(feature_vector)
 
 # Show variance explained
 var_explained = pca.explained_variance_ratio_
-print(f"\n✅ PCA complete")
+print("\n✅ PCA complete")
 print(f"   PC1 variance: {var_explained[0]:.1%}")
 print(f"   PC2 variance: {var_explained[1]:.1%}")
 print(f"   Total variance captured: {var_explained.sum():.1%}")</div>
@@ -4237,24 +4241,24 @@ print(f"   Total variance captured: {var_explained.sum():.1%}")</div>
     <span class="n">x</span><span class="o">=</span><span class="n">latent_points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
     <span class="n">y</span><span class="o">=</span><span class="n">latent_points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
     <span class="n">mode</span><span class="o">=</span><span class="s1">'markers'</span><span class="p">,</span>
-    <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-        <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-        <span class="n">color</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_batch</span><span class="p">),</span>
-        <span class="n">colorscale</span><span class="o">=</span><span class="s1">'Viridis'</span><span class="p">,</span>
-        <span class="n">showscale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">colorbar</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Structure ID'</span><span class="p">),</span>
-        <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">)</span>
-    <span class="p">),</span>
+    <span class="n">marker</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">'size'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s1">'color'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_batch</span><span class="p">),</span>
+        <span class="s1">'colorscale'</span><span class="p">:</span> <span class="s1">'Viridis'</span><span class="p">,</span>
+        <span class="s1">'showscale'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">'colorbar'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Structure ID'</span><span class="p">},</span>
+        <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'width'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">}</span>
+    <span class="p">},</span>
     <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Structure </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)],</span>
     <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">'%</span><span class="si">{text}</span><span class="s1">&lt;br&gt;PC1: %</span><span class="si">{x:.2f}</span><span class="s1">&lt;br&gt;PC2: %</span><span class="si">{y:.2f}</span><span class="s1">&lt;extra&gt;&lt;/extra&gt;'</span>
 <span class="p">)])</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-    <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-        <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Protein Latent Space (PCA of 6D Orientograms)&lt;br&gt;&lt;sub&gt;Variance explained: PC1=</span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">, PC2=</span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&lt;/sub&gt;'</span><span class="p">,</span>
-        <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">xanchor</span><span class="o">=</span><span class="s1">'center'</span>
-    <span class="p">),</span>
+    <span class="n">title</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">'text'</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'Protein Latent Space (PCA of 6D Orientograms)&lt;br&gt;&lt;sub&gt;Variance explained: PC1=</span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">, PC2=</span><span class="si">{</span><span class="n">var_explained</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">&lt;/sub&gt;'</span><span class="p">,</span>
+        <span class="s1">'x'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s1">'xanchor'</span><span class="p">:</span> <span class="s1">'center'</span>
+    <span class="p">},</span>
     <span class="n">xaxis_title</span><span class="o">=</span><span class="s1">'Principal Component 1'</span><span class="p">,</span>
     <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">'Principal Component 2'</span><span class="p">,</span>
     <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
@@ -4268,24 +4272,24 @@ print(f"   Total variance captured: {var_explained.sum():.1%}")</div>
     x=latent_points[:, 0],
     y=latent_points[:, 1],
     mode='markers',
-    marker=dict(
-        size=8,
-        color=np.arange(n_batch),
-        colorscale='Viridis',
-        showscale=True,
-        colorbar=dict(title='Structure ID'),
-        line=dict(width=0.5, color='white')
-    ),
+    marker={
+        'size': 8,
+        'color': np.arange(n_batch),
+        'colorscale': 'Viridis',
+        'showscale': True,
+        'colorbar': {'title': 'Structure ID'},
+        'line': {'width': 0.5, 'color': 'white'}
+    },
     text=[f"Structure {i}" for i in range(n_batch)],
     hovertemplate='%{text}<br/>PC1: %{x:.2f}<br/>PC2: %{y:.2f}<extra></extra>'
 )])
 
 fig.update_layout(
-    title=dict(
-        text=f'Protein Latent Space (PCA of 6D Orientograms)<br/><sub>Variance explained: PC1={var_explained[0]:.1%}, PC2={var_explained[1]:.1%}</sub>',
-        x=0.5,
-        xanchor='center'
-    ),
+    title={
+        'text': f'Protein Latent Space (PCA of 6D Orientograms)<br/><sub>Variance explained: PC1={var_explained[0]:.1%}, PC2={var_explained[1]:.1%}</sub>',
+        'x': 0.5,
+        'xanchor': 'center'
+    },
     xaxis_title='Principal Component 1',
     yaxis_title='Principal Component 2',
     width=900, height=600,
@@ -4342,22 +4346,22 @@ fig.show()</div>
     <span class="k">global</span> <span class="n">_initializing</span>
     <span class="k">if</span> <span class="n">_initializing</span> <span class="ow">and</span> <span class="n">change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
-    
+
     <span class="n">index</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-    
+
     <span class="c1"># Create structure</span>
     <span class="n">pgen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">pgen</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
-    
+
     <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">array_length</span><span class="p">()</span> <span class="o">==</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">coords</span>
-    
+
     <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Structure </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1"> | PC1=</span><span class="si">{</span><span class="n">latent_points</span><span class="p">[</span><span class="n">index</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">, PC2=</span><span class="si">{</span><span class="n">latent_points</span><span class="p">[</span><span class="n">index</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-        
+
         <span class="c1"># 3D viewer</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
         <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
@@ -4365,7 +4369,7 @@ fig.show()</div>
         <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#1a1a1a'</span><span class="p">)</span>
         <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
         <span class="n">display</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">())</span>
-        
+
         <span class="c1"># Distance map</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">orients</span><span class="p">[</span><span class="s1">'dist'</span><span class="p">][</span><span class="n">index</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -4403,22 +4407,22 @@ def view_from_latent(change=None):
     global _initializing
     if _initializing and change is not None:
         return
-    
+
     index = slider.value
     coords = batch.coords[index]
-    
+
     # Create structure
     pgen = PeptideGenerator(sequence)
     res = pgen.generate()
-    
+
     if res.structure.array_length() == coords.shape[0]:
         res.structure.coord = coords
-    
+
     with out:
         clear_output(wait=True)
-        
+
         print(f'Structure {index} | PC1={latent_points[index,0]:.2f}, PC2={latent_points[index,1]:.2f}\n')
-        
+
         # 3D viewer
         view = py3Dmol.view(width=500, height=400)
         view.addModel(res.pdb, "pdb")
@@ -4426,7 +4430,7 @@ def view_from_latent(change=None):
         view.setBackgroundColor('#1a1a1a')
         view.zoomTo()
         display(view.show())
-        
+
         # Distance map
         fig, ax = plt.subplots(1, 1, figsize=(4, 4))
         im = ax.imshow(orients['dist'][index], cmap='magma', vmin=0, vmax=20)

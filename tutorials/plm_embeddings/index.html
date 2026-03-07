@@ -4296,10 +4296,10 @@ for predicting masked residues.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcolors</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.plm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESM2Embedder</span>
 
 <span class="c1"># Instantiate the embedder — model loads lazily on first embed() call</span>
@@ -4307,10 +4307,10 @@ for predicting masked residues.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ESM2Embedder ready (model: </span><span class="si">{</span><span class="n">embedder</span><span class="o">.</span><span class="n">model_name</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Embedding dim: </span><span class="si">{</span><span class="n">embedder</span><span class="o">.</span><span class="n">embedding_dim</span><span class="si">}</span><span class="s2">  (will be 320 for the default t6_8M model)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
+<div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
+
 from synth_pdb.plm import ESM2Embedder
 
 # Instantiate the embedder — model loads lazily on first embed() call
@@ -5037,10 +5037,11 @@ preferences linearly from the amino acid type alone.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">cross_val_score</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="c1"># Build a labelled dataset of residue embeddings</span>
 <span class="c1"># Label 0 = helix (Ala)  |  Label 1 = strand (Val)  |  Label 2 = coil (Gly)</span>
@@ -5053,7 +5054,7 @@ preferences linearly from the amino acid type alone.</p>
 <span class="p">]</span>
 
 <span class="n">X_probe</span><span class="p">,</span> <span class="n">y_probe</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">seq</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">probe_seqs</span><span class="p">:</span>
+<span class="k">for</span> <span class="n">seq</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">_desc</span> <span class="ow">in</span> <span class="n">probe_seqs</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">continue</span>
     <span class="n">emb</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>   <span class="c1"># (L, 320)</span>
@@ -5083,7 +5084,8 @@ preferences linearly from the amino acid type alone.</p>
 <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">,</span> <span class="n">y_probe</span><span class="p">)</span>
 <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_scaled</span><span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">ConfusionMatrixDisplay</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+
 <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_probe</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">disp</span> <span class="o">=</span> <span class="n">ConfusionMatrixDisplay</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">display_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"Helix (Ala)"</span><span class="p">,</span> <span class="s2">"Strand (Val)"</span><span class="p">,</span> <span class="s2">"Coil (Gly)"</span><span class="p">])</span>
@@ -5101,10 +5103,11 @@ preferences linearly from the amino acid type alone.</p>
 <span class="s2">  This is the same principle that enables ESMFold to predict full 3D structure.</span>
 <span class="s2">"""</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">from sklearn.linear_model import LogisticRegression
+<div class="clipboard-copy-txt" id="cell-8">import warnings
+
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
-import warnings
 
 # Build a labelled dataset of residue embeddings
 # Label 0 = helix (Ala)  |  Label 1 = strand (Val)  |  Label 2 = coil (Gly)
@@ -5117,7 +5120,7 @@ probe_seqs = [
 ]
 
 X_probe, y_probe = [], []
-for seq, label, desc in probe_seqs:
+for seq, label, _desc in probe_seqs:
     if label is None:
         continue
     emb = embedder.embed(seq)   # (L, 320)
@@ -5147,7 +5150,8 @@ print(f"Individual folds: {[f'{s:.1%}' for s in cv_scores]}")
 clf.fit(X_scaled, y_probe)
 y_pred = clf.predict(X_scaled)
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
 cm = confusion_matrix(y_probe, y_pred)
 fig, ax = plt.subplots(figsize=(5, 4))
 disp = ConfusionMatrixDisplay(cm, display_labels=["Helix (Ala)", "Strand (Val)", "Coil (Gly)"])
@@ -5232,10 +5236,12 @@ concatenate them as features.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 
 <span class="c1"># Generate a synthetic 20-residue peptide using synth-pdb.</span>
 <span class="c1"># 'conformation="alpha"' sets all backbone torsion angles to canonical</span>
@@ -5284,10 +5290,12 @@ concatenate them as features.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"This can be used directly as node features in a GNN, or concatenated"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"with geometric features (bond angles, SASA, etc.) for richer input representations."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">from synth_pdb.generator import generate_pdb_content
-import biotite.structure.io.pdb as pdb
+<div class="clipboard-copy-txt" id="cell-9">import io
+
 import biotite.structure as struc
-import io
+import biotite.structure.io.pdb as pdb
+
+from synth_pdb.generator import generate_pdb_content
 
 # Generate a synthetic 20-residue peptide using synth-pdb.
 # 'conformation="alpha"' sets all backbone torsion angles to canonical

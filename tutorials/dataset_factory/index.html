@@ -3698,7 +3698,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="c1"># Ensure the local synth_pdb source code is prioritized if running from the repo</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> 
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
@@ -3710,10 +3710,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
         <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb torch numpy matplotlib py3Dmol'</span><span class="p">)</span>
-        
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY..."</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ Please wait 10 seconds, then Run All Cells again."</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
@@ -3731,7 +3731,7 @@ from pathlib import Path
 # Ensure the local synth_pdb source code is prioritized if running from the repo
 try:
     current_path = Path(".").resolve()
-    repo_root = current_path.parent.parent 
+    repo_root = current_path.parent.parent
     if (repo_root / "synth_pdb").exists():
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
@@ -3743,10 +3743,10 @@ if 'google.colab' in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
         get_ipython().run_line_magic('pip', 'install synth-pdb torch numpy matplotlib py3Dmol')
-        
+
         with open("installed.marker", "w") as f:
             f.write("done")
-        
+
         print("🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY...")
         print("⚠️ Please wait 10 seconds, then Run All Cells again.")
         os.kill(os.getpid(), 9)
@@ -3779,22 +3779,26 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span><span class="p">,</span> <span class="n">BatchedPeptide</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries Loaded. Accelerating with PyTorch! 🚀"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import time
-import torch
-from torch.utils.data import Dataset, DataLoader
+<div class="clipboard-copy-txt" id="cell-2">import time
+
 import matplotlib.pyplot as plt
+import numpy as np
 import py3Dmol
+import torch
+from torch.utils.data import DataLoader, Dataset
+
 from synth_pdb.batch_generator import BatchedGenerator, BatchedPeptide
 
 print("Libraries Loaded. Accelerating with PyTorch! 🚀")</div>
@@ -3971,9 +3975,9 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
         <span class="n">c</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Strip zeros and ghost atoms</span>
         <span class="n">c_clean</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_clean</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
-        
+
         <span class="c1"># 2. Individual Centering (Per-Model Anchor)</span>
         <span class="c1"># Using CA centroid for much better stability than min/max</span>
         <span class="n">ca_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">j</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span>
@@ -3982,21 +3986,21 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
             <span class="n">center</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">valid_ca</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">center</span> <span class="o">=</span> <span class="n">c_clean</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            
+
         <span class="n">c_centered</span> <span class="o">=</span> <span class="n">c_clean</span> <span class="o">-</span> <span class="n">center</span>
-        
+
         <span class="n">p_tmp</span> <span class="o">=</span> <span class="n">BatchedPeptide</span><span class="p">(</span>
-            <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
-            <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> 
-            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> 
+            <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+            <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="p">)</span>
-        
+
         <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">p_tmp</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">'pdb'</span><span class="p">)</span>
         <span class="c1"># HIGH-VISIBILITY STYLE: Large Spheres (radius 0.3) + Thick Sticks</span>
         <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span> <span class="p">{</span>
-            <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span> 
-            <span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span> 
+            <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+            <span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
             <span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"scale"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
         <span class="p">})</span>
 
@@ -4005,11 +4009,11 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
     <span class="n">view</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    
+
     <span class="c1"># Diagnostic Info to prove sanity</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Ensemble Visualized with PDB Column-Shift Guard."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Ensemble Visualized with PDB Column-Shift Guard."</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Residue 1 Name: '</span><span class="si">{</span><span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">' | Residue 7 Name: '</span><span class="si">{</span><span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
-    
+
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"3D Viewer Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
@@ -4023,9 +4027,9 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
         c = batch.coords[i].copy()
         mask = np.any(np.abs(c) &gt; 1e-4, axis=1) # Strip zeros and ghost atoms
         c_clean = c[mask]
-        
+
         if len(c_clean) == 0: continue
-        
+
         # 2. Individual Centering (Per-Model Anchor)
         # Using CA centroid for much better stability than min/max
         ca_idxs = [j for j, name in enumerate(batch.atom_names) if name == "CA"]
@@ -4034,21 +4038,21 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
             center = c[valid_ca].mean(axis=0)
         else:
             center = c_clean.mean(axis=0)
-            
+
         c_centered = c_clean - center
-        
+
         p_tmp = BatchedPeptide(
-            c_centered[np.newaxis, ...], 
-            batch.sequence, 
-            np.array(batch.atom_names)[mask].tolist(), 
+            c_centered[np.newaxis, ...],
+            batch.sequence,
+            np.array(batch.atom_names)[mask].tolist(),
             np.array(batch.residue_indices)[mask].tolist()
         )
-        
+
         view.addModel(p_tmp.to_pdb(0), 'pdb')
         # HIGH-VISIBILITY STYLE: Large Spheres (radius 0.3) + Thick Sticks
         view.setStyle({'model': i}, {
-            "cartoon": {"color": colors[i], "opacity": 0.5}, 
-            "stick": {"color": colors[i], "radius": 0.3}, 
+            "cartoon": {"color": colors[i], "opacity": 0.5},
+            "stick": {"color": colors[i], "radius": 0.3},
             "sphere": {"color": colors[i], "scale": 0.3}
         })
 
@@ -4057,11 +4061,11 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
     view.zoom(2.0)
     view.center()
     view.show()
-    
+
     # Diagnostic Info to prove sanity
-    print(f"✅ Ensemble Visualized with PDB Column-Shift Guard.")
+    print("✅ Ensemble Visualized with PDB Column-Shift Guard.")
     print(f"Residue 1 Name: '{batch.sequence[0]}' | Residue 7 Name: '{batch.sequence[6]}'")
-    
+
 except Exception as e:
     print(f"3D Viewer Error: {e}")</div>
 </div>
@@ -4171,10 +4175,10 @@ print(f"✅ NPZ Load (10k samples): {npz_time:.4f}s")</div>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">npz_path</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">npz_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">'coords'</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
-        
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
@@ -4188,10 +4192,10 @@ print(f"✅ NPZ Load (10k samples): {npz_time:.4f}s")</div>
     def __init__(self, npz_path):
         data = np.load(npz_path)
         self.coords = torch.from_numpy(data['coords']).float()
-        
+
     def __len__(self):
         return len(self.coords)
-        
+
     def __getitem__(self, idx):
         return self.coords[idx]
 

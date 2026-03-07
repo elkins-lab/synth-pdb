@@ -3819,7 +3819,9 @@ For local Jupyter, activate your <code>synth-pdb</code> environment first.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🐍 Python: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">google.colab</span>
@@ -3840,7 +3842,9 @@ For local Jupyter, activate your <code>synth-pdb</code> environment first.</p>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Running locally — no install needed."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import sys, os
+<div class="clipboard-copy-txt" id="cell-1">import os
+import sys
+
 print(f"🐍 Python: {sys.executable}")
 try:
     import google.colab
@@ -3938,12 +3942,13 @@ else:
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># ============================================================</span>
 <span class="c1"># Core imports and RDC formula</span>
 <span class="c1"># ============================================================</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcolors</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mcolors</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
     <span class="s1">'figure.dpi'</span><span class="p">:</span> <span class="mi">110</span><span class="p">,</span>
@@ -3957,7 +3962,7 @@ else:
 <span class="sd">    Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]</span>
 
 <span class="sd">    Tjandra &amp; Bax (1997), Science 278:1111.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    theta_deg : float or ndarray  — polar angle in degrees (0° = Z-axis)</span>
@@ -3978,12 +3983,13 @@ else:
 <div class="clipboard-copy-txt" id="cell-2"># ============================================================
 # Core imports and RDC formula
 # ============================================================
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-import ipywidgets as widgets
-from IPython.display import display
 import io
+
+import ipywidgets as widgets
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
+import numpy as np
+from IPython.display import display
 
 plt.rcParams.update({
     'figure.dpi': 110,
@@ -3997,7 +4003,7 @@ def rdc_formula(theta_deg, phi_deg, Da, R):
     Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
 
     Tjandra &amp; Bax (1997), Science 278:1111.
-    
+
     Parameters
     ----------
     theta_deg : float or ndarray  — polar angle in degrees (0° = Z-axis)
@@ -4118,7 +4124,7 @@ print(f"Sanity check (X-axis, Da=10, R=0):  {rdc_formula(90, 0, 10, 0):.1f} Hz  
     <span class="n">norm</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">TwoSlopeNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=-</span><span class="n">limit</span><span class="p">,</span> <span class="n">vcenter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
     <span class="n">fc</span>   <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">RdBu_r</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
 
-    <span class="n">surf</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span>
         <span class="n">facecolors</span><span class="o">=</span><span class="n">fc</span><span class="p">,</span>
         <span class="n">rstride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cstride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -4240,7 +4246,7 @@ def draw_tensor_sphere(Da, R):
     norm = mcolors.TwoSlopeNorm(vmin=-limit, vcenter=0, vmax=limit)
     fc   = plt.cm.RdBu_r(norm(D))
 
-    surf = ax.plot_surface(
+    ax.plot_surface(
         X, Y, Z,
         facecolors=fc,
         rstride=2, cstride=2,
@@ -4395,6 +4401,7 @@ display(
 <span class="c1"># Section 2: Generate structure + live RDC bar chart</span>
 <span class="c1"># ============================================================</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdbio</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.rdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rdcs</span>
 
@@ -4423,6 +4430,7 @@ display(
 # Section 2: Generate structure + live RDC bar chart
 # ============================================================
 import biotite.structure.io.pdb as pdbio
+
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.rdc import calculate_rdcs
 
@@ -4948,8 +4956,8 @@ print("Reference: Bax &amp; Grishaev (2005), Curr Opin Struct Biol 15:563.")
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># ============================================================</span>
 <span class="c1"># Section 4: RDC vs NOE — Direct Complementarity Visualisation</span>
 <span class="c1"># ============================================================</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.nmr</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_synthetic_noes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_contact_map</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.nmr</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_synthetic_noes</span>
 
 <span class="c1"># Compute RDCs (current slider values) and NOEs</span>
 <span class="n">Da_final</span><span class="p">,</span> <span class="n">R_final</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.1</span>
@@ -5021,7 +5029,7 @@ print("Reference: Bax &amp; Grishaev (2005), Curr Opin Struct Biol 15:563.")
 
 <span class="c1"># Arrow showing complementarity</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">5.1</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">4.9</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">),</span>
-             <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">'&lt;-&gt;'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">2.0</span><span class="p">))</span>
+             <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">"arrowstyle"</span><span class="p">:</span> <span class="s1">'&lt;-&gt;'</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span> <span class="s2">"lw"</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">})</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s1">'Complementary!'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
          <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#27ae60'</span><span class="p">)</span>
 
@@ -5033,7 +5041,7 @@ print("Reference: Bax &amp; Grishaev (2005), Curr Opin Struct Biol 15:563.")
      <span class="s1">'protease dimer to 0.4 Å RMSD</span><span class="se">\n</span><span class="s1">'</span>
      <span class="s1">'without any additional NOEs.'</span><span class="p">,</span>
      <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#333'</span><span class="p">,</span>
-     <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">'round,pad=0.4'</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">'#f9f9f9'</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s1">'#bbb'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+     <span class="n">bbox</span><span class="o">=</span><span class="p">{</span><span class="s2">"boxstyle"</span><span class="p">:</span> <span class="s1">'round,pad=0.4'</span><span class="p">,</span> <span class="s2">"fc"</span><span class="p">:</span> <span class="s1">'#f9f9f9'</span><span class="p">,</span> <span class="s2">"ec"</span><span class="p">:</span> <span class="s1">'#bbb'</span><span class="p">,</span> <span class="s2">"lw"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Information Content</span><span class="se">\n</span><span class="s1">NOE vs RDC'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
@@ -5047,8 +5055,8 @@ print("Reference: Bax &amp; Grishaev (2005), Curr Opin Struct Biol 15:563.")
 <div class="clipboard-copy-txt" id="cell-7"># ============================================================
 # Section 4: RDC vs NOE — Direct Complementarity Visualisation
 # ============================================================
-from synth_pdb.nmr import calculate_synthetic_noes
 from synth_pdb.contact import compute_contact_map
+from synth_pdb.nmr import calculate_synthetic_noes
 
 # Compute RDCs (current slider values) and NOEs
 Da_final, R_final = 10.0, 0.1
@@ -5120,7 +5128,7 @@ box(ax2, 5.3, 5.5, 4.4, 4.0, '#2980b9', '🧭 RDCs (Global)',
 
 # Arrow showing complementarity
 ax2.annotate('', xy=(5.1, 7.5), xytext=(4.9, 7.5),
-             arrowprops=dict(arrowstyle='&lt;-&gt;', color='black', lw=2.0))
+             arrowprops={"arrowstyle": '&lt;-&gt;', "color": 'black', "lw": 2.0})
 ax2.text(5.0, 8.1, 'Complementary!', ha='center', fontsize=9,
          fontweight='bold', color='#27ae60')
 
@@ -5132,7 +5140,7 @@ ax2.text(5.0, 1.4,
      'protease dimer to 0.4 Å RMSD\n'
      'without any additional NOEs.',
      ha='center', fontsize=8, color='#333',
-     bbox=dict(boxstyle='round,pad=0.4', fc='#f9f9f9', ec='#bbb', lw=1))
+     bbox={"boxstyle": 'round,pad=0.4', "fc": '#f9f9f9', "ec": '#bbb', "lw": 1})
 ax2.set_title('Information Content\nNOE vs RDC', fontsize=11)
 
 fig.suptitle(
@@ -5241,11 +5249,11 @@ plt.show()
 <span class="c1"># Annotation</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">'Poles: D = +2Dₐ</span><span class="se">\n</span><span class="s1">(few vectors, strong coupling)'</span><span class="p">,</span>
              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">),</span>
-             <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">'-&gt;'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+             <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">"arrowstyle"</span><span class="p">:</span> <span class="s1">'-&gt;'</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span> <span class="s2">"lw"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
              <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">'Equator: D = −Dₐ</span><span class="se">\n</span><span class="s1">(many vectors, negative coupling)'</span><span class="p">,</span>
              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">8.5</span><span class="p">,</span> <span class="mf">0.055</span><span class="p">),</span>
-             <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">'-&gt;'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+             <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">"arrowstyle"</span><span class="p">:</span> <span class="s1">'-&gt;'</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span> <span class="s2">"lw"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
              <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
@@ -5312,11 +5320,11 @@ ax2.grid(axis='y', ls='--', alpha=0.35)
 # Annotation
 ax2.annotate('Poles: D = +2Dₐ\n(few vectors, strong coupling)',
              xy=(20, 0.005), xytext=(12, 0.025),
-             arrowprops=dict(arrowstyle='-&gt;', color='black', lw=1),
+             arrowprops={"arrowstyle": '-&gt;', "color": 'black', "lw": 1},
              fontsize=8)
 ax2.annotate('Equator: D = −Dₐ\n(many vectors, negative coupling)',
              xy=(-10, 0.025), xytext=(-8.5, 0.055),
-             arrowprops=dict(arrowstyle='-&gt;', color='black', lw=1),
+             arrowprops={"arrowstyle": '-&gt;', "color": 'black', "lw": 1},
              fontsize=8)
 
 plt.tight_layout()

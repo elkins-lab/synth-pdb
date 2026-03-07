@@ -3672,7 +3672,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> 
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
@@ -3684,10 +3684,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
         <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb torch numpy matplotlib py3Dmol biotite'</span><span class="p">)</span>
-        
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY..."</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -3703,7 +3703,7 @@ from pathlib import Path
 
 try:
     current_path = Path(".").resolve()
-    repo_root = current_path.parent.parent 
+    repo_root = current_path.parent.parent
     if (repo_root / "synth_pdb").exists():
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
@@ -3715,10 +3715,10 @@ if 'google.colab' in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
         get_ipython().run_line_magic('pip', 'install synth-pdb torch numpy matplotlib py3Dmol biotite')
-        
+
         with open("installed.marker", "w") as f:
             f.write("done")
-        
+
         print("🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY...")
         os.kill(os.getpid(), 9)
     else:
@@ -3750,29 +3750,23 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.chemical_shifts</span><span class="w"> </span><span class="kn">import</span> <span class="n">predict_chemical_shifts</span><span class="p">,</span> <span class="n">calculate_csi</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.chemical_shifts</span><span class="w"> </span><span class="kn">import</span> <span class="n">predict_chemical_shifts</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Magnetic Resonance Engine: ONLINE ⚡"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import time
-import torch
-from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
 import py3Dmol
-import biotite.structure as struc
+import torch
+from torch.utils.data import DataLoader, Dataset
+
 from synth_pdb.batch_generator import BatchedGenerator
-from synth_pdb.chemical_shifts import predict_chemical_shifts, calculate_csi
-from synth_pdb.generator import generate_pdb_content
+from synth_pdb.chemical_shifts import predict_chemical_shifts
 
 print("Magnetic Resonance Engine: ONLINE ⚡")</div>
 </div>
@@ -3817,7 +3811,7 @@ print("Magnetic Resonance Engine: ONLINE ⚡")</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🚀 Generating </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> synchronized multi-modal structural samples..."</span><span class="p">)</span>
 
 <span class="n">generator</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">batch</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">drift</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span> 
+<span class="n">batch</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">drift</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Structural Tensors Generated."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"⚡ Predicting Chemical Shifts (SPARTA-Lite + Ring Currents)..."</span><span class="p">)</span>
@@ -3827,9 +3821,10 @@ print("Magnetic Resonance Engine: ONLINE ⚡")</div>
     <span class="c1"># Convert batch member to biotite structure for the NMR engine</span>
     <span class="n">pdb_str</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+
     <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb_io</span>
     <span class="n">struct</span> <span class="o">=</span> <span class="n">pdb_io</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="n">shifts</span> <span class="o">=</span> <span class="n">predict_chemical_shifts</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
     <span class="n">all_shifts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shifts</span><span class="p">)</span>
 
@@ -3842,7 +3837,7 @@ n_samples = 100
 print(f"🚀 Generating {n_samples} synchronized multi-modal structural samples...")
 
 generator = BatchedGenerator(sequence, n_batch=n_samples, full_atom=True)
-batch = generator.generate_batch(drift=2.0) 
+batch = generator.generate_batch(drift=2.0)
 
 print("✅ Structural Tensors Generated.")
 print("⚡ Predicting Chemical Shifts (SPARTA-Lite + Ring Currents)...")
@@ -3852,9 +3847,10 @@ for i in range(5): # We'll analyze the first 5 in detail for the demo
     # Convert batch member to biotite structure for the NMR engine
     pdb_str = batch.to_pdb(i)
     from io import StringIO
+
     import biotite.structure.io.pdb as pdb_io
     struct = pdb_io.PDBFile.read(StringIO(pdb_str)).get_structure(model=1)
-    
+
     shifts = predict_chemical_shifts(struct)
     all_shifts.append(shifts)
 
@@ -4049,9 +4045,9 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
         <span class="c1"># Tensorize the 'CA' and 'HA' shifts as features</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shifts_list</span><span class="p">)</span>
         <span class="n">n_res</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">4</span> <span class="c1"># Approximate for backbone clusters</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_res</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="c1"># [CA_shift, HA_shift]</span>
-        
+
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="c1"># Only use chain A for the demo</span>
             <span class="k">if</span> <span class="s1">'A'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">shifts_list</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="k">continue</span>
@@ -4061,10 +4057,10 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
                 <span class="k">if</span> <span class="n">r_idx</span> <span class="o">&lt;</span> <span class="n">n_res</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'CA'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'HA'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-                    
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
-        
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
@@ -4073,7 +4069,7 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
 <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">batch_coords</span><span class="p">,</span> <span class="n">batch_nmr</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">loader</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Multi-Modal Batch Data Ready."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Multi-Modal Batch Data Ready."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Geometry Shape: </span><span class="si">{</span><span class="n">batch_coords</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"NMR Tensor Shape: </span><span class="si">{</span><span class="n">batch_nmr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> (Input for Transformer Encoded Shifts)"</span><span class="p">)</span>
 </pre></div>
@@ -4083,9 +4079,9 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
         # Tensorize the 'CA' and 'HA' shifts as features
         n_samples = len(shifts_list)
         n_res = coords.shape[1] // 4 # Approximate for backbone clusters
-        
+
         self.nmr_features = torch.zeros((n_samples, n_res, 2)) # [CA_shift, HA_shift]
-        
+
         for i in range(n_samples):
             # Only use chain A for the demo
             if 'A' not in shifts_list[i]: continue
@@ -4095,10 +4091,10 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
                 if r_idx &lt; n_res:
                     self.nmr_features[i, r_idx, 0] = s[r_id].get('CA', 0.0)
                     self.nmr_features[i, r_idx, 1] = s[r_id].get('HA', 0.0)
-                    
+
     def __len__(self):
         return len(self.coords)
-        
+
     def __getitem__(self, idx):
         return self.coords[idx], self.nmr_features[idx]
 
@@ -4107,7 +4103,7 @@ ds = MultiModalProteinDataset(batch.coords[:5], all_shifts)
 loader = DataLoader(ds, batch_size=2, shuffle=True)
 
 batch_coords, batch_nmr = next(iter(loader))
-print(f"✅ Multi-Modal Batch Data Ready.")
+print("✅ Multi-Modal Batch Data Ready.")
 print(f"Geometry Shape: {batch_coords.shape}")
 print(f"NMR Tensor Shape: {batch_nmr.shape} (Input for Transformer Encoded Shifts)")</div>
 </div>

@@ -3827,7 +3827,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="c1"># Ensure the local synth_pdb source code is prioritized if running from the repo</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> 
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
@@ -3839,10 +3839,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
         <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol'</span><span class="p">)</span>
-        
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
-        
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY..."</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ Please wait 10 seconds, then Run All Cells again."</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">9</span><span class="p">)</span>
@@ -3860,7 +3860,7 @@ from pathlib import Path
 # Ensure the local synth_pdb source code is prioritized if running from the repo
 try:
     current_path = Path(".").resolve()
-    repo_root = current_path.parent.parent 
+    repo_root = current_path.parent.parent
     if (repo_root / "synth_pdb").exists():
         if str(repo_root) not in sys.path:
             sys.path.insert(0, str(repo_root))
@@ -3872,10 +3872,10 @@ if 'google.colab' in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
         get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol')
-        
+
         with open("installed.marker", "w") as f:
             f.write("done")
-        
+
         print("🔄 Installation complete. KERNEL RESTARTING AUTOMATICALLY...")
         print("⚠️ Please wait 10 seconds, then Run All Cells again.")
         os.kill(os.getpid(), 9)
@@ -3908,19 +3908,19 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span><span class="p">,</span> <span class="n">BatchedPeptide</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries Loaded."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-2">import matplotlib.pyplot as plt
+import numpy as np
 import py3Dmol
+
 from synth_pdb.batch_generator import BatchedGenerator, BatchedPeptide
-from synth_pdb.generator import generate_pdb_content
 
 print("Libraries Loaded.")</div>
 </div>
@@ -4023,10 +4023,11 @@ print("Generation Complete.")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_rama_angles</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Extract phi/psi angles using biotite"""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+
     <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
-    
+
     <span class="n">text_file</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">)</span>
     <span class="n">array</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">text_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># dihedral_backbone returns (phi, psi, omega) arrays</span>
@@ -4041,7 +4042,7 @@ print("Generation Complete.")</div>
         <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">get_rama_angles</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="n">all_phi</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">phi</span><span class="p">)])</span>
         <span class="n">all_psi</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">psi</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">psi</span><span class="p">)])</span>
-        
+
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">all_phi</span><span class="p">,</span> <span class="n">all_psi</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#667eea'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
@@ -4059,10 +4060,11 @@ print("Generation Complete.")</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def get_rama_angles(pdb_str):
     """Extract phi/psi angles using biotite"""
+    from io import StringIO
+
     import biotite.structure as struc
     import biotite.structure.io.pdb as pdb
-    from io import StringIO
-    
+
     text_file = StringIO(pdb_str)
     array = pdb.PDBFile.read(text_file).get_structure(model=1)
     # dihedral_backbone returns (phi, psi, omega) arrays
@@ -4077,7 +4079,7 @@ def plot_ramachandran(batch, title):
         phi, psi = get_rama_angles(batch.to_pdb(i))
         all_phi.extend(phi[~np.isnan(phi)])
         all_psi.extend(psi[~np.isnan(psi)])
-        
+
     plt.figure(figsize=(6, 6))
     plt.scatter(all_phi, all_psi, alpha=0.5, s=10, color='#667eea')
     plt.xlim(-180, 180)
@@ -4137,11 +4139,11 @@ plot_ramachandran(hard_decoy, "Hard Decoy (15° Noise)")</div>
     <span class="n">atom_names</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span>
     <span class="n">ca_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"CA"</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">atom_names</span><span class="p">])</span>
     <span class="n">ca_coords</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">ca_mask</span><span class="p">]</span>
-    
+
     <span class="c1"># Calculate pairwise distances</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">ca_coords</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">ca_coords</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
     <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">diff</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-    
+
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dist_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'viridis_r'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Distance (Å)"</span><span class="p">)</span>
@@ -4159,11 +4161,11 @@ plot_ramachandran(hard_decoy, "Hard Decoy (15° Noise)")</div>
     atom_names = batch.atom_names
     ca_mask = np.array([name == "CA" for name in atom_names])
     ca_coords = c[ca_mask]
-    
+
     # Calculate pairwise distances
     diff = ca_coords[:, np.newaxis, :] - ca_coords[np.newaxis, :, :]
     dist_matrix = np.sqrt((diff**2).sum(-1))
-    
+
     plt.figure(figsize=(6, 5))
     plt.imshow(dist_matrix, cmap='viridis_r')
     plt.colorbar(label="Distance (Å)")
@@ -4212,11 +4214,12 @@ plot_contact_map(hard_decoy, "Decoy Contacts (Scattered)")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">create_shuffled_decoy</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
     <span class="n">original_seq</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span>
     <span class="n">shuffled_seq</span> <span class="o">=</span> <span class="n">original_seq</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffled_seq</span><span class="p">)</span>
-    
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Native Sequence:  </span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">original_seq</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Shuffled Decoy:  </span><span class="si">{</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shuffled_seq</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">shuffled_seq</span>
@@ -4226,11 +4229,12 @@ plot_contact_map(hard_decoy, "Decoy Contacts (Scattered)")</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">import random
 
+
 def create_shuffled_decoy(batch):
     original_seq = batch.sequence
     shuffled_seq = original_seq.copy()
     random.shuffle(shuffled_seq)
-    
+
     print(f"Native Sequence:  {' '.join(original_seq[:8])}...")
     print(f"Shuffled Decoy:  {' '.join(shuffled_seq[:8])}...")
     return shuffled_seq
@@ -4305,9 +4309,9 @@ print("\n✅ This structural data now points to a nonsensical chemical identity.
 <span class="n">c_centered</span> <span class="o">=</span> <span class="n">c_clean</span> <span class="o">-</span> <span class="n">center</span>
 
 <span class="n">p_tmp</span> <span class="o">=</span> <span class="n">BatchedPeptide</span><span class="p">(</span>
-    <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
-    <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> 
-    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> 
+    <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
     <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="p">)</span>
 
@@ -4338,9 +4342,9 @@ center = (c_clean.min(axis=0) + c_clean.max(axis=0)) / 2
 c_centered = c_clean - center
 
 p_tmp = BatchedPeptide(
-    c_centered[np.newaxis, ...], 
-    batch.sequence, 
-    np.array(batch.atom_names)[mask].tolist(), 
+    c_centered[np.newaxis, ...],
+    batch.sequence,
+    np.array(batch.atom_names)[mask].tolist(),
     np.array(batch.residue_indices)[mask].tolist()
 )
 
@@ -4413,17 +4417,17 @@ view.show()</div>
     <span class="n">c</span> <span class="o">=</span> <span class="n">hard_decoy</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">c_clean</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-    
+
     <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_clean</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">c_clean</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="n">c_centered</span> <span class="o">=</span> <span class="n">c_clean</span> <span class="o">-</span> <span class="n">center</span>
-    
+
     <span class="n">p_tmp</span> <span class="o">=</span> <span class="n">BatchedPeptide</span><span class="p">(</span>
-        <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> 
-        <span class="n">hard_decoy</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> 
-        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hard_decoy</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> 
+        <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+        <span class="n">hard_decoy</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hard_decoy</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hard_decoy</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="p">)</span>
-    
+
     <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">p_tmp</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">'pdb'</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}})</span>
 
@@ -4441,17 +4445,17 @@ for i in range(min(5, hard_decoy.coords.shape[0])):
     c = hard_decoy.coords[i].copy()
     mask = np.any(c != 0, axis=1)
     c_clean = c[mask]
-    
+
     center = (c_clean.min(axis=0) + c_clean.max(axis=0)) / 2
     c_centered = c_clean - center
-    
+
     p_tmp = BatchedPeptide(
-        c_centered[np.newaxis, ...], 
-        hard_decoy.sequence, 
-        np.array(hard_decoy.atom_names)[mask].tolist(), 
+        c_centered[np.newaxis, ...],
+        hard_decoy.sequence,
+        np.array(hard_decoy.atom_names)[mask].tolist(),
         np.array(hard_decoy.residue_indices)[mask].tolist()
     )
-    
+
     view.addModel(p_tmp.to_pdb(0), 'pdb')
     view.setStyle({'model': i}, {'stick': {'radius': 0.15, 'color': colors[i], 'opacity': 0.8}})
 

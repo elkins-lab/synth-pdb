@@ -3803,15 +3803,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🔧 Environment Detection &amp; Setup (Works in VS Code + Google Colab)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="c1"># Detect environment</span>
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
-    
+
     <span class="c1"># Install synth-pdb if not already installed</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
@@ -3820,11 +3820,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb..."</span><span class="p">)</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
-    
+
     <span class="c1"># Colab uses 'notebook' renderer for Plotly</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
     <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'colab'</span>
-    
+
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment (VS Code/JupyterLab)"</span><span class="p">)</span>
     <span class="c1"># Add parent directory to path for local development</span>
@@ -3833,15 +3833,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured successfully!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Detection &amp; Setup (Works in VS Code + Google Colab)
-import sys
 import os
+import sys
 
 # Detect environment
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
     print("🌐 Running in Google Colab")
-    
+
     # Install synth-pdb if not already installed
     try:
         import synth_pdb
@@ -3850,11 +3850,11 @@ if IN_COLAB:
         print("   📦 Installing synth-pdb...")
         !pip install -q synth-pdb py3Dmol
         print("   ✅ Installation complete")
-    
+
     # Colab uses 'notebook' renderer for Plotly
     import plotly.io as pio
     pio.renderers.default = 'colab'
-    
+
 else:
     print("💻 Running in local Jupyter environment (VS Code/JupyterLab)")
     # Add parent directory to path for local development
@@ -3885,18 +3885,18 @@ print("✅ Environment configured successfully!")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">clear_output</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">widgets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">IntSlider</span><span class="p">,</span> <span class="n">FloatSlider</span><span class="p">,</span> <span class="n">Dropdown</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">plotly.subplots</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_subplots</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">clear_output</span><span class="p">,</span> <span class="n">display</span>
 
 <span class="c1"># --- UNIVERSAL SETUP ---</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span><span class="p">,</span> <span class="n">EnergyMinimizer</span><span class="p">,</span> <span class="n">PDBValidator</span><span class="p">,</span> <span class="n">PeptideResult</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnergyMinimizer</span><span class="p">,</span> <span class="n">PDBValidator</span><span class="p">,</span> <span class="n">PeptideGenerator</span><span class="p">,</span> <span class="n">PeptideResult</span>
 
 <span class="c1"># Initialize variables</span>
 <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
@@ -3909,18 +3909,18 @@ print("✅ Environment configured successfully!")</div>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment Ready | synth-pdb v1.0 | Enhanced Visualization Mode"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from IPython.display import display, HTML, clear_output
+<div class="clipboard-copy-txt" id="cell-2">import os
+import sys
+
 import ipywidgets as widgets
-from ipywidgets import interact, IntSlider, FloatSlider, Dropdown
-import os, sys, numpy as np
-import py3Dmol
+import numpy as np
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import plotly.io as pio
+import py3Dmol
+from IPython.display import clear_output, display
 
 # --- UNIVERSAL SETUP ---
-from synth_pdb import PeptideGenerator, EnergyMinimizer, PDBValidator, PeptideResult
-import biotite.structure as struc
+from synth_pdb import EnergyMinimizer, PDBValidator, PeptideGenerator, PeptideResult
 
 # Initialize variables
 X, Y, Z = np.array([]), np.array([]), np.array([])
@@ -4040,7 +4040,7 @@ print("✅ Environment Ready | synth-pdb v1.0 | Enhanced Visualization Mode")</d
     <span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
     <span class="n">phis</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">57.0</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="o">-</span><span class="mf">57.0</span><span class="p">]</span>  <span class="c1"># Alpha helix flanking</span>
     <span class="n">psis</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">47.0</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="o">-</span><span class="mf">47.0</span><span class="p">]</span>
-    
+
     <span class="k">try</span><span class="p">:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">phi_list</span><span class="o">=</span><span class="n">phis</span><span class="p">,</span> <span class="n">psi_list</span><span class="o">=</span><span class="n">psis</span><span class="p">)</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="n">minimizer</span><span class="o">.</span><span class="n">calculate_energy</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -4063,7 +4063,7 @@ print("✅ Environment Ready | synth-pdb v1.0 | Enhanced Visualization Mode")</d
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">res_grid</span><span class="p">):</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">get_energy_for_angles</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span>
         <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>  <span class="c1"># Cap extreme energies</span>
-    
+
     <span class="c1"># Progress indicator</span>
     <span class="n">progress</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">res_grid</span> <span class="o">*</span> <span class="mi">100</span>
     <span class="n">bar_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">progress</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
@@ -4071,7 +4071,7 @@ print("✅ Environment Ready | synth-pdb v1.0 | Enhanced Visualization Mode")</d
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\r</span><span class="s2">   [</span><span class="si">{</span><span class="n">bar</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">progress</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">%"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">   "</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Energy Landscape Complete!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Energy Landscape Complete!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Min Energy: </span><span class="si">{</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Max Energy: </span><span class="si">{</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Energy Range: </span><span class="si">{</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
@@ -4083,7 +4083,7 @@ def get_energy_for_angles(phi, psi, sequence="ALA-ALA-ALA"):
     gen = PeptideGenerator(sequence)
     phis = [-57.0, phi, -57.0]  # Alpha helix flanking
     psis = [-47.0, psi, -47.0]
-    
+
     try:
         res = gen.generate(phi_list=phis, psi_list=psis)
         energy = minimizer.calculate_energy(res)
@@ -4106,7 +4106,7 @@ for i in range(res_grid):
     for j in range(res_grid):
         val = get_energy_for_angles(X[i,j], Y[i,j])
         Z[i,j] = min(val, 5000)  # Cap extreme energies
-    
+
     # Progress indicator
     progress = (i + 1) / res_grid * 100
     bar_length = int(progress / 2)
@@ -4114,7 +4114,7 @@ for i in range(res_grid):
     print(f"\r   [{bar}] {progress:.0f}%", end="")
 
 print("\n   " + "="*50)
-print(f"✅ Energy Landscape Complete!")
+print("✅ Energy Landscape Complete!")
 print(f"   Min Energy: {Z.min():.1f} kJ/mol")
 print(f"   Max Energy: {Z.max():.1f} kJ/mol")
 print(f"   Energy Range: {Z.max() - Z.min():.1f} kJ/mol")</div>
@@ -4185,21 +4185,21 @@ print(f"   Energy Range: {Z.max() - Z.min():.1f} kJ/mol")</div>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">'.pdb'</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
             <span class="n">f_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">minimizer</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">f_in</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">f_out</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_out</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_out</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
                 <span class="n">updated_pdb</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">updated_pdb</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">f_in</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">f_out</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-    
+
     <span class="c1"># Record trajectory</span>
     <span class="n">trajectory_structs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
     <span class="n">current_energy</span> <span class="o">=</span> <span class="n">minimizer</span><span class="o">.</span><span class="n">calculate_energy</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
     <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_energy</span><span class="p">)</span>
-    
+
     <span class="c1"># Track central residue angles</span>
     <span class="n">angles</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">calculate_dihedrals</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
     <span class="n">phi_psi_history</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">angles</span><span class="p">[</span><span class="s1">'phi'</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="s1">'psi'</span><span class="p">][</span><span class="mi">2</span><span class="p">]])</span>
-    
+
     <span class="c1"># Progress with energy display</span>
     <span class="n">energy_change</span> <span class="o">=</span> <span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="n">arrow</span> <span class="o">=</span> <span class="s2">"↓"</span> <span class="k">if</span> <span class="n">energy_change</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"↑"</span> <span class="k">if</span> <span class="n">energy_change</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">"→"</span>
@@ -4209,7 +4209,7 @@ print(f"   Energy Range: {Z.max() - Z.min():.1f} kJ/mol")</div>
 <span class="n">traj_psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">phi_psi_history</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"   "</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Folding Complete!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Folding Complete!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Initial Energy: </span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Final Energy:   </span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Total ΔE:       </span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> kJ/mol"</span><span class="p">)</span>
@@ -4239,21 +4239,21 @@ for step in range(15):
         with tempfile.NamedTemporaryFile(suffix='.pdb', delete=False) as f_out:
             f_out.close()
             minimizer.minimize(f_in.name, f_out.name, max_iterations=20)
-            with open(f_out.name, 'r') as r:
+            with open(f_out.name) as r:
                 updated_pdb = r.read()
             res = PeptideResult(updated_pdb)
             os.unlink(f_in.name)
             os.unlink(f_out.name)
-    
+
     # Record trajectory
     trajectory_structs.append(res.structure.copy())
     current_energy = minimizer.calculate_energy(res)
     energies.append(current_energy)
-    
+
     # Track central residue angles
     angles = validator.calculate_dihedrals(res)
     phi_psi_history.append([angles['phi'][2], angles['psi'][2]])
-    
+
     # Progress with energy display
     energy_change = energies[-1] - energies[-2] if len(energies) &gt; 1 else 0
     arrow = "↓" if energy_change &lt; 0 else "↑" if energy_change &gt; 0 else "→"
@@ -4263,7 +4263,7 @@ traj_phi = np.array([p[0] for p in phi_psi_history])
 traj_psi = np.array([p[1] for p in phi_psi_history])
 
 print("   " + "="*60)
-print(f"✅ Folding Complete!")
+print("✅ Folding Complete!")
 print(f"   Initial Energy: {energies[0]:.2f} kJ/mol")
 print(f"   Final Energy:   {energies[-1]:.2f} kJ/mol")
 print(f"   Total ΔE:       {energies[-1] - energies[0]:.2f} kJ/mol")
@@ -4320,79 +4320,79 @@ print(f"   Final φ/ψ:      ({traj_phi[-1]:.1f}°, {traj_psi[-1]:.1f}°)")</div
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Create figure with Ramachandran annotations</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
-    
+
     <span class="c1"># Energy surface</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Surface</span><span class="p">(</span>
         <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span>
         <span class="n">colorscale</span><span class="o">=</span><span class="n">ENERGY_COLORSCALE</span><span class="p">,</span>
         <span class="n">opacity</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s1">'Energy Surface'</span><span class="p">,</span>
-        <span class="n">colorbar</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">title</span><span class="o">=</span><span class="s2">"Energy&lt;br&gt;(kJ/mol)"</span><span class="p">,</span>
-            <span class="n">tickmode</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span>
-            <span class="n">tick0</span><span class="o">=</span><span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
-            <span class="n">dtick</span><span class="o">=</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="mi">5</span>
-        <span class="p">),</span>
+        <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'title'</span><span class="p">:</span> <span class="s2">"Energy&lt;br&gt;(kJ/mol)"</span><span class="p">,</span>
+            <span class="s1">'tickmode'</span><span class="p">:</span> <span class="s2">"linear"</span><span class="p">,</span>
+            <span class="s1">'tick0'</span><span class="p">:</span> <span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span>
+            <span class="s1">'dtick'</span><span class="p">:</span> <span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">Z</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="mi">5</span>
+        <span class="p">},</span>
         <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">'φ: %</span><span class="si">{x:.1f}</span><span class="s1">°&lt;br&gt;ψ: %</span><span class="si">{y:.1f}</span><span class="s1">°&lt;br&gt;E: %</span><span class="si">{z:.1f}</span><span class="s1"> kJ/mol&lt;extra&gt;&lt;/extra&gt;'</span>
     <span class="p">))</span>
-    
+
     <span class="c1"># Folding trajectory</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">traj_phi</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">traj_psi</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">energies</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="s1">'markers+lines'</span><span class="p">,</span>
-        <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">)),</span>
-            <span class="n">colorscale</span><span class="o">=</span><span class="s1">'Hot'</span><span class="p">,</span>
-            <span class="n">showscale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">colorbar</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">title</span><span class="o">=</span><span class="s2">"Step"</span><span class="p">,</span>
-                <span class="n">x</span><span class="o">=</span><span class="mf">1.15</span>
-            <span class="p">),</span>
-            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">TRAJECTORY_COLOR</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
+        <span class="n">marker</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'size'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s1">'color'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">)),</span>
+            <span class="s1">'colorscale'</span><span class="p">:</span> <span class="s1">'Hot'</span><span class="p">,</span>
+            <span class="s1">'showscale'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">'colorbar'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">'title'</span><span class="p">:</span> <span class="s2">"Step"</span><span class="p">,</span>
+                <span class="s1">'x'</span><span class="p">:</span> <span class="mf">1.15</span>
+            <span class="p">},</span>
+            <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="p">},</span>
+        <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="n">TRAJECTORY_COLOR</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span>
         <span class="n">name</span><span class="o">=</span><span class="s1">'Folding Path'</span><span class="p">,</span>
         <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">'Step %</span><span class="si">{marker.color}</span><span class="s1">&lt;br&gt;φ: %</span><span class="si">{x:.1f}</span><span class="s1">°&lt;br&gt;ψ: %</span><span class="si">{y:.1f}</span><span class="s1">°&lt;br&gt;E: %</span><span class="si">{z:.1f}</span><span class="s1"> kJ/mol&lt;extra&gt;&lt;/extra&gt;'</span>
     <span class="p">))</span>
-    
+
     <span class="c1"># Add Ramachandran region annotations</span>
     <span class="n">annotations</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">60</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"α-helix"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-             <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">),</span> <span class="n">bgcolor</span><span class="o">=</span><span class="s1">'rgba(0,100,200,0.7)'</span><span class="p">),</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">120</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"β-sheet"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-             <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">),</span> <span class="n">bgcolor</span><span class="o">=</span><span class="s1">'rgba(200,100,0,0.7)'</span><span class="p">),</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mi">75</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">145</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"PPII"</span><span class="p">,</span> <span class="n">showarrow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-             <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'white'</span><span class="p">),</span> <span class="n">bgcolor</span><span class="o">=</span><span class="s1">'rgba(100,200,0,0.7)'</span><span class="p">)</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="o">-</span><span class="mi">60</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="o">-</span><span class="mi">45</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"α-helix"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">'font'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'size'</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">},</span> <span class="s1">'bgcolor'</span><span class="p">:</span> <span class="s1">'rgba(0,100,200,0.7)'</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="o">-</span><span class="mi">120</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"β-sheet"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">'font'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'size'</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">},</span> <span class="s1">'bgcolor'</span><span class="p">:</span> <span class="s1">'rgba(200,100,0,0.7)'</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="o">-</span><span class="mi">75</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">145</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="n">Z</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">0.3</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"PPII"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="s1">'font'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'size'</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">},</span> <span class="s1">'bgcolor'</span><span class="p">:</span> <span class="s1">'rgba(100,200,0,0.7)'</span><span class="p">}</span>
     <span class="p">]</span>
-    
+
     <span class="c1"># Layout</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">text</span><span class="o">=</span><span class="s1">'🏔️ Protein Folding Energy Landscape&lt;br&gt;&lt;sub&gt;Ramachandran Space with Folding Trajectory&lt;/sub&gt;'</span><span class="p">,</span>
-            <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-            <span class="n">xanchor</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span>
-            <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-        <span class="p">),</span>
-        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">xaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Phi φ (degrees)'</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s1">'rgb(50,50,50)'</span><span class="p">),</span>
-            <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Psi ψ (degrees)'</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s1">'rgb(50,50,50)'</span><span class="p">),</span>
-            <span class="n">zaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Potential Energy (kJ/mol)'</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="n">gridcolor</span><span class="o">=</span><span class="s1">'rgb(50,50,50)'</span><span class="p">),</span>
-            <span class="n">camera</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">eye</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">1.3</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'text'</span><span class="p">:</span> <span class="s1">'🏔️ Protein Folding Energy Landscape&lt;br&gt;&lt;sub&gt;Ramachandran Space with Folding Trajectory&lt;/sub&gt;'</span><span class="p">,</span>
+            <span class="s1">'x'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s1">'xanchor'</span><span class="p">:</span> <span class="s1">'center'</span><span class="p">,</span>
+            <span class="s1">'font'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'size'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+        <span class="p">},</span>
+        <span class="n">scene</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'xaxis'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Phi φ (degrees)'</span><span class="p">,</span> <span class="s1">'backgroundcolor'</span><span class="p">:</span> <span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="s1">'gridcolor'</span><span class="p">:</span> <span class="s1">'rgb(50,50,50)'</span><span class="p">},</span>
+            <span class="s1">'yaxis'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Psi ψ (degrees)'</span><span class="p">,</span> <span class="s1">'backgroundcolor'</span><span class="p">:</span> <span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="s1">'gridcolor'</span><span class="p">:</span> <span class="s1">'rgb(50,50,50)'</span><span class="p">},</span>
+            <span class="s1">'zaxis'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Potential Energy (kJ/mol)'</span><span class="p">,</span> <span class="s1">'backgroundcolor'</span><span class="p">:</span> <span class="s1">'rgb(20,20,20)'</span><span class="p">,</span> <span class="s1">'gridcolor'</span><span class="p">:</span> <span class="s1">'rgb(50,50,50)'</span><span class="p">},</span>
+            <span class="s1">'camera'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">'eye'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
         <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
         <span class="n">template</span><span class="o">=</span><span class="s1">'plotly_dark'</span><span class="p">,</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-            <span class="n">x</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
-            <span class="n">y</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
-            <span class="n">bgcolor</span><span class="o">=</span><span class="s1">'rgba(0,0,0,0.5)'</span>
-        <span class="p">)</span>
+        <span class="n">legend</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">'x'</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span>
+            <span class="s1">'y'</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span>
+            <span class="s1">'bgcolor'</span><span class="p">:</span> <span class="s1">'rgba(0,0,0,0.5)'</span>
+        <span class="p">}</span>
     <span class="p">)</span>
-    
+
     <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">if len(X) == 0 or len(traj_phi) == 0:
@@ -4400,79 +4400,79 @@ print(f"   Final φ/ψ:      ({traj_phi[-1]:.1f}°, {traj_psi[-1]:.1f}°)")</div
 else:
     # Create figure with Ramachandran annotations
     fig = go.Figure()
-    
+
     # Energy surface
     fig.add_trace(go.Surface(
         z=Z, x=X, y=Y,
         colorscale=ENERGY_COLORSCALE,
         opacity=0.85,
         name='Energy Surface',
-        colorbar=dict(
-            title="Energy<br/>(kJ/mol)",
-            tickmode="linear",
-            tick0=Z.min(),
-            dtick=(Z.max() - Z.min()) / 5
-        ),
+        colorbar={
+            'title': "Energy<br/>(kJ/mol)",
+            'tickmode': "linear",
+            'tick0': Z.min(),
+            'dtick': (Z.max() - Z.min()) / 5
+        },
         hovertemplate='φ: %{x:.1f}°<br/>ψ: %{y:.1f}°<br/>E: %{z:.1f} kJ/mol<extra></extra>'
     ))
-    
+
     # Folding trajectory
     fig.add_trace(go.Scatter3d(
         x=traj_phi, y=traj_psi, z=energies,
         mode='markers+lines',
-        marker=dict(
-            size=8,
-            color=np.arange(len(energies)),
-            colorscale='Hot',
-            showscale=True,
-            colorbar=dict(
-                title="Step",
-                x=1.15
-            ),
-            line=dict(color='white', width=2)
-        ),
-        line=dict(color=TRAJECTORY_COLOR, width=6),
+        marker={
+            'size': 8,
+            'color': np.arange(len(energies)),
+            'colorscale': 'Hot',
+            'showscale': True,
+            'colorbar': {
+                'title': "Step",
+                'x': 1.15
+            },
+            'line': {'color': 'white', 'width': 2}
+        },
+        line={'color': TRAJECTORY_COLOR, 'width': 6},
         name='Folding Path',
         hovertemplate='Step %{marker.color}<br/>φ: %{x:.1f}°<br/>ψ: %{y:.1f}°<br/>E: %{z:.1f} kJ/mol<extra></extra>'
     ))
-    
+
     # Add Ramachandran region annotations
     annotations = [
-        dict(x=-60, y=-45, z=Z.max()*0.3, text="α-helix", showarrow=False,
-             font=dict(size=14, color='white'), bgcolor='rgba(0,100,200,0.7)'),
-        dict(x=-120, y=120, z=Z.max()*0.3, text="β-sheet", showarrow=False,
-             font=dict(size=14, color='white'), bgcolor='rgba(200,100,0,0.7)'),
-        dict(x=-75, y=145, z=Z.max()*0.3, text="PPII", showarrow=False,
-             font=dict(size=14, color='white'), bgcolor='rgba(100,200,0,0.7)')
+        {'x': -60, 'y': -45, 'z': Z.max()*0.3, 'text': "α-helix", 'showarrow': False,
+             'font': {'size': 14, 'color': 'white'}, 'bgcolor': 'rgba(0,100,200,0.7)'},
+        {'x': -120, 'y': 120, 'z': Z.max()*0.3, 'text': "β-sheet", 'showarrow': False,
+             'font': {'size': 14, 'color': 'white'}, 'bgcolor': 'rgba(200,100,0,0.7)'},
+        {'x': -75, 'y': 145, 'z': Z.max()*0.3, 'text': "PPII", 'showarrow': False,
+             'font': {'size': 14, 'color': 'white'}, 'bgcolor': 'rgba(100,200,0,0.7)'}
     ]
-    
+
     # Layout
     fig.update_layout(
-        title=dict(
-            text='🏔️ Protein Folding Energy Landscape<br/><sub>Ramachandran Space with Folding Trajectory</sub>',
-            x=0.5,
-            xanchor='center',
-            font=dict(size=20)
-        ),
-        scene=dict(
-            xaxis=dict(title='Phi φ (degrees)', backgroundcolor='rgb(20,20,20)', gridcolor='rgb(50,50,50)'),
-            yaxis=dict(title='Psi ψ (degrees)', backgroundcolor='rgb(20,20,20)', gridcolor='rgb(50,50,50)'),
-            zaxis=dict(title='Potential Energy (kJ/mol)', backgroundcolor='rgb(20,20,20)', gridcolor='rgb(50,50,50)'),
-            camera=dict(
-                eye=dict(x=1.5, y=1.5, z=1.3)
-            )
-        ),
+        title={
+            'text': '🏔️ Protein Folding Energy Landscape<br/><sub>Ramachandran Space with Folding Trajectory</sub>',
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {'size': 20}
+        },
+        scene={
+            'xaxis': {'title': 'Phi φ (degrees)', 'backgroundcolor': 'rgb(20,20,20)', 'gridcolor': 'rgb(50,50,50)'},
+            'yaxis': {'title': 'Psi ψ (degrees)', 'backgroundcolor': 'rgb(20,20,20)', 'gridcolor': 'rgb(50,50,50)'},
+            'zaxis': {'title': 'Potential Energy (kJ/mol)', 'backgroundcolor': 'rgb(20,20,20)', 'gridcolor': 'rgb(50,50,50)'},
+            'camera': {
+                'eye': {'x': 1.5, 'y': 1.5, 'z': 1.3}
+            }
+        },
         width=1000,
         height=800,
         template='plotly_dark',
         showlegend=True,
-        legend=dict(
-            x=0.02,
-            y=0.98,
-            bgcolor='rgba(0,0,0,0.5)'
-        )
+        legend={
+            'x': 0.02,
+            'y': 0.98,
+            'bgcolor': 'rgba(0,0,0,0.5)'
+        }
     )
-    
+
     fig.show()</div>
 </div>
 </div>
@@ -4516,9 +4516,9 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBFile</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 
 <span class="n">viewer_output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
 <span class="n">info_label</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span>
@@ -4532,40 +4532,40 @@ else:
 <span class="w">    </span><span class="sd">"""Render structure using py3Dmol with enhanced styling."""</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectory_structs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
-    
+
     <span class="c1"># Update info panel</span>
     <span class="n">energy_delta</span> <span class="o">=</span> <span class="n">energies</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">energies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
     <span class="n">info_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"""</span>
-<span class="s2">    &lt;div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); </span>
-<span class="s2">                color: white; padding: 15px; border-radius: 10px; </span>
+<span class="s2">    &lt;div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);</span>
+<span class="s2">                color: white; padding: 15px; border-radius: 10px;</span>
 <span class="s2">                font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3);'&gt;</span>
-<span class="s2">        &lt;b&gt;📸 Snapshot </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&lt;/b&gt; | </span>
-<span class="s2">        Energy: &lt;span style='color: #FFD700;'&gt;</span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> kJ/mol&lt;/span&gt; | </span>
-<span class="s2">        ΔE: &lt;span style='color: </span><span class="si">{</span><span class="s1">'#00FF00'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">energy_delta</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'#FF6B6B'</span><span class="si">}</span><span class="s2">;'&gt;</span><span class="si">{</span><span class="n">energy_delta</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2"> kJ/mol&lt;/span&gt; | </span>
+<span class="s2">        &lt;b&gt;📸 Snapshot </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&lt;/b&gt; |</span>
+<span class="s2">        Energy: &lt;span style='color: #FFD700;'&gt;</span><span class="si">{</span><span class="n">energies</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> kJ/mol&lt;/span&gt; |</span>
+<span class="s2">        ΔE: &lt;span style='color: </span><span class="si">{</span><span class="s1">'#00FF00'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">energy_delta</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'#FF6B6B'</span><span class="si">}</span><span class="s2">;'&gt;</span><span class="si">{</span><span class="n">energy_delta</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2"> kJ/mol&lt;/span&gt; |</span>
 <span class="s2">        φ/ψ: &lt;span style='color: #87CEEB;'&gt;(</span><span class="si">{</span><span class="n">traj_phi</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">°, </span><span class="si">{</span><span class="n">traj_psi</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">°)&lt;/span&gt;</span>
 <span class="s2">    &lt;/div&gt;</span>
 <span class="s2">    """</span>
-    
+
     <span class="k">with</span> <span class="n">viewer_output</span><span class="p">:</span>
         <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        
+
         <span class="c1"># Get PDB string</span>
         <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">PDBFile</span><span class="p">()</span>
         <span class="n">pdb_file</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">trajectory_structs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
         <span class="n">sink</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
         <span class="n">pdb_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
         <span class="n">pdb_str</span> <span class="o">=</span> <span class="n">sink</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
-        
+
         <span class="c1"># Create viewer</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
         <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-        
+
         <span class="c1"># Enhanced styling</span>
         <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span>
             <span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'colorscheme'</span><span class="p">:</span> <span class="s1">'chainHetatm'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span>
             <span class="s1">'sphere'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'scale'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">'colorscheme'</span><span class="p">:</span> <span class="s1">'chainHetatm'</span><span class="p">}</span>
         <span class="p">})</span>
-        
+
         <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#1a1a1a'</span><span class="p">)</span>
         <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
         <span class="n">view_widget</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -4597,9 +4597,9 @@ else:
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trajectory_structs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
     <span class="n">display_molecule</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">import py3Dmol
+<div class="clipboard-copy-txt" id="cell-6">import io
+
 from biotite.structure.io.pdb import PDBFile
-import io
 
 viewer_output = widgets.Output()
 info_label = widgets.HTML(
@@ -4613,40 +4613,40 @@ def display_molecule(index):
     """Render structure using py3Dmol with enhanced styling."""
     if len(trajectory_structs) == 0:
         return
-    
+
     # Update info panel
     energy_delta = energies[index] - energies[0] if index &gt; 0 else 0
     info_label.value = f"""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; padding: 15px; border-radius: 10px; 
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; padding: 15px; border-radius: 10px;
                 font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-<b>📸 Snapshot {index}</b> | 
-        Energy: <span style="color: #FFD700;">{energies[index]:.1f} kJ/mol</span> | 
-        ΔE: <span #00ff00'="" '#ff6b6b'};'="" 0="" <="" else="" energy_delta="" if="" style="color: {">{energy_delta:+.1f} kJ/mol</span> | 
+<b>📸 Snapshot {index}</b> |
+        Energy: <span style="color: #FFD700;">{energies[index]:.1f} kJ/mol</span> |
+        ΔE: <span #00ff00'="" '#ff6b6b'};'="" 0="" <="" else="" energy_delta="" if="" style="color: {">{energy_delta:+.1f} kJ/mol</span> |
         φ/ψ: <span style="color: #87CEEB;">({traj_phi[index]:.1f}°, {traj_psi[index]:.1f}°)</span>
 </div>
     """
-    
+
     with viewer_output:
         clear_output(wait=True)
-        
+
         # Get PDB string
         pdb_file = PDBFile()
         pdb_file.set_structure(trajectory_structs[index])
         sink = io.StringIO()
         pdb_file.write(sink)
         pdb_str = sink.getvalue()
-        
+
         # Create viewer
         view = py3Dmol.view(width=600, height=450)
         view.addModel(pdb_str, 'pdb')
-        
+
         # Enhanced styling
         view.setStyle({
             'stick': {'colorscheme': 'chainHetatm', 'radius': 0.15},
             'sphere': {'scale': 0.25, 'colorscheme': 'chainHetatm'}
         })
-        
+
         view.setBackgroundColor('#1a1a1a')
         view.zoomTo()
         view_widget = view.show()
