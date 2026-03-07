@@ -1490,3 +1490,66 @@ class EnergyMinimizer:
             logger.error(f"Simulation failed: {e}", exc_info=True)
             return None
 
+
+def simulate_trajectory(pdb_content: str, temperature_kelvin: float = 300.0, steps: int = 1000, report_interval: int = 20) -> List[str]:
+    """
+    Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
+    
+    Args:
+        pdb_content: Complete string representation of the starting PDB.
+        temperature_kelvin: Simulation temperature.
+        steps: Total number of 2fs integration steps to run.
+        report_interval: How many steps between saving a frame to the trajectory.
+        
+    Returns:
+        A list of PDB formatted strings, one for each recorded frame.
+    """
+    import tempfile
+    import os
+    import io
+    from openmm import app, unit
+    import openmm as mm
+    
+    with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False) as f:
+        f.write(pdb_content.encode('utf-8'))
+        temp_pdb = f.name
+
+    try:
+        pdb = app.PDBFile(temp_pdb)
+        forcefield = app.ForceField('amber14-all.xml', 'implicit/obc2.xml')
+        system = forcefield.createSystem(
+            pdb.topology, nonbondedMethod=app.NoCutoff, constraints=app.HBonds
+        )
+        integrator = mm.LangevinMiddleIntegrator(
+            temperature_kelvin * unit.kelvin, 
+            1.0 / unit.picosecond, 
+            2.0 * unit.femtoseconds
+        )
+        simulation = app.Simulation(pdb.topology, system, integrator)
+        simulation.context.setPositions(pdb.positions)
+        simulation.minimizeEnergy()
+        
+        trajectory = []
+        
+        # Save frame 0
+        state = simulation.context.getState(getPositions=True)
+        out_io = io.StringIO()
+        app.PDBFile.writeFile(simulation.topology, state.getPositions(), out_io)
+        trajectory.append(out_io.getvalue())
+        
+        n_frames = steps // report_interval
+        for _ in range(n_frames):
+            simulation.step(report_interval)
+            state = simulation.context.getState(getPositions=True)
+            out_io = io.StringIO()
+            app.PDBFile.writeFile(simulation.topology, state.getPositions(), out_io)
+            trajectory.append(out_io.getvalue())
+            
+        return trajectory
+    except Exception as e:
+        logger.error(f"simulate_trajectory failed: {e}")
+        return []
+    finally:
+        if os.path.exists(temp_pdb):
+            os.unlink(temp_pdb)
+
