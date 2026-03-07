@@ -1,9 +1,9 @@
 
-import numpy as np
 import biotite.structure as struc
-from biotite.structure.io.pdb import PDBFile
-import pytest
+import numpy as np
+
 from synth_pdb.special_chemistry import find_gfp_chromophore_motif, form_gfp_chromophore
+
 
 def create_mock_structure(res_names):
     """Helper to create a simple AtomArray for testing."""
@@ -47,7 +47,7 @@ def test_form_gfp_chromophore_placeholder(caplog):
     """Test that the placeholder function logs a warning."""
     structure = create_mock_structure(["SER", "TYR", "GLY"])
     motif = find_gfp_chromophore_motif(structure)
-    
+
     with caplog.at_level("WARNING"):
         returned_structure = form_gfp_chromophore(structure, motif)
         assert "Chromophore formation is not yet implemented" in caplog.text

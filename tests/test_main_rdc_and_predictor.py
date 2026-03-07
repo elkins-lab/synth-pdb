@@ -40,14 +40,11 @@ References:
 """
 
 import logging
-import os
 
-import numpy as np
 import pytest
 
 from synth_pdb import main
 from synth_pdb.generator import create_atom_line
-
 
 # ---------------------------------------------------------------------------
 # Helpers

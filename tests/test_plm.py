@@ -47,9 +47,8 @@ Five test classes, ordered from trivial to semantic:
 """
 
 import unittest
-import importlib
-import numpy as np
 
+import numpy as np
 
 # ---------------------------------------------------------------------------
 # Shared test fixture: minimal amino acid sequences
@@ -140,7 +139,7 @@ class TestImportSafety(unittest.TestCase):
         """When transformers is missing, embed() must raise ImportError with pip hint."""
         import sys
         orig_transformers = sys.modules.get("transformers")
-        orig_torch = sys.modules.get("torch")
+        sys.modules.get("torch")
 
         # Simulate missing transformers
         sys.modules["transformers"] = None  # type: ignore[assignment]

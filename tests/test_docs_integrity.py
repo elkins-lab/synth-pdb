@@ -1,14 +1,15 @@
-import unittest
 import os
+import unittest
+
 
 class TestDocumentationIntegrity(unittest.TestCase):
     """
     Safeguard to ensure educational notes are not accidentally removed.
-    
+
     These tests scan the source code for specific educational content that
     must be preserved to maintain the pedagogical value of the project.
     """
-    
+
     def setUp(self):
         # Define paths relative to this test file
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,14 +32,14 @@ class TestDocumentationIntegrity(unittest.TestCase):
 
     def _check_file_contains(self, filepath, substrings):
         """Helper to assert file contains list of substrings."""
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:
             content = " ".join(f.read().split())
-            
+
         for substring in substrings:
             normalized_substring = " ".join(substring.split())
             self.assertIn(
-                normalized_substring, 
-                content, 
+                normalized_substring,
+                content,
                 f"Missing educational note in {os.path.basename(filepath)}: '{substring[:50]}...'"
             )
 

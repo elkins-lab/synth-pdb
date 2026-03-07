@@ -1,12 +1,14 @@
 
-import os
 import argparse
 import logging
-import numpy as np
+import os
+
 import joblib
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, accuracy_score
+
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.quality.features import extract_quality_features, get_feature_names
 
@@ -30,8 +32,9 @@ def generate_dataset(n_samples=200, random_state=42):
     """
     logger.info("Generating training data (%d samples)...", n_samples)
 
-    import biotite.structure.io.pdb as pdb
     import io
+
+    import biotite.structure.io.pdb as pdb
 
     rng = np.random.default_rng(random_state)
 

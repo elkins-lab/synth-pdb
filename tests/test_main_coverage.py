@@ -1,10 +1,11 @@
-import pytest
-import sys
-from unittest.mock import patch, MagicMock
-from synth_pdb.main import main, _build_command_string
 import argparse
-import os
+from unittest.mock import MagicMock, patch
+
 import numpy as np
+import pytest
+
+from synth_pdb.main import _build_command_string, main
+
 
 def test_build_command_string_complex():
     """Test _build_command_string with many flags."""
@@ -66,7 +67,7 @@ def test_main_docking_missing_input():
     """Test docking mode without input-pdb dispatch."""
     # Patch the source module to be extra safe
     with patch("sys.argv", ["synth-pdb", "--mode", "docking", "--log-level", "ERROR"]), \
-         patch("synth_pdb.docking.DockingPrep") as mock_prep:
+         patch("synth_pdb.docking.DockingPrep"):
         with patch("sys.exit") as mock_exit:
             main()
             mock_exit.assert_called_with(1)
@@ -89,7 +90,7 @@ def test_main_docking_missing_input():
     """Test docking mode without input-pdb dispatch."""
     # Targeting the name in main.py namespace
     with patch("sys.argv", ["synth-pdb", "--mode", "docking", "--log-level", "ERROR"]), \
-         patch("synth_pdb.main.DockingPrep") as mock_prep:
+         patch("synth_pdb.main.DockingPrep"):
         with patch("sys.exit") as mock_exit:
             main()
             mock_exit.assert_called_with(1)
@@ -179,10 +180,10 @@ def test_main_inferred_length_none_coverage():
 def test_main_positive_length_failure():
     """Test main() with zero or negative length."""
     with patch("sys.argv", ["synth-pdb", "--length", "0"]), \
-         patch("sys.exit") as mock_exit:
+         patch("sys.exit"):
         main()
         # In the current main.py, it defaults to 10 if structure is None
-    
+
     # To hit 510, we'd need a negative length that survives 480
     # But 480 is if args.length is None or args.length <= 0
     # So 510 'elif args.length <= 0' is unreachable as noted.

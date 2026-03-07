@@ -1,15 +1,16 @@
 
+import json
+import os
+
+import biotite.structure.io.pdb as pdb
+import numpy as np
 import pytest
 import requests
-import json
-import numpy as np
-import os
-import biotite.structure as struc
-import biotite.structure.io.pdb as pdb
-from synth_pdb.physics import EnergyMinimizer
-from synth_nmr.chemical_shifts import predict_chemical_shifts
-from synth_pdb.j_coupling import calculate_hn_ha_coupling
 from scipy.stats import pearsonr
+from synth_nmr.chemical_shifts import predict_chemical_shifts
+
+from synth_pdb.j_coupling import calculate_hn_ha_coupling
+from synth_pdb.physics import EnergyMinimizer
 
 # Define URLs for the data
 PDB_URL = "https://files.rcsb.org/download/1UBQ.pdb"
@@ -42,7 +43,7 @@ def experimental_data():
 
 def _strip_hetatm(pdb_path, out_path):
     """Remove HETATM records (water, ligands) that OpenMM cannot template."""
-    with open(pdb_path, 'r') as f:
+    with open(pdb_path) as f:
         lines = f.readlines()
     with open(out_path, 'w') as f:
         f.writelines(l for l in lines if not l.startswith("HETATM"))
@@ -107,7 +108,7 @@ def test_ubiquitin_j_coupling_correlation(experimental_data, tmp_path):
     correlation, p_value = pearsonr(ref_vals, pred_vals)
     rmse = np.sqrt(np.mean((np.array(ref_vals) - np.array(pred_vals)) ** 2))
 
-    print(f"\nJ-Coupling Geometry Preservation (crystal vs. minimized 1UBQ):")
+    print("\nJ-Coupling Geometry Preservation (crystal vs. minimized 1UBQ):")
     print(f"  Pearson r = {correlation:.4f}  (p = {p_value:.2e})")
     print(f"  RMSE      = {rmse:.3f} Hz  (n = {len(ref_vals)} residues)")
     print(f"  Ref range = [{min(ref_vals):.2f}, {max(ref_vals):.2f}] Hz")
@@ -131,7 +132,7 @@ def parse_bmrb_chemical_shifts(bmrb_file):
     """
     Parses a BMRB JSON file to extract chemical shifts.
     """
-    with open(bmrb_file, 'r') as f:
+    with open(bmrb_file) as f:
         entry_data = json.load(f)
 
     entry_id = list(entry_data.keys())[0]

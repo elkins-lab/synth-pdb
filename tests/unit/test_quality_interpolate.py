@@ -1,11 +1,14 @@
 
-import unittest
-import numpy as np
-import tempfile
 import os
-from biotite.structure.io.pdb import PDBFile
+import tempfile
+import unittest
+
 import biotite.structure as struc
+import numpy as np
+from biotite.structure.io.pdb import PDBFile
+
 from synth_pdb.quality.interpolate import interpolate_structures
+
 
 class TestQualityInterpolate(unittest.TestCase):
     def setUp(self):
@@ -21,11 +24,11 @@ class TestQualityInterpolate(unittest.TestCase):
         atoms1.res_id = np.repeat(range(1, 6), 4)
         atoms1.res_name = np.tile(["ALA"], 20)
         atoms1.element = np.tile(["N", "C", "C", "O"], 5)
-        
+
         f1 = PDBFile()
         f1.set_structure(atoms1)
         f1.write(self.pdb1_path)
-        
+
         # Create dummy structure 2 (len 5)
         atoms2 = atoms1.copy()
         # Change coords slightly
@@ -33,9 +36,9 @@ class TestQualityInterpolate(unittest.TestCase):
         f2 = PDBFile()
         f2.set_structure(atoms2)
         f2.write(self.pdb2_path)
-        
+
         # Create dummy structure 3 (len 6) - Mismatch
-        atoms3 = struc.AtomArray(24) 
+        atoms3 = struc.AtomArray(24)
         atoms3.coord = np.zeros((24, 3))
         atoms3.atom_name = np.tile(["N", "CA", "C", "O"], 6)
         atoms3.res_name = np.tile(["ALA"], 24)
@@ -56,7 +59,7 @@ class TestQualityInterpolate(unittest.TestCase):
     def test_interpolate_valid(self):
         out_prefix = os.path.join(self.test_dir, "morph")
         interpolate_structures(self.pdb1_path, self.pdb2_path, steps=2, output_prefix=out_prefix)
-        
+
         # Should create out_0.pdb, out_1.pdb, out_2.pdb
         for i in range(3):
             self.assertTrue(os.path.exists(f"{out_prefix}_{i}.pdb"))

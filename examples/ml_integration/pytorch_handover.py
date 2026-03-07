@@ -8,26 +8,28 @@ The BatchedGenerator produces contiguous NumPy arrays which are 'zero-copy' comp
 with PyTorch (meaning they share the same physical memory).
 """
 
-import numpy as np
+import time
+
 import torch
 import torch.nn as nn
+
 from synth_pdb.batch_generator import BatchedGenerator
-import time
+
 
 def demo_pytorch_integration():
     print("--- synth-pdb -> PyTorch Handover Demo ---")
-    
+
     # 1. Generate a large batch of structures (e.g., 5000 structures of length 20)
     # We use full_atom=False for simplicity, but it works exactly the same for full-atom.
     sequence = "ALA-GLY-SER-TRP-HIS-LYS-CYS-ASP-GLU-PHE" * 2
     n_batch = 5000
-    
+
     print(f"Generating {n_batch} structures of length {len(sequence.split('-'))}...")
     start_time = time.time()
-    
+
     generator = BatchedGenerator(sequence, n_batch=n_batch)
     batch = generator.generate_batch(drift=2.0) # Add some 'structural noise' for the model
-    
+
     gen_time = time.time() - start_time
     print(f"Generation Complete in {gen_time:.4f}s ({n_batch/gen_time:.1f} structures/sec)")
 
@@ -35,8 +37,8 @@ def demo_pytorch_integration():
     # torch.from_numpy() creates a tensor that shares the memory with the numpy array.
     # This is "Zero-Copy" - no data is moved in RAM.
     coords_tensor = torch.from_numpy(batch.coords).float()
-    
-    print(f"Handover to PyTorch Complete.")
+
+    print("Handover to PyTorch Complete.")
     print(f"Tensor Shape: {coords_tensor.shape} (Batch, Atoms, XYZ)")
     print(f"Tensor Memory Contiguity: {coords_tensor.is_contiguous()}")
 
@@ -53,17 +55,17 @@ def demo_pytorch_integration():
                 nn.ReLU(),
                 nn.Linear(64, 1) # Predict a single float (Radius of Gyration)
             )
-            
+
         def forward(self, x):
             return self.net(x)
 
     model = RyGModel(batch.n_atoms)
-    
+
     # 4. Inference Run
     # We process the entire 5000 structure batch in a single forward pass
     with torch.no_grad():
         predictions = model(coords_tensor)
-        
+
     print(f"Model Inference Success. Output Shape: {predictions.shape}")
     print(f"Sample Prediction (Structure 0): {predictions[0].item():.4f} Å")
 
@@ -71,8 +73,8 @@ def demo_pytorch_integration():
     # This shows how easy it is to mix PyTorch and NumPy for structural analysis
     centroid = coords_tensor.mean(dim=1, keepdim=True)
     rg = torch.sqrt(((coords_tensor - centroid)**2).sum(dim=-1).mean(dim=1))
-    
-    print(f"Batch-wise Radius of Gyration calculated in PyTorch.")
+
+    print("Batch-wise Radius of Gyration calculated in PyTorch.")
     print(f"Mean Rg for Batch: {rg.mean().item():.2f} Å")
 
 if __name__ == "__main__":

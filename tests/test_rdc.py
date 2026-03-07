@@ -30,9 +30,8 @@ Additional validation context:
   Q Rev Biophys, 33, 371–424. DOI: 10.1017/S0033583500003656
 """
 
-import pytest
-import numpy as np
 import biotite.structure as struc
+import pytest
 
 
 class TestRDCShimImport:

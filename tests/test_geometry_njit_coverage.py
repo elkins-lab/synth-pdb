@@ -7,11 +7,9 @@ Tests targeting geometry.py coverage gaps:
   - reconstruct_sidechain rotation path (rotate_points inner fn + superimpose)
 """
 import math
-import types
 
 import numpy as np
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -41,6 +39,7 @@ class TestNjitFallback:
         try:
             # Re-import geometry in a fresh module to trigger the ImportError branch
             import importlib
+
             import synth_pdb.geometry as geom_mod
             importlib.reload(geom_mod)
 
@@ -229,7 +228,9 @@ class TestReconstructSidechainRotation:
     def test_rotation_path_does_not_raise(self, pdb_with_phe):
         """Calling reconstruct_sidechain on PHE should exercise the rotate_points path."""
         import io
+
         import biotite.structure.io.pdb as bpdb
+
         from synth_pdb.geometry import reconstruct_sidechain
         pdb_file = bpdb.PDBFile.read(io.StringIO(pdb_with_phe))
         peptide = pdb_file.get_structure(model=1)
@@ -239,7 +240,9 @@ class TestReconstructSidechainRotation:
     def test_rotation_path_changes_sidechain(self, pdb_with_phe):
         """Sidechain atoms of PHE must move after applying a different chi1."""
         import io
+
         import biotite.structure.io.pdb as bpdb
+
         from synth_pdb.geometry import reconstruct_sidechain
         pdb_file = bpdb.PDBFile.read(io.StringIO(pdb_with_phe))
         peptide = pdb_file.get_structure(model=1)
@@ -256,7 +259,9 @@ class TestReconstructSidechainRotation:
     def test_rotation_path_lys_long_chain(self):
         """LYS has chi1-chi4; exercise the rotation path with a long sidechain."""
         import io
+
         import biotite.structure.io.pdb as bpdb
+
         from synth_pdb.generator import generate_pdb_content
         from synth_pdb.geometry import reconstruct_sidechain
         pdb_content = generate_pdb_content(sequence_str="AKA", conformation="alpha",
@@ -272,7 +277,9 @@ class TestReconstructSidechainRotation:
         Passing a plain float for chi1 should be handled gracefully.
         """
         import io
+
         import biotite.structure.io.pdb as bpdb
+
         from synth_pdb.generator import generate_pdb_content
         from synth_pdb.geometry import reconstruct_sidechain
         pdb_content = generate_pdb_content(sequence_str="AC", conformation="alpha",

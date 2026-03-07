@@ -1,10 +1,12 @@
 
 import sys
-import unittest
+from unittest.mock import MagicMock, mock_open, patch
+
 import numpy as np
 import pytest
-from unittest.mock import MagicMock, patch, mock_open
+
 import synth_pdb.physics
+
 
 class TestPhysicsCoverage:
 
@@ -15,7 +17,7 @@ class TestPhysicsCoverage:
         # Mock HAS_OPENMM = False
         with patch("synth_pdb.physics.HAS_OPENMM", False):
             minimizer = synth_pdb.physics.EnergyMinimizer()
-            
+
             # Should fail/return False gracefully
             assert minimizer.minimize("dummy.pdb", "out.pdb") is False
             assert minimizer.equilibrate("dummy.pdb", "out.pdb") is False
@@ -32,12 +34,13 @@ class TestPhysicsCoverage:
 
     def test_init_unknown_solvent_model_falls_back_to_explicit(self, caplog):
         """Unknown implicit solvent model logs a warning and defaults to 'explicit'."""
-        from synth_pdb.physics import EnergyMinimizer
         import logging
-        
+
+        from synth_pdb.physics import EnergyMinimizer
+
         with caplog.at_level(logging.WARNING, logger="synth_pdb.physics"):
             minimizer = EnergyMinimizer(solvent_model="app.UnknownModel123")
-            
+
         assert minimizer.solvent_model == "explicit"
         assert "Unknown solvent model 'app.UnknownModel123'" in caplog.text
         assert "Defaulting to 'explicit'" in caplog.text
@@ -45,10 +48,10 @@ class TestPhysicsCoverage:
     def test_init_invalid_box_size_raises_valueerror(self):
         """box_size <= 0 must raise ValueError."""
         from synth_pdb.physics import EnergyMinimizer
-        
+
         with pytest.raises(ValueError, match="box_size must be positive"):
             EnergyMinimizer(box_size=0.0)
-            
+
         with pytest.raises(ValueError, match="box_size must be positive"):
             EnergyMinimizer(box_size=-1.5)
 
@@ -73,10 +76,10 @@ class TestPhysicsCoverage:
         """
         # Set up a working minimizer mock
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Mock PDBFile to fail
         mock_app.PDBFile.side_effect = Exception("Corrupt PDB")
-        
+
         # Should return None and catch exception
         assert minimizer._run_simulation("bad.pdb", "out.pdb") is None
 
@@ -85,63 +88,63 @@ class TestPhysicsCoverage:
     def test_hetatm_restoration_logic(self, mock_app, caplog):
         """
         Test the specific logic for preserving ZN ions during hydrogen checking.
-        The "AI Trinity" logic: identifying non-protein atoms, storing them, 
+        The "AI Trinity" logic: identifying non-protein atoms, storing them,
         and restoring them after addHydrogens.
         """
         import logging
         caplog.set_level(logging.INFO)
-        
+
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Initialize mock objects explicitly to avoid NameErrors in partial edits
         mock_res_ala = MagicMock()
         mock_res_zn = MagicMock()
-        
+
         # Mock PDBFile and Topology
         mock_pdb = MagicMock()
         mock_topology = MagicMock()
         mock_pdb.topology = mock_topology
         mock_positions = [1, 2, 3] # Dummy list
         mock_pdb.positions = mock_positions
-        
+
         mock_app.PDBFile.return_value = mock_pdb
-        
+
         # Mock Modeller
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
         mock_modeller.topology = mock_topology
         mock_modeller.positions = mock_positions # Initially same
-        
+
         # Setup residues in topology:
         # 1. Protein residue (ALA)
         # 2. Zinc Ion (ZN) - The target of our test
-        
+
         mock_res_ala = MagicMock()
         mock_res_ala.name = "ALA"
-        
+
         mock_res_zn = MagicMock()
         mock_res_zn.name = "ZN"
         # Setup atoms for ZN residue
         mock_atom_zn = MagicMock()
         mock_atom_zn.name = "ZN"
-        mock_atom_zn.element = "Zn" 
+        mock_atom_zn.element = "Zn"
         mock_atom_zn.index = 0
         mock_res_zn.atoms.return_value = [mock_atom_zn]
-        
+
         # Initial residues loop
         mock_topology.residues.return_value = [mock_res_ala, mock_res_zn]
-        
+
         # Mock addHydrogens behavior
         # After addHydrogens is called, we simulate the Modeller losing the ZN residue
         def side_effect_add_hydrogens(*args, **kwargs):
-             mock_topology.residues.side_effect = None 
+             mock_topology.residues.side_effect = None
              # Only ALA is left after hydrogen addition
              # Reset atoms iterator to only return ALA atoms
-             mock_topology.residues.return_value = [mock_res_ala] 
-             mock_topology.atoms.side_effect = lambda: iter([MagicMock()]) 
-             
+             mock_topology.residues.return_value = [mock_res_ala]
+             mock_topology.atoms.side_effect = lambda: iter([MagicMock()])
+
              def side_effect_add_atom(*args, **kwargs):
-                  pass 
+                  pass
              mock_topology.addAtom.side_effect = side_effect_add_atom
              return
         mock_modeller.addHydrogens.side_effect = side_effect_add_hydrogens
@@ -161,29 +164,29 @@ class TestPhysicsCoverage:
         # Mock dependencies for restoring HETATM
         mock_topology.addChain.return_value = "new_chain"
         mock_topology.addResidue.return_value = "new_res"
-        
+
         # Mock internal imports
         mock_biotite = MagicMock()
         mock_biotite_structure = MagicMock()
         mock_biotite_pdb_module = MagicMock()
         mock_biotite_pdb_file = MagicMock()
-        mock_biotite_struc = MagicMock()
-        
+        MagicMock()
+
         mock_biotite_pdb_module.PDBFile = mock_biotite_pdb_file
-        mock_biotite_pdb_file.read.return_value.get_structure.return_value = MagicMock() 
+        mock_biotite_pdb_file.read.return_value.get_structure.return_value = MagicMock()
 
         # IMPORTANT: ensure Modeller.topology.residues() returns [ALA, ZN] initially
-        # Use simple list return value for residues() 
+        # Use simple list return value for residues()
         mock_topology.residues.return_value = [mock_res_ala, mock_res_zn]
         # Use lambda for atoms() to return fresh iterator every time
         mock_topology.atoms.side_effect = lambda: iter([MagicMock(), mock_atom_zn])
 
         mock_cofactors = MagicMock()
-        mock_cofactors.find_metal_binding_sites.return_value = [] 
-        
+        mock_cofactors.find_metal_binding_sites.return_value = []
+
         mock_biophysics = MagicMock()
-        mock_biophysics.find_salt_bridges.return_value = [] 
-        
+        mock_biophysics.find_salt_bridges.return_value = []
+
         # Mock Simulation
         mock_simulation = MagicMock()
         mock_app.Simulation.return_value = mock_simulation
@@ -195,7 +198,7 @@ class TestPhysicsCoverage:
         mock_state.getPositions.return_value = mock_pos_data
         mock_state.getPotentialEnergy.return_value.value_in_unit.return_value = -100.0
         mock_simulation.context.getState.return_value = mock_state
-        mock_simulation.topology = mock_topology 
+        mock_simulation.topology = mock_topology
 
         # Patch sys.modules
         with patch.dict(sys.modules, {
@@ -208,7 +211,7 @@ class TestPhysicsCoverage:
         }), patch("builtins.open", mock_open(read_data="ATOM      1  N   ALA A   1       0.000   0.000   0.000\nHETATM    2 ZN    ZN A   2       5.000   5.000   5.000  1.00 20.00          ZN\n")), patch("os.path.exists", return_value=True):
              # Run internal simulation method
              minimizer._run_simulation("dummy.pdb", "out.pdb", add_hydrogens=True)
-        
+
         # Verifications
         # 1. Did we detect ZN and try to restore it?
         # Check logs for "Restoring lost HETATM: ZN"
@@ -221,11 +224,11 @@ class TestPhysicsCoverage:
         Test that minimize() correctly calls _run_simulation with add_hydrogens=False.
         """
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Mock the internal _run_simulation method
         with patch.object(minimizer, '_run_simulation', return_value=True) as mock_run:
             result = minimizer.minimize("in.pdb", "out.pdb", max_iterations=50, tolerance=5.0)
-            
+
             assert result is True
             mock_run.assert_called_once_with("in.pdb", "out.pdb", max_iterations=50, tolerance=5.0, add_hydrogens=False, cyclic=False, disulfides=None, coordination=None)
 
@@ -237,25 +240,25 @@ class TestPhysicsCoverage:
         """
         import logging
         caplog.set_level(logging.ERROR)
-        
+
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Mock PDB with empty atoms list
         mock_pdb = MagicMock()
         mock_topology = MagicMock()
         mock_pdb.topology = mock_topology
         mock_pdb.positions = []
-        
+
         mock_app.PDBFile.return_value = mock_pdb
         mock_topology.atoms.return_value = iter([]) # Empty iterator
-        
+
         # Mock Modeller to also return empty atoms
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
         mock_modeller.topology.atoms.return_value = iter([])
-        
+
         result = minimizer._run_simulation("empty.pdb", "out.pdb", add_hydrogens=True)
-        
+
         assert result is None
         assert "Topology has 0 atoms" in caplog.text
 
@@ -267,39 +270,39 @@ class TestPhysicsCoverage:
         """
         import logging
         caplog.set_level(logging.ERROR)
-        
+
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Setup successful initialization but empty positions at end
         mock_pdb = MagicMock()
         mock_app.PDBFile.return_value = mock_pdb
         mock_pdb.topology.atoms.return_value = iter([MagicMock()]) # Not empty initially
-        
+
         mock_modeller = MagicMock() # Modeller
         mock_app.Modeller.return_value = mock_modeller
         # IMPORTANT: Use lambda to return NEW iterator on every call
         mock_modeller.topology.atoms.side_effect = lambda: iter([MagicMock()])
-        
+
         # Simulation setup
         mock_simulation = MagicMock()
         mock_app.Simulation.return_value = mock_simulation
-        
+
         # State returns empty positions
         mock_state = MagicMock()
-        mock_state.getPositions.return_value = [] 
+        mock_state.getPositions.return_value = []
         mock_simulation.context.getState.return_value = mock_state
-        
+
         # Need to mock forcefield creation to avoid real file loading
         minimizer.forcefield = MagicMock()
-        
+
         # Mock internal dependencies to avoid import errors or side effects
         with patch.dict(sys.modules, {
-            "biotite": MagicMock(), 
+            "biotite": MagicMock(),
             "synth_pdb.cofactors": MagicMock(),
             "synth_pdb.biophysics": MagicMock()
         }):
              result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
-             
+
         assert result is None
         assert "OpenMM returned empty positions" in caplog.text
 
@@ -312,44 +315,44 @@ class TestPhysicsCoverage:
         """
         import logging
         caplog.set_level(logging.DEBUG)
-        
+
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Mock PDB & Topology
         mock_pdb = MagicMock()
         mock_topology = MagicMock()
         mock_pdb.topology = mock_topology
         mock_pdb.positions = [1, 2, 3]
         mock_app.PDBFile.return_value = mock_pdb
-        
+
         # Setup Atoms: Residue 1 (LYS), Residue 10 (ASP)
         atom1 = MagicMock(); atom1.index = 0; atom1.name = "NZ"; atom1.residue.id = "1"; atom1.residue.name = "LYS"
         atom2 = MagicMock(); atom2.index = 1; atom2.name = "OD1"; atom2.residue.id = "10"; atom2.residue.name = "ASP"
-        
+
         mock_topology.atoms.return_value = iter([atom1, atom2]) # Used in Modeller init
-        
+
         # Mock Modeller to return same atoms
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
         mock_modeller.topology.atoms.side_effect = lambda: iter([atom1, atom2])
         mock_modeller.topology.residues.return_value = [] # No ion checks needed
-        
+
         # Mock find_salt_bridges return value
         mock_biophysics = MagicMock()
         mock_biophysics.find_salt_bridges.return_value = [
             {"res_ia": 1, "atom_a": "NZ", "res_ib": 10, "atom_b": "OD1", "distance": 3.0}
         ]
-        
+
         # Mock ForceField & System
         minimizer.forcefield = MagicMock()
         mock_system = MagicMock()
         minimizer.forcefield.createSystem.return_value = mock_system
-        
+
         # Mock Simulation
         mock_simulation = MagicMock()
         mock_app.Simulation.return_value = mock_simulation
         mock_simulation.context.getState.return_value.getPositions.return_value = [1]
-        
+
         # Mock Dependencies
         with patch.dict(sys.modules, {
             "biotite": MagicMock(),
@@ -359,16 +362,16 @@ class TestPhysicsCoverage:
             "synth_pdb.biophysics": mock_biophysics
         }):
             minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
-            
+
         # Verify Force Creation
         mock_mm.CustomBondForce.assert_any_call("0.5*k_sb*(r-r0)^2")
-        
+
         # Verify Force was added to system
         # We expect addForce to be called twice (once for coordination (empty), once for salt bridges)
         # Actually coordination force is only added if restraints > 0.
         # But we mocked mm.CustomBondForce, so we check if system.addForce was called with the result
         assert mock_system.addForce.called
-        
+
         # Check logs for debug message
         assert "Found 1 salt bridges" in caplog.text
 
@@ -381,12 +384,12 @@ class TestPhysicsCoverage:
         Test utility wrappers add_hydrogens_and_minimize and equilibrate steps.
         """
         minimizer = synth_pdb.physics.EnergyMinimizer()
-        
+
         # Test add_hydrogens_and_minimize
         with patch.object(minimizer, '_run_simulation', return_value=True) as mock_run:
             minimizer.add_hydrogens_and_minimize("in.pdb", "out.pdb")
             mock_run.assert_called_with("in.pdb", "out.pdb", add_hydrogens=True, max_iterations=0, tolerance=10.0, cyclic=False, disulfides=None, coordination=None)
-            
+
         # Test equilibrate with steps
         # This requires mocking _run_simulation internals to verify simulation.step(steps) is called
         # But _run_simulation handles that logic. We just need to check if _run_simulation

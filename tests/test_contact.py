@@ -1,14 +1,16 @@
-import pytest
-import numpy as np
 import biotite.structure as struc
+import numpy as np
+import pytest
+
 from synth_pdb.contact import compute_contact_map
+
 
 @pytest.fixture
 def mock_structure():
     """Create a simple 2-residue structure."""
     # Res 1 at Origin, Res 2 at (10, 0, 0)
     # Distance = 10.0
-    
+
     structure = struc.AtomArray(2)
     structure.coord = np.array([
         [0.0, 0.0, 0.0],
@@ -24,7 +26,7 @@ def mock_structure():
 def test_distance_matrix(mock_structure):
     """Test raw distance calculation."""
     matrix = compute_contact_map(mock_structure, method="ca", power=None)
-    
+
     assert matrix.shape == (2, 2)
     # Diagonal should be 0
     assert matrix[0, 0] == 0.0
@@ -51,7 +53,7 @@ def test_method_selection(mock_structure):
     complex_structure.atom_name = np.array(["CA", "CB", "CA"])
     complex_structure.element = np.array(["C", "C", "C"])
     complex_structure.res_name = np.array(["ALA", "ALA", "ALA"]) # Needs CA for filtering logic if any
-    
+
     matrix = compute_contact_map(complex_structure, method="ca")
     assert matrix.shape == (2, 2) # Should ignore CB
 
@@ -60,9 +62,9 @@ def test_noe_intensity(mock_structure):
     # Distance = 10.0
     # Intensity = 1e-6
     matrix = compute_contact_map(mock_structure, method="ca", power=6)
-    
+
     expected = 1.0 / (10.0 ** 6)
     assert pytest.approx(matrix[0, 1]) == expected
-    
+
     # Diagonal should be 0 (handled by fill_diagonal)
     assert matrix[0, 0] == 0.0

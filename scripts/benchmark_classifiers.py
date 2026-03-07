@@ -18,8 +18,8 @@ Usage:
 import argparse
 import io
 import logging
-import os
 import time
+
 import numpy as np
 
 logging.basicConfig(
@@ -41,6 +41,7 @@ def generate_shared_dataset(n_samples: int = 100, random_state: int = 42):
     the RF builds tabular features via extract_quality_features.
     """
     import biotite.structure.io.pdb as pdb_io
+
     from synth_pdb.generator import generate_pdb_content
 
     rng = np.random.default_rng(random_state)
@@ -114,7 +115,8 @@ def generate_shared_dataset(n_samples: int = 100, random_state: int = 42):
 
 def benchmark_rf(pdbs_train, y_train, pdbs_test, y_test):
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.metrics import classification_report, accuracy_score, roc_auc_score
+    from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+
     from synth_pdb.quality.features import extract_quality_features
 
     logger.info("--- Random Forest ---")
@@ -177,9 +179,9 @@ def benchmark_rf(pdbs_train, y_train, pdbs_test, y_test):
 def benchmark_gnn(pdbs_train, y_train, pdbs_test, y_test, epochs: int = 50, hidden_dim: int = 64):
     import torch
     import torch.nn.functional as F
-    from torch_geometric.data import Data
+    from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
     from torch_geometric.loader import DataLoader
-    from sklearn.metrics import classification_report, accuracy_score, roc_auc_score
+
     from synth_pdb.quality.gnn.graph import build_protein_graph
     from synth_pdb.quality.gnn.model import ProteinGNN
 

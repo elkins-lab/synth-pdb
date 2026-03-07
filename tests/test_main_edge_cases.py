@@ -1,8 +1,9 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-import sys
-import os
-from unittest.mock import patch, MagicMock
+
 from synth_pdb.main import main
+
 
 def test_main_structure_inference_fail():
     """Cover sys.exit(1) for structure inference failure (line 521)."""
@@ -32,7 +33,7 @@ def test_main_relax_logic():
          patch("synth_pdb.relaxation.calculate_relaxation_rates", return_value={}), \
          patch("synth_pdb.nef_io.write_nef_relaxation"), \
          patch("builtins.open", MagicMock()):
-        
+
         with patch("sys.argv", ["synth-pdb", "--sequence", "A", "--gen-relax", "--tumbling-time", "8.0"]):
             try:
                 main()

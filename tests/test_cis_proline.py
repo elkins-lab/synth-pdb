@@ -1,13 +1,15 @@
 
-import pytest
-import numpy as np
 import biotite.structure as struc
+import numpy as np
+import pytest
+
 from synth_pdb.generator import generate_pdb_content
+
 
 class TestCisProline:
     """
     TDD Test Suite for Cis-Proline Isomerization.
-    
+
     EDUCATIONAL NOTE - Peptide Bond Isomerism (Cis vs Trans)
     --------------------------------------------------------
     The peptide bond (C-N) has partial double-bond character, restricting rotation.
@@ -40,16 +42,17 @@ class TestCisProline:
 
     def _get_omega_angles(self, pdb_content):
         """Helper to extract omega angles from generated PDB content."""
-        import biotite.structure.io.pdb as pdb
         import io
-        
+
+        import biotite.structure.io.pdb as pdb
+
         file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = file.get_structure(model=1)
-        
+
         # Calculate backbone dihedrals (phi, psi, omega)
         # Omega is the angle between CA_i, C_i, N_{i+1}, CA_{i+1}
         phi, psi, omega = struc.dihedral_backbone(structure)
-        
+
         # Remove NaNs (first/last residues) and convert to degrees
         omega_deg = np.degrees(omega)
         omega_deg = omega_deg[~np.isnan(omega_deg)]
@@ -62,7 +65,7 @@ class TestCisProline:
         # Force 0% cis to ensure deterministic Trans for this test
         content = generate_pdb_content(sequence_str=seq, cis_proline_frequency=0.0)
         omegas = self._get_omega_angles(content)
-        
+
         # Check that all are near 180 (abs > 150)
         is_trans = np.abs(omegas) > 150
         assert np.all(is_trans), f"Default generation produced non-trans bonds: {omegas}"
@@ -72,28 +75,28 @@ class TestCisProline:
         Test that we can force Cis-Proline generation.
         """
         seq = "APA" # ALA-PRO-ALA. The A-P bond should be cis.
-        
+
         content = generate_pdb_content(
             sequence_str=seq,
             cis_proline_frequency=1.0 # 100% probability
         )
-            
+
         omegas = self._get_omega_angles(content)
-        
-        # omegas has NaNs removed. 
+
+        # omegas has NaNs removed.
         # For len 3 ("APA"), original omegas are [NaN, w1, w2].
         # Filtered omegas are [w1, w2].
         # w1 is bond A-P (Residue 1).
-        
+
         omega_pro = omegas[0] # The first valid omega is A-P
-        
+
         # Check for CIS (near 0, between -30 and +30)
         assert abs(omega_pro) < 30.0, f"Expected Cis-Proline (omega~0), got {omega_pro}"
 
     def test_cis_only_on_proline(self):
         """Test that --cis-proline-frequency does NOT affect non-proline residues."""
         seq = "AAAAA" # No prolines
-        
+
         try:
             content = generate_pdb_content(
                 sequence_str=seq,
@@ -103,7 +106,7 @@ class TestCisProline:
              pytest.fail("Argument not implemented yet")
 
         omegas = self._get_omega_angles(content)
-        
+
         # All should still be Trans
         is_trans = np.abs(omegas) > 150
         assert np.all(is_trans), "Non-proline residues became cis!"

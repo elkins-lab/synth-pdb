@@ -4,9 +4,10 @@ TDD tests for synth_pdb/quality/gnn/model.py and gnn_classifier.py.
 Written BEFORE the implementation exists — all tests should fail initially.
 """
 import unittest
-import numpy as np
 
+import numpy as np
 import pytest
+
 torch = pytest.importorskip("torch", reason="PyTorch not installed")
 pyg = pytest.importorskip("torch_geometric", reason="torch_geometric not installed")
 
@@ -22,8 +23,8 @@ class TestGNNModelForwardPass(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        from synth_pdb.quality.gnn.model import ProteinGNN
         from synth_pdb.quality.gnn.graph import build_protein_graph
+        from synth_pdb.quality.gnn.model import ProteinGNN
         cls.model = ProteinGNN(node_features=8, edge_features=2, hidden_dim=32, num_classes=2)
         cls.model.eval()
         cls.graph = build_protein_graph(_make_helix_pdb(15))
@@ -62,6 +63,7 @@ class TestGNNModelForwardPass(unittest.TestCase):
     def test_batched_forward_pass(self):
         """Batched forward pass with 3 graphs must return [3, 2] output."""
         from torch_geometric.data import Batch
+
         from synth_pdb.quality.gnn.graph import build_protein_graph
         graphs = [
             build_protein_graph(_make_helix_pdb(10)),

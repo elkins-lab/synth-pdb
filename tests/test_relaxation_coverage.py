@@ -1,8 +1,14 @@
-import pytest
-import numpy as np
+from unittest.mock import patch
+
 import biotite.structure as struc
-from unittest.mock import patch, MagicMock
-from synth_pdb.relaxation import predict_order_parameters, calculate_relaxation_rates, spectral_density
+import numpy as np
+
+from synth_pdb.relaxation import (
+    calculate_relaxation_rates,
+    predict_order_parameters,
+    spectral_density,
+)
+
 
 def test_spectral_density_tau_f():
     """Test spectral density with fast internal motion (tau_f > 0)."""
@@ -25,7 +31,7 @@ def test_predict_order_parameters_ptm_and_ions():
     atoms.atom_name = np.array(["N", "CA", "CA", "P", "ZN"])
     atoms.coord = np.zeros((5, 3))
     atoms.element = np.array(["N", "C", "C", "P", "ZN"])
-    
+
     # We mock struc.sasa to return NaNs to hit line 129
     with patch("biotite.structure.sasa", return_value=np.array([np.nan]*5)):
         s2_map = predict_order_parameters(atoms)
@@ -38,14 +44,14 @@ def test_calculate_relaxation_rates_proline():
     atoms.res_id = np.array([1, 1, 1])
     atoms.atom_name = np.array(["N", "CA", "CD"]) # No H
     atoms.coord = np.zeros((3, 3))
-    
+
     # Add a mock Hydrogen to PRO to try and trigger the loop check
     atoms_with_h = struc.AtomArray(4)
     atoms_with_h.res_name = np.array(["PRO", "PRO", "PRO", "PRO"])
     atoms_with_h.res_id = np.array([1, 1, 1, 1])
     atoms_with_h.atom_name = np.array(["N", "CA", "CD", "H"])
     atoms_with_h.coord = np.zeros((4, 3))
-    
+
     rates = calculate_relaxation_rates(atoms_with_h)
     assert 1 not in rates # Proline should be skipped even if it somehow has an H in our mock
 

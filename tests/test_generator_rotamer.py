@@ -1,5 +1,5 @@
-import unittest
 import logging
+import unittest
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
@@ -20,7 +20,7 @@ class TestGeneratorWithRotamers(unittest.TestCase):
 
         # Get the atoms for the chi-1 angle of LEU
         leu_atoms = {atom['atom_name']: atom for atom in atoms if atom['residue_name'] == 'LEU'}
-        
+
         self.assertIn('N', leu_atoms, "N atom not found for LEU")
         self.assertIn('CA', leu_atoms, "CA atom not found for LEU")
         self.assertIn('CB', leu_atoms, "CB atom not found for LEU")
@@ -40,7 +40,7 @@ class TestGeneratorWithRotamers(unittest.TestCase):
         is_gauche_minus = -100 < chi1_angle < -20  # Around -60 degrees
         is_trans = chi1_angle > 100 or chi1_angle < -100  # Around 180 degrees (or -180)
         self.assertTrue(
-            is_gauche_minus or is_trans, 
+            is_gauche_minus or is_trans,
             f"Chi-1 angle for LEU is {chi1_angle:.1f}°, expected rotamer ranges: "
             f"-100° to -20° (gauche-) or ±100° to ±180° (trans)"
         )

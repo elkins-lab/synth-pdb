@@ -1,6 +1,6 @@
-import unittest
 import logging
-import numpy as np
+import unittest
+
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
 
@@ -44,9 +44,9 @@ class TestChirality(unittest.TestCase):
         # Generate a sufficiently long random peptide to cover many amino acid types
         # Using a fixed seed for reproducibility
         pdb_content = generate_pdb_content(length=50, seed=42)
-        
+
         validator = PDBValidator(pdb_content=pdb_content)
-        
+
         # This method doesn't exist yet (TDD), but we define the contract here.
         # It should check improper dihedrals and raise violations for D-amino acids.
         # EDUCATIONAL: The validate_chirality method will likely implement the
@@ -54,14 +54,14 @@ class TestChirality(unittest.TestCase):
         if hasattr(validator, 'validate_chirality'):
             validator.validate_chirality()
             violations = validator.get_violations()
-            
+
             chirality_violations = [v for v in violations if "Chirality violation" in v]
-            
+
             if chirality_violations:
                 for v in chirality_violations:
                     logger.error(v)
-            
-            self.assertEqual(len(chirality_violations), 0, 
+
+            self.assertEqual(len(chirality_violations), 0,
                              f"Found {len(chirality_violations)} D-amino acids! Proteins must be L-chiral.")
         else:
             # TDD Step 1: Fail if method is missing, or warn

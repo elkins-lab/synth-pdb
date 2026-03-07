@@ -6,8 +6,7 @@ Tests for synth_pdb/quality/gnn/gnn_classifier.py — targeting uncovered lines:
   - Lines 303-305: load() exception path
 """
 import os
-import sys
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -174,14 +173,15 @@ class TestGNNPredictHappyPath:
         (lines 136-146).
         """
         import logging
+
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
 
         with caplog.at_level(logging.INFO):
             with patch("os.path.exists", return_value=False):
                 # Ensure we also mock the internal init so we don't accidentally do full setup
                 with patch.object(GNNQualityClassifier, "_init_fresh_model") as mock_init:
-                    clf = GNNQualityClassifier(model_path=None)
-                    
+                    GNNQualityClassifier(model_path=None)
+
                     assert "No pre-trained GNN checkpoint found at" in caplog.text
                     assert "Classifier initialised with a random-weight model" in caplog.text
                     mock_init.assert_called_once()

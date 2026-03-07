@@ -6,12 +6,9 @@ Tests for synth_pdb/quality/classifier.py — targeting all uncovered lines:
   - Line 65:  predict() when self.model is None (raises RuntimeError)
 """
 import logging
-import os
-import types
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # ProteinQualityClassifier.__init__ — no model file present
@@ -47,7 +44,7 @@ class TestClassifierInit:
         fake_path = str(tmp_path / "nonexistent.joblib")
 
         # Should not raise — load_model catches exceptions
-        clf = ProteinQualityClassifier(model_path=fake_path)
+        ProteinQualityClassifier(model_path=fake_path)
         # model will be None because the file doesn't exist; that's fine
         # (we just confirm it doesn't propagate an unhandled exception)
 
@@ -139,8 +136,9 @@ class TestPredictHappyPath:
         With a mocked sklearn model, predict() should return (bool, float, dict).
         """
         import numpy as np
-        from synth_pdb.quality.classifier import ProteinQualityClassifier
+
         from synth_pdb.generator import generate_pdb_content
+        from synth_pdb.quality.classifier import ProteinQualityClassifier
 
         pdb_str = generate_pdb_content(sequence_str="ACDEFGHIK", conformation="alpha",
                                        minimize_energy=False)
@@ -160,13 +158,14 @@ class TestPredictHappyPath:
         assert isinstance(prob, float)
         assert isinstance(feat_dict, dict)
         assert 0.0 <= prob <= 1.0
-        assert is_good == True   # 0.7 > 0.5
+        assert is_good   # 0.7 > 0.5
 
     def test_predict_low_score_is_bad(self, tmp_path):
         """When model gives P(good)=0.2, is_good should be False."""
         import numpy as np
-        from synth_pdb.quality.classifier import ProteinQualityClassifier
+
         from synth_pdb.generator import generate_pdb_content
+        from synth_pdb.quality.classifier import ProteinQualityClassifier
 
         pdb_str = generate_pdb_content(sequence_str="ACDEFGHIK", conformation="alpha",
                                        minimize_energy=False)
@@ -187,7 +186,6 @@ class TestPredictHappyPath:
         """
         When joblib.load succeeds, model should be set and an info log emitted.
         """
-        import numpy as np
         from synth_pdb.quality.classifier import ProteinQualityClassifier
 
         clf = ProteinQualityClassifier.__new__(ProteinQualityClassifier)

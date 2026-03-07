@@ -1,10 +1,9 @@
 
-import pytest
 import subprocess
-import os
 import sys
-from pathlib import Path
+
 from synth_pdb.validator import PDBValidator
+
 
 # Helper to run the CLI command
 def run_synth_pdb(args):
@@ -19,21 +18,21 @@ class TestEducationalExamples:
         Verifies that the generated PDB has low Ramachandran violations for an alpha helix.
         """
         output_file = tmp_path / "glucagon.pdb"
-        
+
         args = [
             "--sequence", "HSQGTFTSDYSKYLDSRRAQDFVQWLMNT",
             "--conformation", "alpha",
             "--refine-clashes", "0",
             "--output", str(output_file)
         ]
-        
+
         run_synth_pdb(args)
-        
+
         assert output_file.exists()
-        
-        with open(output_file, 'r') as f:
+
+        with open(output_file) as f:
             content = f.read()
-            
+
         validator = PDBValidator(content)
         # Verify it generated the correct length (29 residues)
         sequences = validator._get_sequences_by_chain()
@@ -45,7 +44,7 @@ class TestEducationalExamples:
         Uses --structure to define regions.
         """
         output_file = tmp_path / "melittin.pdb"
-        
+
         # Sequence: GIGAVLKVLTTGLPALISWIKRKRQQ
         # Structure: 1-11 alpha, 12-14 random (hinge), 15-26 alpha
         args = [
@@ -54,17 +53,17 @@ class TestEducationalExamples:
             "--refine-clashes", "50",
             "--output", str(output_file)
         ]
-        
+
         run_synth_pdb(args)
 
         assert output_file.exists()
-        
-        with open(output_file, 'r') as f:
+
+        with open(output_file) as f:
             content = f.read()
-        
+
         # Basic validity check (it generated successfully)
         assert "ATOM" in content
-        
+
         # Verify length matches (sometimes refinement might drop atoms if catastrophic, but shouldn't)
         validator = PDBValidator(content)
         sequences = validator._get_sequences_by_chain()
@@ -76,37 +75,37 @@ class TestEducationalExamples:
         BPTI has 3 disulfide bonds.
         """
         output_file = tmp_path / "bpti.pdb"
-        
+
         args = [
             "--sequence", "RPDFCLEPPYTGPCKARIIRYFYNAKAGLCQTFVYGGCRAKRNNFKSAEDCMRTCGGA",
-            "--conformation", "random", 
+            "--conformation", "random",
             "--refine-clashes", "100",
             "--output", str(output_file)
         ]
-        
+
         run_synth_pdb(args)
 
         assert output_file.exists()
-        
-        with open(output_file, 'r') as f:
+
+        with open(output_file) as f:
             content = f.read()
-            
+
         # Check that the file is valid PDB format
         assert "HEADER" in content
         assert "ATOM" in content
         assert "END" in content
-        
+
         # The generator should ATTEMPT to detect disulfides and write SSBOND if found.
         # BPTI is small and constrained; some disulfides should be detected.
         # Check for SSBOND and CONECT correlation
         if "SSBOND" in content:
             assert "CONECT" in content, "SSBOND header present but no CONECT records for structural bonding"
-            
+
             # Verify that SG atoms are involved in CONECT records
             lines = content.split('\n')
             sg_indices = [int(l[6:11]) for l in lines if l.startswith('ATOM') and l[12:16].strip() == 'SG']
             conect_lines = [l for l in lines if l.startswith('CONECT')]
-            
+
             sg_bonded = False
             import re
             for line in conect_lines:
@@ -123,24 +122,24 @@ class TestEducationalExamples:
         Good stress test for clashes.
         """
         output_file = tmp_path / "ubiquitin.pdb"
-        
+
         # Simplified structure for reliability in test environment
         args = [
             "--sequence", "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG",
-            "--structure", "1-7:beta,23-34:alpha", 
+            "--structure", "1-7:beta,23-34:alpha",
             "--refine-clashes", "50",
-            "--best-of-N", "2", 
+            "--best-of-N", "2",
             "--output", str(output_file)
         ]
-        
+
         run_synth_pdb(args)
-        
+
         assert output_file.exists()
-        with open(output_file, 'r') as f:
+        with open(output_file) as f:
             content = f.read()
-            
+
         validator = PDBValidator(content)
-        # It should adhere to the rules, but might have some clashes. 
+        # It should adhere to the rules, but might have some clashes.
         # We just want to ensure it generated the full length.
         sequences = validator._get_sequences_by_chain()
         assert len(sequences.get('A', '')) == 76
@@ -152,9 +151,9 @@ class TestEducationalExamples:
         Verifies correct length and presence of SSBOND records.
         """
         output_file = tmp_path / "egf.pdb"
-        
+
         success = False
-        # Try a few seeds because random generation + minimization is sensitive to 
+        # Try a few seeds because random generation + minimization is sensitive to
         # numpy versions and OS math differences which can cause flakiness.
         for seed in [42, 43, 44, 45, 46]:
             args = [
@@ -165,19 +164,19 @@ class TestEducationalExamples:
                 "--metal-ions", "none",
                 "--output", str(output_file)
             ]
-            
+
             run_synth_pdb(args)
-            
+
             assert output_file.exists()
-            
-            with open(output_file, 'r') as f:
+
+            with open(output_file) as f:
                 content = f.read()
-                
+
             validator = PDBValidator(content)
             # Verify it generated the correct length (53 residues)
             sequences = validator._get_sequences_by_chain()
             assert len(sequences.get('A', '')) == 53
-            
+
             # Check for SSBOND records
             if "SSBOND" in content and "CONECT" in content:
                 # Verify CONECT references SG atoms
@@ -186,5 +185,5 @@ class TestEducationalExamples:
                 if any("CONECT" in l and any(str(idx) in l for idx in sg_indices) for l in lines):
                     success = True
                     break
-        
+
         assert success, "hEGF failed to form any disulfide bonds across multiple random seeds"

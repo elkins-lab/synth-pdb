@@ -1,15 +1,27 @@
 import logging
-import pytest
+
 import numpy as np
+import pytest
+
 from synth_pdb.validator import PDBValidator
 
 logger = logging.getLogger(__name__)
 # logging.getLogger().setLevel(logging.DEBUG) # Optional: Configure externally
 from synth_pdb.data import (
-    BOND_LENGTH_N_CA, BOND_LENGTH_CA_C, BOND_LENGTH_C_N, BOND_LENGTH_C_O,
-    ANGLE_N_CA_C, ANGLE_C_N_CA, ANGLE_CA_C_O, ANGLE_CA_C_N
+    ANGLE_C_N_CA,
+    ANGLE_CA_C_N,
+    ANGLE_CA_C_O,
+    ANGLE_N_CA_C,
+    BOND_LENGTH_C_N,
+    BOND_LENGTH_C_O,
+    BOND_LENGTH_CA_C,
+    BOND_LENGTH_N_CA,
 )
-from synth_pdb.generator import CA_DISTANCE, create_atom_line, _position_atom_3d_from_internal_coords # Import create_atom_line
+from synth_pdb.generator import (  # Import create_atom_line
+    CA_DISTANCE,
+    _position_atom_3d_from_internal_coords,
+    create_atom_line,
+)
 
 logging.getLogger().setLevel(logging.DEBUG)
 
@@ -19,7 +31,7 @@ def is_valid_pdb_file(file_path: str) -> bool:
     the PDBValidator can parse it and find at least one atom.
     """
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             pdb_content = f.read()
         validator = PDBValidator(pdb_content)
         return bool(validator.atoms)
@@ -94,7 +106,7 @@ class TestPDBValidator:
         ca1_coords = n1_coords + np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
         c1_coords = ca1_coords + np.array([BOND_LENGTH_CA_C, 0.0, 0.0])
         o1_coords = c1_coords + np.array([BOND_LENGTH_C_O, 0.0, 0.0]) # simplified
-        
+
         n2_coords = c1_coords + np.array([BOND_LENGTH_C_N, 0.0, 0.0]) # peptide bond
         ca2_coords = n2_coords + np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
 
@@ -117,7 +129,7 @@ class TestPDBValidator:
         ca1_coords = n1_coords + np.array([BOND_LENGTH_N_CA + 0.5, 0.0, 0.0]) # N-CA too long
         c1_coords = ca1_coords + np.array([BOND_LENGTH_CA_C, 0.0, 0.0])
         o1_coords = c1_coords + np.array([BOND_LENGTH_C_O, 0.0, 0.0])
-        
+
         pdb_content = (
             create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="") + "\n" +
             create_atom_line(2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code="") + "\n" +
@@ -136,7 +148,7 @@ class TestPDBValidator:
         # Manually construct atoms to match ideal bond angles.
         n_ca_c_angle_rad = np.deg2rad(ANGLE_N_CA_C) # 110.0
         ca_c_o_angle_rad = np.deg2rad(ANGLE_CA_C_O) # 120.8
-        c_n_ca_angle_rad = np.deg2rad(ANGLE_C_N_CA) # 121.7 (for peptide bond C(i)-N(i+1)-CA(i+1))
+        np.deg2rad(ANGLE_C_N_CA) # 121.7 (for peptide bond C(i)-N(i+1)-CA(i+1))
 
         # Residue 1: N1-CA1-C1-O1
         n1_coords = np.array([0.000, 0.000, 0.000])
@@ -145,8 +157,8 @@ class TestPDBValidator:
         # C1 from CA1, forming N1-CA1-C1 angle
         # Rotate from CA1-N1 vector to get CA1-C1
         vec_ca1_n1 = n1_coords - ca1_coords
-        vec_ca1_n1_norm = vec_ca1_n1 / np.linalg.norm(vec_ca1_n1)
-        
+        vec_ca1_n1 / np.linalg.norm(vec_ca1_n1)
+
         # We want the angle relative to current x-axis if N1 is at origin.
         # Let's simplify: place N1 at (0,0,0), CA1 at (1.458,0,0)
         # C1 relative to CA1, making an angle of 110 with N1
@@ -157,16 +169,16 @@ class TestPDBValidator:
 
         # O1 from C1, forming CA1-C1-O1 angle
         # C1-CA1 vector
-        vec_c1_ca1 = ca1_coords - c1_coords
+        ca1_coords - c1_coords
         # Angle from C1-CA1 to C1-O1 should be CA_C_O.
         # Let's rotate O1 around C1.
-        x_offset_o1 = BOND_LENGTH_C_O * np.cos(ca_c_o_angle_rad)
-        y_offset_o1 = BOND_LENGTH_C_O * np.sin(ca_c_o_angle_rad)
+        BOND_LENGTH_C_O * np.cos(ca_c_o_angle_rad)
+        BOND_LENGTH_C_O * np.sin(ca_c_o_angle_rad)
         # A bit tricky to get relative angles right. Let's assume a fixed orientation.
         # Simplest is to place O1 in the same "plane" as N1-CA1-C1, in a sensible direction.
         # The generator uses np.pi - angle for C1 relative to CA-X, then np.pi - angle for O1 relative to C-X
         # Let's use coordinates that should ideally align based on generator's logic.
-        
+
         # N1 (0,0,0)
         # CA1 (1.458, 0, 0)
         # C1 (CA1_x + BL_CA_C * cos(180-110), BL_CA_C * sin(180-110), 0)
@@ -197,7 +209,7 @@ class TestPDBValidator:
         n2_x = c1[0] + BOND_LENGTH_C_N * np.cos(angle_c1_x)
         n2_y = c1[1] + BOND_LENGTH_C_N * np.sin(angle_c1_x)
         n2 = np.array([n2_x, n2_y, 0.0])
-        
+
         # CA2: from N2, forming C1-N2-CA2 angle (121.7)
         # Vector N2-C1
         angle_n2_c1 = np.arctan2(c1[1]-n2[1], c1[0]-n2[0])
@@ -239,7 +251,7 @@ class TestPDBValidator:
         assert "deviates from standard" in violations[0]
 
     # --- Ramachandran Tests ---
-    # Simplified Ramachandran tests will check if the angle is calculated, 
+    # Simplified Ramachandran tests will check if the angle is calculated,
     # and if it falls outside the simplified broad ranges.
     # Generating PDB content that perfectly fits specific Ramachandran regions
     # requires advanced conformational sampling, which is beyond this project's scope.
@@ -262,7 +274,7 @@ class TestPDBValidator:
         """
         Test that a General residue (Alanine) is FLAGGED as a violation when placed
         in the "Left-Handed Alpha Helix" region (Phi approx +60).
-        
+
         Biological Context:
         -------------------
         Most L-amino acids cannot adopt positive Phi angles due to steric clashes
@@ -272,12 +284,12 @@ class TestPDBValidator:
         # Test violation for General residue (ALA) with Phi=+60, Psi=+60
         # This is Left-handed Alpha region, forbidden for ALA (General)
         # Should be an Outlier because Phi > -30.
-        
+
         # Initial atoms
         c1_res1 = np.array([0.0, 1.0, 0.0])
         n2_res2 = np.array([0.0, 0.0, 0.0])
         ca2_res2 = np.array([1.458, 0.0, 0.0])
-        
+
         # Calculate P4 (Res2 C) for Phi=+60
         # NOTE: The helper apparently flips sign (or coordinate system implies it).
         # We observed that input 60.0 yields -60.0.
@@ -290,7 +302,7 @@ class TestPDBValidator:
             bond_angle_deg=ANGLE_N_CA_C,
             dihedral_angle_deg=target_phi # Use +60 to generate +60 (Left-handed Alpha violation)
         )
-        
+
         # Calculate P5 (Res3 N) for Psi=+60
         # We want Psi=+60.
         # We want Psi=+60.
@@ -301,7 +313,7 @@ class TestPDBValidator:
             bond_angle_deg=ANGLE_CA_C_N,
             dihedral_angle_deg=target_psi # Use +60 to generate +60
         )
-        
+
         pdb_content = (
             create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C", alt_loc="", insertion_code="") + "\n" +
             create_atom_line(2, "N", "ALA", "A", 2, *n2_res2, "N", alt_loc="", insertion_code="") + "\n" +
@@ -329,18 +341,18 @@ class TestPDBValidator:
         """
         # Same geometry (Phi=+60, Psi=+60) for GLYCINE.
         # Glycine allows positive Phi (Favored region).
-        
+
         c1_res1 = np.array([0.0, 1.0, 0.0])
         n2_res2 = np.array([0.0, 0.0, 0.0])
         ca2_res2 = np.array([1.458, 0.0, 0.0])
-        
+
         c2_res2 = _position_atom_3d_from_internal_coords(
             p1=c1_res1, p2=n2_res2, p3=ca2_res2,
             bond_length=BOND_LENGTH_CA_C,
             bond_angle_deg=ANGLE_N_CA_C,
             dihedral_angle_deg=60.0
         )
-        
+
         n3_res3 = _position_atom_3d_from_internal_coords(
             p1=n2_res2, p2=ca2_res2, p3=c2_res2,
             bond_length=BOND_LENGTH_C_N,
@@ -364,7 +376,7 @@ class TestPDBValidator:
     def test_validate_ramachandran_violation_proline(self):
         """
         Test that Proline is FLAGGED as a violation in the standard Beta region.
-        
+
         Biological Context:
         -------------------
         Proline's side chain forms a cyclic ring connecting back to the nitrogen.
@@ -374,11 +386,11 @@ class TestPDBValidator:
         """
         # Proline with Phi = -120 (Beta region)
         # Proline is restricted to Phi ~ -60. Beta region is an outlier.
-        
+
         c1_res1 = np.array([0.0, 1.0, 0.0])
         n2_res2 = np.array([0.0, 0.0, 0.0])
         ca2_res2 = np.array([1.458, 0.0, 0.0])
-        
+
         # Phi = -120
         c2_res2 = _position_atom_3d_from_internal_coords(
             p1=c1_res1, p2=n2_res2, p3=ca2_res2,
@@ -386,7 +398,7 @@ class TestPDBValidator:
             bond_angle_deg=ANGLE_N_CA_C,
             dihedral_angle_deg=-120.0
         )
-        
+
         # Psi = 120 (Beta)
         n3_res3 = _position_atom_3d_from_internal_coords(
             p1=n2_res2, p2=ca2_res2, p3=c2_res2,
@@ -409,7 +421,7 @@ class TestPDBValidator:
         assert len(violations) >= 1
         assert "PRO" in violations[0]
         assert "Outlier" in violations[0]
-    
+
     def test_parse_clashing_pdb_content(self):
         clashing_pdb_content = (
             "HEADER    clashing_peptide\n" +
@@ -493,7 +505,7 @@ class TestPDBValidator:
         # Apply tweak
         initial_parsed_atoms = initial_validator.get_atoms()
         tweaked_atoms = PDBValidator._apply_steric_clash_tweak(initial_parsed_atoms, push_distance=0.1)
-        
+
         # Re-validate after tweak
         tweaked_pdb_content = PDBValidator.atoms_to_pdb_content(tweaked_atoms)
         tweaked_validator = PDBValidator(pdb_content=tweaked_pdb_content)
@@ -544,7 +556,7 @@ class TestPDBValidator:
             bond_angle_deg=ANGLE_CA_C_N, # Angle CA1-C1-N2
             dihedral_angle_deg=90.0 # Force a 90-degree omega violation
         )
-        
+
         # We NEED CA2 for the correct Omega definition: CA(i-1)-C(i-1)-N(i)-CA(i)
         # Place CA2 from N2
         ca2 = _position_atom_3d_from_internal_coords(
@@ -553,7 +565,7 @@ class TestPDBValidator:
             bond_angle_deg=ANGLE_N_CA_C,
             dihedral_angle_deg=90.0 # Omega angle: 90 deg is a decided non-planarity (violation)
         )
-        
+
         pdb_content = (
             create_atom_line(1, "N", "ALA", "A", 1, *n1, "N") + "\n" +
             create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C") + "\n" +
@@ -715,7 +727,7 @@ class TestPDBValidator:
         validator.validate_sequence_improbabilities(max_consecutive_charged=4)
         violations = validator.get_violations()
         assert any("Charge Cluster" in v for v in violations)
-        
+
         # VVVVVVVVVVV at end
         pdb_content = ""
         for i in range(11):
@@ -763,7 +775,7 @@ class TestPDBValidator:
     def test_validate_rotamers_violation(self):
         """
         Test that a side-chain rotamer violation is detected.
-        
+
         Scenario: Valine (VAL) with Chi1 = 0.0 degrees (completely eclipsed).
         Allowed Chi1 for VAL: {-60, 180, 60}.
         0.0 is a high-energy eclipsed state and should be flagged.
@@ -773,19 +785,19 @@ class TestPDBValidator:
         n = np.array([0.0, 0.0, 0.0])
         # CA on X-axis (N-CA bond)
         ca = np.array([1.46, 0.0, 0.0])
-        
+
         # CB in XY plane (N-CA-CB angle ~ 110)
         # Place CB such that N-CA-CB is defined.
         # Let's use internal coords helper to be robust.
         cb = _position_atom_3d_from_internal_coords(
             p1=n + np.array([0., 1., 0.]), # Dummy start
-            p2=n, 
+            p2=n,
             p3=ca,
             bond_length=1.53, # CA-CB
             bond_angle_deg=110.0, # N-CA-CB
             dihedral_angle_deg=0.0
         )
-        
+
         # CG1: This defines Chi1 (N-CA-CB-CG1).
         # We want Chi1 = 0.0 degrees.
         cg1 = _position_atom_3d_from_internal_coords(
@@ -796,9 +808,9 @@ class TestPDBValidator:
             bond_angle_deg=110.0, # CA-CB-CG
             dihedral_angle_deg=0.0 # Chi1 = 0.0
         )
-        
+
         # We also need C atom to form a complete residue for grouping, though not strictly for Chi1
-        c = np.array([ca[0] + 1.5, ca[1], ca[2]]) 
+        c = np.array([ca[0] + 1.5, ca[1], ca[2]])
 
         pdb_content = (
             create_atom_line(1, "N", "VAL", "A", 1, *n, "N") + "\n" +
@@ -807,7 +819,7 @@ class TestPDBValidator:
             create_atom_line(4, "CB", "VAL", "A", 1, *cb, "C") + "\n" +
             create_atom_line(5, "CG1", "VAL", "A", 1, *cg1, "C")
         )
-        
+
         validator = PDBValidator(pdb_content)
         # Attempt minimal validation (skip backbone which might fail)
         try:
@@ -816,7 +828,7 @@ class TestPDBValidator:
              # If method doesn't exist yet (TDD), this confirms we need to add it.
              # We can fail the test here or let it error out.
              pytest.fail("validate_side_chain_rotamers method not found on PDBValidator")
-             
+
         violations = validator.get_violations()
         assert len(violations) >= 1
         assert "Rotamer violation" in violations[0]
@@ -833,10 +845,10 @@ class TestPDBValidator:
         n1 = np.array([0.0, 0.0, 0.0])
         ca1 = np.array([1.46, 0.0, 0.0])
         c1 = np.array([2.5, 1.0, 0.0])
-        
+
         # Residue 2: N2 (but missing CA2)
         n2 = np.array([3.5, 1.0, 0.0])
-        
+
         pdb_content = (
             create_atom_line(1, "N", "ALA", "A", 1, *n1, "N") + "\n" +
             create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C") + "\n" +
@@ -844,7 +856,7 @@ class TestPDBValidator:
             create_atom_line(4, "N", "ALA", "A", 2, *n2, "N")
             # Missing CA for ALA 2
         )
-        
+
         validator = PDBValidator(pdb_content)
         # This call should no longer raise TypeError: 'NoneType' object is not subscriptable
         validator.validate_bond_angles()

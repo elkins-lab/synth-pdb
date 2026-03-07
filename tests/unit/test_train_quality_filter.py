@@ -5,9 +5,9 @@ These tests were written BEFORE the fixes, so they are expected to FAIL against
 the original code. They document the required behavior after the fixes are applied.
 """
 import ast
-import textwrap
 import unittest
 from pathlib import Path
+
 import numpy as np
 
 SCRIPT_PATH = Path(__file__).parent.parent.parent / "scripts" / "train_quality_filter.py"
@@ -111,7 +111,7 @@ class TestGenerateDatasetBalance(unittest.TestCase):
 
     def test_dataset_minimum_yield(self):
         # Import dynamically so that import errors surface clearly
-        import importlib.util, sys
+        import importlib.util
 
         spec = importlib.util.spec_from_file_location(
             "train_quality_filter", str(SCRIPT_PATH)

@@ -1,8 +1,10 @@
 
+import io
 import os
 import tokenize
-import io
+
 import pytest
+
 
 def calculate_comment_ratio(file_path):
     """
@@ -10,21 +12,21 @@ def calculate_comment_ratio(file_path):
     """
     if not os.path.exists(file_path):
         return 0.0
-        
-    with open(file_path, 'r', encoding='utf-8') as f:
+
+    with open(file_path, encoding='utf-8') as f:
         content = f.read()
-        
+
     try:
         f_obj = io.StringIO(content)
         tokens = list(tokenize.generate_tokens(f_obj.readline))
-        
+
         comment_line_indices = set()
         code_line_indices = set()
-        
+
         for tok in tokens:
             start_line = tok.start[0]
-            end_line = tok.end[0]
-            
+            tok.end[0]
+
             if tok.type == tokenize.COMMENT:
                 # Check if the comment (excluding the #) has non-blank content
                 comment_content = tok.string.lstrip('#').strip()
@@ -39,11 +41,11 @@ def calculate_comment_ratio(file_path):
             elif tok.type not in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT, tokenize.ENDMARKER, tokenize.STRING):
                 # Count actual code tokens (excluding blank lines and docstrings)
                 code_line_indices.add(start_line)
-        
+
         # A line can be both a code line AND a comment line (inline comments)
         final_comment_count = len(comment_line_indices)
         final_code_count = len(code_line_indices)
-        
+
         return final_comment_count / max(1, final_code_count)
     except Exception:
         return 0.0
@@ -66,6 +68,6 @@ def test_library_documentation_density(file_path, min_ratio):
     if not os.path.exists(full_path):
         # Fallback for different test execution working directories
         full_path = file_path
-        
+
     ratio = calculate_comment_ratio(full_path)
     assert ratio >= min_ratio, f"Documentation density for {file_path} is {ratio:.2f}, which is below the required {min_ratio}"

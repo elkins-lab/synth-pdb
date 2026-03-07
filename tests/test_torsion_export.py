@@ -1,10 +1,8 @@
-import pytest
-import numpy as np
-import biotite.structure as struc
-import biotite.structure.io.pdb as pdb
 import io
-import os
-from pathlib import Path
+
+import biotite.structure.io.pdb as pdb
+import numpy as np
+import pytest
 
 # Try to import the module to be tested (will fail initially)
 try:
@@ -12,25 +10,24 @@ try:
 except ImportError:
     torsion = None
 
-from synth_pdb.generator import create_atom_line
 
 class TestTorsionExport:
-    
+
     @pytest.fixture
     def alpha_helix_pdb(self):
         """Returns a string wrapper for a simple 3-residue alpha helix PDB content."""
         # Ideally using Biotite to build it properly or a raw string.
         # For torsion calculation, we need valid geometry.
         # I'll use a mocked PDB string that approximates an alpha helix
-        # Helix: (-60, -45). 
+        # Helix: (-60, -45).
         # But constructing coordinates by hand is hard.
-        # I will rely on biotite to build a structure if possible, 
+        # I will rely on biotite to build a structure if possible,
         # or use a pre-calculated small PDB string.
-        
+
         # Let's use a very simple linear chain (extended) which is easier to coordinate manually
-        # Res 1 at (0,0,0), Res 2 at (3.8, 0, 0)... 
+        # Res 1 at (0,0,0), Res 2 at (3.8, 0, 0)...
         # This gives 180 degree angles approximately.
-        
+
         return """HEADER    EXTENDED
 ATOM      1  N   ALA A   1      -1.458   0.000   0.000  1.00  0.00           N
 ATOM      2  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C
@@ -56,25 +53,25 @@ END
         """Test calculation of angles from structure."""
         if torsion is None:
             pytest.skip("Module not implemented")
-            
+
         pdb_file = pdb.PDBFile.read(io.StringIO(alpha_helix_pdb))
         atom_array = pdb_file.get_structure(model=1)
-        
+
         # Calculate
         df = torsion.calculate_torsion_angles(atom_array)
-        
+
         # Check structure of return
         assert isinstance(df, list)
         assert len(df) == 3 # 3 residues
-        
+
         # First residue has no Phi
         assert df[0]['phi'] is None or np.isnan(df[0]['phi'])
         assert df[0]['psi'] is not None
-        
+
         # Second residue has both
         assert df[1]['phi'] is not None
         assert df[1]['psi'] is not None
-        
+
         # Last residue has no Psi
         assert df[2]['psi'] is None or np.isnan(df[2]['psi'])
 
@@ -82,15 +79,15 @@ END
         """Test export to CSV format."""
         if torsion is None:
             pytest.skip("Module not implemented")
-            
+
         data = [
             {'residue': 'ALA', 'res_id': 1, 'phi': np.nan, 'psi': -57.0, 'omega': 180.0},
             {'residue': 'GLY', 'res_id': 2, 'phi': -60.0, 'psi': -45.0, 'omega': 180.0},
         ]
-        
+
         outfile = tmp_path / "angles.csv"
         torsion.export_torsion_angles(data, str(outfile), fmt="csv")
-        
+
         assert outfile.exists()
         content = outfile.read_text()
         assert "residue,res_id,phi,psi,omega" in content.lower()
@@ -100,14 +97,14 @@ END
         """Test export to JSON format."""
         if torsion is None:
             pytest.skip("Module not implemented")
-            
+
         data = [
             {'residue': 'ALA', 'res_id': 1, 'phi': None, 'psi': -57.0},
         ]
-        
+
         outfile = tmp_path / "angles.json"
         torsion.export_torsion_angles(data, str(outfile), fmt="json")
-        
+
         assert outfile.exists()
         import json
         loaded = json.loads(outfile.read_text())

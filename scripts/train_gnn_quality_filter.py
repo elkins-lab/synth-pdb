@@ -35,6 +35,7 @@ def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
         List of torch_geometric.data.Data objects with .y set.
     """
     import torch
+
     from synth_pdb.quality.gnn.graph import build_protein_graph
 
     graphs = []
@@ -59,8 +60,10 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
     training. Returns (pdb_list, y) rather than (X_feats, y) since the GNN
     builds its own graph features directly from the PDB atoms.
     """
-    import biotite.structure.io.pdb as pdb_io
     import io
+
+    import biotite.structure.io.pdb as pdb_io
+
     from synth_pdb.generator import generate_pdb_content
 
     rng = np.random.default_rng(random_state)
@@ -160,15 +163,15 @@ def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
     try:
         import torch
         import torch.nn.functional as F
-        from torch_geometric.loader import DataLoader
+        from sklearn.metrics import accuracy_score, classification_report
         from sklearn.model_selection import train_test_split
-        from sklearn.metrics import classification_report, accuracy_score
+        from torch_geometric.loader import DataLoader
     except ImportError as exc:
         logger.error("Missing dependency: %s. Run: pip install synth-pdb[gnn]", exc)
         sys.exit(1)
 
-    from synth_pdb.quality.gnn.model import ProteinGNN
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
+    from synth_pdb.quality.gnn.model import ProteinGNN
 
     # ------------------------------------------------------------------
     # Data generation
@@ -216,8 +219,6 @@ def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
     # Training loop
     # ------------------------------------------------------------------
     logger.info("Training for %d epochs...", epochs)
-    best_acc = 0.0
-    best_state = None
 
     for epoch in range(1, epochs + 1):
         model.train()

@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 import pytest
+
 torch = pytest.importorskip("torch", reason="PyTorch not installed")
 pyg = pytest.importorskip("torch_geometric", reason="torch_geometric not installed")
 
@@ -17,7 +18,6 @@ from synth_pdb.quality.gnn.graph import build_protein_graph
 
 def _quick_dataset(n_good: int = 5, n_bad: int = 5):
     """Tiny balanced dataset for fast integration tests."""
-    from torch_geometric.data import Data
     graphs, labels = [], []
     for _ in range(n_good):
         pdb = generate_pdb_content(length=15, conformation="alpha", minimize_energy=False)
@@ -39,8 +39,9 @@ class TestGNNTraining(unittest.TestCase):
 
     def test_gnn_trains_without_error(self):
         """Training for 3 epochs on 10 tiny samples must complete without exception."""
-        from synth_pdb.quality.gnn.model import ProteinGNN
         from torch_geometric.loader import DataLoader
+
+        from synth_pdb.quality.gnn.model import ProteinGNN
 
         graphs = _quick_dataset(n_good=5, n_bad=5)
         loader = DataLoader(graphs, batch_size=5, shuffle=True)
@@ -50,7 +51,7 @@ class TestGNNTraining(unittest.TestCase):
 
         losses = []
         model.train()
-        for epoch in range(3):
+        for _epoch in range(3):
             epoch_loss = 0.0
             for batch in loader:
                 optimizer.zero_grad()

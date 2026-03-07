@@ -1,15 +1,14 @@
 
+import json
 import os
-import sys
-import numpy as np
+
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
+import numpy as np
 import requests
-import json
-from scipy.stats import pearsonr
-from synth_pdb.physics import EnergyMinimizer
-from synth_pdb.validator import PDBValidator
 from synth_nmr.chemical_shifts import predict_chemical_shifts
+
+from synth_pdb.physics import EnergyMinimizer
 
 # Constants
 PDB_URL = "https://files.rcsb.org/download/1UBQ.pdb"
@@ -28,7 +27,7 @@ def download_data():
         with open(BMRB_FILE, 'w') as f: f.write(r.text)
 
 def parse_bmrb_shifts(filename):
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         data = json.load(f)
     entry_id = list(data.keys())[0]
     shifts = {}
@@ -52,21 +51,21 @@ def run_benchmark():
     print("="*60)
     print(" SYNTH-PDB EXPERIMENTAL BENCHMARK: UBIQUITIN (1UBQ)")
     print("="*60)
-    
+
     # 1. Load Experimental
     exp_file = pdb.PDBFile.read(PDB_FILE)
     exp_struct = exp_file.get_structure(model=1)
     exp_struct = exp_struct[struc.filter_amino_acids(exp_struct)]
-    
+
     # 2. Refine Structure
     print("Relaxing structure with EnergyMinimizer (OpenMM)...")
     minimizer = EnergyMinimizer()
     temp_pdb = "benchmark_min.pdb"
     # Clean PDB for OpenMM
-    with open(PDB_FILE, 'r') as f:
+    with open(PDB_FILE) as f:
         lines = [l for l in f.readlines() if l.startswith("ATOM")]
     with open("clean_exp.pdb", 'w') as f: f.writelines(lines)
-    
+
     success = minimizer.add_hydrogens_and_minimize("clean_exp.pdb", temp_pdb)
     if not success:
         print("FAILED: Energy minimization failed.")
@@ -78,13 +77,13 @@ def run_benchmark():
 
     # 4. Metrics
     results = {}
-    
+
     # RMSD
     mask_exp = (exp_struct.atom_name == "CA")
     mask_min = (min_struct.atom_name == "CA")
     ca_exp = exp_struct[mask_exp]
     ca_min = min_struct[mask_min]
-    
+
     # Match by res_id for safety
     common_exp = []
     common_min = []
@@ -93,19 +92,19 @@ def run_benchmark():
         if r.res_id in min_map:
             common_exp.append(r.coord)
             common_min.append(min_map[r.res_id])
-    
+
     exp_arr = struc.AtomArray(len(common_exp))
     exp_arr.coord = np.array(common_exp)
     min_arr = struc.AtomArray(len(common_min))
     min_arr.coord = np.array(common_min)
-    
+
     superimposed, _ = struc.superimpose(exp_arr, min_arr)
     results['RMSD (CA)'] = struc.rmsd(exp_arr, superimposed)
 
     # Dihedrals
     exp_phi, exp_psi, _ = struc.dihedral_backbone(exp_struct)
     min_phi, min_psi, _ = struc.dihedral_backbone(min_struct)
-    
+
     mask = ~np.isnan(exp_phi) & ~np.isnan(min_phi)
     results['Phi Correlation'] = np.corrcoef(exp_phi[mask], min_phi[mask])[0,1]
     mask = ~np.isnan(exp_psi) & ~np.isnan(min_psi)
@@ -114,7 +113,7 @@ def run_benchmark():
     # Chemical Shifts
     exp_shifts = parse_bmrb_shifts(BMRB_FILE)
     pred_shifts = predict_chemical_shifts(min_struct)
-    
+
     vals_exp, vals_pred = [], []
     for res_id, atoms in exp_shifts.items():
         if 'A' in pred_shifts and res_id in pred_shifts['A']:
@@ -122,7 +121,7 @@ def run_benchmark():
                 if atom in pred_shifts['A'][res_id] and atom in ["N", "H", "CA", "CB", "C"]:
                     vals_exp.append(val)
                     vals_pred.append(pred_shifts['A'][res_id][atom])
-    
+
     results['CS Correlation (Backbone)'] = np.corrcoef(vals_exp, vals_pred)[0,1]
 
     # SSE Preservation
@@ -133,7 +132,7 @@ def run_benchmark():
     # 5. Report
     print(f"{'Metric':<30} | {'Value':<10} | {'Status':<10}")
     print("-"*60)
-    
+
     thresholds = {
         'RMSD (CA)': (0.8, False), # Less than 0.8 is GOOD
         'Phi Correlation': (0.9, True), # Greater than 0.9 is GOOD

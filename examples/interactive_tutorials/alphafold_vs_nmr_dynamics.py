@@ -1,25 +1,24 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # # 🤖 AlphaFold Confidence (pLDDT) vs. NMR Flexibility ($S^2$)
 # ### Validating AI predictions with physical molecular dynamics
-# 
+#
 # ---
-# 
+#
 # ## 🎯 Overview & Academic Context
-# 
-# When AlphaFold2 predicts a protein structure, it assigns a confidence score to every residue called **pLDDT** (predicted Local Distance Difference Test, 0-100). 
-# 
+#
+# When AlphaFold2 predicts a protein structure, it assigns a confidence score to every residue called **pLDDT** (predicted Local Distance Difference Test, 0-100).
+#
 # A major finding in recent structural biology is that regions with low pLDDT (<70) are not necessarily "wrong" predictions. Instead, they often physically correspond to **Intrinsically Disordered Regions (IDRs)** or highly flexible loops.
-# 
+#
 # ### 📚 Key Literature References
 # 1. **Ruff & Pappu (2021)** - *"AlphaFold and Implications for Intrinsically Disordered Proteins" (JMB)*. Demonstrated that low pLDDT strongly correlates with dynamic disorder.
 # 2. **Alderson et al. (2022)** - *"Local unfolding of the p53 DNA binding domain... predicted by AlphaFold2" (PNAS)*. Correlated pLDDT with experimental NMR relaxation dispersion.
 # 3. **Zweckstetter (2021)** - *"NMR: prediction of protein flexibility" (Nature Comm)*. Showed that AI confidence maps directly to NMR $S^2$ order parameters.
-# 
+#
 # ### 🧪 The Experiment
 # In real NMR, backbone flexibility is measured by the **Lipari-Szabo order parameter ($S^2$)**, which ranges from 0 (completely flexible) to 1 (completely rigid). In Molecular Dynamics, flexibility is measured by **RMSF** (Root Mean Square Fluctuation).
-# 
+#
 # In this tutorial, we will:
 # 1. Generate a synthetic structure with a mix of rigid helices and a flexible unstructured loop.
 # 2. Use `synth_pdb.physics` to run a brief molecular dynamics simulation of this chain.
@@ -30,7 +29,9 @@
 
 
 # 🔧 Environment Detection & Setup
-import sys, os
+import os
+import sys
+
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
@@ -54,25 +55,23 @@ print('✅ Environment configured!')
 # In[ ]:
 
 
-import numpy as np
+import io
+
+import biotite.structure.io.pdb as pdb
 import matplotlib.pyplot as plt
+import numpy as np
 import py3Dmol
-import ipywidgets as widgets
-from IPython.display import display, HTML
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.physics import simulate_trajectory
-import biotite.structure.io.pdb as pdb
-import biotite.structure as struc
-import io
 
 print("📦 All imports successful!")
 
 
 # ## 1. Generating a Test Structure
-# 
-# We will design a 45-residue protein with two rigid Alpha-helices connected by a long, 15-residue "random coil" loop. 
-# 
+#
+# We will design a 45-residue protein with two rigid Alpha-helices connected by a long, 15-residue "random coil" loop.
+#
 # In AlphaFold, the helices would score pLDDT > 90, while the long unstructured loop would score pLDDT < 50.
 
 # In[ ]:
@@ -95,9 +94,9 @@ print("✅ Baseline structure ready!")
 
 
 # ## 2. Simulating Physical Dynamics (MD)
-# 
-# To measure flexibility, we need to observe the molecule moving over time. We will use `synth_pdb.physics.simulate_trajectory` to run a brief Molecular Dynamics (MD) simulation using OpenMM. 
-# 
+#
+# To measure flexibility, we need to observe the molecule moving over time. We will use `synth_pdb.physics.simulate_trajectory` to run a brief Molecular Dynamics (MD) simulation using OpenMM.
+#
 # *Note: Real NMR characterizes nanosecond to millisecond motions. Our short MD run will just capture fast picosecond thermal fluctuations.*
 
 # In[ ]:
@@ -115,7 +114,7 @@ print(f"✅ Sim complete! Captured {len(trajectory_pdbs)} trajectory frames.")
 
 
 # ## 3. Visualizing the Trajectory
-# 
+#
 # Let's overlay all the frames from the trajectory. You should visibly see the two alpha-helices remaining relatively tight and static (dark blue/red lines), while the central disordered loop whips around wildly (green/yellow spectrum).
 
 # In[ ]:
@@ -139,9 +138,9 @@ print("White Tube: Starting position.\nRainbow Lines: The 50 thermal motion fram
 
 
 # ## 4. Calculating Flexibility (RMSF)
-# 
-# Root Mean Square Fluctuation (RMSF) measures the standard deviation of each atom's position from its average position over the trajectory. 
-# 
+#
+# Root Mean Square Fluctuation (RMSF) measures the standard deviation of each atom's position from its average position over the trajectory.
+#
 # - **Low RMSF** = Rigid (High NMR $S^2$, High AlphaFold pLDDT)
 # - **High RMSF** = Flexible (Low NMR $S^2$, Low AlphaFold pLDDT)
 
