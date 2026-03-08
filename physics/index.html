@@ -2832,6 +2832,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#explicit-solvent-water-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit Solvent (Water Box)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-generation-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2876,13 +2887,26 @@
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    /              \__ Low Energy
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   /                  (Stable / Minimized)
 </span></code></pre></div>
-<p><code>synth-pdb</code> uses <strong>Implicit Solvent (OBC2)</strong> to simulate the effect of water without the computational cost of thousands of explicit water molecules.</p>
+<p><code>synth-pdb</code> defaults to <strong>Implicit Solvent (OBC2)</strong> to simulate the effect of water without the computational cost of thousands of explicit water molecules. This allows for lightning-fast physics refinement natively on the CPU.</p>
+<h2 id="explicit-solvent-water-box">Explicit Solvent (Water Box)</h2>
+<p>For advanced biophysics and molecular dynamics (MD), <code>synth-pdb</code> now fully supports generating and simulating <strong>Explicit Solvent</strong>.</p>
+<p>By using <code>--solvent explicit</code>, OpenMM will build a surrounding box of classical <strong>TIP3P</strong> water molecules around the generated peptide.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Generate a linear peptide padded by 1.2 nanometers of water</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span>ALA-PRO-GLY<span class="w"> </span>--minimize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--solvent<span class="w"> </span>explicit<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>--solvent-padding<span class="w"> </span><span class="m">1</span>.2
+</span></code></pre></div>
+<blockquote>
+<p>[!TIP]
+<strong>Stripping Solvent:</strong> 
+By default, <code>synth-pdb</code> strips the thousands of generated <code>HOH</code> (water) atoms from the final <code>.pdb</code> output to keep file sizes small and clean for downstream AI pipelines. If you want to export the entire simulated water box, use the <code>--keep-solvent</code> flag.</p>
+</blockquote>
 <h2 id="the-generation-pipeline">The Generation Pipeline</h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[User] -&gt; [Generator] -&gt; [Geometry Builder] -&gt; [Sidechain Packer] -&gt; [Energy Minimizer] -&gt; [PDB File]
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>             ^                  |                    |                      |
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>             |                                       |                      |
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>             +---------------------------------------+----------------------+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[User] -&gt; [Generator] -&gt; [Geometry Builder] -&gt; [Sidechain Packer] -&gt; [Energy Minimizer] -&gt; [PDB File]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>             ^                  |                    |                      |
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>             |                                       |                      |
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>             +---------------------------------------+----------------------+
 </span></code></pre></div>
 
 
