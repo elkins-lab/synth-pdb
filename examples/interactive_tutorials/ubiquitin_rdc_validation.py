@@ -1,24 +1,23 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # # 🔬 Validating Synthetic RDCs against Experimental NMR Data
 # ### Using Ubiquitin (PDB: 1D3Z) and Published Restraints
-# 
+#
 # ---
-# 
+#
 # ## 🎯 Academic Context & The Q-Factor
 # To prove a computational physics engine is accurately predicting biological observables, we must benchmark it against "gold-standard" experimental data.
-# 
+#
 # In NMR, **Residual Dipolar Couplings (RDCs)** provide highly precise long-range orientational restraints. They describe the angle between an internuclear bond vector (like N-H) and the external magnetic field.
-# 
+#
 # The standard metric for evaluating the agreement between a theoretical 3D structural model and experimental RDCs is the **Cornilescu Q-factor** (*J Biomol NMR*, 1998):
-# 
+#
 # $$ Q = \frac{RMS(D_{exp} - D_{calc})}{RMS(D_{exp})} $$
-# 
+#
 # - **Q < 0.20** indicates excellent agreement (typical of high-resolution structures refined against RDCs).
 # - **Q < 0.35** indicates a fundamentally correct fold but with local geometric inaccuracies.
 # - **Q > 0.50** indicates severe structural errors or an incorrect fold.
-# 
+#
 # In this notebook, we will calculate the Q-factor of `synth-pdb`'s internal geometry engine against published experimental data for Ubiquitin, proving our synthetic structural physics are grounded in reality.
 
 # In[ ]:
@@ -42,7 +41,7 @@ print('✅ Environment configured!')
 
 
 # ## 1. Downloading the Experimental Data
-# 
+#
 # We need two pieces of data:
 # 1. **The 3D coordinates** for Ubiquitin (PDB ID: 1D3Z).
 # 2. **The experimental NMR restraints** containing the measured RDCs.
@@ -69,19 +68,21 @@ print("✅ Experimental data downloaded.")
 
 
 # ## 2. Parsing the Experimental RDCs
-# 
+#
 # The PDB restraints are formatted in older XPLOR/CNS syntaxes. We extract the N-H dipole couplings specifically from the bicelles alignment medium (`DipolarCouplings.HN-N.tbl`).
 
 # In[ ]:
 
 
 import re
+
 import numpy as np
 import pandas as pd
 
+
 def extract_nh_rdcs_from_xplor(filepath):
     """Extract N-H RDCs from the 1D3Z XPLOR/CNS restraint file."""
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
 
     # Extract the block containing N-H RDCs in bicelles
@@ -122,7 +123,7 @@ df_rdc.head()
 
 
 # ## 3. Calculating Synthetic RDCs with `synth-pdb`
-# 
+#
 # We now feed the experimental 1D3Z structural coordinates into `synth_pdb` to map the biophysics. We calculate theoretical RDCs using an alignment tensor mathematically fitted to the 1D3Z structure.
 
 # In[ ]:
@@ -198,14 +199,14 @@ Sxx, Syy, Szz = eigenvalues[idx_sort]
 Da = Szz / 2.0
 R = (Sxx - Syy) / Szz
 
-print(f"SVD Tensor Fitting Complete!")
+print("SVD Tensor Fitting Complete!")
 print(f"Fitted Axial Component (Da): {Da:.2f} Hz")
 print(f"Fitted Rhombicity (R): {R:.3f}")
 
 # Now calculate the theoretical RDCs using this exact fitted tensor
 from synth_nmr.rdc import calculate_rdcs
 
-# Note: The 'calculate_rdcs' function expects the PDB to be oriented such that 
+# Note: The 'calculate_rdcs' function expects the PDB to be oriented such that
 # its coordinates align with the principal axes of the tensor.
 # Since we just found the principal axes (eigenvectors), we must rotate the structure!
 
@@ -227,7 +228,7 @@ print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
 
 
 # ## 4. Q-Factor Validation & Correlation
-# 
+#
 # Let's calculate the Cornilescu Q-factor and standard Pearson's $R$ to evaluate the synthetic engine's performance.
 
 # In[ ]:
@@ -262,7 +263,7 @@ plt.ylabel("synth-pdb Calculated RDC $D_{HN}$ (Hz)", fontsize=12)
 
 # Annotate stats
 bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
-plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}", 
+plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
          fontsize=12, bbox=bbox_props, family='monospace')
 
 plt.grid(alpha=0.2)

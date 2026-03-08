@@ -1,19 +1,21 @@
 import re
+
 import pandas as pd
+
 
 def extract_nh_rdcs_from_xplor(filepath):
     """Extract N-H RDCs from the 1D3Z XPLOR/CNS restraint file."""
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
-    
+
     start_idx = content.find('!!! DipolarCouplings.HN-N.tbl\n')
     end_idx = content.find('!!! DipolarCouplings.HN-CO.tbl\n', start_idx)
-    
+
     rdc_block = content[start_idx:end_idx if end_idx != -1 else len(content)]
-    
+
     rdc_data = []
     lines = rdc_block.split('\n')
-    
+
     current_res = None
     for line in lines:
         if 'HN' in line and 'and name' in line:
