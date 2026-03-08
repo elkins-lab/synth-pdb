@@ -100,6 +100,17 @@ class EnergyMinimizer:
         if not HAS_OPENMM:
             return
 
+        # Normalize string inputs from CLI (e.g. "obc2") to OpenMM names ("app.OBC2")
+        if isinstance(solvent_model, str) and solvent_model.lower() in [
+            "obc2",
+            "obc1",
+            "gbn",
+            "gbn2",
+            "hct",
+        ]:
+            name_map = {"obc2": "OBC2", "obc1": "OBC1", "gbn": "GBn", "gbn2": "GBn2", "hct": "HCT"}
+            solvent_model = f"app.{name_map[solvent_model.lower()]}"
+
         # Robust Validation
         valid_implicit = ["app.OBC2", "app.OBC1", "app.GBn", "app.GBn2", "app.HCT"]
         if (
@@ -112,6 +123,14 @@ class EnergyMinimizer:
 
         if box_size <= 0:
             raise ValueError("box_size must be positive (nm).")
+
+        if solvent_model == "explicit" and box_size <= 1.0:
+            logger.warning(
+                f"Explicit solvent box_size ({box_size} nm) is dangerously small. "
+                f"OpenMM requires the box to be at least twice the nonbonded cutoff (1.0 nm). "
+                f"Increasing box_size to 1.1 nm to prevent NonbondedForce creation errors."
+            )
+            box_size = 1.1
 
         self.forcefield_name = forcefield_name
         self.water_model = "amber14/tip3pfb.xml"

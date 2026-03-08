@@ -1236,6 +1236,9 @@ def _do_energy_minimization(
     cyclic: bool,
     equilibrate: bool,
     equilibrate_steps: int,
+    solvent_model: str,
+    solvent_padding: float,
+    keep_solvent: bool,
 ) -> Tuple[Optional[str], struc.AtomArray]:
     """Run OpenMM energy minimization (or MD equilibration) and return results.
 
@@ -1278,7 +1281,9 @@ def _do_energy_minimization(
             pdb_file_write.set_structure(peptide_to_save)
             pdb_file_write.write(input_pdb_path)
 
-            minimizer = EnergyMinimizer(forcefield_name=forcefield)
+            minimizer = EnergyMinimizer(
+                forcefield_name=forcefield, solvent_model=solvent_model, box_size=solvent_padding
+            )
             current_disulfides = _detect_disulfide_bonds(peptide)
 
             if equilibrate:
@@ -1313,6 +1318,30 @@ def _do_energy_minimization(
 
             pdb_file_read = pdb.PDBFile.read(output_pdb_path)
             peptide = pdb_file_read.get_structure(model=1)
+
+            # EDUCATIONAL NOTE - Explicit Solvent Pruning:
+            # When researchers request explicit solvent (TIP3P), OpenMM simulates the peptide
+            # floating in a dense box of thousands of water molecules.
+            # While this is biophysically accurate during minimization, leaving 10,000+
+            # waters in a PDB makes it extraordinarily difficult to parse or feed into AI models.
+            #
+            # Thus, if the user did not specify --keep-solvent, we programmatically strip
+            # out the explicit water molecules (HOH residue name) here, leaving only the
+            # high-quality, physics-refined protein coordinates.
+            if solvent_model == "explicit" and not keep_solvent:
+                logger.info(
+                    "Stripping thousands of explicit water molecules (HOH) from the final structure for a cleaner PDB..."
+                )
+                peptide = peptide[peptide.res_name != "HOH"]
+
+                # We also need to regenerate the atomic_and_ter_content from the pruned peptide,
+                # otherwise the raw OpenMM output string (with full water box) will be saved!
+                peptide.atom_id = np.arange(1, peptide.array_length() + 1)
+                pdb_file_out = pdb.PDBFile()
+                pdb_file_out.set_structure(peptide)
+                string_io = io.StringIO()
+                pdb_file_out.write(string_io)
+                atomic_and_ter_content = string_io.getvalue()
 
             # RESTORE PTM NAMES (Fix for "Missing Orange Balls"):
             # OpenMM reverted SEP→SER etc.; restore for downstream viewers.
@@ -1481,6 +1510,9 @@ def generate_pdb_content(
     optimize_sidechains: bool = False,
     minimize_energy: bool = False,
     forcefield: str = "amber14-all.xml",
+    solvent_model: str = "obc2",
+    solvent_padding: float = 1.0,
+    keep_solvent: bool = False,
     seed: Optional[int] = None,
     ph: float = 7.4,
     cap_termini: bool = False,
@@ -1648,6 +1680,9 @@ def generate_pdb_content(
             cyclic,
             equilibrate,
             equilibrate_steps,
+            solvent_model,
+            solvent_padding,
+            keep_solvent,
         )
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records

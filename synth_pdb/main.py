@@ -214,6 +214,25 @@ def main() -> None:
         help="Forcefield to use for minimization (default: amber14-all.xml).",
     )
 
+    parser.add_argument(
+        "--solvent",
+        type=str,
+        default="obc2",
+        choices=["obc2", "obc1", "gbn", "gbn2", "hct", "explicit"],
+        help="Solvent model for energy minimization and MD.",
+    )
+    parser.add_argument(
+        "--solvent-padding",
+        type=float,
+        default=1.0,
+        help="Padding distance (nm) for the explicit water box (default: 1.0).",
+    )
+    parser.add_argument(
+        "--keep-solvent",
+        action="store_true",
+        help="Retain explicit water (HOH) molecules in the final PDB. Default is to strip them.",
+    )
+
     # Phase 3: Research Utilities Arguments
     # Using 'mode' argument to distinguish workflows without breaking BC (default is 'generate')
     parser.add_argument(
@@ -823,6 +842,9 @@ def main() -> None:
                 optimize_sidechains=args.optimize,
                 minimize_energy=args.minimize,
                 forcefield=args.forcefield,
+                solvent_model=args.solvent,
+                solvent_padding=args.solvent_padding,
+                keep_solvent=args.keep_solvent,
                 seed=args.seed,
                 ph=args.ph,
                 cap_termini=args.cap_termini,

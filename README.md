@@ -478,9 +478,20 @@ my_training_data/
 #### **Physics & Advanced Refinement **
 
 - `--minimize`: Run physics-based energy minimization (OpenMM).
-  - Uses implicit solvent (OBC2) and AMBER forcefield.
+  - Defaults to implicit solvent (OBC2) and AMBER forcefield.
   - Highly recommended for "realistic" geometry.
   - Example: `--minimize`
+
+- `--solvent <MODEL>`: Specify the solvent model for minimization/equilibration.
+  - Options: `obc2` (default), `obc1`, `gbn`, `gbn2`, `hct`, `explicit`
+  - Example: `--solvent explicit` (simulates a TIP3P water box)
+
+- `--solvent-padding <FLOAT>`: Padding distance (in nm) for the explicit water box.
+  - Default: `1.0`
+  - Example: `--solvent-padding 1.5`
+
+- `--keep-solvent`: Retain the generated water molecules (HOH) in the final PDB file.
+  - Default: False (water is stripped for cleaner outputs)
 
 - `--optimize`: Run Monte Carlo side-chain optimization.
   - Reduces steric clashes by rotating side chains.
@@ -687,6 +698,25 @@ synth-pdb --length 15 --guarantee-valid --max-attempts 200 --output valid.pdb
 
 # Best of 50 attempts
 synth-pdb --length 20 --best-of-N 50 --output best_structure.pdb
+```
+
+#### Explicit Solvent & Hardware Testing
+
+Simulate your protein in a realistic water box (TIP3P) for high-fidelity physics or export the explicit solvent map for downstream molecular dynamics.
+
+```bash
+# Basic explicit solvent: generate a small peptide and pad with 1.2 nm of water.
+# By default, synth-pdb strips the water atoms before saving the final clean PDB.
+synth-pdb --sequence ALA-PRO-GLY --minimize --solvent explicit --solvent-padding 1.2 --output small_peptide.pdb
+
+# Retain the water box: save the entire simulated system (protein + thousands of HOH atoms)
+synth-pdb --sequence TRP-TYR-PHE --minimize --solvent explicit --solvent-padding 1.5 --keep-solvent --output full_water_box.pdb
+
+# 🚀 EXTREME Hardware Limit Test
+# Generate a large 50-residue sequence, bury it in a massive 2.5 nm water box, 
+# and run 10,000 steps of Langevin Dynamics equilibration.
+# WARNING: This will generate >50,000 atoms and heavily tax your CPU/GPU!
+synth-pdb --length 50 --conformation random --minimize --equilibrate --md-steps 10000 --solvent explicit --solvent-padding 2.5 --keep-solvent --output extreme_limit_test.pdb
 ```
 
 ## ML Integration (AI Research)
