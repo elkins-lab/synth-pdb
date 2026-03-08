@@ -53,6 +53,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 random_linear_peptide_*.pdb
+custom_peptide_*.pdb
 test_*.pdb
 1UBQ.pdb
 decoys/

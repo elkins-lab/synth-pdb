@@ -248,6 +248,21 @@ class EnergyMinimizer:
             cyclic: Whether to apply head-to-tail peptide bond constraints.
             disulfides: Optional list of (res1, res2) indices for SSBOND constraints.
             coordination: Optional list of (ion_name, [res_indices]) for metal constraints.
+            
+        ### Educational Note - Thermal Equilibration:
+        -------------------------------------------
+        After finding a local energy minimum (where atoms are perfectly still at 0 K),
+        we need to bring the system up to "room temperature" (300 K).
+        
+        We "heat" the system by assigning random velocities to all atoms according
+        to a Maxwell-Boltzmann distribution for 300 K. We then simulate the Newtonian
+        equations of motion over time (F = ma).
+        
+        This step allows the protein to "settle" and find a stable dynamic average
+        structure rather than being trapped in a rigid unnatural minimum. In NMR,
+        the true structure is an ensemble of these room-temperature states, not
+        a single frozen snapshot.
+
         Returns:
             True if successful.
         """
@@ -972,7 +987,19 @@ class EnergyMinimizer:
         """
         topology, positions = modeller.topology, modeller.positions
 
-        # EDUCATIONAL NOTE - Anatomy of a Forcefield:
+        # EDUCATIONAL NOTE - System Creation & Solvent Handling:
+        # ----------------------------------------------------
+        # The `createSystem` method is the heaviest computation here. It maps every atom in our
+        # Topology to a set of parameters (charge, radius, mass) defined in the Amber XML files.
+        #
+        # For implicit solvent (like OBC2), it also calculates the 'Born Radii' for every atom,
+        # which determines how shielded they are from the water dielectric.
+        sys_kwargs: Dict[str, Any] = {
+            "nonbondedMethod": app.NoCutoff if self.solvent_model != "explicit" else app.PME,
+            "nonbondedCutoff": 1.0 * unit.nanometers,
+            "constraints": app.HBonds,  # Constrain H-bonds to allow 2fs timestep
+            "rigidWater": True,
+        }
         # A forcefield (like Amber14) approximates the potential energy (U) of a
         # molecule as a sum of four main terms:
         #   U = U_bond + U_angle + U_torsion + [U_vdw + U_elec]
@@ -1223,6 +1250,33 @@ class EnergyMinimizer:
         # speed. If none are available, OpenMM falls back to the CPU reference
         # platform, which is correct but slower. Mixed precision is used for
         # GPU platforms to balance accuracy and throughput.
+        #
+        # EDUCATIONAL NOTE - Thermodynamic Ensembles & Integrators:
+        # ---------------------------------------------------------
+        # When we simulate a protein, we must choose which thermodynamic variables to hold constant.
+        # The choice of "Ensemble" dictates how the integrator manages the system over time.
+        # 
+        # 1. NVE (Microcanonical Ensemble):
+        #    - Constant: Number of particles (N), Volume (V), Energy (E).
+        #    - Integrator: Verlet Integrator.
+        #    - Realism: Poor for lab conditions, but conserves energy perfectly.
+        #
+        # 2. NVT (Canonical Ensemble) <-- **What we use here!**:
+        #    - Constant: Number of particles (N), Volume (V), Temperature (T).
+        #    - Integrator: Langevin Integrator (or Andersen thermostat).
+        #    - Realism: Good. The Langevin collision frequency (friction, 1.0/ps here) mimics the viscosity 
+        #               of water, randomly kicking atoms to maintain kinetic energy (T=300K) while 
+        #               dragging on them to prevent explosions.
+        #
+        # 3. NPT (Isothermal-Isobaric Ensemble):
+        #    - Constant: Number of particles (N), Pressure (P), Temperature (T).
+        #    - Integrator: Langevin Integrator + Monte Carlo Barostat.
+        #    - Realism: Best for replicating a test tube on a lab bench.
+        #
+        # Note on Timesteps: We use a 2.0 femtosecond (0.002 ps) timestep. 
+        # Bonds involving hydrogen vibrate with a period of ~10 fs. 
+        # A 2 fs timestep is only stable because we passed `app.HBonds` to `constraints` earlier, 
+        # which rigidly locks all R-H bond lengths, removing the fastest vibrations from the system.
         # Build Simulation
         integrator = mm.LangevinIntegrator(
             300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
@@ -1356,6 +1410,22 @@ class EnergyMinimizer:
                 logger.error("OpenMM returned empty positions! Topology might be corrupted.")
                 return False
 
+            # EDUCATIONAL NOTE - The Importance of Metadata Restoration:
+            # --------------------------------------------------------------
+            # During the preprocessing steps, we violently mutated the input structure
+            # to make it compatible with the Amber forcefield:
+            # 1. Phosphorylation (SEP, TPO) -> Dephosphorylated L-amino acids.
+            # 2. D-Amino Acids (DAL, DTR) -> L-Amino Acids (ALA, TRP).
+            # 3. Metal Ions (Zn2+, Ca2+) -> Stripped and stored.
+            # 4. Cyclic Peptides -> Bonded, with terminal oxygens purged.
+            #
+            # If we exported the file right now, the user would lose all their special
+            # chemistry. This `_finalize_output` step carefully puts everything back
+            # the way it was, using the `original_metadata` dictionary as a guide.
+            # This ensures that down-stream analysis pipelines (like PyMOL, CYANA, or 3Dmol.js)
+            # see the correct chemical identities, even though OpenMM treated them
+            # as standard amino acids for the minimization.
+            #
             # EDUCATIONAL NOTE - Serialization:
             # -------------------------------------------------------
             # After physics completes, we must "tidy up" our synthetic hack.
@@ -1371,6 +1441,13 @@ class EnergyMinimizer:
                 if res_key in original_metadata:
                     res.name = original_metadata[res_key]["name"]
                     res.id = original_metadata[res_key]["id"]
+                    
+            # EDUCATIONAL NOTE - Disulfide Mapping:
+            # -------------------------------------
+            # OpenMM's PDBFile writer doesn't output SSBOND records automatically.
+            # We must explicitly write them to the PDB Header so that parsers
+            # (and visualizers like PyMOL) know that the SG atoms are covalently linked,
+            # rather than just displaying them as physically close.
 
             if added_bonds:
                 for s, (id1, id2) in enumerate(added_bonds, 1):
@@ -1383,6 +1460,12 @@ class EnergyMinimizer:
                         pass
 
             # Build PDB buffer
+            # EDUCATIONAL NOTE - PDB Atom Sorting:
+            # ------------------------------------
+            # The Protein Data Bank (PDB) format is heavily standardized. Many parsers
+            # will crash if atoms are out of order, or if CONECT records reference
+            # non-existent serial numbers. We use a precise formatting string to ensure
+            # the output precisely matches the PDB v3.3 spec.
             pdb_buffer = _io.StringIO()
             app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
             pdb_lines = pdb_buffer.getvalue().split("\n")
