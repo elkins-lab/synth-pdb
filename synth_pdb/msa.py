@@ -64,7 +64,7 @@ class CoevolutionModel:
         
         self._build_physical_couplings(base_sequence)
 
-    def _build_physical_couplings(self, base_sequence: str):
+    def _build_physical_couplings(self, base_sequence: str) -> None:
         """
         Constructs the J_ij coupling matrix based on simplified sterics.
         If residues closely pack in 3D space, massive-massive combinations are penalized (steric clash).
@@ -134,7 +134,7 @@ class MetropolisHastingsSampler:
         self.current_sequence = ""
         self.current_energy = 0.0
 
-    def start(self, base_sequence: str):
+    def start(self, base_sequence: str) -> None:
         """Initialize the MCMC chain."""
         self.current_sequence = base_sequence
         self.current_energy = self.model.calculate_energy(base_sequence)
@@ -155,9 +155,9 @@ class MetropolisHastingsSampler:
         if current_aa == new_aa:
             return False
             
-        proposed_seq = list(self.current_sequence)
-        proposed_seq[site] = new_aa
-        proposed_seq = "".join(proposed_seq)
+        proposed_seq_list = list(self.current_sequence)
+        proposed_seq_list[site] = new_aa
+        proposed_seq = "".join(proposed_seq_list)
         
         # 2. Evaluate energetic change
         proposed_energy = self.model.calculate_energy(proposed_seq)
