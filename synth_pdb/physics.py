@@ -257,7 +257,7 @@ class EnergyMinimizer:
         We "heat" the system by assigning random velocities to all atoms according
         to a Maxwell-Boltzmann distribution for 300 K. We then simulate the Newtonian
         equations of motion over time (F = ma).
-        
+
         This step allows the protein to "settle" and find a stable dynamic average
         structure rather than being trapped in a rigid unnatural minimum. In NMR,
         the true structure is an ensemble of these room-temperature states, not
@@ -994,12 +994,7 @@ class EnergyMinimizer:
         #
         # For implicit solvent (like OBC2), it also calculates the 'Born Radii' for every atom,
         # which determines how shielded they are from the water dielectric.
-        sys_kwargs: Dict[str, Any] = {
-            "nonbondedMethod": app.NoCutoff if self.solvent_model != "explicit" else app.PME,
-            "nonbondedCutoff": 1.0 * unit.nanometers,
-            "constraints": app.HBonds,  # Constrain H-bonds to allow 2fs timestep
-            "rigidWater": True,
-        }
+
         # A forcefield (like Amber14) approximates the potential energy (U) of a
         # molecule as a sum of four main terms:
         #   U = U_bond + U_angle + U_torsion + [U_vdw + U_elec]
@@ -1441,7 +1436,7 @@ class EnergyMinimizer:
                 if res_key in original_metadata:
                     res.name = original_metadata[res_key]["name"]
                     res.id = original_metadata[res_key]["id"]
-                    
+
             # EDUCATIONAL NOTE - Disulfide Mapping:
             # -------------------------------------
             # OpenMM's PDBFile writer doesn't output SSBOND records automatically.
