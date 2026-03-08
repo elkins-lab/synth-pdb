@@ -257,7 +257,7 @@ class EnergyMinimizer:
         We "heat" the system by assigning random velocities to all atoms according
         to a Maxwell-Boltzmann distribution for 300 K. We then simulate the Newtonian
         equations of motion over time (F = ma).
-
+        
         This step allows the protein to "settle" and find a stable dynamic average
         structure rather than being trapped in a rigid unnatural minimum. In NMR,
         the true structure is an ensemble of these room-temperature states, not
@@ -1441,7 +1441,7 @@ class EnergyMinimizer:
                 if res_key in original_metadata:
                     res.name = original_metadata[res_key]["name"]
                     res.id = original_metadata[res_key]["id"]
-
+                    
             # EDUCATIONAL NOTE - Disulfide Mapping:
             # -------------------------------------
             # OpenMM's PDBFile writer doesn't output SSBOND records automatically.
