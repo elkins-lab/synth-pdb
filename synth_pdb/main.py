@@ -451,10 +451,10 @@ def main() -> None:
         help="Number of sequences to generate for MSA (default: 100).",
     )
     parser.add_argument(
-        "--mutation-rate",
+        "--evolution-temp",
         type=float,
-        default=0.1,
-        help="Mutation rate per position per sequence (default: 0.1).",
+        default=1.5,
+        help="Thermal Noise of MSA MCMC evolution (default: 1.5). Higher means more sequence divergence.",
     )
 
     # Phase 13: Distogram Export (AI Trinity #3)
@@ -1064,7 +1064,7 @@ def main() -> None:
                         # NEW IMPORTS for Export
                         from .contact import compute_contact_map
                         from .distogram import calculate_distogram, export_distogram
-                        from .evolution import generate_msa_sequences, write_msa
+                        from .msa import generate_msa # NEW: Physics based generator
                         from .export import export_constraints
                         from .nef_io import (
                             write_nef_chemical_shifts,
@@ -1226,9 +1226,27 @@ def main() -> None:
 
                             # 6. MSA Generation (Phase 12)
                             if args.gen_msa:
-                                sequences = generate_msa_sequences(structure, n_seqs=args.msa_depth, mutation_rate=args.mutation_rate)
-                                msa_filename = output_filename.replace(".pdb", ".fasta")
-                                write_msa(sequences, msa_filename)
+                                logger.info(f"Generating Synthetic MSA (depth: {args.msa_depth}, temp: {args.evolution_temp})...")
+                                # 1. Extract ground-truth contact map (e.g., 8.0 Angstroms) for constraints
+                                cmap = compute_contact_map(structure, method="ca", threshold=8.0)
+                                # Convert Distogram to boolean map
+                                bool_cmap = (cmap > 0) & (cmap <= 8.0)
+                                
+                                # 2. Run Metropolis-Hastings Co-Evolution
+                                sequences = generate_msa(
+                                    base_sequence=seq_str,
+                                    contact_map=bool_cmap,
+                                    num_sequences=args.msa_depth,
+                                    temperature=args.evolution_temp,
+                                    steps_between_samples=100
+                                )
+                                
+                                # 3. Write FASTA
+                                msa_filename = args.output if args.output and args.output.endswith(".fasta") else output_filename.replace(".pdb", ".fasta")
+                                with open(msa_filename, "w") as f:
+                                    for idx, sq in enumerate(sequences):
+                                        f.write(f">seq_{idx}\n{sq}\n")
+                                        
                                 logger.info(f"Synthetic MSA generated: {os.path.abspath(msa_filename)}")
 
                             # 7. Distogram Export (Phase 13)

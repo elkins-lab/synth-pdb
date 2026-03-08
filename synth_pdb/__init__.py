@@ -2,6 +2,7 @@ import logging
 
 from synth_pdb.batch_generator import BatchedGenerator
 from synth_pdb.generator import PeptideGenerator, PeptideResult
+from synth_pdb.msa import CoevolutionModel, MetropolisHastingsSampler, generate_msa
 from synth_pdb.physics import EnergyMinimizer
 from synth_pdb.validator import PDBValidator
 
