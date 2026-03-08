@@ -9,7 +9,7 @@ import ast
 import sys
 from pathlib import Path
 
-PHYSICS = Path(__file__).parent.parent / 'synth_pdb' / 'physics.py'
+PHYSICS = Path(__file__).parent.parent / "synth_pdb" / "physics.py"
 original = PHYSICS.read_text()
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -994,7 +994,7 @@ NEW_RUN_SIM = r'''        """Internal engine. Returns final_energy if successful
 # Perform the patch
 # ─────────────────────────────────────────────────────────────────────────────
 
-START_MARKER = '    def _run_simulation(self, input_path, output_path'
+START_MARKER = "    def _run_simulation(self, input_path, output_path"
 END_MARKER = '\n        except Exception as e:\n            logger.error(f"Simulation failed: {e}", exc_info=True)\n            return None\n'
 
 start_idx = original.find(START_MARKER)
@@ -1010,19 +1010,19 @@ prefix = original[:start_idx]
 
 # Locate the docstring inside _run_simulation
 doc_start = original.find('"""', start_idx)
-doc_end   = original.find('"""', doc_start + 3) + 3
+doc_end = original.find('"""', doc_start + 3) + 3
 run_sim_signature_and_doc = original[start_idx:doc_end]
 
 suffix = original[end_idx:]
 
 new_content = (
     prefix
-    + NEW_METHODS                 # 4 new private methods
-    + '\n'
-    + run_sim_signature_and_doc   # original signature + docstring
-    + '\n'
-    + NEW_RUN_SIM                 # new ~120-line orchestrator body
-    + '\n'
+    + NEW_METHODS  # 4 new private methods
+    + "\n"
+    + run_sim_signature_and_doc  # original signature + docstring
+    + "\n"
+    + NEW_RUN_SIM  # new ~120-line orchestrator body
+    + "\n"
     + suffix
 )
 

@@ -1,4 +1,3 @@
-
 import unittest
 
 import biotite.structure as struc
@@ -40,7 +39,7 @@ class TestQualityFeatures(unittest.TestCase):
     def test_extract_features_shape(self):
         # Create a dummy atom array
         atoms = struc.AtomArray(12)
-        atoms.coord = np.zeros((12, 3)) # Dummy coords
+        atoms.coord = np.zeros((12, 3))  # Dummy coords
         atoms.atom_name = np.tile(["N", "CA", "C", "O"], 3)
         atoms.res_id = np.repeat([1, 2, 3], 4)
         atoms.res_name = np.tile(["ALA"], 12)
@@ -70,5 +69,6 @@ class TestQualityFeatures(unittest.TestCase):
         pdb_bond_len_index = 3
         self.assertTrue(features[pdb_bond_len_index] > 0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

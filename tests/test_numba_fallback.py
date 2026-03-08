@@ -11,7 +11,9 @@ class TestNumbaFallback(unittest.TestCase):
         from synth_pdb import geometry
 
         # We check if geometry.njit is callable and works as a decorator
-        def my_func(x): return x * 2
+        def my_func(x):
+            return x * 2
+
         decorated = geometry.njit(my_func)
         self.assertEqual(decorated(5), 10)
 
@@ -22,6 +24,7 @@ class TestNumbaFallback(unittest.TestCase):
     def test_relaxation_works_without_errors(self):
         """Simple smoke test for relaxation module."""
         from synth_pdb import relaxation
+
         val = relaxation.spectral_density(0.0, 1e-8, 0.85)
         self.assertGreater(val, 0)
 
@@ -30,7 +33,8 @@ class TestNumbaFallback(unittest.TestCase):
         import numpy as np
 
         from synth_pdb import chemical_shifts
-        rings = np.array([[0,0,0, 0,0,1, 1.]])
-        proton = np.array([0,0,2.])
+
+        rings = np.array([[0, 0, 0, 0, 0, 1, 1.0]])
+        proton = np.array([0, 0, 2.0])
         shift = chemical_shifts._calculate_ring_current_shift(proton, rings)
         self.assertNotEqual(shift, 0)

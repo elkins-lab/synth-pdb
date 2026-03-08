@@ -1,6 +1,11 @@
 import os
 import unittest
 
+"""
+Enforce the philosophy that the code is the textbook by checking for educational note comments.
+Also see test_comment_density.py for tests of the comment density.
+"""
+
 
 class TestDocumentationIntegrity(unittest.TestCase):
     """
@@ -13,26 +18,31 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def setUp(self):
         # Define paths relative to this test file
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.generator_path = os.path.join(self.base_dir, 'synth_pdb', 'generator.py')
-        self.bfactor_test_path = os.path.join(self.base_dir, 'tests', 'test_bfactor.py')
-        self.ramachandran_test_path = os.path.join(self.base_dir, 'tests', 'test_ramachandran.py')
-        self.decoys_path = os.path.join(self.base_dir, 'synth_pdb', 'decoys.py')
-        self.biophysics_path = os.path.join(self.base_dir, 'synth_pdb', 'biophysics.py')
-        self.physics_path = os.path.join(self.base_dir, 'synth_pdb', 'physics.py')
-        self.validator_path = os.path.join(self.base_dir, 'synth_pdb', 'validator.py')
-        self.cofactors_path = os.path.join(self.base_dir, 'synth_pdb', 'cofactors.py')
-        self.geometry_path = os.path.join(self.base_dir, 'synth_pdb', 'geometry.py')
-        self.packing_path = os.path.join(self.base_dir, 'synth_pdb', 'packing.py')
-        self.scoring_path = os.path.join(self.base_dir, 'synth_pdb', 'scoring.py')
-        self.dataset_path = os.path.join(self.base_dir, 'synth_pdb', 'dataset.py')
-        self.batch_generator_path = os.path.join(self.base_dir, 'synth_pdb', 'batch_generator.py')
-        self.data_path = os.path.join(self.base_dir, 'synth_pdb', 'data.py')
-        self.orientogram_path = os.path.join(self.base_dir, 'synth_pdb', 'orientogram.py')
-        self.special_chemistry_path = os.path.join(self.base_dir, 'synth_pdb', 'special_chemistry.py')
+        self.generator_path = os.path.join(self.base_dir, "synth_pdb", "generator.py")
+        self.bfactor_test_path = os.path.join(self.base_dir, "tests", "test_bfactor.py")
+        self.ramachandran_test_path = os.path.join(self.base_dir, "tests", "test_ramachandran.py")
+        self.decoys_path = os.path.join(self.base_dir, "synth_pdb", "decoys.py")
+        self.biophysics_path = os.path.join(self.base_dir, "synth_pdb", "biophysics.py")
+        self.physics_path = os.path.join(self.base_dir, "synth_pdb", "physics.py")
+        self.validator_path = os.path.join(self.base_dir, "synth_pdb", "validator.py")
+        self.cofactors_path = os.path.join(self.base_dir, "synth_pdb", "cofactors.py")
+        self.geometry_path = os.path.join(self.base_dir, "synth_pdb", "geometry.py")
+        self.packing_path = os.path.join(self.base_dir, "synth_pdb", "packing.py")
+        self.scoring_path = os.path.join(self.base_dir, "synth_pdb", "scoring.py")
+        self.dataset_path = os.path.join(self.base_dir, "synth_pdb", "dataset.py")
+        self.batch_generator_path = os.path.join(self.base_dir, "synth_pdb", "batch_generator.py")
+        self.data_path = os.path.join(self.base_dir, "synth_pdb", "data.py")
+        self.orientogram_path = os.path.join(self.base_dir, "synth_pdb", "orientogram.py")
+        self.special_chemistry_path = os.path.join(
+            self.base_dir, "synth_pdb", "special_chemistry.py"
+        )
+        self.rdc_path = os.path.join(self.base_dir, "synth_pdb", "rdc.py")
+        self.docking_path = os.path.join(self.base_dir, "synth_pdb", "docking.py")
+        self.main_path = os.path.join(self.base_dir, "synth_pdb", "main.py")
 
     def _check_file_contains(self, filepath, substrings):
         """Helper to assert file contains list of substrings."""
-        with open(filepath, encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             content = " ".join(f.read().split())
 
         for substring in substrings:
@@ -40,7 +50,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             self.assertIn(
                 normalized_substring,
                 content,
-                f"Missing educational note in {os.path.basename(filepath)}: '{substring[:50]}...'"
+                f"Missing educational note in {os.path.basename(filepath)}: '{substring[:50]}...'",
             )
 
     def test_decoys_educational_notes(self):
@@ -54,7 +64,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Threading",
             "Shuffling",
             "torsion errors (Drift)",
-            'EDUCATIONAL NOTE - RMSD (Root Mean Square Deviation):',
+            "EDUCATIONAL NOTE - RMSD (Root Mean Square Deviation):",
         ]
         self._check_file_contains(self.decoys_path, required_notes)
 
@@ -93,10 +103,21 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - Salt Bridges & Electrostatics:",
             "EDUCATIONAL NOTE - CYX Renaming & Thiol Stripping:",
             "EDUCATIONAL NOTE - Constraints and Macrocycles:",
-            "EDUCATIONAL NOTE - The \"Nuclear Option\" & \"Shadow Caps\":",
-            "EDUCATIONAL NOTE - Harmonic \"Pull\" Restraints & Hard Constraints:",
+            'EDUCATIONAL NOTE - The "Nuclear Option" & "Shadow Caps":',
+            'EDUCATIONAL NOTE - Harmonic "Pull" Restraints & Hard Constraints:',
             "EDUCATIONAL NOTE - Thermal Jiggling (Simulated Annealing):",
             "EDUCATIONAL NOTE - Thermal Equilibration (MD):",
+            "Educational Note - Thermal Equilibration:",
+            "find a stable dynamic average",
+            "EDUCATIONAL NOTE - System Creation & Solvent Handling:",
+            "Born Radii",
+            "EDUCATIONAL NOTE - Thermodynamic Ensembles & Integrators:",
+            "NVE",
+            "NVT",
+            "NPT",
+            "EDUCATIONAL NOTE - The Importance of Metadata Restoration:",
+            "violently mutated the input structure",
+            "EDUCATIONAL NOTE - PDB Atom Sorting:",
         ]
         self._check_file_contains(self.physics_path, required_notes)
 
@@ -110,7 +131,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Outlier",
             "Educational Note - Side Chain Packing:",
             "Backbone-Dependent Library",
-            "gauche+", "gauche-", "trans",
+            "gauche+",
+            "gauche-",
+            "trans",
             "EDUCATIONAL NOTE - Physics of the Ramachandran Plot:",
             "HARD-SPHERE STERICS",
         ]
@@ -129,7 +152,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Ensure geometry.py retains Z-Matrix and NeRF notes."""
         required_notes = [
             "EDUCATIONAL NOTE - Z-Matrix Construction",
-            "Bond Length", "Bond Angle", "Torsion/Dihedral Angle",
+            "Bond Length",
+            "Bond Angle",
+            "Torsion/Dihedral Angle",
             "EDUCATIONAL NOTE - NeRF Geometry",
             "Natural Extension Reference Frame",
             "EDUCATIONAL NOTE - SIMD & Parallel Geometry:",
@@ -150,7 +175,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Broadcasting",
             "Hardware Acceleration",
             "EDUCATIONAL NOTE - Peptidyl Chain Walk:",
-            "EDUCATIONAL NOTE - The \"Memory Wall\" in AI Training:",
+            'EDUCATIONAL NOTE - The "Memory Wall" in AI Training:',
             "PCIE Latency",
         ]
         self._check_file_contains(self.batch_generator_path, required_notes)
@@ -160,9 +185,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         required_notes = [
             "EDUCATIONAL NOTE - Engh & Huber Parameters (The Gold Standard):",
             "Gold Standard",
-            "EDUCATIONAL NOTE - Proline Sterics (The \"Proline Effect\"):",
+            'EDUCATIONAL NOTE - Proline Sterics (The "Proline Effect"):',
             "structure breaker",
-            "EDUCATIONAL NOTE - The \"Mirror Image\" World:",
+            'EDUCATIONAL NOTE - The "Mirror Image" World:',
             "EDUCATIONAL NOTE - Backbone Dependency:",
             "EDUCATIONAL NOTE - Rotamers for Non-Branched Residues:",
             "EDUCATIONAL NOTE - Aromatic Residues (PHE, TYR, TRP):",
@@ -172,8 +197,13 @@ class TestDocumentationIntegrity(unittest.TestCase):
 
     def test_packing_and_scoring_educational_notes(self):
         """Ensure packing.py and scoring.py retain optimization notes."""
-        self._check_file_contains(self.packing_path, ["EDUCATIONAL NOTE - Monte Carlo Optimization"])
-        self._check_file_contains(self.scoring_path, ["EDUCATIONAL NOTE - Steric Repulsion and Forces", "Lennard-Jones Potential"])
+        self._check_file_contains(
+            self.packing_path, ["EDUCATIONAL NOTE - Monte Carlo Optimization"]
+        )
+        self._check_file_contains(
+            self.scoring_path,
+            ["EDUCATIONAL NOTE - Steric Repulsion and Forces", "Lennard-Jones Potential"],
+        )
 
     def test_generator_educational_notes(self):
         """Ensure generator.py retains key educational blocks."""
@@ -206,7 +236,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
 
     def test_viewer_educational_notes(self):
         """Ensure viewer.py retains key educational blocks and examples."""
-        viewer_path = os.path.join(self.base_dir, 'synth_pdb', 'viewer.py')
+        viewer_path = os.path.join(self.base_dir, "synth_pdb", "viewer.py")
         required_notes = [
             "EDUCATIONAL NOTE - Why Browser-Based Visualization:",
             "EDUCATIONAL NOTE - 3Dmol.js:",
@@ -216,9 +246,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
 
     def test_readme_educational_notes(self):
         """Ensure README.md retains key academic notes."""
-        readme_path = os.path.join(self.base_dir, 'README.md')
+        readme_path = os.path.join(self.base_dir, "README.md")
         required_notes = [
-            "Academic Note - \"Amphipathic\"",
+            'Academic Note - "Amphipathic"',
             "Hydrophobic Face",
             "Hydrophilic Face",
             "Atomic Records & B-Factors",
@@ -251,7 +281,33 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL OVERVIEW - GFP Chromophore Maturation:",
             "residues Ser65, Tyr66, and Gly67",
             "nucleophilic attack",
-            "Cyclization", "Dehydration", "Oxidation",
+            "Cyclization",
+            "Dehydration",
+            "Oxidation",
             "imidazolinone ring",
         ]
         self._check_file_contains(self.special_chemistry_path, required_notes)
+
+    def test_rdc_educational_notes(self):
+        """Ensure rdc.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — What are Residual Dipolar Couplings (RDCs)?",
+        ]
+        self._check_file_contains(self.rdc_path, required_notes)
+
+    def test_docking_educational_notes(self):
+        """Ensure docking.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE: Ensure connectivity before hydrogen addition",
+        ]
+        self._check_file_contains(self.docking_path, required_notes)
+
+    def test_main_educational_notes(self):
+        """Ensure main.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — Scientific Reproducibility:",
+            "EDUCATIONAL NOTE — RDC Background:",
+            "EDUCATIONAL NOTE — Predictor Selection:",
+            "EDUCATIONAL NOTE — RDC Calculation:",
+        ]
+        self._check_file_contains(self.main_path, required_notes)

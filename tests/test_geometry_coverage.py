@@ -11,13 +11,13 @@ def test_normalize_batch():
     # normalization's safety check.
 
     # p1, p2, p3 are collinear, so the cross product will be zero.
-    p1 = np.array([[0., 0., 0.]])
-    p2 = np.array([[1., 0., 0.]])
-    p3 = np.array([[2., 0., 0.]])
+    p1 = np.array([[0.0, 0.0, 0.0]])
+    p2 = np.array([[1.0, 0.0, 0.0]])
+    p3 = np.array([[2.0, 0.0, 0.0]])
 
     bond_lengths = np.array([1.5])
-    bond_angles = np.array([90.])
-    dihedral_angles = np.array([90.])
+    bond_angles = np.array([90.0])
+    dihedral_angles = np.array([90.0])
 
     # This would fail with a division-by-zero error if not for the
     # normalization's safety check inside position_atoms_batch.
@@ -27,20 +27,15 @@ def test_normalize_batch():
     # The result will be mathematically degenerate but should not be NaN.
     assert not np.any(np.isnan(p4))
 
+
 def test_superimpose_batch_reflection():
     """Test superimpose_batch with a reflection."""
     from synth_pdb.geometry import superimpose_batch
 
-    sources = np.array([
-        [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]
-    ])
+    sources = np.array([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]])
 
     # Reflection matrix
-    reflection = np.array([
-        [1., 0., 0.],
-        [0., 1., 0.],
-        [0., 0., -1.]
-    ])
+    reflection = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, -1.0]])
 
     targets = np.matmul(sources, reflection.T)
 

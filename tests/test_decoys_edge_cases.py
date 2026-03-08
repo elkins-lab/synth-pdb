@@ -26,20 +26,25 @@ def test_decoy_rmsd_rejection(tmp_path):
         sequence=sequence,
         n_decoys=2,
         out_dir=str(out_dir),
-        rmsd_max=0.0001, # Almost identical required
-        seed=1 # Different seeds in attempts will likely create different structures
+        rmsd_max=0.0001,  # Almost identical required
+        seed=1,  # Different seeds in attempts will likely create different structures
     )
     # This might fail to find 2 decoys and return only 1 or empty after max_attempts.
     # The important part is that it hits the 'else' branch for rejected decoys.
     assert len(decoys) <= 1
+
 
 def test_extract_backbone_multi_chain():
     """Cover multi-chain backbone extraction."""
     gen = DecoyGenerator()
 
     # Create a 2-chain PDB manually
-    atom1 = struc.Atom([0,0,0], chain_id="A", res_id=1, res_name="ALA", atom_name="N", element="N")
-    atom2 = struc.Atom([1,1,1], chain_id="B", res_id=1, res_name="ALA", atom_name="N", element="N")
+    atom1 = struc.Atom(
+        [0, 0, 0], chain_id="A", res_id=1, res_name="ALA", atom_name="N", element="N"
+    )
+    atom2 = struc.Atom(
+        [1, 1, 1], chain_id="B", res_id=1, res_name="ALA", atom_name="N", element="N"
+    )
     struc.array([atom1, atom2])
 
     # Need full backbone per chain for dihedral_backbone to work without erroring on backbone gaps
@@ -66,6 +71,7 @@ def test_extract_backbone_multi_chain():
     phi, psi, omega = gen._extract_backbone_dihedrals(out.getvalue())
     assert len(phi) > 0
 
+
 def test_shuffle_empty_structure():
     """Cover shuffling of empty structure."""
     gen = DecoyGenerator()
@@ -79,6 +85,7 @@ def test_shuffle_empty_structure():
     except Exception:
         # If it fails due to biotite's strictness, it's still covered as an error path
         pass
+
 
 def test_shuffle_no_atoms():
     """Cover res_ids empty check."""

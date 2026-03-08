@@ -1,4 +1,3 @@
-
 import argparse
 import logging
 import os
@@ -46,7 +45,10 @@ def generate_dataset(n_samples=200, random_state=42):
 
     logger.info(
         "Dataset split: %d Good, %d Random, %d Distorted, %d Clashing",
-        n_good, n_bad_random, n_bad_distorted, n_bad_clash,
+        n_good,
+        n_bad_random,
+        n_bad_distorted,
+        n_bad_clash,
     )
 
     X = []
@@ -60,7 +62,9 @@ def generate_dataset(n_samples=200, random_state=42):
         if i % 10 == 0:
             logger.info("  Good %d/%d", i, n_good)
         try:
-            pdb_content = generate_pdb_content(length=20, conformation='alpha', minimize_energy=False)
+            pdb_content = generate_pdb_content(
+                length=20, conformation="alpha", minimize_energy=False
+            )
             X.append(extract_quality_features(pdb_content))
             y.append(1)
         except Exception as e:
@@ -74,7 +78,9 @@ def generate_dataset(n_samples=200, random_state=42):
         if i % 10 == 0:
             logger.info("  Random %d/%d", i, n_bad_random)
         try:
-            pdb_content = generate_pdb_content(length=20, conformation='random', minimize_energy=False)
+            pdb_content = generate_pdb_content(
+                length=20, conformation="random", minimize_energy=False
+            )
             X.append(extract_quality_features(pdb_content))
             y.append(0)
         except Exception as e:
@@ -88,7 +94,7 @@ def generate_dataset(n_samples=200, random_state=42):
         if i % 10 == 0:
             logger.info("  Distorted %d/%d", i, n_bad_distorted)
         try:
-            clean = generate_pdb_content(length=20, conformation='alpha', minimize_energy=False)
+            clean = generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
             f = io.StringIO(clean)
             struc_obj = pdb.PDBFile.read(f).get_structure(model=1)
             struc_obj.coord += rng.normal(0, 0.5, struc_obj.coord.shape)
@@ -109,7 +115,7 @@ def generate_dataset(n_samples=200, random_state=42):
         if i % 10 == 0:
             logger.info("  Clashing %d/%d", i, n_bad_clash)
         try:
-            clean = generate_pdb_content(length=20, conformation='alpha', minimize_energy=False)
+            clean = generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
             f = io.StringIO(clean)
             struc_obj = pdb.PDBFile.read(f).get_structure(model=1)
 
@@ -136,8 +142,10 @@ def generate_dataset(n_samples=200, random_state=42):
     if total_failures > 0:
         logger.warning(
             "Generation failures: Good=%d, Random=%d, Distorted=%d, Clash=%d (total=%d)",
-            failure_counts["good"], failure_counts["random"],
-            failure_counts["distorted"], failure_counts["clash"],
+            failure_counts["good"],
+            failure_counts["random"],
+            failure_counts["distorted"],
+            failure_counts["clash"],
             total_failures,
         )
     else:
@@ -171,7 +179,7 @@ def generate_dataset(n_samples=200, random_state=42):
     bad_means = []
     for i, name in enumerate(feature_names):
         good_mean = np.mean(X[y == 1][:, i]) if np.any(y == 1) else 0.0
-        bad_mean  = np.mean(X[y == 0][:, i]) if np.any(y == 0) else 0.0
+        bad_mean = np.mean(X[y == 0][:, i]) if np.any(y == 0) else 0.0
         good_means.append(good_mean)
         bad_means.append(bad_mean)
         logger.info("%-30s | %-10.4f | %-10.4f", name, good_mean, bad_mean)
@@ -183,12 +191,14 @@ def generate_dataset(n_samples=200, random_state=42):
             "Low Ramachandran separation: Good=%.1f%% vs Bad=%.1f%%. "
             "The 'random' conformation may not be sufficiently distinct. "
             "Consider reviewing the Bad class composition.",
-            good_means[rama_idx], bad_means[rama_idx],
+            good_means[rama_idx],
+            bad_means[rama_idx],
         )
     else:
         logger.info(
             "Ramachandran separation OK: Good=%.1f%% vs Bad=%.1f%%",
-            good_means[rama_idx], bad_means[rama_idx],
+            good_means[rama_idx],
+            bad_means[rama_idx],
         )
 
     return X, y
@@ -199,19 +209,16 @@ def train_model(output_path, n_samples=200):
 
     if X.ndim != 2 or X.shape[0] == 0:
         raise RuntimeError(
-            f"Feature matrix has unexpected shape {X.shape}. "
-            "Expected a non-empty 2D array."
+            f"Feature matrix has unexpected shape {X.shape}. " "Expected a non-empty 2D array."
         )
 
     logger.info("\nTraining RandomForest Classifier...")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     clf = RandomForestClassifier(
         n_estimators=100,
         max_depth=None,
-        max_features="sqrt",   # sklearn default for classifiers; explicit for clarity
+        max_features="sqrt",  # sklearn default for classifiers; explicit for clarity
         random_state=42,
     )
     clf.fit(X_train, y_train)
@@ -224,9 +231,7 @@ def train_model(output_path, n_samples=200):
     try:
         acc = accuracy_score(y_test, y_pred)
         logger.info("Accuracy: %.2f", acc)
-        report = classification_report(
-            y_test, y_pred, target_names=['Bad', 'Good'], labels=[0, 1]
-        )
+        report = classification_report(y_test, y_pred, target_names=["Bad", "Good"], labels=[0, 1])
         logger.info("\n%s", report)
     except Exception as e:
         logger.warning("Evaluation warning: %s", e)
@@ -263,11 +268,11 @@ if __name__ == "__main__":
         default="synth_pdb/quality/models/quality_filter_v1.joblib",
         help="Output path for model",
     )
+    parser.add_argument("--n-samples", type=int, default=200, help="Number of samples to generate")
     parser.add_argument(
-        "--n-samples", type=int, default=200, help="Number of samples to generate"
-    )
-    parser.add_argument(
-        "--random-state", type=int, default=42,
+        "--random-state",
+        type=int,
+        default=42,
         help="Random seed for reproducible distortion in Bad (Distorted) class",
     )
     args = parser.parse_args()

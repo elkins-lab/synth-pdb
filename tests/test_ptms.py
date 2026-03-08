@@ -1,5 +1,3 @@
-
-
 import pytest
 
 from synth_pdb.generator import generate_pdb_content
@@ -22,13 +20,12 @@ class TestPTMs:
 
     def test_phosphorylation_injection(self):
         """Test that SER/THR/TYR are converted to SEP/TPO/PTR."""
-        seq = "STY" # Serine, Threonine, Tyrosine
+        seq = "STY"  # Serine, Threonine, Tyrosine
 
         # NOTE: API not implemented yet
         try:
             pdb_content = generate_pdb_content(
-                sequence_str=seq,
-                phosphorylation_rate=1.0 # 100% conversion
+                sequence_str=seq, phosphorylation_rate=1.0  # 100% conversion
             )
         except TypeError:
             pytest.fail("generate_pdb_content() does not accept 'phosphorylation_rate' kwarg.")

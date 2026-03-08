@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 import sys
@@ -27,10 +26,11 @@ class TestQualityFilterCLI(unittest.TestCase):
         with open(self.start_pdb, "w") as f:
             f.write(pdb_content)
         with open(self.end_pdb, "w") as f:
-            f.write(pdb_content) # same content is fine for basic CLI check
+            f.write(pdb_content)  # same content is fine for basic CLI check
 
     def tearDown(self):
         import shutil
+
         shutil.rmtree(self.test_dir)
 
     def run_command(self, args):
@@ -43,12 +43,18 @@ class TestQualityFilterCLI(unittest.TestCase):
         # output will be morph_0.pdb, morph_1.pdb
 
         cmd = [
-            "--mode", "ai",
-            "--ai-op", "interpolate",
-            "--start-pdb", self.start_pdb,
-            "--end-pdb", self.end_pdb,
-            "--steps", "1",
-            "--output", "morph" # Prefix
+            "--mode",
+            "ai",
+            "--ai-op",
+            "interpolate",
+            "--start-pdb",
+            self.start_pdb,
+            "--end-pdb",
+            self.end_pdb,
+            "--steps",
+            "1",
+            "--output",
+            "morph",  # Prefix
         ]
 
         result = self.run_command(cmd)
@@ -67,28 +73,34 @@ class TestQualityFilterCLI(unittest.TestCase):
         # Check if model exists first
         model_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-            "synth_pdb", "quality", "models", "quality_filter_v1.joblib"
+            "synth_pdb",
+            "quality",
+            "models",
+            "quality_filter_v1.joblib",
         )
         if not os.path.exists(model_path):
-             print("Skipping Quality Filter CLI test because model file is missing.")
-             return
+            print("Skipping Quality Filter CLI test because model file is missing.")
+            return
 
         cmd = [
-            "--length", "5",
+            "--length",
+            "5",
             "--quality-filter",
-            "--quality-score-cutoff", "0.0",
-            "--output", "filtered.pdb"
+            "--quality-score-cutoff",
+            "0.0",
+            "--output",
+            "filtered.pdb",
         ]
 
         result = self.run_command(cmd)
 
         if result.returncode != 0:
-             # It might fail if scikit-learn not installed (but we are running this test..)
-             print("STDERR:", result.stderr)
+            # It might fail if scikit-learn not installed (but we are running this test..)
+            print("STDERR:", result.stderr)
 
         self.assertEqual(result.returncode, 0)
         self.assertTrue(os.path.exists(os.path.join(self.test_dir, "filtered.pdb")))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

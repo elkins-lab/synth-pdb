@@ -28,7 +28,7 @@ def demo_pytorch_integration():
     start_time = time.time()
 
     generator = BatchedGenerator(sequence, n_batch=n_batch)
-    batch = generator.generate_batch(drift=2.0) # Add some 'structural noise' for the model
+    batch = generator.generate_batch(drift=2.0)  # Add some 'structural noise' for the model
 
     gen_time = time.time() - start_time
     print(f"Generation Complete in {gen_time:.4f}s ({n_batch/gen_time:.1f} structures/sec)")
@@ -53,7 +53,7 @@ def demo_pytorch_integration():
                 nn.ReLU(),
                 nn.Linear(256, 64),
                 nn.ReLU(),
-                nn.Linear(64, 1) # Predict a single float (Radius of Gyration)
+                nn.Linear(64, 1),  # Predict a single float (Radius of Gyration)
             )
 
         def forward(self, x):
@@ -72,10 +72,11 @@ def demo_pytorch_integration():
     # 5. Calculate "Ground Truth" (Mean Distance from Centroid)
     # This shows how easy it is to mix PyTorch and NumPy for structural analysis
     centroid = coords_tensor.mean(dim=1, keepdim=True)
-    rg = torch.sqrt(((coords_tensor - centroid)**2).sum(dim=-1).mean(dim=1))
+    rg = torch.sqrt(((coords_tensor - centroid) ** 2).sum(dim=-1).mean(dim=1))
 
     print("Batch-wise Radius of Gyration calculated in PyTorch.")
     print(f"Mean Rg for Batch: {rg.mean().item():.2f} Å")
+
 
 if __name__ == "__main__":
     try:

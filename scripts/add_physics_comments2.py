@@ -6,7 +6,7 @@ import sys
 import tokenize
 from pathlib import Path
 
-PHYSICS = Path(__file__).parent.parent / 'synth_pdb' / 'physics.py'
+PHYSICS = Path(__file__).parent.parent / "synth_pdb" / "physics.py"
 text = PHYSICS.read_text()
 
 REPLACEMENTS = [
@@ -81,6 +81,7 @@ except SyntaxError as e:
 PHYSICS.write_text(text)
 print("SUCCESS: Written.")
 
+
 # Report new ratio
 def ratio(path):
     content = open(path).read()
@@ -89,13 +90,24 @@ def ratio(path):
     for tok in tokens:
         sl = tok.start[0]
         if tok.type == tokenize.COMMENT:
-            if tok.string.lstrip('#').strip(): cl.add(sl)
+            if tok.string.lstrip("#").strip():
+                cl.add(sl)
         elif tok.type == tokenize.STRING:
             for i, s in enumerate(tok.string.splitlines()):
-                if s.strip(): cl.add(sl+i)
-        elif tok.type not in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT, tokenize.ENDMARKER, tokenize.STRING):
+                if s.strip():
+                    cl.add(sl + i)
+        elif tok.type not in (
+            tokenize.NL,
+            tokenize.NEWLINE,
+            tokenize.INDENT,
+            tokenize.DEDENT,
+            tokenize.ENDMARKER,
+            tokenize.STRING,
+        ):
             code.add(sl)
-    return len(cl), len(code), len(cl)/max(1,len(code))
+    return len(cl), len(code), len(cl) / max(1, len(code))
+
+
 c, cd, r = ratio(PHYSICS)
 print(f"  New ratio: {r:.3f}  (comments={c}, code={cd})")
 print(f"  {'PASS ✓' if r >= 0.6 else f'FAIL — need {int(0.6*cd - c)} more'}")

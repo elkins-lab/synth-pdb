@@ -13,7 +13,9 @@ def test_energy_minimization_reduction():
     """
     # 1. Generate a raw structure (strained)
     # Use poly-alanine to ensure standard templates match easily
-    pdb_content = generate_pdb_content(sequence_str="AAAAA", conformation='alpha', optimize_sidechains=False)
+    pdb_content = generate_pdb_content(
+        sequence_str="AAAAA", conformation="alpha", optimize_sidechains=False
+    )
 
     # 2. Save to file (Stripping Hydrogens first, as generator.py does internally)
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -24,6 +26,7 @@ def test_energy_minimization_reduction():
         import io
 
         import biotite.structure.io.pdb as pdb
+
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
         heavy = structure[structure.element != "H"]
@@ -52,6 +55,7 @@ def test_energy_minimization_reduction():
         # Parse output to ensure it's valid PDB
         pdb = app.PDBFile(output_path)
         assert len(list(pdb.topology.atoms())) > 0
+
 
 def test_minimizer_class_initialization():
     minimizer = EnergyMinimizer()

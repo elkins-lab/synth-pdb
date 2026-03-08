@@ -1,4 +1,3 @@
-
 from unittest.mock import patch
 
 import biotite.structure as struc
@@ -10,19 +9,19 @@ class TestPackingCoverage:
 
     def get_dummy_peptide(self):
         # Create a simple structure
-        atoms = struc.array([
-            struc.Atom([0,0,0], atom_name="N", res_id=1, res_name="VAL"),
-            struc.Atom([1,0,0], atom_name="CA", res_id=1, res_name="VAL"),
-            struc.Atom([2,0,0], atom_name="C", res_id=1, res_name="VAL"),
-        ])
+        atoms = struc.array(
+            [
+                struc.Atom([0, 0, 0], atom_name="N", res_id=1, res_name="VAL"),
+                struc.Atom([1, 0, 0], atom_name="CA", res_id=1, res_name="VAL"),
+                struc.Atom([2, 0, 0], atom_name="C", res_id=1, res_name="VAL"),
+            ]
+        )
         return atoms
 
     def test_no_optimizable_residues(self):
         """Test early exit when no residues can be optimized."""
         # GLY has no rotamers
-        atoms = struc.array([
-            struc.Atom([0,0,0], atom_name="CA", res_id=1, res_name="GLY")
-        ])
+        atoms = struc.array([struc.Atom([0, 0, 0], atom_name="CA", res_id=1, res_name="GLY")])
         packer = SideChainPacker(steps=10)
         result = packer.optimize(atoms)
         # Should return same object
@@ -35,8 +34,8 @@ class TestPackingCoverage:
 
         # Mock dependencies to control flow
         # defined in synth_pdb.packing
-        with patch('synth_pdb.packing.ROTAMER_LIBRARY', {'VAL': [{'chi1': [180.0], 'prob': 1.0}]}):
-            with patch('synth_pdb.packing.calculate_clash_score') as mock_score:
+        with patch("synth_pdb.packing.ROTAMER_LIBRARY", {"VAL": [{"chi1": [180.0], "prob": 1.0}]}):
+            with patch("synth_pdb.packing.calculate_clash_score") as mock_score:
                 # Sequence of scores:
                 # 1. Initial: 10.0
                 # 2. Step 1 (Better): 5.0 -> Accept (Improvement)
@@ -44,7 +43,7 @@ class TestPackingCoverage:
                 # 4. Step 3 (Worse, Reject): 20.0 (diff +12.0) -> Force reject via random
                 mock_score.side_effect = [10.0, 5.0, 8.0, 20.0, 20.0]
 
-                with patch('numpy.random.random'):
+                with patch("numpy.random.random"):
                     # Logic calls random() for:
                     # 1. Selection logic (multiple calls usually)
                     # 2. Metropolis check (explicit call)
@@ -80,9 +79,9 @@ class TestPackingCoverage:
         # Or just mocking calculate_clash_score is enough if we assume other randoms don't crash.
 
         # Let's implement a deterministic flow
-        with patch('synth_pdb.packing.ROTAMER_LIBRARY', {'VAL': [{'chi1': [180.0], 'prob': 1.0}]}):
-             with patch('synth_pdb.packing.calculate_clash_score') as mock_score:
-                mock_score.side_effect = [10.0, 15.0, 15.0] # Initial, Worse
+        with patch("synth_pdb.packing.ROTAMER_LIBRARY", {"VAL": [{"chi1": [180.0], "prob": 1.0}]}):
+            with patch("synth_pdb.packing.calculate_clash_score") as mock_score:
+                mock_score.side_effect = [10.0, 15.0, 15.0]  # Initial, Worse
 
                 # We need to catch the "Worthy" random() check.
                 # If we set temp very high, probability ~ 1.0. Always Accept.
@@ -95,7 +94,7 @@ class TestPackingCoverage:
         packer = SideChainPacker(steps=1)
         peptide = self.get_dummy_peptide()
 
-        with patch('synth_pdb.packing.reconstruct_sidechain') as mock_recon:
+        with patch("synth_pdb.packing.reconstruct_sidechain") as mock_recon:
             mock_recon.side_effect = Exception("Geometry failure")
 
             # Should not crash, just log warning and continue

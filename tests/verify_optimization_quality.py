@@ -1,4 +1,3 @@
-
 import logging
 
 from synth_pdb.generator import generate_pdb_content
@@ -6,7 +5,7 @@ from synth_pdb.validator import PDBValidator
 
 
 def verify_quality():
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     logger = logging.getLogger("quality_check")
 
     # Use a challenging sequence (Helix + Beta + Turn) to stress test
@@ -20,7 +19,7 @@ def verify_quality():
         structure=structure_def,
         minimize_energy=True,
         minimization_k=10.0,
-        minimization_max_iter=0
+        minimization_max_iter=0,
     )
 
     logger.info("--- Generating OPTIMIZED Structure (Tol=100.0, MaxIter=500) ---")
@@ -29,7 +28,7 @@ def verify_quality():
         structure=structure_def,
         minimize_energy=True,
         minimization_k=100.0,
-        minimization_max_iter=1000
+        minimization_max_iter=1000,
     )
 
     # Helper to count violations
@@ -59,6 +58,7 @@ def verify_quality():
         logger.warning(f"Optimized structure has {v_opt - v_base} MORE violations than baseline!")
     else:
         logger.info("Optimized structure quality is EQUAL or BETTER than baseline.")
+
 
 if __name__ == "__main__":
     verify_quality()

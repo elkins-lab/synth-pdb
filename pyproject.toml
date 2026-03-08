@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synth-pdb"
-version = "1.23.0"
+version = "1.24.0"
 description = "Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education, and tool development"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -63,6 +63,7 @@ dev = [
     "mypy>=1.0.0",
     "pytest-mock>=3.10.0",
     "psutil>=5.9.0",
+    "pre-commit>=3.0.0",
     "scikit-learn>=1.0.0",  # for test_train_quality_filter dynamic script load
     "joblib>=1.1.0",        # for test_train_quality_filter dynamic script load
 ]

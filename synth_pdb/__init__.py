@@ -11,4 +11,4 @@ logger = logging.getLogger(__name__)
 
 logger.debug("synth_pdb package initialized.")
 
-__version__ = "1.23.0"
+__version__ = "1.24.0"

@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 import unittest
@@ -17,8 +16,12 @@ from synth_pdb.quality.interpolate import interpolate_structures
 class TestQualityModules(unittest.TestCase):
     def setUp(self):
         # Generate two simple PDBs for testing
-        self.pdb1_content = generate_pdb_content(length=10, sequence_str="AAAAAAAAAA", conformation="alpha")
-        self.pdb2_content = generate_pdb_content(length=10, sequence_str="AAAAAAAAAA", conformation="extended")
+        self.pdb1_content = generate_pdb_content(
+            length=10, sequence_str="AAAAAAAAAA", conformation="alpha"
+        )
+        self.pdb2_content = generate_pdb_content(
+            length=10, sequence_str="AAAAAAAAAA", conformation="extended"
+        )
 
         self.test_dir = tempfile.mkdtemp()
         self.pdb1_path = os.path.join(self.test_dir, "start.pdb")
@@ -37,7 +40,7 @@ class TestQualityModules(unittest.TestCase):
         self.assertEqual(len(features), len(feature_names))
         print(f"Features extraction successful. Vector shape: {features.shape}")
         # Basic checks
-        self.assertTrue(0 <= features[0] <= 100) # Rama favored %
+        self.assertTrue(0 <= features[0] <= 100)  # Rama favored %
 
     def test_classifier(self):
         print("\nTesting Quality Classifier...")
@@ -75,7 +78,9 @@ class TestQualityModules(unittest.TestCase):
 
     def tearDown(self):
         import shutil
+
         shutil.rmtree(self.test_dir)
+
 
 if __name__ == "__main__":
     unittest.main()

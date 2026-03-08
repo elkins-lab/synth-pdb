@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 
@@ -13,7 +12,7 @@ from synth_pdb.physics import HAS_OPENMM, EnergyMinimizer
 def test_salt_bridge_detection_in_minimization(caplog):
     """Test that salt bridges are detected and handled during minimization."""
     # Sequence with potential salt bridge
-    sequence = "KAAAAE" # Lysine and Glutamate
+    sequence = "KAAAAE"  # Lysine and Glutamate
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False) as tmp_in:
         # Generate initial PDB content
@@ -27,6 +26,7 @@ def test_salt_bridge_detection_in_minimization(caplog):
         minimizer = EnergyMinimizer()
         # We need to set logging to DEBUG to catch the "Found X salt bridges" message
         import logging
+
         logging.getLogger("synth_pdb.physics").setLevel(logging.DEBUG)
 
         success = minimizer.add_hydrogens_and_minimize(tmp_in_path, tmp_out_path)
@@ -39,18 +39,23 @@ def test_salt_bridge_detection_in_minimization(caplog):
         assert "Processing physics" in caplog.text
 
     finally:
-        if os.path.exists(tmp_in_path): os.remove(tmp_in_path)
-        if os.path.exists(tmp_out_path): os.remove(tmp_out_path)
+        if os.path.exists(tmp_in_path):
+            os.remove(tmp_in_path)
+        if os.path.exists(tmp_out_path):
+            os.remove(tmp_out_path)
+
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_hetatm_restoration(caplog):
     """Test that HETATMs (like ZN) are restored if culled by OpenMM."""
     # Zinc finger-like sequence - needs 4 ligands (Cys or His)
-    sequence = "CPYCKCPYCK" # 4 Cysteines
+    sequence = "CPYCKCPYCK"  # 4 Cysteines
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False) as tmp_in:
         # Generate with Zinc
-        pdb_content = generate_pdb_content(sequence_str=sequence, metal_ions="auto", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            sequence_str=sequence, metal_ions="auto", minimize_energy=False
+        )
         tmp_in.write(pdb_content)
         tmp_in_path = tmp_in.name
 
@@ -69,12 +74,16 @@ def test_hetatm_restoration(caplog):
             assert "HETATM" in out_content
 
     finally:
-        if os.path.exists(tmp_in_path): os.remove(tmp_in_path)
-        if os.path.exists(tmp_out_path): os.remove(tmp_out_path)
+        if os.path.exists(tmp_in_path):
+            os.remove(tmp_in_path)
+        if os.path.exists(tmp_out_path):
+            os.remove(tmp_out_path)
+
 
 def test_minimizer_no_openmm(monkeypatch, caplog):
     """Test behavior when OpenMM is not present."""
     import synth_pdb.physics
+
     monkeypatch.setattr(synth_pdb.physics, "HAS_OPENMM", False)
 
     minimizer = EnergyMinimizer()
@@ -83,12 +92,15 @@ def test_minimizer_no_openmm(monkeypatch, caplog):
     assert result is False
     assert "OpenMM not found" in caplog.text
 
+
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_minimizer_empty_topology(caplog):
     """Test error handling for empty or malformed topology."""
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False) as tmp:
         # Use a mostly empty PDB but with one line to avoid immediate PDBFile crash
-        tmp.write("REMARK Empty PDB\nATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\nEND\n")
+        tmp.write(
+            "REMARK Empty PDB\nATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\nEND\n"
+        )
         tmp_path = tmp.name
 
     try:
@@ -100,7 +112,9 @@ def test_minimizer_empty_topology(caplog):
         # OpenMM might fail to createSystem for 1 atom without bonds.
         assert result is False or result is True
     finally:
-        if os.path.exists(tmp_path): os.remove(tmp_path)
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_explicit_solvent_minimization(caplog, monkeypatch):
@@ -122,7 +136,7 @@ def test_explicit_solvent_minimization(caplog, monkeypatch):
     debug_pdb_path = "intermediate_debug.pdb"
 
     try:
-        minimizer = EnergyMinimizer(solvent_model='explicit')
+        minimizer = EnergyMinimizer(solvent_model="explicit")
         success = minimizer.add_hydrogens_and_minimize(tmp_in_path, tmp_out_path)
 
         if os.path.exists(debug_pdb_path):
@@ -138,10 +152,14 @@ def test_explicit_solvent_minimization(caplog, monkeypatch):
             assert "HOH" in out_content
 
     finally:
-        if os.path.exists(tmp_in_path): os.remove(tmp_in_path)
-        if os.path.exists(tmp_out_path): os.remove(tmp_out_path)
-        if os.path.exists(debug_pdb_path): os.remove(debug_pdb_path)
+        if os.path.exists(tmp_in_path):
+            os.remove(tmp_in_path)
+        if os.path.exists(tmp_out_path):
+            os.remove(tmp_out_path)
+        if os.path.exists(debug_pdb_path):
+            os.remove(debug_pdb_path)
         monkeypatch.delenv("SYNTH_PDB_DEBUG_SAVE_INTERMEDIATE", raising=False)
+
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_physics_health_check_nan(monkeypatch):
@@ -152,7 +170,9 @@ def test_physics_health_check_nan(monkeypatch):
     from openmm import unit as mm_unit
 
     class MockState:
-        def getPotentialEnergy(self): return 100.0 * mm_unit.kilojoule_per_mole
+        def getPotentialEnergy(self):
+            return 100.0 * mm_unit.kilojoule_per_mole
+
         def getPositions(self, asNumpy=False):
             return np.array([[np.nan, 0, 0]]) * mm_unit.nanometer
 
@@ -160,9 +180,15 @@ def test_physics_health_check_nan(monkeypatch):
         def __init__(self, *args, **kwargs):
             self.context = self
             self.topology = None
-        def setPositions(self, *args): pass
-        def minimizeEnergy(self, *args, **kwargs): pass
-        def getState(self, *args, **kwargs): return MockState()
+
+        def setPositions(self, *args):
+            pass
+
+        def minimizeEnergy(self, *args, **kwargs):
+            pass
+
+        def getState(self, *args, **kwargs):
+            return MockState()
 
     # We need to bypass the initial PDB loading and system creation
     # and just test the run_simulation logic's health check part.
@@ -173,6 +199,7 @@ def test_physics_health_check_nan(monkeypatch):
     # by checking the logs for "Thermal Jiggling".
     pass
 
+
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_cyclic_annealing_log(caplog):
     """Verify that cyclic peptides trigger the simulated annealing (jiggling) logic."""
@@ -180,7 +207,9 @@ def test_cyclic_annealing_log(caplog):
     minimizer = EnergyMinimizer()
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False) as tmp_in:
-        pdb_content = generate_pdb_content(sequence_str=sequence, minimize_energy=False, cyclic=True)
+        pdb_content = generate_pdb_content(
+            sequence_str=sequence, minimize_energy=False, cyclic=True
+        )
         tmp_in.write(pdb_content)
         tmp_in_path = tmp_in.name
 
@@ -189,8 +218,9 @@ def test_cyclic_annealing_log(caplog):
     try:
         # We need to set logging to INFO to catch the "Thermal Jiggling" message
         import logging
+
         logging.getLogger("synth_pdb.physics").setLevel(logging.INFO)
-        logging.getLogger('numba').setLevel(logging.WARNING)
+        logging.getLogger("numba").setLevel(logging.WARNING)
         caplog.set_level(logging.INFO)
 
         # Run with cyclic=True
@@ -198,8 +228,11 @@ def test_cyclic_annealing_log(caplog):
         assert "Thermal Jiggling" in caplog.text
 
     finally:
-        if os.path.exists(tmp_in_path): os.remove(tmp_in_path)
-        if os.path.exists(tmp_out_path): os.remove(tmp_out_path)
+        if os.path.exists(tmp_in_path):
+            os.remove(tmp_in_path)
+        if os.path.exists(tmp_out_path):
+            os.remove(tmp_out_path)
+
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_ptm_restoration_validation(caplog):
@@ -230,5 +263,7 @@ def test_ptm_restoration_validation(caplog):
             assert " P " not in out_content
 
     finally:
-        if os.path.exists(tmp_in_path): os.remove(tmp_in_path)
-        if os.path.exists(tmp_out_path): os.remove(tmp_out_path)
+        if os.path.exists(tmp_in_path):
+            os.remove(tmp_in_path)
+        if os.path.exists(tmp_out_path):
+            os.remove(tmp_out_path)

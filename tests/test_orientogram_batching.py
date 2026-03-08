@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from synth_pdb.orientogram import compute_6d_orientations
@@ -8,7 +7,7 @@ def test_orientations_batch_consistency():
     """Verify that orientations are identical regardless of batch size."""
     B = 4
     L = 10
-    N_atoms = L * 4 # N, CA, C, CB
+    N_atoms = L * 4  # N, CA, C, CB
 
     # Mock coordinates
     coords = np.random.randn(B, N_atoms, 3)
@@ -22,10 +21,11 @@ def test_orientations_batch_consistency():
 
     # Individual runs
     for i in range(B):
-        res_single = compute_6d_orientations(coords[i:i+1], atom_names, residue_indices, L)
+        res_single = compute_6d_orientations(coords[i : i + 1], atom_names, residue_indices, L)
 
         for key in res_full:
             np.testing.assert_allclose(res_full[key][i], res_single[key][0], atol=1e-6)
+
 
 def test_orientations_with_missing_atoms():
     """Verify orientations handle missing non-core atoms gracefully."""
@@ -42,6 +42,6 @@ def test_orientations_with_missing_atoms():
     # This should trigger virtual CB reconstruction for ALL residues
     res = compute_6d_orientations(coords, atom_names, residue_indices, L)
 
-    assert res['dist'].shape == (B, L, L)
-    assert not np.any(np.isnan(res['dist']))
-    assert not np.any(np.isnan(res['omega']))
+    assert res["dist"].shape == (B, L, L)
+    assert not np.any(np.isnan(res["dist"]))
+    assert not np.any(np.isnan(res["omega"]))

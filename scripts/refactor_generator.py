@@ -10,7 +10,7 @@ import ast
 import sys
 from pathlib import Path
 
-GENERATOR = Path(__file__).parent.parent / 'synth_pdb' / 'generator.py'
+GENERATOR = Path(__file__).parent.parent / "synth_pdb" / "generator.py"
 original = GENERATOR.read_text()
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -694,7 +694,7 @@ def _assemble_pdb_output(
 # NEW generate_pdb_content ORCHESTRATOR (replaces the 900-line body)
 # ─────────────────────────────────────────────────────────────────────────────
 
-NEW_ORCHESTRATOR = r'''
+NEW_ORCHESTRATOR = r"""
     if seed is not None:
         logger.info(f"Setting random seed to {seed} for reproducibility.")
         random.seed(seed)
@@ -759,15 +759,15 @@ NEW_ORCHESTRATOR = r'''
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records
     return _assemble_pdb_output(peptide, atomic_and_ter_content, sequence_length, cyclic)
-'''
+"""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Perform the patch
 # ─────────────────────────────────────────────────────────────────────────────
 
-START_MARKER = 'def generate_pdb_content('
-END_MARKER = '\nclass PeptideGenerator:'
+START_MARKER = "def generate_pdb_content("
+END_MARKER = "\nclass PeptideGenerator:"
 
 start_idx = original.find(START_MARKER)
 end_idx = original.find(END_MARKER)
@@ -786,7 +786,7 @@ func_def_and_docstring = original[start_idx:end_idx]
 # Find where the docstring ends (closing """) and the real body starts.
 # The body starts after the first occurrence of the closing triple-quote of the docstring.
 docstring_start = func_def_and_docstring.find('"""')
-docstring_end   = func_def_and_docstring.find('"""', docstring_start + 3) + 3
+docstring_end = func_def_and_docstring.find('"""', docstring_start + 3) + 3
 signature_and_docstring = func_def_and_docstring[:docstring_end]
 
 # The suffix is everything from class PeptideGenerator onwards
@@ -794,11 +794,11 @@ suffix = original[end_idx:]
 
 new_content = (
     prefix
-    + HELPERS.lstrip('\n')   # 5 helper functions
-    + '\n'
+    + HELPERS.lstrip("\n")  # 5 helper functions
+    + "\n"
     + signature_and_docstring  # original def + docstring preserved verbatim
-    + '\n'
-    + NEW_ORCHESTRATOR         # new 50-line body
+    + "\n"
+    + NEW_ORCHESTRATOR  # new 50-line body
     + suffix
 )
 

@@ -4,6 +4,7 @@ Tests for per-region conformation control.
 Following TDD methodology - RED PHASE.
 These tests should FAIL initially until we implement the per-region conformation feature.
 """
+
 import pytest
 
 from synth_pdb.generator import _parse_structure_regions, generate_pdb_content
@@ -17,22 +18,22 @@ class TestPerRegionConformations:
         """Test parsing simple structure specification."""
         result = _parse_structure_regions("1-10:alpha,11-20:beta", 20)
         assert len(result) == 20
-        assert all(result[i] == 'alpha' for i in range(10))
-        assert all(result[i] == 'beta' for i in range(10, 20))
+        assert all(result[i] == "alpha" for i in range(10))
+        assert all(result[i] == "beta" for i in range(10, 20))
 
     def test_parse_three_regions(self):
         """Test parsing three regions."""
         result = _parse_structure_regions("1-5:alpha,6-10:beta,11-15:extended", 15)
         assert len(result) == 15
-        assert all(result[i] == 'alpha' for i in range(5))
-        assert all(result[i] == 'beta' for i in range(5, 10))
-        assert all(result[i] == 'extended' for i in range(10, 15))
+        assert all(result[i] == "alpha" for i in range(5))
+        assert all(result[i] == "beta" for i in range(5, 10))
+        assert all(result[i] == "extended" for i in range(10, 15))
 
     def test_parse_with_random(self):
         """Test parsing with random conformation."""
         result = _parse_structure_regions("1-5:alpha,6-10:random", 10)
-        assert result[0] == 'alpha'
-        assert result[5] == 'random'
+        assert result[0] == "alpha"
+        assert result[5] == "random"
 
     def test_parse_invalid_syntax_no_colon(self):
         """Test that invalid syntax (no colon) raises ValueError."""
@@ -74,14 +75,14 @@ class TestPerRegionConformations:
         result = _parse_structure_regions("1-5:alpha,10-15:beta", 20)
         # Residues 6-9 and 16-20 are not specified
         assert len(result) == 11  # 5 alpha (1-5) + 6 beta (10-15) = 11 specified residues
-        assert all(result[i] == 'alpha' for i in range(5))
-        assert all(result[i] == 'beta' for i in range(9, 15))
+        assert all(result[i] == "alpha" for i in range(5))
+        assert all(result[i] == "beta" for i in range(9, 15))
 
     def test_generate_mixed_structure(self):
         """Test generating structure with mixed conformations."""
         pdb = generate_pdb_content(
             sequence_str="AAAAAAAAAAAAAAAAAAAA",  # Fixed 20-residue sequence
-            structure="1-10:alpha,11-20:beta"
+            structure="1-10:alpha,11-20:beta",
         )
         assert "ATOM" in pdb
 
@@ -91,7 +92,7 @@ class TestPerRegionConformations:
         assert len(atoms) > 0
 
         # Verify we have 20 CA atoms (one per residue)
-        ca_atoms = [a for a in atoms if a['atom_name'].strip() == 'CA']
+        ca_atoms = [a for a in atoms if a["atom_name"].strip() == "CA"]
         assert len(ca_atoms) == 20
 
     def test_structure_overrides_conformation(self):
@@ -99,8 +100,8 @@ class TestPerRegionConformations:
         # Use fixed sequence to ensure deterministic comparison
         pdb_with_structure = generate_pdb_content(
             sequence_str="AAAAAAAAAA",  # Fixed sequence
-            conformation='beta',  # This should be overridden
-            structure='1-10:alpha'
+            conformation="beta",  # This should be overridden
+            structure="1-10:alpha",
         )
         # Should generate a valid PDB
         lines = pdb_with_structure.splitlines()
@@ -114,15 +115,15 @@ class TestPerRegionConformations:
         """Test that gaps in structure specification use default conformation."""
         pdb = generate_pdb_content(
             length=15,
-            conformation='extended',  # Default for unspecified regions
-            structure='1-5:alpha,11-15:beta'
+            conformation="extended",  # Default for unspecified regions
+            structure="1-5:alpha,11-15:beta",
         )
         # Residues 6-10 should use 'extended' conformation
         assert "ATOM" in pdb
 
     def test_backward_compatibility_no_structure(self):
         """Test that existing --conformation still works when structure not provided."""
-        pdb = generate_pdb_content(length=10, conformation='beta')
+        pdb = generate_pdb_content(length=10, conformation="beta")
         assert "ATOM" in pdb
 
         # Should be valid
@@ -132,23 +133,24 @@ class TestPerRegionConformations:
     def test_structure_with_sequence(self):
         """Test structure parameter works with explicit sequence."""
         pdb = generate_pdb_content(
-            sequence_str="ACDEFGHIKLMNPQRSTVWY",
-            structure="1-5:alpha,6-10:beta,11-20:extended"
+            sequence_str="ACDEFGHIKLMNPQRSTVWY", structure="1-5:alpha,6-10:beta,11-20:extended"
         )
         assert "ATOM" in pdb
 
         # Verify we have 20 residues
         validator = PDBValidator(pdb)
-        ca_atoms = [a for a in validator.atoms if a['atom_name'].strip() == 'CA']
+        ca_atoms = [a for a in validator.atoms if a["atom_name"].strip() == "CA"]
         assert len(ca_atoms) == 20
 
     def test_parse_structure_regions_function_exists(self):
         """Test that _parse_structure_regions function exists."""
         from synth_pdb.generator import _parse_structure_regions
+
         assert callable(_parse_structure_regions)
 
     def test_generate_pdb_content_accepts_structure_parameter(self):
         """Test that generate_pdb_content accepts structure parameter."""
         import inspect
+
         sig = inspect.signature(generate_pdb_content)
-        assert 'structure' in sig.parameters
+        assert "structure" in sig.parameters

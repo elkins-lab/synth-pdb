@@ -51,11 +51,13 @@ class TestRDCShimImport:
         # This import will FAIL until synth_pdb/rdc.py is created — that is expected
         # for the Red phase of Red-Green-Refactor (TDD).
         from synth_pdb.rdc import calculate_rdcs  # noqa: F401
+
         assert callable(calculate_rdcs)
 
     def test_rdc_all_exports(self):
         """__all__ must include calculate_rdcs so 'from synth_pdb.rdc import *' works."""
         import synth_pdb.rdc as rdc_module
+
         assert hasattr(rdc_module, "__all__"), "rdc.py must define __all__"
         assert "calculate_rdcs" in rdc_module.__all__
 
@@ -183,9 +185,9 @@ class TestRDCPhysics:
             val = rdcs[1]
             rdc_max = 2 * da
             rdc_min = da * (-1 - 1.5 * R)
-            assert rdc_min <= val <= rdc_max, (
-                f"RDC={val:.2f} Hz outside theoretical range [{rdc_min:.2f}, {rdc_max:.2f}] Hz"
-            )
+            assert (
+                rdc_min <= val <= rdc_max
+            ), f"RDC={val:.2f} Hz outside theoretical range [{rdc_min:.2f}, {rdc_max:.2f}] Hz"
 
 
 class TestRDCEdgeCases:
@@ -211,8 +213,9 @@ class TestRDCEdgeCases:
         """
         from synth_pdb.rdc import calculate_rdcs
 
-        pro_n = struc.Atom([0, 0, 0], atom_name="N", element="N",
-                           res_id=1, res_name="PRO", chain_id="A")
+        pro_n = struc.Atom(
+            [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="PRO", chain_id="A"
+        )
         structure = struc.array([pro_n])
         rdcs = calculate_rdcs(structure, Da=10.0, R=0.5)
 
@@ -226,10 +229,12 @@ class TestRDCEdgeCases:
         from synth_pdb.rdc import calculate_rdcs
 
         # N at res 1, H at res 2 (mismatched — no H for res 1)
-        n_atom = struc.Atom([0, 0, 0], atom_name="N", element="N",
-                            res_id=1, res_name="ALA", chain_id="A")
-        h_atom = struc.Atom([0, 0, 1], atom_name="H", element="H",
-                            res_id=2, res_name="ALA", chain_id="A")
+        n_atom = struc.Atom(
+            [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="ALA", chain_id="A"
+        )
+        h_atom = struc.Atom(
+            [0, 0, 1], atom_name="H", element="H", res_id=2, res_name="ALA", chain_id="A"
+        )
         structure = struc.array([n_atom, h_atom])
         rdcs = calculate_rdcs(structure, Da=10.0, R=0.5)
 
@@ -245,11 +250,21 @@ class TestRDCEdgeCases:
         from synth_pdb.rdc import calculate_rdcs
 
         atoms = [
-            struc.Atom([0, 0, 0], atom_name="N", element="N", res_id=1, res_name="GLY", chain_id="A"),
-            struc.Atom([0, 0, 1], atom_name="H", element="H", res_id=1, res_name="GLY", chain_id="A"),
-            struc.Atom([3, 0, 0], atom_name="N", element="N", res_id=2, res_name="PRO", chain_id="A"),
-            struc.Atom([6, 0, 0], atom_name="N", element="N", res_id=3, res_name="ALA", chain_id="A"),
-            struc.Atom([6, 0, 1], atom_name="H", element="H", res_id=3, res_name="ALA", chain_id="A"),
+            struc.Atom(
+                [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="GLY", chain_id="A"
+            ),
+            struc.Atom(
+                [0, 0, 1], atom_name="H", element="H", res_id=1, res_name="GLY", chain_id="A"
+            ),
+            struc.Atom(
+                [3, 0, 0], atom_name="N", element="N", res_id=2, res_name="PRO", chain_id="A"
+            ),
+            struc.Atom(
+                [6, 0, 0], atom_name="N", element="N", res_id=3, res_name="ALA", chain_id="A"
+            ),
+            struc.Atom(
+                [6, 0, 1], atom_name="H", element="H", res_id=3, res_name="ALA", chain_id="A"
+            ),
         ]
         structure = struc.array(atoms)
         rdcs = calculate_rdcs(structure, Da=10.0, R=0.0)  # R=0 → pure axial
@@ -263,10 +278,12 @@ class TestRDCEdgeCases:
         """Return type must always be a dictionary, even for edge-case inputs."""
         from synth_pdb.rdc import calculate_rdcs
 
-        n_atom = struc.Atom([0, 0, 0], atom_name="N", element="N",
-                            res_id=1, res_name="GLY", chain_id="A")
-        h_atom = struc.Atom([0, 0, 1], atom_name="H", element="H",
-                            res_id=1, res_name="GLY", chain_id="A")
+        n_atom = struc.Atom(
+            [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="GLY", chain_id="A"
+        )
+        h_atom = struc.Atom(
+            [0, 0, 1], atom_name="H", element="H", res_id=1, res_name="GLY", chain_id="A"
+        )
         structure = struc.array([n_atom, h_atom])
         result = calculate_rdcs(structure, Da=10.0, R=0.0)
 

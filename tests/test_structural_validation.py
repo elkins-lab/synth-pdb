@@ -1,4 +1,3 @@
-
 import os
 
 import biotite.structure as struc
@@ -14,6 +13,7 @@ from synth_pdb.validator import PDBValidator
 PDB_URL = "https://files.rcsb.org/download/1UBQ.pdb"
 PDB_FILE = "1UBQ.pdb"
 
+
 @pytest.fixture(scope="module")
 def experimental_pdb():
     """
@@ -26,6 +26,7 @@ def experimental_pdb():
         with open(PDB_FILE, "w") as f:
             f.write(response.text)
     return PDB_FILE
+
 
 def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     """
@@ -50,7 +51,7 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     with open(experimental_pdb) as f:
         lines = f.readlines()
     cleaned_pdb = tmp_path / "1UBQ_cleaned.pdb"
-    with open(cleaned_pdb, 'w') as f:
+    with open(cleaned_pdb, "w") as f:
         f.writelines([l for l in lines if l.startswith("ATOM")])
 
     success = minimizer.add_hydrogens_and_minimize(str(cleaned_pdb), str(minimized_pdb))
@@ -64,8 +65,16 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     # 4. Calculate RMSD
     # Align structures first
     # We use backbone heavy atoms (N, CA, C) for alignment and RMSD
-    exp_backbone_mask = (exp_struct.atom_name == "N") | (exp_struct.atom_name == "CA") | (exp_struct.atom_name == "C")
-    min_backbone_mask = (min_struct.atom_name == "N") | (min_struct.atom_name == "CA") | (min_struct.atom_name == "C")
+    exp_backbone_mask = (
+        (exp_struct.atom_name == "N")
+        | (exp_struct.atom_name == "CA")
+        | (exp_struct.atom_name == "C")
+    )
+    min_backbone_mask = (
+        (min_struct.atom_name == "N")
+        | (min_struct.atom_name == "CA")
+        | (min_struct.atom_name == "C")
+    )
 
     exp_backbone = exp_struct[exp_backbone_mask]
     min_backbone = min_struct[min_backbone_mask]
@@ -103,7 +112,9 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
         min_backbone = struc.AtomArray(len(min_backbone_coords))
         min_backbone.coord = min_backbone_coords
 
-    assert len(exp_backbone) == len(min_backbone), f"Atom count mismatch: {len(exp_backbone)} vs {len(min_backbone)}"
+    assert len(exp_backbone) == len(
+        min_backbone
+    ), f"Atom count mismatch: {len(exp_backbone)} vs {len(min_backbone)}"
 
     superimposed, transformation = struc.superimpose(exp_backbone, min_backbone)
     rmsd = struc.rmsd(exp_backbone, superimposed)
@@ -118,7 +129,7 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     # Get residue IDs for masking
     res_ids = exp_struct[exp_struct.atom_name == "CA"].res_id
     # Mask out NaNs and the flexible C-terminus (72-76)
-    core_mask = (res_ids <= 71)
+    core_mask = res_ids <= 71
 
     # Biotite dihedrals are per-residue, so they match res_ids length
     mask = ~np.isnan(exp_phi) & ~np.isnan(min_phi) & core_mask
@@ -167,7 +178,10 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
         print(f"  Violation: {v}")
 
     # We expect 0 major violations after minimization
-    assert len(important_violations) == 0, f"Found structural violations after minimization: {important_violations}"
+    assert (
+        len(important_violations) == 0
+    ), f"Found structural violations after minimization: {important_violations}"
+
 
 def test_experimental_clash_comparison(experimental_pdb, tmp_path):
     """
@@ -191,7 +205,7 @@ def test_experimental_clash_comparison(experimental_pdb, tmp_path):
     # Minimize
     minimizer = EnergyMinimizer()
     minimized_pdb_path = tmp_path / "1UBQ_min.pdb"
-    with open(tmp_path / "exp_clean.pdb", 'w') as f:
+    with open(tmp_path / "exp_clean.pdb", "w") as f:
         f.write(cleaned_exp_pdb)
 
     minimizer.add_hydrogens_and_minimize(str(tmp_path / "exp_clean.pdb"), str(minimized_pdb_path))

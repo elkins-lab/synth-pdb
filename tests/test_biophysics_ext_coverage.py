@@ -13,7 +13,9 @@ from synth_pdb.generator import generate_pdb_content
 
 def test_docking_prep_pqr():
     # Use generator with minimization to ensure OpenMM-compatible atom sets
-    pdb_content = generate_pdb_content(sequence_str="ALA-GLY-SER", minimize_energy=True, cap_termini=True)
+    pdb_content = generate_pdb_content(
+        sequence_str="ALA-GLY-SER", minimize_energy=True, cap_termini=True
+    )
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_pdb:
         tmp_pdb.write(pdb_content)
@@ -26,13 +28,16 @@ def test_docking_prep_pqr():
             assert success
             assert os.path.exists(tmp_pqr.name)
 
+
 def test_contact_map_noe_method():
-    atoms = struc.array([
-        struc.Atom([0,0,0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),
-        struc.Atom([1,0,0], atom_name="CB", res_name="ALA", res_id=1, chain_id="A"),
-        struc.Atom([10,0,0], atom_name="CA", res_name="ALA", res_id=2, chain_id="A"),
-        struc.Atom([11,0,0], atom_name="CB", res_name="ALA", res_id=2, chain_id="A")
-    ])
+    atoms = struc.array(
+        [
+            struc.Atom([0, 0, 0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),
+            struc.Atom([1, 0, 0], atom_name="CB", res_name="ALA", res_id=1, chain_id="A"),
+            struc.Atom([10, 0, 0], atom_name="CA", res_name="ALA", res_id=2, chain_id="A"),
+            struc.Atom([11, 0, 0], atom_name="CB", res_name="ALA", res_id=2, chain_id="A"),
+        ]
+    )
     # Test NOE method (uses CB)
     cmap = compute_contact_map(atoms, method="noe")
     assert cmap.shape == (2, 2)
@@ -41,18 +46,21 @@ def test_contact_map_noe_method():
     with pytest.raises(ValueError, match="Method must be 'ca' or 'noe'"):
         compute_contact_map(atoms, method="invalid")
 
+
 def test_distogram_edge_cases():
-    atoms = struc.array([
-        struc.Atom([0,0,0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),
-        struc.Atom([10,0,0], atom_name="CA", res_name="ALA", res_id=2, chain_id="A")
-    ])
+    atoms = struc.array(
+        [
+            struc.Atom([0, 0, 0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),
+            struc.Atom([10, 0, 0], atom_name="CA", res_name="ALA", res_id=2, chain_id="A"),
+        ]
+    )
     disto = calculate_distogram(atoms, method="ca")
     assert disto.shape == (2, 2)
     assert np.allclose(disto[0, 1], 10.0)
 
     # Test CB method
     disto_cb = calculate_distogram(atoms, method="cb")
-    assert disto_cb.shape == (2, 2) # Should fall back to CA if CB missing
+    assert disto_cb.shape == (2, 2)  # Should fall back to CA if CB missing
 
     # Test unknown method
     disto_unk = calculate_distogram(atoms, method="unknown")

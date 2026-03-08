@@ -1,4 +1,3 @@
-
 import biotite.structure.io.pdb as pdb
 import numpy as np
 import pytest
@@ -26,12 +25,13 @@ class TestCyclicPeptides:
         # We use Glycine because it's flexible and easiest to cyclize.
         pdb_content = generate_pdb_content(
             sequence_str="GGGGG",
-            cyclic=True,        # <--- New Flag
-            minimize_energy=True # Required for closure
+            cyclic=True,  # <--- New Flag
+            minimize_energy=True,  # Required for closure
         )
 
         # 2. Parse
         import io
+
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
 
@@ -60,16 +60,11 @@ class TestCyclicPeptides:
         - N-terminus should NOT have H1/H2/H3 (only H).
         - C-terminus should NOT have OXT.
         """
-        pdb_content = generate_pdb_content(
-            sequence_str="GGGG",
-            cyclic=True,
-            minimize_energy=True
-        )
+        pdb_content = generate_pdb_content(sequence_str="GGGG", cyclic=True, minimize_energy=True)
 
         # Check for forbidden atoms
         assert "OXT" not in pdb_content, "Cyclic peptide should not have C-terminal Oxygen (OXT)"
         assert "H1 " not in pdb_content, "Cyclic peptide should not have N-terminal protons (H1)"
-
 
     def test_cyclic_with_proline_minimization(self):
         """Test that cyclic peptides containing Proline can be minimized without crashing."""
@@ -101,7 +96,7 @@ class TestCyclicPeptides:
         for l in reversed(atomic_lines):
             rnum = int(l[22:26].strip())
             aname = l[12:16].strip()
-            if rnum == last_res_num and aname == 'C':
+            if rnum == last_res_num and aname == "C":
                 c_serial = int(l[6:11].strip())
                 break
 

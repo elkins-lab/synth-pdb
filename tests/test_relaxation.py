@@ -7,18 +7,20 @@ from synth_pdb.relaxation import calculate_relaxation_rates, spectral_density
 
 logger = logging.getLogger(__name__)
 
+
 def test_spectral_density_function():
     """Test standard J(w) behavior."""
     # Tests that J(w) decreases with frequency
-    tau_m = 10e-9 # 10ns
-    s2 = 0.85 # Define order parameter (rigid)
+    tau_m = 10e-9  # 10ns
+    s2 = 0.85  # Define order parameter (rigid)
 
     j_0 = spectral_density(0, tau_m, s2)
     j_high = spectral_density(1e9, tau_m, s2)
 
     assert j_0 > 0
     assert j_high > 0
-    assert j_0 > j_high # Spectral density decays at high frequency
+    assert j_0 > j_high  # Spectral density decays at high frequency
+
 
 def test_relaxation_trends():
     """Test that rigid regions have different rates than flexible ones."""
@@ -36,19 +38,19 @@ def test_relaxation_trends():
         ids.extend([i, i, i])
 
     structure.res_id = np.array(ids)
-    structure.res_name = np.array(["ALA"]*15)
-    structure.atom_name = np.array(["N", "CA", "H"]*5)
+    structure.res_name = np.array(["ALA"] * 15)
+    structure.atom_name = np.array(["N", "CA", "H"] * 5)
 
     # Set seed for reproducibility of random noise
     np.random.seed(42)
 
     rates = calculate_relaxation_rates(structure, field_mhz=600, tau_m_ns=10.0)
 
-    s2_term = rates[1]['S2']
-    s2_core = rates[3]['S2']
+    s2_term = rates[1]["S2"]
+    s2_core = rates[3]["S2"]
 
-    noe_term = rates[1]['NOE']
-    noe_core = rates[3]['NOE']
+    noe_term = rates[1]["NOE"]
+    noe_core = rates[3]["NOE"]
 
     logger.info(f"Term S2: {s2_term}, Core S2: {s2_core}")
     logger.info(f"Term NOE: {noe_term}, Core NOE: {noe_core}")
@@ -62,7 +64,7 @@ def test_relaxation_trends():
     # PHYSICS NOTE:
     # Rigid (High S2) -> Larger R2 (faster transverse decay)
     # R2 ~ S2 * tau_m
-    assert rates[3]['R2'] > rates[1]['R2']
+    assert rates[3]["R2"] > rates[1]["R2"]
 
     # PHYSICS (fixed):
     # With per-residue tau_f, the fast-motion (1-S2) term breaks the S2 cancellation in
@@ -71,13 +73,13 @@ def test_relaxation_trends():
     # Reference: Lipari & Szabo (1982) J Am Chem Soc 104:4546.
     assert noe_core > noe_term
 
+
 def test_proline_exclusion():
     """Ensure Prolines are skipped (no amide proton)."""
     structure = struc.AtomArray(3)
     structure.res_id = [1, 1, 1]
     structure.res_name = ["PRO", "PRO", "PRO"]
-    structure.atom_name = ["N", "CA", "CD"] # No H
+    structure.atom_name = ["N", "CA", "CD"]  # No H
 
     rates = calculate_relaxation_rates(structure)
     assert len(rates) == 0
-

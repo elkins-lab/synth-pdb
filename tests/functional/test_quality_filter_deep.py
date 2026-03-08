@@ -1,4 +1,3 @@
-
 import io
 import unittest
 
@@ -22,7 +21,9 @@ class TestQualityFilterDeep(unittest.TestCase):
     def test_high_quality_helix(self):
         """Test that a perfect alpha helix is classified as High Quality."""
         # Generate a standard alpha helix (should be very good) - Use Poly-ALA to avoid sidechain clashes in unminimized structure
-        pdb_content = generate_pdb_content(sequence_str="A"*20, conformation="alpha", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            sequence_str="A" * 20, conformation="alpha", minimize_energy=False
+        )
 
         is_good, prob, features = self.classifier.predict(pdb_content)
 
@@ -80,8 +81,8 @@ class TestQualityFilterDeep(unittest.TestCase):
         # We'll just take the string and manually mess with coordinates
         # Or simpler: create a random point cloud
 
-        atoms = struc.AtomArray(40) # 10 residues
-        atoms.coord = np.random.rand(40, 3) * 10 # Random scatter
+        atoms = struc.AtomArray(40)  # 10 residues
+        atoms.coord = np.random.rand(40, 3) * 10  # Random scatter
         atoms.atom_name = np.tile(["N", "CA", "C", "O"], 10)
         atoms.res_id = np.repeat(range(1, 11), 4)
         atoms.res_name = np.tile(["ALA"], 40)
@@ -101,5 +102,6 @@ class TestQualityFilterDeep(unittest.TestCase):
         self.assertFalse(is_good, "Random scatter should be classified as Bad")
         self.assertLess(prob, 0.4, "Probability for random scatter should be very low")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

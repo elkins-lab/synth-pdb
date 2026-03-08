@@ -10,7 +10,7 @@ from synth_pdb.generator import generate_pdb_content
 
 def test_generate_pdb_with_torsion_drift():
     """Verify that the drift parameter influences backbone dihedrals."""
-    sequence = "AAAAAAAAAA" # 10 residues
+    sequence = "AAAAAAAAAA"  # 10 residues
 
     # Baseline: no drift (alpha conformation)
     pdb_no_drift = generate_pdb_content(sequence_str=sequence, conformation="alpha")
@@ -18,7 +18,9 @@ def test_generate_pdb_with_torsion_drift():
     # Drifted: 10 degrees drift
     # This should fail initially because 'drift' is not in the signature
     try:
-        pdb_with_drift = generate_pdb_content(sequence_str=sequence, conformation="alpha", drift=10.0, seed=42)
+        pdb_with_drift = generate_pdb_content(
+            sequence_str=sequence, conformation="alpha", drift=10.0, seed=42
+        )
     except TypeError as e:
         pytest.fail(f"generate_pdb_content does not yet support 'drift' parameter: {e}")
 
@@ -38,13 +40,14 @@ def test_generate_pdb_with_torsion_drift():
     assert not np.allclose(phi_no, phi_drift, atol=1e-3)
     assert not np.allclose(psi_no, psi_drift, atol=1e-3)
 
+
 def test_decoy_generator_threading(tmp_path):
     """Verify that threading a sequence on a template fold works."""
 
     from synth_pdb.decoys import DecoyGenerator
 
-    target_seq = "AAAAAAAAAA" # Poly-Ala
-    template_seq = "PPPPPPPPPP" # Poly-Pro (very different fold)
+    target_seq = "AAAAAAAAAA"  # Poly-Ala
+    template_seq = "PPPPPPPPPP"  # Poly-Pro (very different fold)
 
     gen = DecoyGenerator()
     out_dir = tmp_path / "hard_decoys_threading"
@@ -56,7 +59,7 @@ def test_decoy_generator_threading(tmp_path):
         out_dir=str(out_dir),
         hard_mode=True,
         template_sequence=template_seq,
-        seed=42
+        seed=42,
     )
 
     assert len(decoys) == 1
@@ -71,12 +74,13 @@ def test_decoy_generator_threading(tmp_path):
     # (Checking against a non-threaded generation is hard without exact matching,
     # but we've verified the code paths).
 
+
 def test_decoy_generator_shuffling(tmp_path):
     """Verify sequence label shuffling."""
 
     from synth_pdb.decoys import DecoyGenerator
 
-    sequence = "ACDEFGHIKL" # Unique residues
+    sequence = "ACDEFGHIKL"  # Unique residues
     gen = DecoyGenerator()
     out_dir = tmp_path / "hard_decoys_shuffling"
 
@@ -86,7 +90,7 @@ def test_decoy_generator_shuffling(tmp_path):
         out_dir=str(out_dir),
         hard_mode=True,
         shuffle_sequence=True,
-        seed=42
+        seed=42,
     )
 
     assert len(decoys) == 1
@@ -103,19 +107,17 @@ def test_decoy_generator_shuffling(tmp_path):
     structure = pdb_file.get_structure(model=1)
     assert len(structure) > 0
 
+
 def test_decoy_generator_drift_integration(tmp_path):
     """Verify drift integration in DecoyGenerator."""
     from synth_pdb.decoys import DecoyGenerator
+
     sequence = "AAAAAAAAAA"
     gen = DecoyGenerator()
     out_dir = tmp_path / "hard_decoys_drift"
 
     # Generate with high drift
     decoys = gen.generate_ensemble(
-        sequence=sequence,
-        n_decoys=1,
-        out_dir=str(out_dir),
-        drift=45.0, # Massive drift
-        seed=123
+        sequence=sequence, n_decoys=1, out_dir=str(out_dir), drift=45.0, seed=123  # Massive drift
     )
     assert len(decoys) == 1

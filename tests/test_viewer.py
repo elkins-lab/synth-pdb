@@ -1,6 +1,7 @@
 """
 Tests for 3D molecular viewer functionality.
 """
+
 import pytest
 
 from synth_pdb.generator import generate_pdb_content
@@ -86,10 +87,21 @@ class TestMolecularViewer:
         pdb_data = "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N"
 
         # Create a dummy restraint to ensure logic is populated
-        dummy_restraints = [{'chain_1': 'A', 'residue_index_1': 1, 'atom_name_1': 'HA',
-                             'chain_2': 'A', 'residue_index_2': 2, 'atom_name_2': 'H', 'dist': 3.5}]
+        dummy_restraints = [
+            {
+                "chain_1": "A",
+                "residue_index_1": 1,
+                "atom_name_1": "HA",
+                "chain_2": "A",
+                "residue_index_2": 2,
+                "atom_name_2": "H",
+                "dist": 3.5,
+            }
+        ]
 
-        html = _create_3dmol_html(pdb_data, "test.pdb", "cartoon", "spectrum", restraints=dummy_restraints)
+        html = _create_3dmol_html(
+            pdb_data, "test.pdb", "cartoon", "spectrum", restraints=dummy_restraints
+        )
 
         # Check for Ghost Mode UI and Logic
         assert "Ghost Mode" in html
@@ -138,11 +150,12 @@ class TestMolecularViewer:
     def test_ssbond_parsing(self):
         """Test parsing of SSBOND records from PDB."""
         from synth_pdb.viewer import _find_ssbonds
+
         pdb_data = "SSBOND   1 CYS A    3    CYS A   10\n"
         ssbonds = _find_ssbonds(pdb_data)
         assert len(ssbonds) == 1
-        assert ssbonds[0]['r1'] == 3
-        assert ssbonds[0]['r2'] == 10
+        assert ssbonds[0]["r1"] == 3
+        assert ssbonds[0]["r2"] == 10
 
         # Test malformed
         bad_pdb = "SSBOND   1 CYS A  XXXX   CYS A   10\n"
@@ -151,6 +164,7 @@ class TestMolecularViewer:
     def test_conect_parsing(self):
         """Test parsing of CONECT records from PDB."""
         from synth_pdb.viewer import _find_conects
+
         pdb_data = "CONECT    1    5\nCONECT    5    1\n"
         conects = _find_conects(pdb_data)
         # Should avoid duplicates
@@ -169,6 +183,7 @@ ATOM      4  O   ALA A   1       1.200   2.300   0.000  1.00  0.00           O
 ATOM      5  N   ALA A   5       2.000   1.400   3.000  1.00  0.00           N
 """
         from synth_pdb.viewer import _find_hbonds
+
         hbonds = _find_hbonds(pdb_data)
         # N at (2, 1.4, 3) and O at (1.2, 2.3, 0) -> dist approx 3.1
         assert len(hbonds) >= 1
@@ -177,10 +192,12 @@ ATOM      5  N   ALA A   5       2.000   1.400   3.000  1.00  0.00           N
         """Test different highlight styles and label generation."""
         pdb_data = "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N"
         highlights = [
-            {'start': 1, 'end': 1, 'color': 'red', 'style': 'cartoon', 'label': 'HOTSPOT'},
-            {'start': 2, 'end': 2, 'color': 'blue', 'style': 'stick'}
+            {"start": 1, "end": 1, "color": "red", "style": "cartoon", "label": "HOTSPOT"},
+            {"start": 2, "end": 2, "color": "blue", "style": "stick"},
         ]
-        html = _create_3dmol_html(pdb_data, "test.pdb", "cartoon", "spectrum", highlights=highlights)
+        html = _create_3dmol_html(
+            pdb_data, "test.pdb", "cartoon", "spectrum", highlights=highlights
+        )
 
         # Cartoon highlight
         assert "{cartoon:{color:'red'}}" in html

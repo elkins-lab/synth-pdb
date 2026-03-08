@@ -22,7 +22,7 @@ def test_decoy_generation():
             rmsd_min=0.0,
             rmsd_max=10.0,
             optimize=False,
-            minimize=False
+            minimize=False,
         )
 
         # Check count
@@ -34,6 +34,7 @@ def test_decoy_generation():
             assert os.path.getsize(path) > 0
             f = pdb.PDBFile.read(path)
             assert f.get_structure(model=1).array_length() > 0
+
 
 def test_docking_prep_pqr():
     """Verify that DockingPrep converts PDB to PQR with charges."""
@@ -47,6 +48,7 @@ def test_docking_prep_pqr():
         # Write input (stripping H to be safe, though DockingPrep adds them anyway)
         # Using Biotite to strip H
         import io
+
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
         heavy = structure[structure.element != "H"]
@@ -55,7 +57,7 @@ def test_docking_prep_pqr():
         pdb_file_heavy.set_structure(heavy)
         pdb_file_heavy.write(input_path)
 
-        prep = DockingPrep(forcefield_name='amber14-all.xml')
+        prep = DockingPrep(forcefield_name="amber14-all.xml")
         success = prep.write_pqr(input_path, output_pqr)
 
         assert success
@@ -75,4 +77,4 @@ def test_docking_prep_pqr():
 
             assert isinstance(charge, float)
             assert isinstance(radius, float)
-            assert radius > 0 # Radius must be positive
+            assert radius > 0  # Radius must be positive

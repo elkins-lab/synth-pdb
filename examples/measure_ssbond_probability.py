@@ -26,13 +26,13 @@ def measure_probability(sequence, n_trials=100):
                 sequence_str=sequence,
                 conformation="random",
                 optimize_sidechains=True,
-                minimize_energy=True
+                minimize_energy=True,
             )
 
             # Check for SSBOND
             if "SSBOND" in content:
                 ssbond_hits += 1
-                sys.stdout.write("x") # simple progress bar
+                sys.stdout.write("x")  # simple progress bar
             else:
                 sys.stdout.write(".")
             sys.stdout.flush()
@@ -47,9 +47,10 @@ def measure_probability(sequence, n_trials=100):
     print(f"Successes: {ssbond_hits}")
     print(f"Probability: {ssbond_hits/n_trials * 100:.1f}%")
 
+
 if __name__ == "__main__":
     # Test a few candidates
-    print('Testing for SSBOND in candidate sequences')
+    print("Testing for SSBOND in candidate sequences")
 
     # 'CGGC' - short flexible loop
     measure_probability("CGGC", n_trials=30)

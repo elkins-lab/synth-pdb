@@ -19,21 +19,23 @@ class TestGeneratorWithRotamers(unittest.TestCase):
         atoms = PDBValidator._parse_pdb_atoms(pdb_content)
 
         # Get the atoms for the chi-1 angle of LEU
-        leu_atoms = {atom['atom_name']: atom for atom in atoms if atom['residue_name'] == 'LEU'}
+        leu_atoms = {atom["atom_name"]: atom for atom in atoms if atom["residue_name"] == "LEU"}
 
-        self.assertIn('N', leu_atoms, "N atom not found for LEU")
-        self.assertIn('CA', leu_atoms, "CA atom not found for LEU")
-        self.assertIn('CB', leu_atoms, "CB atom not found for LEU")
-        self.assertIn('CG', leu_atoms, "CG atom not found for LEU")
+        self.assertIn("N", leu_atoms, "N atom not found for LEU")
+        self.assertIn("CA", leu_atoms, "CA atom not found for LEU")
+        self.assertIn("CB", leu_atoms, "CB atom not found for LEU")
+        self.assertIn("CG", leu_atoms, "CG atom not found for LEU")
 
         # Get coordinates
-        n_coords = leu_atoms['N']['coords']
-        ca_coords = leu_atoms['CA']['coords']
-        cb_coords = leu_atoms['CB']['coords']
-        cg_coords = leu_atoms['CG']['coords']
+        n_coords = leu_atoms["N"]["coords"]
+        ca_coords = leu_atoms["CA"]["coords"]
+        cb_coords = leu_atoms["CB"]["coords"]
+        cg_coords = leu_atoms["CG"]["coords"]
 
         # Calculate the chi-1 angle
-        chi1_angle = PDBValidator._calculate_dihedral_angle(n_coords, ca_coords, cb_coords, cg_coords)
+        chi1_angle = PDBValidator._calculate_dihedral_angle(
+            n_coords, ca_coords, cb_coords, cg_coords
+        )
 
         # Check for a reasonable chi-1 angle for LEU. Common rotamer values are around -60 and 180 degrees.
         # Accept angles in either rotamer range
@@ -42,9 +44,9 @@ class TestGeneratorWithRotamers(unittest.TestCase):
         self.assertTrue(
             is_gauche_minus or is_trans,
             f"Chi-1 angle for LEU is {chi1_angle:.1f}°, expected rotamer ranges: "
-            f"-100° to -20° (gauche-) or ±100° to ±180° (trans)"
+            f"-100° to -20° (gauche-) or ±100° to ±180° (trans)",
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

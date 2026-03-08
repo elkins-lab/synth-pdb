@@ -1,4 +1,3 @@
-
 import logging
 import os
 
@@ -14,7 +13,7 @@ def test_salt_bridge_restraint_logging(caplog):
     Verify that salt bridge restraints are detected and applied.
     We use sequence ER in alpha helical conformation.
     """
-    logging.getLogger('numba').setLevel(logging.WARNING)
+    logging.getLogger("numba").setLevel(logging.WARNING)
     caplog.set_level(logging.INFO)
 
     # E and K separated by 3 A: i, i+4 (common in helices)
@@ -34,7 +33,7 @@ def test_salt_bridge_restraint_logging(caplog):
         # If it fails to find bridge, we want to know WHY (distances).
         # We check the log for my debug prints in biophysics.py or physics.py
         log_text = caplog.text
-        print(log_text) # Show in test output
+        print(log_text)  # Show in test output
 
         assert success
         # Even if 0 found, we should see the DEBUG line
@@ -42,5 +41,7 @@ def test_salt_bridge_restraint_logging(caplog):
         # If we find 0, we'll need to adjust the test or the generator.
 
     finally:
-        if os.path.exists(input_pdb): os.remove(input_pdb)
-        if os.path.exists(output_pdb): os.remove(output_pdb)
+        if os.path.exists(input_pdb):
+            os.remove(input_pdb)
+        if os.path.exists(output_pdb):
+            os.remove(output_pdb)

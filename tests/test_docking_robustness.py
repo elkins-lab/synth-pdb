@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 
@@ -14,12 +13,15 @@ class TestDockingRobustness:
         This ensures OpenMM templates match correctly.
         """
         # Generate a small valid peptide
-        pdb_content = generate_pdb_content(length=5, sequence_str="ALA-ALA-ALA-ALA-ALA", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            length=5, sequence_str="ALA-ALA-ALA-ALA-ALA", minimize_energy=False
+        )
 
         with tempfile.TemporaryDirectory() as tmp:
             in_pdb = os.path.join(tmp, "in.pdb")
             out_pqr = os.path.join(tmp, "out.pqr")
-            with open(in_pdb, 'w') as f: f.write(pdb_content)
+            with open(in_pdb, "w") as f:
+                f.write(pdb_content)
 
             prep = DockingPrep()
             success = prep.write_pqr(in_pdb, out_pqr)
@@ -46,12 +48,15 @@ class TestDockingRobustness:
         Verify that PTMs are translated correctly by preparer before OpenMM sees them.
         """
         # ALA-ALA-SEP-ALA-ALA
-        pdb_content = generate_pdb_content(length=5, sequence_str="ALA-ALA-SEP-ALA-ALA", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            length=5, sequence_str="ALA-ALA-SEP-ALA-ALA", minimize_energy=False
+        )
 
         with tempfile.TemporaryDirectory() as tmp:
             in_pdb = os.path.join(tmp, "in.pdb")
             out_pqr = os.path.join(tmp, "out.pqr")
-            with open(in_pdb, 'w') as f: f.write(pdb_content)
+            with open(in_pdb, "w") as f:
+                f.write(pdb_content)
 
             prep = DockingPrep()
             success = prep.write_pqr(in_pdb, out_pqr)
@@ -63,7 +68,7 @@ class TestDockingRobustness:
             assert "SER" in content
             assert "SEP" not in content
 
-            atom_lines = [l for l in content.split('\n') if l.startswith("ATOM")]
+            atom_lines = [l for l in content.split("\n") if l.startswith("ATOM")]
             for l in atom_lines:
                 atom_name = l[12:16].strip()
                 assert atom_name not in ["P", "O1P", "O2P", "O3P"]

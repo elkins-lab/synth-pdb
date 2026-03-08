@@ -2,6 +2,7 @@
 Tests for conformational diversity feature.
 Following TDD methodology - these tests should fail initially.
 """
+
 import numpy as np
 import pytest
 
@@ -15,41 +16,41 @@ class TestConformationalDiversity:
 
     def test_ramachandran_presets_exist(self):
         """Test that RAMACHANDRAN_PRESETS dictionary exists in data.py."""
-        assert 'alpha' in RAMACHANDRAN_PRESETS
-        assert 'beta' in RAMACHANDRAN_PRESETS
-        assert 'extended' in RAMACHANDRAN_PRESETS
-        assert 'ppii' in RAMACHANDRAN_PRESETS
+        assert "alpha" in RAMACHANDRAN_PRESETS
+        assert "beta" in RAMACHANDRAN_PRESETS
+        assert "extended" in RAMACHANDRAN_PRESETS
+        assert "ppii" in RAMACHANDRAN_PRESETS
 
     def test_ramachandran_preset_structure(self):
         """Test that each preset has correct keys."""
         for conformation, angles in RAMACHANDRAN_PRESETS.items():
             # Check for standard presets (phi/psi)
-            if 'phi' in angles:
-                assert 'psi' in angles, f"{conformation} missing psi"
-                assert isinstance(angles['phi'], (int, float))
-                assert isinstance(angles['psi'], (int, float))
+            if "phi" in angles:
+                assert "psi" in angles, f"{conformation} missing psi"
+                assert isinstance(angles["phi"], (int, float))
+                assert isinstance(angles["psi"], (int, float))
             # Check for residue-specific presets (mean/std)
-            elif 'phi_mean' in angles:
-                assert 'phi_std' in angles
-                assert 'psi_mean' in angles
-                assert 'psi_std' in angles
+            elif "phi_mean" in angles:
+                assert "phi_std" in angles
+                assert "psi_mean" in angles
+                assert "psi_std" in angles
             # Check for region-based presets (RAMACHANDRAN_REGIONS structure)
-            elif 'favored' in angles:
-                assert isinstance(angles['favored'], list)
+            elif "favored" in angles:
+                assert isinstance(angles["favored"], list)
             else:
                 pytest.fail(f"Unknown preset format for {conformation}: {angles.keys()}")
 
     def test_alpha_helix_angles(self):
         """Test alpha helix preset has correct angles."""
-        alpha = RAMACHANDRAN_PRESETS['alpha']
-        assert alpha['phi'] == pytest.approx(-57.0, abs=1.0)
-        assert alpha['psi'] == pytest.approx(-47.0, abs=1.0)
+        alpha = RAMACHANDRAN_PRESETS["alpha"]
+        assert alpha["phi"] == pytest.approx(-57.0, abs=1.0)
+        assert alpha["psi"] == pytest.approx(-47.0, abs=1.0)
 
     def test_beta_sheet_angles(self):
         """Test beta sheet preset has correct angles."""
-        beta = RAMACHANDRAN_PRESETS['beta']
-        assert beta['phi'] == pytest.approx(-135.0, abs=5.0)
-        assert beta['psi'] == pytest.approx(135.0, abs=5.0)
+        beta = RAMACHANDRAN_PRESETS["beta"]
+        assert beta["phi"] == pytest.approx(-135.0, abs=5.0)
+        assert beta["psi"] == pytest.approx(135.0, abs=5.0)
 
     def test_default_conformation_is_alpha(self):
         """Test that default conformation is alpha helix."""
@@ -67,11 +68,7 @@ class TestConformationalDiversity:
 
     def test_generate_with_beta_conformation(self):
         """Test generating PDB with beta sheet conformation."""
-        pdb_content = generate_pdb_content(
-            length=5,
-            sequence_str="AAAAA",
-            conformation='beta'
-        )
+        pdb_content = generate_pdb_content(length=5, sequence_str="AAAAA", conformation="beta")
 
         # Should generate valid PDB
         assert "ATOM" in pdb_content
@@ -84,11 +81,7 @@ class TestConformationalDiversity:
 
     def test_generate_with_extended_conformation(self):
         """Test generating PDB with extended conformation."""
-        pdb_content = generate_pdb_content(
-            length=5,
-            sequence_str="AAAAA",
-            conformation='extended'
-        )
+        pdb_content = generate_pdb_content(length=5, sequence_str="AAAAA", conformation="extended")
 
         # Should generate valid PDB
         assert "ATOM" in pdb_content
@@ -96,11 +89,7 @@ class TestConformationalDiversity:
 
     def test_generate_with_ppii_conformation(self):
         """Test generating PDB with polyproline II conformation."""
-        pdb_content = generate_pdb_content(
-            length=5,
-            sequence_str="PPPPP",
-            conformation='ppii'
-        )
+        pdb_content = generate_pdb_content(length=5, sequence_str="PPPPP", conformation="ppii")
 
         # Should generate valid PDB
         assert "ATOM" in pdb_content
@@ -109,8 +98,8 @@ class TestConformationalDiversity:
     def test_generate_with_random_conformation(self):
         """Test generating PDB with random conformation sampling."""
         # Generate two structures with random conformations
-        pdb1 = generate_pdb_content(length=10, conformation='random')
-        pdb2 = generate_pdb_content(length=10, conformation='random')
+        pdb1 = generate_pdb_content(length=10, conformation="random")
+        pdb2 = generate_pdb_content(length=10, conformation="random")
 
         # Both should be valid
         assert "ATOM" in pdb1
@@ -133,12 +122,12 @@ class TestConformationalDiversity:
     def test_invalid_conformation_raises_error(self):
         """Test that invalid conformation name raises ValueError."""
         with pytest.raises(ValueError, match="Invalid conformation"):
-            generate_pdb_content(length=5, conformation='invalid_name')
+            generate_pdb_content(length=5, conformation="invalid_name")
 
     def test_conformation_affects_backbone_geometry(self):
         """Test that different conformations produce different backbone geometries."""
-        alpha_pdb = generate_pdb_content(length=10, sequence_str="A"*10, conformation='alpha')
-        beta_pdb = generate_pdb_content(length=10, sequence_str="A"*10, conformation='beta')
+        alpha_pdb = generate_pdb_content(length=10, sequence_str="A" * 10, conformation="alpha")
+        beta_pdb = generate_pdb_content(length=10, sequence_str="A" * 10, conformation="beta")
 
         # Parse CA coordinates
         alpha_validator = PDBValidator(alpha_pdb)
@@ -148,18 +137,19 @@ class TestConformationalDiversity:
         beta_atoms = beta_validator._parse_pdb_atoms(beta_pdb)
 
         # Get CA atoms
-        alpha_ca = [a for a in alpha_atoms if a['atom_name'].strip() == 'CA']
-        beta_ca = [a for a in beta_atoms if a['atom_name'].strip() == 'CA']
+        alpha_ca = [a for a in alpha_atoms if a["atom_name"].strip() == "CA"]
+        beta_ca = [a for a in beta_atoms if a["atom_name"].strip() == "CA"]
 
         # Calculate end-to-end distance
         alpha_distance = np.linalg.norm(
-            np.array(alpha_ca[-1]['coords']) - np.array(alpha_ca[0]['coords'])
+            np.array(alpha_ca[-1]["coords"]) - np.array(alpha_ca[0]["coords"])
         )
         beta_distance = np.linalg.norm(
-            np.array(beta_ca[-1]['coords']) - np.array(beta_ca[0]['coords'])
+            np.array(beta_ca[-1]["coords"]) - np.array(beta_ca[0]["coords"])
         )
 
         # Beta sheets are more extended than alpha helices
         # So end-to-end distance should be greater for beta
-        assert beta_distance > alpha_distance, \
-            f"Beta sheet ({beta_distance:.2f}Å) should be more extended than alpha helix ({alpha_distance:.2f}Å)"
+        assert (
+            beta_distance > alpha_distance
+        ), f"Beta sheet ({beta_distance:.2f}Å) should be more extended than alpha helix ({alpha_distance:.2f}Å)"

@@ -24,25 +24,32 @@ def generate_egf_example():
 
     sys.argv = [
         "synth_pdb",
-        "--sequence", egf_seq,
-        "--output", output_file,
-        "--conformation", "random",
+        "--sequence",
+        egf_seq,
+        "--output",
+        output_file,
+        "--conformation",
+        "random",
         "--minimize",
         "--cap-termini",
         "--gen-shifts",
         "--gen-relax",
         "--validate",
-        "--log-level", "DEBUG"
+        "--log-level",
+        "DEBUG",
     ]
 
     try:
         synth_main()
         print(f"\nSuccessfully generated EGF protein: {output_file}")
         print("Note: EGF has 3 critical disulfide bonds (C6-C20, C14-C31, C33-C42).")
-        print("The minimized structure in 'egf_protein.pdb' should have these detected and modeled.")
+        print(
+            "The minimized structure in 'egf_protein.pdb' should have these detected and modeled."
+        )
 
     except Exception as e:
         print(f"Error generating EGF: {e}")
+
 
 if __name__ == "__main__":
     generate_egf_example()

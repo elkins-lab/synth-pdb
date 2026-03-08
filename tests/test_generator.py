@@ -39,7 +39,7 @@ class TestGenerator(unittest.TestCase):
             "occupancy": float(line[54:60]),
             "temp_factor": float(line[60:66]),
             "element": line[76:78].strip(),
-            "charge": line[78:80].strip()
+            "charge": line[78:80].strip(),
         }
 
     # --- Tests for _get_sequence ---
@@ -49,9 +49,7 @@ class TestGenerator(unittest.TestCase):
             sequence = _resolve_sequence(length=length, user_sequence_str=None)
             self.assertEqual(len(sequence), length)
 
-    def test_generate_pdb_content_full_atom_backbone_geometry(
-        self
-    ):
+    def test_generate_pdb_content_full_atom_backbone_geometry(self):
         """
         Test if the N, CA, C, O backbone atom coordinates for a single residue
         adhere to the defined bond lengths and angles from data.py.
@@ -65,9 +63,9 @@ class TestGenerator(unittest.TestCase):
             temp_file_path = temp_pdb_file.name
 
         try:
-            atom_array = strucio.load_structure(temp_file_path) # Removed format="pdb"
+            atom_array = strucio.load_structure(temp_file_path)  # Removed format="pdb"
             if isinstance(atom_array, struc.AtomArrayStack):
-                atom_array = atom_array[0] # Take the first model if it's a stack
+                atom_array = atom_array[0]  # Take the first model if it's a stack
 
             # Extract coordinates for N, CA, C, O
             n_coord = atom_array[atom_array.atom_name == "N"].coord[0]
@@ -78,15 +76,21 @@ class TestGenerator(unittest.TestCase):
             # Verify bond lengths
             # N-CA bond length
             dist_n_ca = np.linalg.norm(n_coord - ca_coord)
-            self.assertAlmostEqual(dist_n_ca, BOND_LENGTH_N_CA, places=1, msg="N-CA bond length mismatch")
+            self.assertAlmostEqual(
+                dist_n_ca, BOND_LENGTH_N_CA, places=1, msg="N-CA bond length mismatch"
+            )
 
             # CA-C bond length
             dist_ca_c = np.linalg.norm(ca_coord - c_coord)
-            self.assertAlmostEqual(dist_ca_c, BOND_LENGTH_CA_C, places=1, msg="CA-C bond length mismatch")
+            self.assertAlmostEqual(
+                dist_ca_c, BOND_LENGTH_CA_C, places=1, msg="CA-C bond length mismatch"
+            )
 
             # C-O bond length
             dist_c_o = np.linalg.norm(c_coord - o_coord)
-            self.assertAlmostEqual(dist_c_o, BOND_LENGTH_C_O, places=1, msg="C-O bond length mismatch")
+            self.assertAlmostEqual(
+                dist_c_o, BOND_LENGTH_C_O, places=1, msg="C-O bond length mismatch"
+            )
 
             # Verify angles (optional, as the focus is on bond lengths here)
             # Helper to calculate angle between three points (B is vertex)
@@ -105,7 +109,7 @@ class TestGenerator(unittest.TestCase):
             calculate_angle(ca_coord, c_coord, o_coord)
             # self.assertAlmostEqual(angle_ca_c_o, ANGLE_CA_C_O, places=1, msg="CA-C-O angle mismatch")
         finally:
-            os.remove(temp_file_path) # Clean up the temporary file
+            os.remove(temp_file_path)  # Clean up the temporary file
 
     def test_get_sequence_random_empty(self):
         """Test random empty sequence request."""
@@ -124,25 +128,27 @@ class TestGenerator(unittest.TestCase):
         """Test parsing of a valid 1-letter code sequence."""
         sequence_str = "AGV"
         expected_sequence = ["ALA", "GLY", "VAL"]
-        content = generate_pdb_content(sequence_str=sequence_str) # Removed full_atom
+        content = generate_pdb_content(sequence_str=sequence_str)  # Removed full_atom
         atom_lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
         # ALA=13, GLY=10, VAL=19. Total expected for AGV was 42 with internal OXT.
         # With OXT and terminal hydrogens (H2, H3) removed from internal residues (ALA, GLY),
         # we expect (13-1-2) + (10-1-2) + 19 = 10 + 7 + 19 = 36.
         self.assertEqual(len(atom_lines), 36)
 
-        sequence = _resolve_sequence(length=0, user_sequence_str=sequence_str) # length should be ignored
+        sequence = _resolve_sequence(
+            length=0, user_sequence_str=sequence_str
+        )  # length should be ignored
         self.assertEqual(sequence, expected_sequence)
 
     def test_get_sequence_from_3_letter_code(self):
         """Test parsing of a valid 3-letter code sequence."""
         sequence_str = "ALA-GLY-VAL"
-        content = generate_pdb_content(sequence_str=sequence_str) # Removed full_atom
+        content = generate_pdb_content(sequence_str=sequence_str)  # Removed full_atom
         atom_lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
         # ALA=13, GLY=10, VAL=19. Total expected for AGV was 42 with internal OXT.
         # With OXT and terminal hydrogens (H2, H3) removed from internal residues (ALA, GLY),
         # we expect (13-1-2) + (10-1-2) + 19 = 10 + 7 + 19 = 36.
-        self.assertEqual(len(atom_lines), 36) # Check total atom lines
+        self.assertEqual(len(atom_lines), 36)  # Check total atom lines
 
     def test_reproducibility_with_seed(self):
         """Test that using a fixed seed produces identical output."""
@@ -156,17 +162,21 @@ class TestGenerator(unittest.TestCase):
         pdb2 = generate_pdb_content(sequence_str=sequence, conformation="random", seed=seed)
 
         # Run 3 (different seed)
-        pdb3 = generate_pdb_content(sequence_str=sequence, conformation="random", seed=seed+1)
+        pdb3 = generate_pdb_content(sequence_str=sequence, conformation="random", seed=seed + 1)
 
         self.assertEqual(pdb1, pdb2, "Same seed should produce identical PDB content")
-        self.assertNotEqual(pdb1, pdb3, "Different seeds should produce different PDB content (for random conformer)")
+        self.assertNotEqual(
+            pdb1,
+            pdb3,
+            "Different seeds should produce different PDB content (for random conformer)",
+        )
 
     def test_generate_pdb_content_large_scale_stress_test(self):
         """Verify that the generator handles very large proteins without JIT/Memory issues."""
         sequence = "A" * 500
         try:
             pdb_content = generate_pdb_content(sequence_str=sequence)
-            self.assertIn("ATOM   4000", pdb_content) # Should have > 4000 atoms
+            self.assertIn("ATOM   4000", pdb_content)  # Should have > 4000 atoms
             self.assertIn("TER", pdb_content)
         except Exception as e:
             self.fail(f"Large scale generation failed: {e}")
@@ -188,16 +198,19 @@ class TestGenerator(unittest.TestCase):
         self.assertFalse(np.any(np.isnan(jit_res)))
         self.assertEqual(jit_res.dtype, np.float64)
 
-
     def test_get_sequence_from_mixed_case(self):
         """Test parsing of mixed-case sequence strings."""
         sequence_str_1 = "aGv"
         expected_sequence_1 = ["ALA", "GLY", "VAL"]
-        self.assertEqual(_resolve_sequence(length=0, user_sequence_str=sequence_str_1), expected_sequence_1)
+        self.assertEqual(
+            _resolve_sequence(length=0, user_sequence_str=sequence_str_1), expected_sequence_1
+        )
 
         sequence_str_2 = "Ala-GlY-vAl"
         expected_sequence_2 = ["ALA", "GLY", "VAL"]
-        self.assertEqual(_resolve_sequence(length=0, user_sequence_str=sequence_str_2), expected_sequence_2)
+        self.assertEqual(
+            _resolve_sequence(length=0, user_sequence_str=sequence_str_2), expected_sequence_2
+        )
 
     def test_get_sequence_invalid_1_letter_code(self):
         """Test handling of invalid 1-letter code sequence."""
@@ -217,8 +230,9 @@ class TestGenerator(unittest.TestCase):
         adheres to the expected distribution within a tolerance.
         """
         from synth_pdb.data import AMINO_ACID_FREQUENCIES
+
         test_length = 10000
-        tolerance = 0.02 # 2% deviation allowed
+        tolerance = 0.02  # 2% deviation allowed
 
         sequence = _resolve_sequence(length=test_length, use_plausible_frequencies=True)
         self.assertEqual(len(sequence), test_length)
@@ -230,22 +244,29 @@ class TestGenerator(unittest.TestCase):
         # Compare observed with expected frequencies
         for aa, expected_freq in AMINO_ACID_FREQUENCIES.items():
             observed_freq = observed_frequencies.get(aa, 0.0)
-            self.assertAlmostEqual(observed_freq, expected_freq, delta=tolerance,
-                                   msg=f"Frequency for {aa} (Observed: {observed_freq:.4f}, Expected: {expected_freq:.4f}) out of tolerance.")
+            self.assertAlmostEqual(
+                observed_freq,
+                expected_freq,
+                delta=tolerance,
+                msg=f"Frequency for {aa} (Observed: {observed_freq:.4f}, Expected: {expected_freq:.4f}) out of tolerance.",
+            )
 
     # --- Tests for generate_pdb_content (general) ---
     def test_generate_pdb_content_empty_length(self):
         """Test PDB content generation for zero or negative length when no sequence is provided."""
-        with self.assertRaisesRegex(ValueError, "Length must be a positive integer when no sequence is provided."):
+        with self.assertRaisesRegex(
+            ValueError, "Length must be a positive integer when no sequence is provided."
+        ):
             generate_pdb_content(length=0, sequence_str=None)
-        with self.assertRaisesRegex(ValueError, "Length must be a positive integer when no sequence is provided."):
+        with self.assertRaisesRegex(
+            ValueError, "Length must be a positive integer when no sequence is provided."
+        ):
             generate_pdb_content(length=-5, sequence_str=None)
 
     def test_generate_pdb_content_empty_sequence_str_raises_error(self):
         """Test PDB content generation with an empty sequence string raises ValueError."""
         with self.assertRaisesRegex(ValueError, "Provided sequence string cannot be empty."):
             generate_pdb_content(length=0, sequence_str="")
-
 
     # --- Refactored tests for unified generate_pdb_content (full-atom) ---
     def test_generate_pdb_content_num_lines(self):
@@ -294,16 +315,24 @@ class TestGenerator(unittest.TestCase):
             self.assertGreater(atom_array.array_length(), 0, "No atoms found for peptide.")
 
             atom_array.res_id[0]
-            for atom_idx in range(1, atom_array.array_length()): # Start from 1 to avoid comparing with itself
+            for atom_idx in range(
+                1, atom_array.array_length()
+            ):  # Start from 1 to avoid comparing with itself
                 # Only check if the residue changes, then the new residue ID should be greater or equal
-                if atom_array.res_id[atom_idx] != atom_array.res_id[atom_idx-1]:
-                    self.assertEqual(atom_array.res_id[atom_idx], atom_array.res_id[atom_idx-1] + 1,
-                                     f"Residue ID not sequential: {atom_array.res_id[atom_idx-1]} -> {atom_array.res_id[atom_idx]}")
+                if atom_array.res_id[atom_idx] != atom_array.res_id[atom_idx - 1]:
+                    self.assertEqual(
+                        atom_array.res_id[atom_idx],
+                        atom_array.res_id[atom_idx - 1] + 1,
+                        f"Residue ID not sequential: {atom_array.res_id[atom_idx-1]} -> {atom_array.res_id[atom_idx]}",
+                    )
 
             # Check if total number of unique residues matches the peptide length
             unique_res_ids = np.unique(atom_array.res_id)
-            self.assertEqual(len(unique_res_ids), length,
-                             f"Expected {length} unique residues, but found {len(unique_res_ids)}")
+            self.assertEqual(
+                len(unique_res_ids),
+                length,
+                f"Expected {length} unique residues, but found {len(unique_res_ids)}",
+            )
         finally:
             os.remove(temp_file_path)
 
@@ -326,7 +355,6 @@ class TestGenerator(unittest.TestCase):
         finally:
             os.remove(temp_file_path)
 
-
     def test_generate_pdb_content_full_atom_more_atoms(self):
         """Test that generated content for ALA has the expected number of atoms."""
         # For a single ALA, we expect 13 atoms
@@ -334,20 +362,20 @@ class TestGenerator(unittest.TestCase):
         atom_lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
         self.assertEqual(len(atom_lines), 13, "Expected 13 atoms for ALA (full atom).")
 
-
     def test_generate_pdb_content_full_atom_backbone_atoms(self):
         """Test for the presence of N, C, O backbone atoms in full_atom mode."""
         length = 1
         content = generate_pdb_content(length=length)
         lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
 
-        atom_names = {self._parse_atom_line(line)['atom_name'] for line in lines} # Extract atom names
+        atom_names = {
+            self._parse_atom_line(line)["atom_name"] for line in lines
+        }  # Extract atom names
 
-        self.assertIn("N", atom_names) # Check for unpadded name
-        self.assertIn("CA", atom_names) # Check for unpadded name
-        self.assertIn("C", atom_names) # Check for unpadded name
-        self.assertIn("O", atom_names) # Check for unpadded name
-
+        self.assertIn("N", atom_names)  # Check for unpadded name
+        self.assertIn("CA", atom_names)  # Check for unpadded name
+        self.assertIn("C", atom_names)  # Check for unpadded name
+        self.assertIn("O", atom_names)  # Check for unpadded name
 
     def test_linear_full_atom_peptide_is_ramachandran_valid(self):
         """
@@ -366,13 +394,13 @@ class TestGenerator(unittest.TestCase):
 
         # Optionally, print violations for debugging purposes if the test fails unexpectedly
         if not violations:
-            print("No Ramachandran violations found. This might indicate an issue with the test setup or validator.")
+            print(
+                "No Ramachandran violations found. This might indicate an issue with the test setup or validator."
+            )
         else:
             print(f"Found {len(violations)} Ramachandran violations (expected for linear chain):")
             for violation in violations:
                 print(f"- {violation}")
-
-
 
     # --- Tests for PDB Header, TER, END records ---
     def test_generate_pdb_content_no_unintended_blank_lines(self):
@@ -388,8 +416,11 @@ class TestGenerator(unittest.TestCase):
 
         # The test should FAIL if it finds any unintended blank lines.
         # We expect 0 unintended blank lines.
-        self.assertEqual(non_trailing_blank_lines_count, 0,
-                         f"Found {non_trailing_blank_lines_count} unintended blank lines. Content:\n{content}")
+        self.assertEqual(
+            non_trailing_blank_lines_count,
+            0,
+            f"Found {non_trailing_blank_lines_count} unintended blank lines. Content:\n{content}",
+        )
 
         # Remove the assertion for total lines, as it's now dynamic and complex to assert directly.
         # non_empty_lines = [line for line in lines if line.strip()]
@@ -437,7 +468,6 @@ class TestGenerator(unittest.TestCase):
         self.assertEqual(ter_res_name, atom_data_last["residue_name"])
         self.assertEqual(ter_res_num, atom_data_last["residue_number"])
 
-
     def test_generate_pdb_content_end_present(self):
         """Test if the END record is present at the very end."""
         content = generate_pdb_content(length=1)
@@ -459,7 +489,11 @@ class TestGenerator(unittest.TestCase):
             if atom_data["residue_number"] not in [r["residue_number"] for r in parsed_residues]:
                 parsed_residues.append(atom_data)
 
-        self.assertEqual(len(parsed_residues), len(expected_sequence), "Number of parsed residues does not match expected sequence length.")
+        self.assertEqual(
+            len(parsed_residues),
+            len(expected_sequence),
+            "Number of parsed residues does not match expected sequence length.",
+        )
         for i, res_data in enumerate(parsed_residues):
             self.assertEqual(res_data["residue_name"], expected_sequence[i])
 
@@ -477,14 +511,18 @@ class TestGenerator(unittest.TestCase):
             if atom_data["residue_number"] not in [r["residue_number"] for r in parsed_residues]:
                 parsed_residues.append(atom_data)
 
-        self.assertEqual(len(parsed_residues), len(expected_sequence), "Number of parsed residues does not match expected sequence length.")
+        self.assertEqual(
+            len(parsed_residues),
+            len(expected_sequence),
+            "Number of parsed residues does not match expected sequence length.",
+        )
         for i, res_data in enumerate(parsed_residues):
             self.assertEqual(res_data["residue_name"], expected_sequence[i])
 
     def test_generate_pdb_content_sequence_overrides_length(self):
         """Test that provided sequence's length overrides the 'length' parameter."""
-        sequence_str = "AG" # Length 2
-        length_param = 5   # Should be ignored
+        sequence_str = "AG"  # Length 2
+        length_param = 5  # Should be ignored
         content = generate_pdb_content(length=length_param, sequence_str=sequence_str)
         atom_lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
 
@@ -495,7 +533,7 @@ class TestGenerator(unittest.TestCase):
             if atom_data["residue_number"] not in [r["residue_number"] for r in parsed_residues]:
                 parsed_residues.append(atom_data)
 
-        self.assertEqual(len(parsed_residues), 2) # Should be 2, not 5
+        self.assertEqual(len(parsed_residues), 2)  # Should be 2, not 5
 
     def test_generate_pdb_content_invalid_sequence_str_raises_error(self):
         """Test that invalid sequence string raises ValueError during PDB generation."""
@@ -510,21 +548,22 @@ class TestGenerator(unittest.TestCase):
         """
         test_cases = [
             (1, "Full-atom"),  # Single residue, full-atom
-            (5, "Full-atom Multi") # Multiple residues, full-atom
+            (5, "Full-atom Multi"),  # Multiple residues, full-atom
         ]
 
         # Regex for float with 3 decimal places and 8 width: ^ {1}\d\.\d{3}$ or ^ {2}\.\d{3}$ or ^ {1}\d{2}\.\d{3}$
         # Generally, it's float_str = f"{value:8.3f}". The space padding is implicit.
         # So we check for 8 characters total, with 3 after the decimal point.
         # Adjusted regex to handle potential leading space/minus sign before digits more flexibly
-        COORD_REGEX = r"^\s*[-]?\d{1,3}\.\d{3}$" # Allows for optional spaces/minus, 1-3 digits before decimal, 3 after
-        OCC_TEMP_REGEX = r"^\s*[-]?\d{1,2}\.\d{2}$" # Allows for optional spaces/minus, 1-2 digits before decimal, 2 after
-
+        COORD_REGEX = r"^\s*[-]?\d{1,3}\.\d{3}$"  # Allows for optional spaces/minus, 1-3 digits before decimal, 3 after
+        OCC_TEMP_REGEX = r"^\s*[-]?\d{1,2}\.\d{2}$"  # Allows for optional spaces/minus, 1-2 digits before decimal, 2 after
 
         for length, description in test_cases:
             with self.subTest(f"Testing {description} (length={length})"):
                 content = generate_pdb_content(length=length)
-                atom_lines = [line for line in content.strip().split("\n") if line.startswith("ATOM")]
+                atom_lines = [
+                    line for line in content.strip().split("\n") if line.startswith("ATOM")
+                ]
 
                 self.assertGreater(len(atom_lines), 0, "No ATOM lines found.")
 
@@ -540,22 +579,36 @@ class TestGenerator(unittest.TestCase):
                     # We need to reflect that in the test expectation.
                     if len(atom_data["atom_name"]) == 1:
                         # For single-char atom names, expect " N  "
-                        self.assertEqual(line[12:16], " " + atom_data["atom_name"] + "  ",
-                                         f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'")
+                        self.assertEqual(
+                            line[12:16],
+                            " " + atom_data["atom_name"] + "  ",
+                            f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                        )
                     elif len(atom_data["atom_name"]) == 2:
                         # For two-char atom names, expect " CA "
-                        self.assertEqual(line[12:16], " " + atom_data["atom_name"] + " ",
-                                         f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'")
+                        self.assertEqual(
+                            line[12:16],
+                            " " + atom_data["atom_name"] + " ",
+                            f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                        )
                     elif len(atom_data["atom_name"]) == 3:
                         # For three-char atom names, expect " CD1" (space, CD1)
-                        self.assertEqual(line[12:16], " " + atom_data["atom_name"],
-                                         f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'")
-                    else: # For four-char atom names, expect exact match
-                        self.assertEqual(line[12:16], atom_data["atom_name"],
-                                         f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'")
+                        self.assertEqual(
+                            line[12:16],
+                            " " + atom_data["atom_name"],
+                            f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                        )
+                    else:  # For four-char atom names, expect exact match
+                        self.assertEqual(
+                            line[12:16],
+                            atom_data["atom_name"],
+                            f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                        )
 
                     # Remaining checks (unchanged from previous iterations)
-                    self.assertEqual(atom_data["record_name"], "ATOM", "Record name should be 'ATOM'")
+                    self.assertEqual(
+                        atom_data["record_name"], "ATOM", "Record name should be 'ATOM'"
+                    )
                     self.assertIsInstance(atom_data["atom_number"], int)
                     self.assertIsInstance(atom_data["residue_number"], int)
                     self.assertIsInstance(atom_data["x_coord"], float)
@@ -574,7 +627,9 @@ class TestGenerator(unittest.TestCase):
 
                     # Chain ID (22) - 1 char
                     self.assertEqual(len(line[21]), 1)
-                    self.assertEqual(atom_data["chain_id"], "A", msg=f"Chain ID mismatch in line: {line}")
+                    self.assertEqual(
+                        atom_data["chain_id"], "A", msg=f"Chain ID mismatch in line: {line}"
+                    )
 
                     # Residue number (23-26) - 4 chars, right justified
                     self.assertEqual(len(line[22:26]), 4)
@@ -586,19 +641,35 @@ class TestGenerator(unittest.TestCase):
                     self.assertEqual(len(line[38:46]), 8)
                     self.assertEqual(len(line[46:54]), 8)
 
-                    self.assertRegex(line[30:38], COORD_REGEX, f"X coord format incorrect: '{line[30:38]}'" )
-                    self.assertRegex(line[38:46], COORD_REGEX, f"Y coord format incorrect: '{line[38:46]}'" )
-                    self.assertRegex(line[46:54], COORD_REGEX, f"Z coord format incorrect: '{line[46:54]}'" )
+                    self.assertRegex(
+                        line[30:38], COORD_REGEX, f"X coord format incorrect: '{line[30:38]}'"
+                    )
+                    self.assertRegex(
+                        line[38:46], COORD_REGEX, f"Y coord format incorrect: '{line[38:46]}'"
+                    )
+                    self.assertRegex(
+                        line[46:54], COORD_REGEX, f"Z coord format incorrect: '{line[46:54]}'"
+                    )
 
                     # Occupancy (55-60) - 6 chars, 2 decimal places
                     self.assertEqual(len(line[54:60]), 6)
-                    self.assertRegex(line[54:60], OCC_TEMP_REGEX, f"Occupancy format incorrect: '{line[54:60]}'" )
+                    self.assertRegex(
+                        line[54:60], OCC_TEMP_REGEX, f"Occupancy format incorrect: '{line[54:60]}'"
+                    )
                     # Occupancy should now be realistic (0.85-1.00), not hardcoded 1.00
-                    self.assertGreaterEqual(atom_data["occupancy"], 0.85, "Occupancy should be >= 0.85")
-                    self.assertLessEqual(atom_data["occupancy"], 1.00, "Occupancy should be <= 1.00")
+                    self.assertGreaterEqual(
+                        atom_data["occupancy"], 0.85, "Occupancy should be >= 0.85"
+                    )
+                    self.assertLessEqual(
+                        atom_data["occupancy"], 1.00, "Occupancy should be <= 1.00"
+                    )
 
                     self.assertEqual(len(line[60:66]), 6)
-                    self.assertRegex(line[60:66], OCC_TEMP_REGEX, f"Temp factor format incorrect: '{line[60:66]}'" )
+                    self.assertRegex(
+                        line[60:66],
+                        OCC_TEMP_REGEX,
+                        f"Temp factor format incorrect: '{line[60:66]}'",
+                    )
                     # B-factors should now be realistic (5-100 Ų), not 0.00
                     # Updated for Model-Free physics (Termini can be highly flexible)
                     temp_factor = float(line[60:66])
@@ -631,12 +702,12 @@ class TestGenerator(unittest.TestCase):
         try:
             atom_array = strucio.load_structure(temp_file_path)
             if isinstance(atom_array, struc.AtomArrayStack):
-                atom_array = atom_array[0] # Take the first model if it's a stack
+                atom_array = atom_array[0]  # Take the first model if it's a stack
 
             self.assertGreater(atom_array.array_length(), 0, "No atoms found for long peptide.")
 
-            current_res_id = atom_array.res_id[0] # Initialize with the first residue ID
-            expected_residue_count = 1 # Start count from 1 for the first residue
+            current_res_id = atom_array.res_id[0]  # Initialize with the first residue ID
+            expected_residue_count = 1  # Start count from 1 for the first residue
 
             for atom_idx in range(atom_array.array_length()):
                 # Atom number should be sequential and unique
@@ -647,22 +718,30 @@ class TestGenerator(unittest.TestCase):
                 # last_atom_num = atom_array.atom_id[atom_idx]
 
                 # Chain ID should always be 'A'
-                self.assertEqual(atom_array.chain_id[atom_idx], "A",
-                                 f"Chain ID not 'A' at index {atom_idx}.")
+                self.assertEqual(
+                    atom_array.chain_id[atom_idx], "A", f"Chain ID not 'A' at index {atom_idx}."
+                )
 
                 # Residue number should be sequential
-                if atom_array.res_id[atom_idx] != current_res_id: # Check if residue changed
+                if atom_array.res_id[atom_idx] != current_res_id:  # Check if residue changed
                     current_res_id = atom_array.res_id[atom_idx]
                     expected_residue_count += 1
-                self.assertEqual(atom_array.res_id[atom_idx], current_res_id, # Corrected variable name
-                                 f"Residue number not consistent within a residue block at index {atom_idx}.")
+                self.assertEqual(
+                    atom_array.res_id[atom_idx],
+                    current_res_id,  # Corrected variable name
+                    f"Residue number not consistent within a residue block at index {atom_idx}.",
+                )
 
             # Check if total number of unique residues matches the peptide length
-            unique_res_ids = np.unique(atom_array.res_id) # Define unique_res_ids here
-            self.assertEqual(len(unique_res_ids), peptide_length,
-                             f"Expected {peptide_length} unique residues, but found {len(unique_res_ids)}")
+            unique_res_ids = np.unique(atom_array.res_id)  # Define unique_res_ids here
+            self.assertEqual(
+                len(unique_res_ids),
+                peptide_length,
+                f"Expected {peptide_length} unique residues, but found {len(unique_res_ids)}",
+            )
         finally:
-            os.remove(temp_file_path) # Clean up the temporary file
+            os.remove(temp_file_path)  # Clean up the temporary file
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

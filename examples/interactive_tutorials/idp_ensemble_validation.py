@@ -29,22 +29,23 @@
 import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     try:
         import synth_pdb
-        print('   ✅ synth-pdb already installed')
-    except ImportError:
-        print('   📦 Installing synth-pdb and dependencies...')
-        get_ipython().system('pip install -q synth-pdb py3Dmol biotite')
-        print('   ✅ Installation complete')
-else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
 
-print('✅ Environment configured!')
+        print("   ✅ synth-pdb already installed")
+    except ImportError:
+        print("   📦 Installing synth-pdb and dependencies...")
+        get_ipython().system("pip install -q synth-pdb py3Dmol biotite")
+        print("   ✅ Installation complete")
+else:
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
+
+print("✅ Environment configured!")
 
 
 # In[ ]:
@@ -53,11 +54,9 @@ print('✅ Environment configured!')
 import io
 
 import biotite.structure.io.pdb as pdb
-import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
 import py3Dmol
-from IPython.display import display
 
 from synth_pdb.batch_generator import BatchedGenerator
 from synth_pdb.generator import generate_pdb_content
@@ -78,7 +77,9 @@ sequence = "GSGSGSGSSGGSGSGSSGSGGSGSGSSGGS"
 structure_def = "1-30:random"
 
 # Generate a single static structure (analogous to what a naive ML model might predict)
-single_pdb = generate_pdb_content(sequence_str=sequence, structure=structure_def, minimize_energy=False)
+single_pdb = generate_pdb_content(
+    sequence_str=sequence, structure=structure_def, minimize_energy=False
+)
 
 print("✅ Single 'static' baseline structure generated!")
 
@@ -112,15 +113,15 @@ print(f"✅ Ensemble of {len(ensemble_pdbs)} structures ready!")
 # In[ ]:
 
 
-view = py3Dmol.view(width=800, height=300, viewergrid=(1,2), linked=False)
-view.addModel(single_pdb, 'pdb', viewer=(0,0))
-view.setStyle({'line': {'color': 'blue', 'linewidth': 3}}, viewer=(0,0))
-view.zoomTo(viewer=(0,0))
+view = py3Dmol.view(width=800, height=300, viewergrid=(1, 2), linked=False)
+view.addModel(single_pdb, "pdb", viewer=(0, 0))
+view.setStyle({"line": {"color": "blue", "linewidth": 3}}, viewer=(0, 0))
+view.zoomTo(viewer=(0, 0))
 
-for pdb_data in ensemble_pdbs[:20]: # Show first 20 subsets for visual clarity
-    view.addModel(pdb_data, 'pdb', viewer=(0,1))
-view.setStyle({'line': {'color': 'spectrum', 'linewidth': 2}}, viewer=(0,1))
-view.zoomTo(viewer=(0,1))
+for pdb_data in ensemble_pdbs[:20]:  # Show first 20 subsets for visual clarity
+    view.addModel(pdb_data, "pdb", viewer=(0, 1))
+view.setStyle({"line": {"color": "spectrum", "linewidth": 2}}, viewer=(0, 1))
+view.zoomTo(viewer=(0, 1))
 
 print("Single Structure (Left) vs. Dynamic Ensemble (Right)")
 
@@ -161,11 +162,12 @@ def calculate_pre_profile(pdb_str, label_resi=15):
     Gamma is proportional to <r^-6>.
     """
     struct = pdb.PDBFile.read(io.StringIO(pdb_str)).get_structure(model=1)
-    ca_atoms = struct[struct.atom_name == 'CA']
+    ca_atoms = struct[struct.atom_name == "CA"]
 
     # Get coordinates of the label site
     label_idx = np.where(ca_atoms.res_id == label_resi)[0]
-    if len(label_idx) == 0: return np.ones(len(ca_atoms))
+    if len(label_idx) == 0:
+        return np.ones(len(ca_atoms))
     label_coord = ca_atoms.coord[label_idx[0]]
 
     intensities = []
@@ -177,7 +179,7 @@ def calculate_pre_profile(pdb_str, label_resi=15):
 
         # Phenomenological 1/r^6 relaxation rate addition
         # Calibrated numerically to give I/I0 ~ 0.5 at 15 Angstroms
-        pre_rate = 1.1e8 / (r ** 6)
+        pre_rate = 1.1e8 / (r**6)
 
         # Intensity ratio I/I0 = R2 / (R2 + Gamma)
         # We assume intrinsic R2 of 10 Hz for an unfolded polypeptide
@@ -185,6 +187,7 @@ def calculate_pre_profile(pdb_str, label_resi=15):
         intensities.append(i_ratio)
 
     return np.array(intensities)
+
 
 print("✅ Phenomenological PRE 1/r^6 physics engine initialized.")
 
@@ -216,18 +219,32 @@ plt.figure(figsize=(12, 6))
 
 # Plot all individual ensemble microstates lightly in the background
 for pre in ensemble_pres:
-    plt.plot(range(1, 31), pre, color='gray', alpha=0.15, linewidth=1)
+    plt.plot(range(1, 31), pre, color="gray", alpha=0.15, linewidth=1)
 
 # Plot the single static structure
-plt.plot(range(1, 31), single_pre, 'b--o', label="Single Static Model (Fails to match NMR)", markersize=6, linewidth=2)
+plt.plot(
+    range(1, 31),
+    single_pre,
+    "b--o",
+    label="Single Static Model (Fails to match NMR)",
+    markersize=6,
+    linewidth=2,
+)
 
 # Plot the Ensemble Average
-plt.plot(range(1, 31), averaged_pre, 'r-s', label="Ensemble Average (Matches in vitro NMR)", markersize=8, linewidth=3)
+plt.plot(
+    range(1, 31),
+    averaged_pre,
+    "r-s",
+    label="Ensemble Average (Matches in vitro NMR)",
+    markersize=8,
+    linewidth=3,
+)
 
-plt.axvline(15, color='black', linestyle=':', label='Spin Label Site (Residue 15)')
+plt.axvline(15, color="black", linestyle=":", label="Spin Label Site (Residue 15)")
 plt.xlabel("Residue Number", fontsize=12)
 plt.ylabel("PRE Intensity Ratio $(I/I_0)$", fontsize=12)
-plt.title("The Need for Ensembles: PRE Profiles in IDPs", fontsize=14, fontweight='bold')
+plt.title("The Need for Ensembles: PRE Profiles in IDPs", fontsize=14, fontweight="bold")
 plt.legend(fontsize=10)
 plt.grid(alpha=0.3)
 plt.xlim(1, 30)
@@ -244,4 +261,3 @@ print("broadening (I/I0 < 1.0) deep into the tails of the sequence.")
 print("\nThis smeared, U-shaped profile exactly mirrors experimental PRE data collected on ")
 print("IDPs like Alpha-synuclein or FUS, proving that computational tools must use ensemble ")
 print("generation to model disordered biology.")
-

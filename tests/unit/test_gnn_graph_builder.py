@@ -3,6 +3,7 @@ TDD tests for synth_pdb/quality/gnn/graph.py (PDB → PyG Data conversion).
 
 Written BEFORE the implementation exists — all tests should fail initially.
 """
+
 import unittest
 
 import pytest
@@ -24,6 +25,7 @@ class TestGraphBuilder(unittest.TestCase):
     def setUpClass(cls):
         # Import here so the error is a test failure, not a collection error
         from synth_pdb.quality.gnn.graph import build_protein_graph
+
         cls.build = staticmethod(build_protein_graph)
         cls.pdb = _make_helix_pdb(20)
         cls.data = cls.build(cls.pdb)
@@ -33,7 +35,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertEqual(
             self.data.x.shape[0],
             20,
-            msg=f"Expected 20 nodes (residues), got {self.data.x.shape[0]}"
+            msg=f"Expected 20 nodes (residues), got {self.data.x.shape[0]}",
         )
 
     def test_node_features_shape(self):
@@ -41,7 +43,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertEqual(
             self.data.x.shape[1],
             8,
-            msg=f"Expected 8 node features per residue, got {self.data.x.shape[1]}"
+            msg=f"Expected 8 node features per residue, got {self.data.x.shape[1]}",
         )
 
     def test_edges_are_bidirectional(self):
@@ -53,7 +55,7 @@ class TestGraphBuilder(unittest.TestCase):
                 (dst, src),
                 edges,
                 msg=f"Edge ({src}→{dst}) exists but reverse ({dst}→{src}) is missing. "
-                    "Graph must be undirected (bidirectional edges)."
+                "Graph must be undirected (bidirectional edges).",
             )
 
     def test_no_self_loops(self):
@@ -62,9 +64,7 @@ class TestGraphBuilder(unittest.TestCase):
         src, dst = edge_index[0].tolist(), edge_index[1].tolist()
         self_loops = [(s, d) for s, d in zip(src, dst) if s == d]
         self.assertEqual(
-            len(self_loops),
-            0,
-            msg=f"Found {len(self_loops)} self-loop(s): {self_loops[:5]}"
+            len(self_loops), 0, msg=f"Found {len(self_loops)} self-loop(s): {self_loops[:5]}"
         )
 
     def test_sin_cos_encoding_bounded(self):
@@ -73,12 +73,14 @@ class TestGraphBuilder(unittest.TestCase):
         for col in range(4):  # sin(phi), cos(phi), sin(psi), cos(psi)
             col_min, col_max = x[:, col].min(), x[:, col].max()
             self.assertGreaterEqual(
-                float(col_min), -1.0 - 1e-6,
-                msg=f"Column {col} min {col_min:.4f} is below -1 (sin/cos must be bounded)"
+                float(col_min),
+                -1.0 - 1e-6,
+                msg=f"Column {col} min {col_min:.4f} is below -1 (sin/cos must be bounded)",
             )
             self.assertLessEqual(
-                float(col_max), 1.0 + 1e-6,
-                msg=f"Column {col} max {col_max:.4f} is above +1 (sin/cos must be bounded)"
+                float(col_max),
+                1.0 + 1e-6,
+                msg=f"Column {col} max {col_max:.4f} is above +1 (sin/cos must be bounded)",
             )
 
     def test_edge_features_shape(self):
@@ -87,7 +89,7 @@ class TestGraphBuilder(unittest.TestCase):
             self.data.edge_attr.shape[1],
             2,
             msg=f"Expected 2 edge features (distance, seq_separation), "
-                f"got {self.data.edge_attr.shape[1]}"
+            f"got {self.data.edge_attr.shape[1]}",
         )
 
     def test_ca_distance_edges_below_threshold(self):
@@ -97,7 +99,7 @@ class TestGraphBuilder(unittest.TestCase):
         self.assertLessEqual(
             max_dist,
             8.0 + 1e-3,
-            msg=f"Max Cα distance in edges is {max_dist:.2f} Å, exceeds 8 Å threshold"
+            msg=f"Max Cα distance in edges is {max_dist:.2f} Å, exceeds 8 Å threshold",
         )
 
 

@@ -34,6 +34,7 @@ from synth_pdb.validator import PDBValidator
 
 logger = logging.getLogger(__name__)
 
+
 class TestChirality(unittest.TestCase):
 
     def test_all_residues_are_L_amino_acids(self):
@@ -51,7 +52,7 @@ class TestChirality(unittest.TestCase):
         # It should check improper dihedrals and raise violations for D-amino acids.
         # EDUCATIONAL: The validate_chirality method will likely implement the
         # mathematical check for the "CORN" rule or equivalent improper torsion.
-        if hasattr(validator, 'validate_chirality'):
+        if hasattr(validator, "validate_chirality"):
             validator.validate_chirality()
             violations = validator.get_violations()
 
@@ -61,11 +62,15 @@ class TestChirality(unittest.TestCase):
                 for v in chirality_violations:
                     logger.error(v)
 
-            self.assertEqual(len(chirality_violations), 0,
-                             f"Found {len(chirality_violations)} D-amino acids! Proteins must be L-chiral.")
+            self.assertEqual(
+                len(chirality_violations),
+                0,
+                f"Found {len(chirality_violations)} D-amino acids! Proteins must be L-chiral.",
+            )
         else:
             # TDD Step 1: Fail if method is missing, or warn
             self.fail("PDBValidator.validate_chirality() not implemented yet.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

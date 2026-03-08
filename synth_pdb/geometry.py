@@ -16,6 +16,7 @@ except ImportError:
             return lambda f: f
         return func
 
+
 # EDUCATIONAL NOTE - Z-Matrix Construction
 # ----------------------------------------
 # Proteins are defined by their "Internal Coordinates" (Z-Matrix):

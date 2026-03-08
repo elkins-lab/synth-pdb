@@ -3,6 +3,7 @@ TDD integration tests for GNN training and checkpoint save/load.
 
 Written BEFORE the implementation exists — all tests should fail initially.
 """
+
 import os
 import tempfile
 import unittest
@@ -64,10 +65,7 @@ class TestGNNTraining(unittest.TestCase):
 
         # Loss must be finite (no NaN/Inf from bad initialisation or graph problems)
         for i, l in enumerate(losses):
-            self.assertTrue(
-                np.isfinite(l),
-                msg=f"Loss at epoch {i} is non-finite: {l}"
-            )
+            self.assertTrue(np.isfinite(l), msg=f"Loss at epoch {i} is non-finite: {l}")
 
     def test_gnn_saves_and_loads_checkpoint(self):
         """Saving and reloading a checkpoint must produce identical predictions."""
@@ -92,13 +90,13 @@ class TestGNNTraining(unittest.TestCase):
             is_good_after, prob_after, _ = clf2.predict(pdb)
 
             self.assertEqual(
-                is_good_before,
-                is_good_after,
-                msg="is_good differs after save/load cycle"
+                is_good_before, is_good_after, msg="is_good differs after save/load cycle"
             )
             self.assertAlmostEqual(
-                prob_before, prob_after, places=4,
-                msg=f"Probability changed after save/load: {prob_before:.6f} → {prob_after:.6f}"
+                prob_before,
+                prob_after,
+                places=4,
+                msg=f"Probability changed after save/load: {prob_before:.6f} → {prob_after:.6f}",
             )
         finally:
             if os.path.exists(checkpoint_path):

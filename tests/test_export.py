@@ -10,12 +10,13 @@ def mock_matrix():
     # Res 1-4
     # Contacts: (1, 4) is Long Range. (1, 2) is neighbor.
     mat = np.zeros((4, 4))
-    mat[0, 3] = 1.0 # Contact between 1 and 4
+    mat[0, 3] = 1.0  # Contact between 1 and 4
     mat[3, 0] = 1.0
 
-    mat[0, 1] = 1.0 # Neighbor
+    mat[0, 1] = 1.0  # Neighbor
     mat[1, 0] = 1.0
     return mat
+
 
 def test_export_casp_format(mock_matrix):
     """Test exporting to CASP RR format."""
@@ -41,12 +42,13 @@ def test_export_casp_format(mock_matrix):
             parts = line.split()
             assert parts[0] == "1"
             assert parts[1] == "4"
-            assert float(parts[2]) == 0.0 # d_min
-            assert float(parts[3]) == 8.0 # d_max (Standard contact threshold)
-            assert float(parts[4]) == 1.0 # Probability
+            assert float(parts[2]) == 0.0  # d_min
+            assert float(parts[3]) == 8.0  # d_max (Standard contact threshold)
+            assert float(parts[4]) == 1.0  # Probability
             found = True
 
     assert found
+
 
 def test_export_csv_format(mock_matrix):
     """Test simple CSV export."""
@@ -55,6 +57,7 @@ def test_export_csv_format(mock_matrix):
 
     # Expect: Res1,Res2,Value
     assert "1,4,1.0" in output
+
 
 def test_export_casp_variety():
     """
@@ -87,6 +90,7 @@ def test_export_casp_variety():
     count_8 = sum(1 for line in lines if "8.0" in line)
     assert count_8 == 0, "CASP output should contain actual distances, not the default threshold."
 
+
 def test_export_csv_variety():
     """Test CSV export with actual distances."""
     dist_mat = np.zeros((3, 3))
@@ -99,6 +103,7 @@ def test_export_csv_variety():
     assert "Res1,Res2,Value" in output
     # Row
     assert "1,3,5.50000" in output
+
 
 def test_export_invalid_format():
     """Test that unknown formats raise ValueError."""

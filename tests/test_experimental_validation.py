@@ -1,4 +1,3 @@
-
 import json
 import os
 
@@ -45,7 +44,7 @@ def _strip_hetatm(pdb_path, out_path):
     """Remove HETATM records (water, ligands) that OpenMM cannot template."""
     with open(pdb_path) as f:
         lines = f.readlines()
-    with open(out_path, 'w') as f:
+    with open(out_path, "w") as f:
         f.writelines(l for l in lines if not l.startswith("HETATM"))
 
 
@@ -77,10 +76,10 @@ def test_ubiquitin_j_coupling_correlation(experimental_data, tmp_path):
     crystal_structure = pdb.PDBFile.read(str(cleaned_pdb)).get_structure(model=1)
     ref_j = calculate_hn_ha_coupling(crystal_structure)
 
-    assert 'A' in ref_j, "Chain A not found in 1UBQ crystal structure"
-    assert len(ref_j['A']) > 50, (
-        f"Only {len(ref_j['A'])} residues in crystal J-coupling dict, expected >50."
-    )
+    assert "A" in ref_j, "Chain A not found in 1UBQ crystal structure"
+    assert (
+        len(ref_j["A"]) > 50
+    ), f"Only {len(ref_j['A'])} residues in crystal J-coupling dict, expected >50."
 
     # ── Minimized structure J-couplings ────────────────────────────────────────
     minimizer = EnergyMinimizer()
@@ -95,10 +94,10 @@ def test_ubiquitin_j_coupling_correlation(experimental_data, tmp_path):
     ref_vals = []
     pred_vals = []
 
-    for res_id, ref_val in ref_j.get('A', {}).items():
-        if 'A' in pred_j and res_id in pred_j['A']:
+    for res_id, ref_val in ref_j.get("A", {}).items():
+        if "A" in pred_j and res_id in pred_j["A"]:
             ref_vals.append(ref_val)
-            pred_vals.append(pred_j['A'][res_id])
+            pred_vals.append(pred_j["A"][res_id])
 
     assert len(ref_vals) > 50, (
         f"Too few matched residues ({len(ref_vals)}). "
@@ -136,20 +135,20 @@ def parse_bmrb_chemical_shifts(bmrb_file):
         entry_data = json.load(f)
 
     entry_id = list(entry_data.keys())[0]
-    saveframes = entry_data[entry_id]['saveframes']
+    saveframes = entry_data[entry_id]["saveframes"]
 
     cs_data = {}
 
     for frame in saveframes:
-        if frame.get('category') == 'assigned_chemical_shifts':
-            for loop in frame['loops']:
-                if loop.get('category') == '_Atom_chem_shift':
-                    tags = loop['tags']
+        if frame.get("category") == "assigned_chemical_shifts":
+            for loop in frame["loops"]:
+                if loop.get("category") == "_Atom_chem_shift":
+                    tags = loop["tags"]
                     res_id_col = tags.index("Seq_ID")
                     atom_id_col = tags.index("Atom_ID")
                     shift_col = tags.index("Val")
 
-                    for row in loop['data']:
+                    for row in loop["data"]:
                         try:
                             res_id = int(row[res_id_col])
                             atom_id = row[atom_id_col]
@@ -187,7 +186,9 @@ def test_ubiquitin_chemical_shift_correlation(experimental_data, tmp_path):
     assert success, "Energy minimization failed"
 
     # Equilibrate
-    success = minimizer.equilibrate(str(minimized_pdb), str(equilibrated_pdb), steps=500)  # 500 steps = 1ps
+    success = minimizer.equilibrate(
+        str(minimized_pdb), str(equilibrated_pdb), steps=500
+    )  # 500 steps = 1ps
     assert success, "Equilibration failed"
 
     # 4. Predict chemical shifts from simulation
@@ -199,10 +200,10 @@ def test_ubiquitin_chemical_shift_correlation(experimental_data, tmp_path):
     pred_values = []
 
     for res_id, atoms in exp_shifts.items():
-        if 'A' in pred_shifts_dict and res_id in pred_shifts_dict['A']:
+        if "A" in pred_shifts_dict and res_id in pred_shifts_dict["A"]:
             for atom_name, exp_shift in atoms.items():
-                if atom_name in pred_shifts_dict['A'][res_id]:
-                    pred_shift = pred_shifts_dict['A'][res_id][atom_name]
+                if atom_name in pred_shifts_dict["A"][res_id]:
+                    pred_shift = pred_shifts_dict["A"][res_id][atom_name]
 
                     # We are interested in backbone atoms
                     if atom_name in ["C", "CA", "CB", "N", "H", "HA"]:

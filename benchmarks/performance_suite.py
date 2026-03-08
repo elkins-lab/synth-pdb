@@ -27,11 +27,12 @@ def get_hardware_info():
         "platform_version": platform.version(),
         "architecture": platform.machine(),
         "processor": platform.processor(),
-        "cpu_brand": platform.processor(), # Fallback, specific brand might need other methods
+        "cpu_brand": platform.processor(),  # Fallback, specific brand might need other methods
         "cpu_cores": psutil.cpu_count(logical=False),
         "cpu_threads": psutil.cpu_count(logical=True),
         "ram_total_gb": round(psutil.virtual_memory().total / (1024**3), 2),
     }
+
 
 def benchmark_serial(sequence, n_samples):
     print(f"  Running Serial Benchmark (N={n_samples})...")
@@ -40,6 +41,7 @@ def benchmark_serial(sequence, n_samples):
         _ = generate_pdb_content(sequence_str=sequence, minimize_energy=False)
     elapsed = time.time() - start_time
     return elapsed
+
 
 def benchmark_batched(sequence, n_samples):
     print(f"  Running Batched Benchmark (N={n_samples})...")
@@ -53,11 +55,18 @@ def benchmark_batched(sequence, n_samples):
     elapsed = time.time() - start_time
     return elapsed
 
+
 def main():
     parser = argparse.ArgumentParser(description="synth-pdb Performance Benchmarking Suite")
-    parser.add_argument("--n", type=int, default=1000, help="Number of structures to generate (default: 1000)")
-    parser.add_argument("--seq", type=str, default="L-K-E-L-E-K-E-L-E-K-E-L-E-K-E-L", help="Sequence to use")
-    parser.add_argument("--output", type=str, default="benchmarks/bench_results.csv", help="Output CSV file")
+    parser.add_argument(
+        "--n", type=int, default=1000, help="Number of structures to generate (default: 1000)"
+    )
+    parser.add_argument(
+        "--seq", type=str, default="L-K-E-L-E-K-E-L-E-K-E-L-E-K-E-L", help="Sequence to use"
+    )
+    parser.add_argument(
+        "--output", type=str, default="benchmarks/bench_results.csv", help="Output CSV file"
+    )
     args = parser.parse_args()
 
     # Create directory if needed
@@ -92,7 +101,7 @@ def main():
             "batched_time": batched_time,
             "speedup": speedup,
             "throughput_serial": throughput_serial,
-            "throughput_batched": throughput_batched
+            "throughput_batched": throughput_batched,
         }
         result_row.update(hardware_info)
         results.append(result_row)
@@ -104,6 +113,7 @@ def main():
             writer.writeheader()
             writer.writerows(results)
         print(f"\n✅ Results saved to {args.output}")
+
 
 if __name__ == "__main__":
     main()

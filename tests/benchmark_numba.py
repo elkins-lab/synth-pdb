@@ -1,4 +1,3 @@
-
 import time
 
 import numpy as np
@@ -22,9 +21,10 @@ def benchmark_nerf():
         _ = position_atom_3d_from_internal_coords(p1, p2, p3, 1.5, 110.0, 180.0)
     end = time.perf_counter()
 
-    avg_time = (end - start) / n_iter * 1e6 # microseconds
+    avg_time = (end - start) / n_iter * 1e6  # microseconds
     print(f"Average time per call ({n_iter} iterations): {avg_time:.3f} us")
     return avg_time
+
 
 def benchmark_spectral_density():
     print("\n--- Benchmarking Spectral Density ---")
@@ -37,13 +37,15 @@ def benchmark_spectral_density():
         _ = spectral_density(0.0, 1e-8, 0.85)
     end = time.perf_counter()
 
-    avg_time = (end - start) / n_iter * 1e6 # microseconds
+    avg_time = (end - start) / n_iter * 1e6  # microseconds
     print(f"Average time per call ({n_iter} iterations): {avg_time:.3f} us")
     return avg_time
+
 
 if __name__ == "__main__":
     try:
         import numba
+
         print(f"Numba version: {numba.__version__}")
     except ImportError:
         print("Numba NOT found. Running baseline performance.")

@@ -1,4 +1,3 @@
-
 import biotite.structure as struc
 import numpy as np
 import pytest
@@ -8,6 +7,7 @@ try:
     from synth_pdb import evolution
 except ImportError:
     evolution = None
+
 
 def create_mock_structure():
     """Creates a simple structure (Alpha Helix like)"""
@@ -24,6 +24,7 @@ def create_mock_structure():
     # We will mock the `calculate_sasa` function result in one test,
     # and test the `generate_msa` logic assuming SASA is known.
     return atoms
+
 
 class TestMSAGenerator:
 
@@ -54,7 +55,7 @@ class TestMSAGenerator:
         # Mock biotite.structure.sasa
         # It takes atom array and radius, returns array of floats
         # 3 residues, 1 atom each in mock
-        mock_areas = np.array([100.0, 10.0, 100.0]) # Res 1, 2, 3
+        mock_areas = np.array([100.0, 10.0, 100.0])  # Res 1, 2, 3
         mocker.patch("biotite.structure.sasa", return_value=mock_areas)
 
         # Mock apply_residue_wise to just return the areas (since 1 atom per res)
@@ -75,9 +76,8 @@ class TestMSAGenerator:
         # Res 1 (LEU) -> 10 area. Max LEU ~ 191. Rel ~ 0.05
 
         assert len(rel_sasa) == 3
-        assert rel_sasa[0] > 0.5 # Exposed
-        assert rel_sasa[1] < 0.2 # Buried
-
+        assert rel_sasa[0] > 0.5  # Exposed
+        assert rel_sasa[1] < 0.2  # Buried
 
     def test_msa_generation_conservation(self, mocker):
         """Verify Core residues mutate less or conservatively."""

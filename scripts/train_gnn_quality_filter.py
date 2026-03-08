@@ -75,7 +75,10 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
 
     logger.info(
         "Generating: %d Good, %d Random, %d Distorted, %d Clashing",
-        n_good, n_bad_random, n_bad_distorted, n_bad_clash,
+        n_good,
+        n_bad_random,
+        n_bad_distorted,
+        n_bad_clash,
     )
 
     pdbs, labels = [], []
@@ -86,7 +89,9 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
         if i % 20 == 0:
             logger.info("  Good %d/%d", i, n_good)
         try:
-            pdbs.append(generate_pdb_content(length=20, conformation="alpha", minimize_energy=False))
+            pdbs.append(
+                generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
+            )
             labels.append(1)
         except Exception as e:
             failure_counts["good"] += 1
@@ -97,7 +102,9 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
         if i % 10 == 0:
             logger.info("  Random %d/%d", i, n_bad_random)
         try:
-            pdbs.append(generate_pdb_content(length=20, conformation="random", minimize_energy=False))
+            pdbs.append(
+                generate_pdb_content(length=20, conformation="random", minimize_energy=False)
+            )
             labels.append(0)
         except Exception as e:
             failure_counts["random"] += 1
@@ -151,15 +158,20 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
 
     if len(pdbs) < int(n_samples * 0.5):
         raise RuntimeError(
-            f"Only {len(pdbs)} of {n_samples} samples generated. "
-            f"Failures: {failure_counts}"
+            f"Only {len(pdbs)} of {n_samples} samples generated. " f"Failures: {failure_counts}"
         )
 
     return pdbs, np.array(labels, dtype=np.int64)
 
 
-def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
-              hidden_dim: int = 64, lr: float = 1e-3, random_state: int = 42):
+def train_gnn(
+    output_path: str,
+    n_samples: int = 200,
+    epochs: int = 50,
+    hidden_dim: int = 64,
+    lr: float = 1e-3,
+    random_state: int = 42,
+):
     try:
         import torch
         import torch.nn.functional as F
@@ -192,16 +204,18 @@ def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
     idx = np.arange(len(graphs))
     idx_train, idx_test = train_test_split(idx, test_size=0.2, random_state=42, stratify=y_graphs)
     train_graphs = [graphs[i] for i in idx_train]
-    test_graphs  = [graphs[i] for i in idx_test]
+    test_graphs = [graphs[i] for i in idx_test]
 
     logger.info(
         "Dataset: %d train / %d test  (Good: %d, Bad: %d)",
-        len(train_graphs), len(test_graphs),
-        int(np.sum(y_graphs == 1)), int(np.sum(y_graphs == 0)),
+        len(train_graphs),
+        len(test_graphs),
+        int(np.sum(y_graphs == 1)),
+        int(np.sum(y_graphs == 0)),
     )
 
     train_loader = DataLoader(train_graphs, batch_size=16, shuffle=True)
-    test_loader  = DataLoader(test_graphs,  batch_size=16, shuffle=False)
+    test_loader = DataLoader(test_graphs, batch_size=16, shuffle=False)
 
     # ------------------------------------------------------------------
     # Model, optimiser, scheduler
@@ -245,7 +259,10 @@ def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
         if epoch % max(1, epochs // 10) == 0 or epoch == epochs:
             logger.info(
                 "Epoch %3d/%d  loss=%.4f  train_acc=%.3f  lr=%.2e",
-                epoch, epochs, total_loss / total, train_acc,
+                epoch,
+                epochs,
+                total_loss / total,
+                train_acc,
                 scheduler.get_last_lr()[0],
             )
 
@@ -267,7 +284,7 @@ def train_gnn(output_path: str, n_samples: int = 200, epochs: int = 50,
     logger.info("Accuracy: %.4f", acc)
     logger.info(
         "\n%s",
-        classification_report(all_labels, all_preds, target_names=["Bad", "Good"], labels=[0, 1])
+        classification_report(all_labels, all_preds, target_names=["Bad", "Good"], labels=[0, 1]),
     )
 
     # ------------------------------------------------------------------

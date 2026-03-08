@@ -12,6 +12,7 @@ from synth_pdb.validator import PDBValidator
 
 logger = logging.getLogger(__name__)
 
+
 class TestRotamerDistribution(unittest.TestCase):
 
     def test_valine_rotamer_distribution(self):
@@ -37,21 +38,23 @@ class TestRotamerDistribution(unittest.TestCase):
             atoms = PDBValidator._parse_pdb_atoms(pdb_content)
 
             # Extract atoms
-            val_atoms = {atom['atom_name']: atom for atom in atoms if atom['residue_name'] == 'VAL'}
+            val_atoms = {atom["atom_name"]: atom for atom in atoms if atom["residue_name"] == "VAL"}
 
             # VAL has Chi1 defined by N-CA-CB-CG1 (or CG2, standard definition uses CG1/CG2)
             # Dunbrack library typically uses CG1 for Chi1 of Valine
-            if 'CG1' in val_atoms:
-                cg_atom = val_atoms['CG1']
+            if "CG1" in val_atoms:
+                cg_atom = val_atoms["CG1"]
             else:
                 continue
 
-            n_coords = val_atoms['N']['coords']
-            ca_coords = val_atoms['CA']['coords']
-            cb_coords = val_atoms['CB']['coords']
-            cg_coords = cg_atom['coords']
+            n_coords = val_atoms["N"]["coords"]
+            ca_coords = val_atoms["CA"]["coords"]
+            cb_coords = val_atoms["CB"]["coords"]
+            cg_coords = cg_atom["coords"]
 
-            angle = PDBValidator._calculate_dihedral_angle(n_coords, ca_coords, cb_coords, cg_coords)
+            angle = PDBValidator._calculate_dihedral_angle(
+                n_coords, ca_coords, cb_coords, cg_coords
+            )
 
             # Bin the angle
             # IMPORTANT: Due to the 180-degree shift to IUPAC convention (Trans=180),
@@ -60,14 +63,14 @@ class TestRotamerDistribution(unittest.TestCase):
             # t  : around 180 (or -180)
             # g+ : around 60
             if -90 <= angle <= -30:
-                rotamer_counts['g-'] += 1
+                rotamer_counts["g-"] += 1
             elif (angle > 150) or (angle < -150):
-                rotamer_counts['t'] += 1
+                rotamer_counts["t"] += 1
             elif 30 <= angle <= 90:
-                rotamer_counts['g+'] += 1
+                rotamer_counts["g+"] += 1
             else:
-                rotamer_counts['other'] += 1
-                if rotamer_counts['other'] <= 10:  # Print first 10 failures
+                rotamer_counts["other"] += 1
+                if rotamer_counts["other"] <= 10:  # Print first 10 failures
                     logger.debug(f"Invalid angle: {angle:.2f}")
 
         # Verify distribution
@@ -82,12 +85,17 @@ class TestRotamerDistribution(unittest.TestCase):
         # We just want to ensure the "most common" one is indeed most common
         # and the "rare" one is rare.
 
-        self.assertGreater(rotamer_counts['g-'], 70, "Valine g- should be the dominant rotamer (>70%)")
-        self.assertGreater(rotamer_counts['t'], 0, "Valine trans should be present (>0)")
-        self.assertLess(rotamer_counts['g+'], 20, "Valine g+ should be rare (<20)")
+        self.assertGreater(
+            rotamer_counts["g-"], 70, "Valine g- should be the dominant rotamer (>70%)"
+        )
+        self.assertGreater(rotamer_counts["t"], 0, "Valine trans should be present (>0)")
+        self.assertLess(rotamer_counts["g+"], 20, "Valine g+ should be rare (<20)")
 
         # Ensure we didn't generate weird angles
-        self.assertEqual(rotamer_counts['other'], 0, "Generated outliers outside standard rotamer bins")
+        self.assertEqual(
+            rotamer_counts["other"], 0, "Generated outliers outside standard rotamer bins"
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

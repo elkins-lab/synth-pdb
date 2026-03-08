@@ -53,9 +53,13 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 random_linear_peptide_*.pdb
+custom_peptide_*.pdb
+custom_peptide_*.fasta
 test_*.pdb
+fix_*.py
 1UBQ.pdb
 decoys/
+bmr6457.json
 
 # Translations
 *.mo
@@ -129,3 +133,6 @@ dmypy.json
 
 # Scratch directory
 scratch
+
+# AI crap
+.gemini/

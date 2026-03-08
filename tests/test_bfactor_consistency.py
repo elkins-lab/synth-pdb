@@ -7,6 +7,7 @@ from synth_pdb.generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
+
 def test_bfactor_reflects_dynamics():
     """
     Verify that B-factors in the generated PDB reflect structural dynamics.
@@ -44,7 +45,10 @@ def test_bfactor_reflects_dynamics():
     for rid, bf in bfactors.items():
         assert 5.0 <= bf <= 100.0, f"B-factor {bf} for residue {rid} out of realistic range"
 
-@pytest.mark.skip(reason="WIP: Geometry generator needs refactoring to produce reliable secondary structure for S2 prediction.")
+
+@pytest.mark.skip(
+    reason="WIP: Geometry generator needs refactoring to produce reliable secondary structure for S2 prediction."
+)
 def test_bfactor_loop_vs_helix():
     """
     Verify that loop regions have higher B-factors than helical regions.
@@ -55,9 +59,7 @@ def test_bfactor_loop_vs_helix():
     """
     # Generate a structure with explicit regions: helix-loop-helix
     pdb_content = generate_pdb_content(
-        sequence_str="A" * 20,
-        structure="1-7:alpha,8-13:random,14-20:alpha",
-        seed=42
+        sequence_str="A" * 20, structure="1-7:alpha,8-13:random,14-20:alpha", seed=42
     )
 
     # Manually parse B-factors

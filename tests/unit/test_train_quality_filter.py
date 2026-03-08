@@ -4,6 +4,7 @@ TDD tests for scripts/train_quality_filter.py and synth_pdb/quality/features.py.
 These tests were written BEFORE the fixes, so they are expected to FAIL against
 the original code. They document the required behavior after the fixes are applied.
 """
+
 import ast
 import unittest
 from pathlib import Path
@@ -15,6 +16,7 @@ SCRIPT_PATH = Path(__file__).parent.parent.parent / "scripts" / "train_quality_f
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _load_script_ast() -> ast.Module:
     src = SCRIPT_PATH.read_text()
@@ -48,6 +50,7 @@ def _get_rf_keyword(tree: ast.Module, keyword: str):
 # Test 1: No bare except clauses
 # ---------------------------------------------------------------------------
 
+
 class TestNoBareExcept(unittest.TestCase):
     """Fails before fix: the script has bare `except: pass` blocks."""
 
@@ -68,6 +71,7 @@ class TestNoBareExcept(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Test 2: RandomForest uses max_features="sqrt"
 # ---------------------------------------------------------------------------
+
 
 class TestRFHyperparameters(unittest.TestCase):
     """Fails before fix: max_features=None is used today."""
@@ -91,8 +95,8 @@ class TestRFHyperparameters(unittest.TestCase):
             value_node.value,
             "sqrt",
             msg=(
-                f'max_features is set to {value_node.value!r}. '
-                "It should be \"sqrt\" to maintain the randomization that makes "
+                f"max_features is set to {value_node.value!r}. "
+                'It should be "sqrt" to maintain the randomization that makes '
                 "Random Forests robust and reduces overfitting."
             ),
         )
@@ -101,6 +105,7 @@ class TestRFHyperparameters(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Test 3: generate_dataset returns close to expected sample count
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateDatasetBalance(unittest.TestCase):
     """
@@ -113,9 +118,7 @@ class TestGenerateDatasetBalance(unittest.TestCase):
         # Import dynamically so that import errors surface clearly
         import importlib.util
 
-        spec = importlib.util.spec_from_file_location(
-            "train_quality_filter", str(SCRIPT_PATH)
-        )
+        spec = importlib.util.spec_from_file_location("train_quality_filter", str(SCRIPT_PATH))
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
 
@@ -153,6 +156,7 @@ class TestGenerateDatasetBalance(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Test 4: "Good" vs "random" conformations are feature-separable
 # ---------------------------------------------------------------------------
+
 
 class TestFeatureSeparability(unittest.TestCase):
     """

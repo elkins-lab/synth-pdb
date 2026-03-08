@@ -32,24 +32,26 @@
 import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     try:
         import synth_pdb
-        print('   ✅ synth-pdb already installed')
-    except ImportError:
-        print('   📦 Installing synth-pdb and dependencies...')
-        get_ipython().system('pip install -q synth-pdb py3Dmol biotite mdtraj')
-        print('   ✅ Installation complete')
-    import plotly.io as pio
-    pio.renderers.default = 'colab'
-else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
 
-print('✅ Environment configured!')
+        print("   ✅ synth-pdb already installed")
+    except ImportError:
+        print("   📦 Installing synth-pdb and dependencies...")
+        get_ipython().system("pip install -q synth-pdb py3Dmol biotite mdtraj")
+        print("   ✅ Installation complete")
+    import plotly.io as pio
+
+    pio.renderers.default = "colab"
+else:
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
+
+print("✅ Environment configured!")
 
 
 # In[ ]:
@@ -84,10 +86,7 @@ structure_def = "1-15:alpha, 16-30:random, 31-45:alpha"
 print("🧬 Generating initial structure and minimizing energy...")
 # Must minimize energy to resolve steric clashes before MD simulation
 initial_pdb = generate_pdb_content(
-    sequence_str=sequence,
-    structure=structure_def,
-    optimize_sidechains=True,
-    minimize_energy=True
+    sequence_str=sequence, structure=structure_def, optimize_sidechains=True, minimize_energy=True
 )
 
 print("✅ Baseline structure ready!")
@@ -105,9 +104,9 @@ print("✅ Baseline structure ready!")
 print("🔥 Heating up and simulating thermal dynamics (This may take 10-20 seconds)...")
 trajectory_pdbs = simulate_trajectory(
     pdb_content=initial_pdb,
-    temperature_kelvin=400.0, # High temperature to accelerate unfolding of the loop while helices resist
-    steps=5000,              # 5x longer simulation for clearer RMSF separation
-    report_interval=50       # Save 100 frames to the trajectory
+    temperature_kelvin=400.0,  # High temperature to accelerate unfolding of the loop while helices resist
+    steps=5000,  # 5x longer simulation for clearer RMSF separation
+    report_interval=50,  # Save 100 frames to the trajectory
 )
 
 print(f"✅ Sim complete! Captured {len(trajectory_pdbs)} trajectory frames.")
@@ -123,13 +122,13 @@ print(f"✅ Sim complete! Captured {len(trajectory_pdbs)} trajectory frames.")
 view = py3Dmol.view(width=800, height=500)
 
 # Add the initial structure as a thick tube
-view.addModel(initial_pdb, 'pdb')
-view.setStyle({'model': -1}, {'tube': {'color': 'white', 'radius': 0.5, 'opacity': 0.3}})
+view.addModel(initial_pdb, "pdb")
+view.setStyle({"model": -1}, {"tube": {"color": "white", "radius": 0.5, "opacity": 0.3}})
 
 # Add all trajectory frames as thin lines colored by spectrum (N -> C terminus)
 for frame_pdb in trajectory_pdbs:
-    view.addModel(frame_pdb, 'pdb')
-    view.setStyle({'model': -1}, {'line': {'color': 'spectrum', 'linewidth': 2}})
+    view.addModel(frame_pdb, "pdb")
+    view.setStyle({"model": -1}, {"line": {"color": "spectrum", "linewidth": 2}})
 
 view.zoomTo()
 view.show()
@@ -154,26 +153,27 @@ def calculate_ca_rmsf(trajectory_pdbs):
     # Extract CA coordinates for every frame
     for frame in trajectory_pdbs:
         struct = pdb.PDBFile.read(io.StringIO(frame)).get_structure(model=1)
-        ca = struct[struct.atom_name == 'CA']
+        ca = struct[struct.atom_name == "CA"]
         ca_coords.append(ca.coord)
 
-    ca_coords = np.array(ca_coords) # Shape: (frames, residues, 3)
+    ca_coords = np.array(ca_coords)  # Shape: (frames, residues, 3)
 
     # For a perfect RMSF, we should structurally align (superimpose) the frames first.
     # To keep this tutorial fast and dependency-light, we rely on the short simulation
     # not having diffused away significantly (which is true for 1000 steps).
 
     # Calculate mean position for each residue
-    mean_coords = np.mean(ca_coords, axis=0) # Shape: (residues, 3)
+    mean_coords = np.mean(ca_coords, axis=0)  # Shape: (residues, 3)
 
     # Calculate squared deviations
-    deviations = ca_coords - mean_coords # Shape: (frames, residues, 3)
-    sq_deviations = np.sum(deviations**2, axis=2) # Shape: (frames, residues)
+    deviations = ca_coords - mean_coords  # Shape: (frames, residues, 3)
+    sq_deviations = np.sum(deviations**2, axis=2)  # Shape: (frames, residues)
 
     # RMSF = sqrt(mean of squared deviations)
     rmsf = np.sqrt(np.mean(sq_deviations, axis=0))
 
     return rmsf
+
 
 rmsf_profile = calculate_ca_rmsf(trajectory_pdbs)
 print("✅ RMSF calculation complete.")
@@ -185,17 +185,19 @@ print("✅ RMSF calculation complete.")
 plt.figure(figsize=(10, 5))
 
 residues = np.arange(1, len(rmsf_profile) + 1)
-plt.plot(residues, rmsf_profile, 'o-', color='purple', linewidth=2, markersize=6)
+plt.plot(residues, rmsf_profile, "o-", color="purple", linewidth=2, markersize=6)
 
 # Shade the regions to match our initial sequence definition
-plt.axvspan(1, 15, color='blue', alpha=0.1, label='Helix 1 (Expected High pLDDT)')
-plt.axvspan(16, 30, color='orange', alpha=0.1, label='Disordered Loop (Expected Low pLDDT)')
-plt.axvspan(31, 45, color='green', alpha=0.1, label='Helix 2 (Expected High pLDDT)')
+plt.axvspan(1, 15, color="blue", alpha=0.1, label="Helix 1 (Expected High pLDDT)")
+plt.axvspan(16, 30, color="orange", alpha=0.1, label="Disordered Loop (Expected Low pLDDT)")
+plt.axvspan(31, 45, color="green", alpha=0.1, label="Helix 2 (Expected High pLDDT)")
 
 plt.xlabel("Residue Number", fontsize=12)
 plt.ylabel("RMSF (Ångströms)", fontsize=12)
-plt.title("Simulated Physical Flexibility (MD RMSF vs. Sequence Regions)", fontsize=14, fontweight='bold')
-plt.legend(loc='upper right')
+plt.title(
+    "Simulated Physical Flexibility (MD RMSF vs. Sequence Regions)", fontsize=14, fontweight="bold"
+)
+plt.legend(loc="upper right")
 plt.grid(alpha=0.3)
 plt.xlim(1, 45)
 plt.ylim(bottom=0)
@@ -209,4 +211,3 @@ print("\nThis perfectly mirrors modern structural biology findings: AlphaFold as
 print("pLDDT confidence score to the loop not because it 'failed' to predict it, but ")
 print("because the sequence physically corresponds to a highly dynamic, flexible region ")
 print("with a low NMR S² order parameter. The AI is successfully predicting disorder!")
-

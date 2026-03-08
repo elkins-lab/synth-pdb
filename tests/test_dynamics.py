@@ -9,6 +9,7 @@ from synth_pdb.generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
+
 def test_get_secondary_structure_helix():
     # Generate a helix (poly-ALA)
     # Manually construct a perfect helix to test the detector
@@ -46,6 +47,7 @@ def test_get_secondary_structure_helix():
     import io
 
     import biotite.structure.io.pdb as pdb
+
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
     structure = pdb_file.get_structure(model=1)
 
@@ -54,14 +56,16 @@ def test_get_secondary_structure_helix():
     ss = get_secondary_structure(structure)
     logger.info(f"Detected SS array: {ss}")
 
-
     # We determined empirically that with seed interactions, we get some alpha.
     # Let's find *contiguous* alpha and assert it exists.
 
     is_alpha = [s == "alpha" for s in ss]
-    has_helix = any(is_alpha[i] and is_alpha[i+1] and is_alpha[i+2] for i in range(len(is_alpha)-2))
+    has_helix = any(
+        is_alpha[i] and is_alpha[i + 1] and is_alpha[i + 2] for i in range(len(is_alpha) - 2)
+    )
 
     assert has_helix, "Should detect at least a short helix segment"
+
 
 def test_predict_order_parameters_helix():
     # Generate a helix
@@ -69,6 +73,7 @@ def test_predict_order_parameters_helix():
     import io
 
     import biotite.structure.io.pdb as pdb
+
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
     structure = pdb_file.get_structure(model=1)
 

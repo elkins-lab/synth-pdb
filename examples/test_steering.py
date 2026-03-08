@@ -11,7 +11,9 @@ from synth_pdb.physics import EnergyMinimizer
 
 def create_distanced_cysteines(filename, distance):
     # Generates a peptide and manually sets distance to 'distance' Angstroms
-    content = generate_pdb_content(sequence_str="CGGC", conformation="extended", optimize_sidechains=False)
+    content = generate_pdb_content(
+        sequence_str="CGGC", conformation="extended", optimize_sidechains=False
+    )
     pdb_file = pdb.PDBFile.read(io.StringIO(content))
     structure = pdb_file.get_structure(model=1)
 
@@ -19,13 +21,14 @@ def create_distanced_cysteines(filename, distance):
     sg4 = structure[(structure.res_id == 4) & (structure.atom_name == "SG")][0]
     target_pos = sg1.coord + np.array([0.0, 0.0, distance])
     shift_vector = target_pos - sg4.coord
-    mask_res4 = (structure.res_id == 4)
+    mask_res4 = structure.res_id == 4
     structure.coord[mask_res4] += shift_vector
 
     pdb_out = pdb.PDBFile()
     pdb_out.set_structure(structure)
     pdb_out.write(filename)
     return filename
+
 
 def test_steering():
     input_file = "test_steering_input.pdb"
@@ -55,6 +58,7 @@ def test_steering():
         print("SUCCESS: Bond formed!")
     else:
         print("FAILURE: Bond did not form (as expected if threshold < 5.0)")
+
 
 if __name__ == "__main__":
     test_steering()

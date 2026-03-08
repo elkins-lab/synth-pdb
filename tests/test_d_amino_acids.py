@@ -25,6 +25,7 @@ def test_d_amino_acid_generation_basic():
     # Standard PDB usually uses DAL for D-Alanine, but many tools stay with ALA.
     # Let's see how our validator handles it.
 
+
 def test_d_amino_acid_chirality_inversion():
     """
     Test that D-ALA has inverted chirality compared to L-ALA.
@@ -38,11 +39,13 @@ def test_d_amino_acid_chirality_inversion():
     # We need to extract the improper dihedral N-CA-C-CB
     def get_improper(validator):
         atoms = validator.atoms
-        n = [a for a in atoms if a['atom_name'] == "N"][0]
-        ca = [a for a in atoms if a['atom_name'] == "CA"][0]
-        c = [a for a in atoms if a['atom_name'] == "C"][0]
-        cb = [a for a in atoms if a['atom_name'] == "CB"][0]
-        return validator._calculate_dihedral_angle(n['coords'], ca['coords'], c['coords'], cb['coords'])
+        n = [a for a in atoms if a["atom_name"] == "N"][0]
+        ca = [a for a in atoms if a["atom_name"] == "CA"][0]
+        c = [a for a in atoms if a["atom_name"] == "C"][0]
+        cb = [a for a in atoms if a["atom_name"] == "CB"][0]
+        return validator._calculate_dihedral_angle(
+            n["coords"], ca["coords"], c["coords"], cb["coords"]
+        )
 
     l_improper = get_improper(l_val)
     d_improper = get_improper(d_val)
@@ -52,6 +55,7 @@ def test_d_amino_acid_chirality_inversion():
     # D-ALA should be ~ -34
     assert np.sign(l_improper) != np.sign(d_improper)
     assert abs(l_improper - (-d_improper)) < 5.0
+
 
 def test_d_amino_acid_validation():
     """

@@ -1,4 +1,3 @@
-
 import biotite.structure as struc
 import numpy as np
 import pytest
@@ -74,11 +73,10 @@ class TestCisProline:
         """
         Test that we can force Cis-Proline generation.
         """
-        seq = "APA" # ALA-PRO-ALA. The A-P bond should be cis.
+        seq = "APA"  # ALA-PRO-ALA. The A-P bond should be cis.
 
         content = generate_pdb_content(
-            sequence_str=seq,
-            cis_proline_frequency=1.0 # 100% probability
+            sequence_str=seq, cis_proline_frequency=1.0  # 100% probability
         )
 
         omegas = self._get_omega_angles(content)
@@ -88,22 +86,19 @@ class TestCisProline:
         # Filtered omegas are [w1, w2].
         # w1 is bond A-P (Residue 1).
 
-        omega_pro = omegas[0] # The first valid omega is A-P
+        omega_pro = omegas[0]  # The first valid omega is A-P
 
         # Check for CIS (near 0, between -30 and +30)
         assert abs(omega_pro) < 30.0, f"Expected Cis-Proline (omega~0), got {omega_pro}"
 
     def test_cis_only_on_proline(self):
         """Test that --cis-proline-frequency does NOT affect non-proline residues."""
-        seq = "AAAAA" # No prolines
+        seq = "AAAAA"  # No prolines
 
         try:
-            content = generate_pdb_content(
-                sequence_str=seq,
-                cis_proline_frequency=1.0
-            )
+            content = generate_pdb_content(sequence_str=seq, cis_proline_frequency=1.0)
         except TypeError:
-             pytest.fail("Argument not implemented yet")
+            pytest.fail("Argument not implemented yet")
 
         omegas = self._get_omega_angles(content)
 

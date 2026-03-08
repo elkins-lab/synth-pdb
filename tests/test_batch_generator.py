@@ -11,6 +11,7 @@ try:
 except ImportError:
     BatchedGenerator = None
 
+
 class TestBatchedGenerator(unittest.TestCase):
     def setUp(self):
         self.sequence = "ALA-GLY-SER"
@@ -21,7 +22,7 @@ class TestBatchedGenerator(unittest.TestCase):
         """Verify batched output matches serial output for a single structure."""
         bg = BatchedGenerator(self.sequence, n_batch=1)
         # Use a fixed seed for comparison
-        bg_coords = bg.generate_batch(seed=42).coords[0] # (L*4, 3) - N, CA, C, O per res
+        bg_coords = bg.generate_batch(seed=42).coords[0]  # (L*4, 3) - N, CA, C, O per res
 
         # Serial generation
         serial_pdb = generate_pdb_content(sequence_str=self.sequence, seed=42)
@@ -30,6 +31,7 @@ class TestBatchedGenerator(unittest.TestCase):
         import io
 
         import biotite.structure.io.pdb as pdb
+
         serial_struct = pdb.PDBFile.read(io.StringIO(serial_pdb)).get_structure()[0]
 
         # Flattened comparison of backbone atom arrays
@@ -46,7 +48,9 @@ class TestBatchedGenerator(unittest.TestCase):
         n_atoms_comp = min(len(bg_coords), len(serial_backbone))
         # Template superimposition in serial generator adds a small drift (~2A shift)
         # compared to pure NeRF construction.
-        np.testing.assert_allclose(bg_coords[:n_atoms_comp], serial_backbone[:n_atoms_comp], atol=2.5)
+        np.testing.assert_allclose(
+            bg_coords[:n_atoms_comp], serial_backbone[:n_atoms_comp], atol=2.5
+        )
 
     @unittest.skipIf(BatchedGenerator is None, "BatchedGenerator not yet implemented")
     def test_batch_performance(self):
@@ -99,6 +103,7 @@ class TestBatchedGenerator(unittest.TestCase):
         self.assertIn("ATOM      2  CA  ALA A   1", pdb_str)
         self.assertIn("TER", pdb_str)
         self.assertIn("END", pdb_str)
+
 
 if __name__ == "__main__":
     unittest.main()

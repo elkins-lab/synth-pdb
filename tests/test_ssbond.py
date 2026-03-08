@@ -46,7 +46,6 @@ Understanding disulfide bonds teaches:
 4. Importance of cellular environment (oxidizing vs reducing)
 """
 
-
 import os
 import re
 import tempfile
@@ -72,6 +71,7 @@ class TestDisulfideBonds:
         3. Identifying pairs within bonding distance (2.0-2.1 Å)
         """
         from synth_pdb.generator import _detect_disulfide_bonds
+
         assert callable(_detect_disulfide_bonds)
 
     def test_detects_close_cysteines(self):
@@ -97,10 +97,10 @@ class TestDisulfideBonds:
         # Generate structure with cysteines
         # Note: In random structures, CYS pairs are unlikely to be close enough
         # This test will need a structure where we can control CYS positions
-        pdb_content = generate_pdb_content(sequence_str="CCC", conformation='alpha')
+        pdb_content = generate_pdb_content(sequence_str="CCC", conformation="alpha")
 
         # Save and load
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as f:
             f.write(pdb_content)
             temp_path = f.name
 
@@ -141,9 +141,9 @@ class TestDisulfideBonds:
         - Most random structures won't have disulfides
         """
         # Generate structure with distant cysteines
-        pdb_content = generate_pdb_content(sequence_str="CAAAAAAAC", conformation='extended')
+        pdb_content = generate_pdb_content(sequence_str="CAAAAAAAC", conformation="extended")
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as f:
             f.write(pdb_content)
             temp_path = f.name
 
@@ -155,8 +155,9 @@ class TestDisulfideBonds:
 
             # Extended conformation should have no close CYS pairs
             # (CYS 1 and CYS 9 are far apart)
-            assert len(disulfides) == 0, \
-                f"Should not detect disulfides in extended structure, but found {len(disulfides)}"
+            assert (
+                len(disulfides) == 0
+            ), f"Should not detect disulfides in extended structure, but found {len(disulfides)}"
         finally:
             os.remove(temp_path)
 
@@ -192,7 +193,7 @@ class TestDisulfideBonds:
 
         # Test with simple disulfide list
         disulfides = [(3, 8), (12, 20)]
-        chain_id = 'A'
+        chain_id = "A"
 
         records = _generate_ssbond_records(disulfides, chain_id)
 
@@ -200,13 +201,13 @@ class TestDisulfideBonds:
         assert isinstance(records, str)
 
         # Should have one record per disulfide
-        lines = [l for l in records.split('\n') if l.strip()]
+        lines = [l for l in records.split("\n") if l.strip()]
         assert len(lines) == len(disulfides)
 
         # Each line should start with SSBOND
         for line in lines:
-            assert line.startswith('SSBOND')
-            assert 'CYS' in line
+            assert line.startswith("SSBOND")
+            assert "CYS" in line
             assert chain_id in line
 
     def test_ssbond_in_generated_pdb(self):
@@ -214,29 +215,30 @@ class TestDisulfideBonds:
         Test that SSBOND and CONECT records appear in generated PDB files.
         """
         # Generate structure with cysteines
-        pdb_content = generate_pdb_content(sequence_str="CCCCC", conformation='alpha')
+        pdb_content = generate_pdb_content(sequence_str="CCCCC", conformation="alpha")
 
         # Check if SSBOND records are present (if any disulfides detected)
-        if 'SSBOND' in pdb_content:
+        if "SSBOND" in pdb_content:
             # Verify SSBOND format
-            ssbond_lines = [l for l in pdb_content.split('\n') if l.startswith('SSBOND')]
+            ssbond_lines = [l for l in pdb_content.split("\n") if l.startswith("SSBOND")]
             assert len(ssbond_lines) > 0
 
             for line in ssbond_lines:
-                assert 'CYS' in line
+                assert "CYS" in line
                 assert len(line) >= 30
 
             # Verify CONECT format (New Requirement)
             # When a disulfide is present, the SG atoms should be linked via CONECT
-            conect_lines = [l for l in pdb_content.split('\n') if l.startswith('CONECT')]
+            conect_lines = [l for l in pdb_content.split("\n") if l.startswith("CONECT")]
             assert len(conect_lines) >= 2, "Disulfide found but no CONECT records generated"
 
             # Check for reciprocity
             # If atom X is connected to Y, Y matches X
             import re
+
             conect_pairs = []
             for line in conect_lines:
-                parts = re.findall(r'\d+', line[6:])
+                parts = re.findall(r"\d+", line[6:])
                 if len(parts) >= 2:
                     conect_pairs.append(tuple(sorted((int(parts[0]), int(parts[1])))))
 
@@ -248,32 +250,33 @@ class TestDisulfideBonds:
         """
         # We need a predictable structure. CGGGGC cyclic forces 1-6 proximity.
         from synth_pdb.physics import HAS_OPENMM
+
         if not HAS_OPENMM:
             pytest.skip("Requires OpenMM for disulfide closure logic")
 
-        pdb_content = generate_pdb_content(
-            sequence_str="CGGGGC",
-            cyclic=True,
-            minimize_energy=True
-        )
+        pdb_content = generate_pdb_content(sequence_str="CGGGGC", cyclic=True, minimize_energy=True)
 
-        lines = pdb_content.split('\n')
-        ssbond_lines = [l for l in lines if l.startswith('SSBOND')]
-        conect_lines = [l for l in lines if l.startswith('CONECT')]
+        lines = pdb_content.split("\n")
+        ssbond_lines = [l for l in lines if l.startswith("SSBOND")]
+        conect_lines = [l for l in lines if l.startswith("CONECT")]
 
         assert len(ssbond_lines) >= 1
-        assert len(conect_lines) >= 3 # 2 for N-C closure + at least 1 for S-S (bidirectional usually)
+        assert (
+            len(conect_lines) >= 3
+        )  # 2 for N-C closure + at least 1 for S-S (bidirectional usually)
 
         # Find SG atoms for residues 1 and 6
-        atom_lines = [l for l in lines if l.startswith('ATOM')]
+        atom_lines = [l for l in lines if l.startswith("ATOM")]
         sg1_idx = None
         sg6_idx = None
         for line in atom_lines:
             res_id = int(line[22:26].strip())
             atom_name = line[12:16].strip()
             atom_idx = int(line[6:11].strip())
-            if res_id == 1 and atom_name == 'SG': sg1_idx = atom_idx
-            if res_id == 6 and atom_name == 'SG': sg6_idx = atom_idx
+            if res_id == 1 and atom_name == "SG":
+                sg1_idx = atom_idx
+            if res_id == 6 and atom_name == "SG":
+                sg6_idx = atom_idx
 
         assert sg1_idx is not None
         assert sg6_idx is not None
@@ -281,12 +284,14 @@ class TestDisulfideBonds:
         # Verify CONECT specifically links sg1_idx and sg6_idx
         ss_conect_found = False
         for line in conect_lines:
-            parts = [int(p) for p in re.findall(r'\d+', line[6:])]
+            parts = [int(p) for p in re.findall(r"\d+", line[6:])]
             if sg1_idx in parts and sg6_idx in parts:
                 ss_conect_found = True
                 break
 
-        assert ss_conect_found, f"No CONECT record found between SG1 ({sg1_idx}) and SG6 ({sg6_idx})"
+        assert (
+            ss_conect_found
+        ), f"No CONECT record found between SG1 ({sg1_idx}) and SG6 ({sg6_idx})"
 
     def test_handles_no_cysteines_gracefully(self):
         """
@@ -304,14 +309,14 @@ class TestDisulfideBonds:
         - No SSBOND records in PDB
         """
         # Generate structure without cysteines
-        pdb_content = generate_pdb_content(sequence_str="AAAAA", conformation='alpha')
+        pdb_content = generate_pdb_content(sequence_str="AAAAA", conformation="alpha")
 
         # Should not have SSBOND records
-        assert 'SSBOND' not in pdb_content
+        assert "SSBOND" not in pdb_content
 
         # Should generate valid PDB
-        assert 'ATOM' in pdb_content
-        assert pdb_content.strip().endswith('END')
+        assert "ATOM" in pdb_content
+        assert pdb_content.strip().endswith("END")
 
     def test_multiple_disulfides(self):
         """
@@ -332,10 +337,10 @@ class TestDisulfideBonds:
 
         # Test with multiple disulfides
         disulfides = [(2, 5), (8, 12), (15, 20)]
-        chain_id = 'A'
+        chain_id = "A"
 
         records = _generate_ssbond_records(disulfides, chain_id)
-        lines = [l for l in records.split('\n') if l.strip()]
+        lines = [l for l in records.split("\n") if l.strip()]
 
         # Should have one record per disulfide
         assert len(lines) == 3

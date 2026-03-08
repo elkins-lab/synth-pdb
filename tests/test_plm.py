@@ -77,6 +77,7 @@ def _get_embedder():
     """
     try:
         from synth_pdb.plm import ESM2Embedder
+
         embedder = ESM2Embedder()
         # Trigger the lazy load now — catches ImportError if transformers is absent
         embedder.embed("ACDEF")
@@ -85,10 +86,10 @@ def _get_embedder():
         raise unittest.SkipTest(f"PLM dependencies not available: {e}")
 
 
-
 # ---------------------------------------------------------------------------
 # 1. Import Safety
 # ---------------------------------------------------------------------------
+
 
 class TestImportSafety(unittest.TestCase):
     """
@@ -108,6 +109,7 @@ class TestImportSafety(unittest.TestCase):
     def test_module_importable_without_transformers(self):
         """synth_pdb.plm must import cleanly — no torch/transformers at module level."""
         import sys
+
         # Temporarily hide transformers to simulate environment without it
         orig = sys.modules.get("transformers")
         sys.modules["transformers"] = None  # type: ignore[assignment]
@@ -128,16 +130,18 @@ class TestImportSafety(unittest.TestCase):
     def test_embedder_instantiable_without_model_loaded(self):
         """ESM2Embedder() constructor must not download/load the model."""
         from synth_pdb.plm import ESM2Embedder
+
         embedder = ESM2Embedder()
         # The model should not be loaded yet — only on first embed() call
-        self.assertIsNone(embedder._model,
-                          "Model should be None until first embed() call (lazy loading)")
-        self.assertIsNone(embedder._tokenizer,
-                          "Tokenizer should be None until first embed() call")
+        self.assertIsNone(
+            embedder._model, "Model should be None until first embed() call (lazy loading)"
+        )
+        self.assertIsNone(embedder._tokenizer, "Tokenizer should be None until first embed() call")
 
     def test_embed_raises_clear_importerror_without_transformers(self):
         """When transformers is missing, embed() must raise ImportError with pip hint."""
         import sys
+
         orig_transformers = sys.modules.get("transformers")
         sys.modules.get("torch")
 
@@ -148,6 +152,7 @@ class TestImportSafety(unittest.TestCase):
 
         try:
             from synth_pdb.plm import ESM2Embedder
+
             embedder = ESM2Embedder()
             with self.assertRaises(ImportError) as ctx:
                 embedder.embed("ACDEFGHIKLMNPQRSTVWY")
@@ -164,6 +169,7 @@ class TestImportSafety(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 2. Output Shape
 # ---------------------------------------------------------------------------
+
 
 class TestEmbeddingShape(unittest.TestCase):
     """
@@ -192,31 +198,34 @@ class TestEmbeddingShape(unittest.TestCase):
         """embed() must return a 2D numpy ndarray."""
         result = self.embedder.embed(_HELIX_SEQ)
         self.assertIsInstance(result, np.ndarray)
-        self.assertEqual(result.ndim, 2,
-                         f"Expected 2D array, got shape {result.shape}")
+        self.assertEqual(result.ndim, 2, f"Expected 2D array, got shape {result.shape}")
 
     def test_output_shape_rows_equals_sequence_length(self):
         """Number of rows must equal the number of residues (L)."""
         for seq in [_HELIX_SEQ, _UBIQUITIN_N20]:
             result = self.embedder.embed(seq)
-            self.assertEqual(result.shape[0], len(seq),
-                             f"Row count {result.shape[0]} != len(seq) {len(seq)}")
+            self.assertEqual(
+                result.shape[0], len(seq), f"Row count {result.shape[0]} != len(seq) {len(seq)}"
+            )
 
     def test_output_dim_matches_model_config(self):
         """Embedding dim must match the model's hidden size advertised in ESM2Embedder."""
         result = self.embedder.embed(_HELIX_SEQ)
-        self.assertEqual(result.shape[1], self.embedder.embedding_dim,
-                         f"Dim {result.shape[1]} != advertised {self.embedder.embedding_dim}")
+        self.assertEqual(
+            result.shape[1],
+            self.embedder.embedding_dim,
+            f"Dim {result.shape[1]} != advertised {self.embedder.embedding_dim}",
+        )
 
     def test_output_dtype_is_float32(self):
         """Embeddings must be float32 (not float64 — PyTorch default is float32)."""
         result = self.embedder.embed(_HELIX_SEQ)
-        self.assertEqual(result.dtype, np.float32,
-                         f"Expected float32, got {result.dtype}")
+        self.assertEqual(result.dtype, np.float32, f"Expected float32, got {result.dtype}")
 
     def test_embed_structure_shape(self):
         """embed_structure(AtomArray) must return (n_residues, embedding_dim)."""
         import biotite.structure as struc
+
         # Build a minimal 5-residue AtomArray (CA atoms only suffices)
         seq = "ACDEF"
         aa_map = {"A": "ALA", "C": "CYS", "D": "ASP", "E": "GLU", "F": "PHE"}
@@ -224,8 +233,11 @@ class TestEmbeddingShape(unittest.TestCase):
         for i, ch in enumerate(seq):
             a = struc.Atom(
                 [i * 3.8, 0.0, 0.0],
-                chain_id="A", res_id=i + 1, res_name=aa_map[ch],
-                atom_name="CA", element="C",
+                chain_id="A",
+                res_id=i + 1,
+                res_name=aa_map[ch],
+                atom_name="CA",
+                element="C",
             )
             atoms.append(a)
         structure = struc.array(atoms)
@@ -237,6 +249,7 @@ class TestEmbeddingShape(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 3. Value Properties
 # ---------------------------------------------------------------------------
+
 
 class TestEmbeddingValues(unittest.TestCase):
     """
@@ -254,33 +267,33 @@ class TestEmbeddingValues(unittest.TestCase):
 
     def test_all_finite(self):
         """No NaN or Inf in the embedding matrix."""
-        self.assertTrue(np.all(np.isfinite(self.emb)),
-                        "Embedding contains NaN or Inf values")
+        self.assertTrue(np.all(np.isfinite(self.emb)), "Embedding contains NaN or Inf values")
 
     def test_values_bounded(self):
         """Values should be in a plausible range — not wildly exploding."""
         # ESM-2 uses LayerNorm; embeddings are typically in [-10, 10]
         # We use a generous bound to avoid false failures
-        self.assertLess(np.max(np.abs(self.emb)), 100.0,
-                        "Embedding values seem unexpectedly large (>100)")
+        self.assertLess(
+            np.max(np.abs(self.emb)), 100.0, "Embedding values seem unexpectedly large (>100)"
+        )
 
     def test_deterministic(self):
         """Same sequence must produce identical embeddings on two calls."""
         emb1 = self.embedder.embed(_UBIQUITIN_N20)
         emb2 = self.embedder.embed(_UBIQUITIN_N20)
-        np.testing.assert_array_equal(
-            emb1, emb2, err_msg="Embeddings are not deterministic"
-        )
+        np.testing.assert_array_equal(emb1, emb2, err_msg="Embeddings are not deterministic")
 
     def test_not_all_zeros(self):
         """Embeddings must not be trivially zero."""
-        self.assertGreater(np.sum(np.abs(self.emb)), 0.0,
-                           "Embeddings are all zeros — model output is degenerate")
+        self.assertGreater(
+            np.sum(np.abs(self.emb)), 0.0, "Embeddings are all zeros — model output is degenerate"
+        )
 
 
 # ---------------------------------------------------------------------------
 # 4. Semantic Properties
 # ---------------------------------------------------------------------------
+
 
 class TestEmbeddingSemantics(unittest.TestCase):
     """
@@ -326,16 +339,16 @@ class TestEmbeddingSemantics(unittest.TestCase):
         """mean_embed(seq, seq) cosine similarity must be 1.0 (up to float32 eps)."""
         e = self.embedder.mean_embed(_UBIQUITIN_N20)
         sim = self._cosine_sim(e, e)
-        self.assertAlmostEqual(sim, 1.0, places=5,
-                               msg="Identical sequence self-similarity should be 1.0")
+        self.assertAlmostEqual(
+            sim, 1.0, places=5, msg="Identical sequence self-similarity should be 1.0"
+        )
 
     def test_different_sequences_similarity_less_than_one(self):
         """Completely different sequences must not have similarity = 1.0."""
         e_helix = self.embedder.mean_embed(_HELIX_SEQ)
         e_strand = self.embedder.mean_embed(_STRAND_SEQ)
         sim = self._cosine_sim(e_helix, e_strand)
-        self.assertLess(sim, 0.9999,
-                        "Polyalanine and polyvaline should differ in embedding space")
+        self.assertLess(sim, 0.9999, "Polyalanine and polyvaline should differ in embedding space")
 
     def test_sequence_similarity_returns_float_in_minus1_to_1(self):
         """sequence_similarity() must return a scalar in [-1, 1]."""
@@ -354,6 +367,7 @@ class TestEmbeddingSemantics(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 5. Structure Input
 # ---------------------------------------------------------------------------
+
 
 class TestStructureInput(unittest.TestCase):
     """
@@ -377,21 +391,43 @@ class TestStructureInput(unittest.TestCase):
     def _make_structure(self, sequence: str):
         """Build a minimal AtomArray (N, CA, C backbone) for testing."""
         import biotite.structure as struc
+
         aa_map = {
-            "A": "ALA", "C": "CYS", "D": "ASP", "E": "GLU", "F": "PHE",
-            "G": "GLY", "H": "HIS", "I": "ILE", "K": "LYS", "L": "LEU",
-            "M": "MET", "N": "ASN", "P": "PRO", "Q": "GLN", "R": "ARG",
-            "S": "SER", "T": "THR", "V": "VAL", "W": "TRP", "Y": "TYR",
+            "A": "ALA",
+            "C": "CYS",
+            "D": "ASP",
+            "E": "GLU",
+            "F": "PHE",
+            "G": "GLY",
+            "H": "HIS",
+            "I": "ILE",
+            "K": "LYS",
+            "L": "LEU",
+            "M": "MET",
+            "N": "ASN",
+            "P": "PRO",
+            "Q": "GLN",
+            "R": "ARG",
+            "S": "SER",
+            "T": "THR",
+            "V": "VAL",
+            "W": "TRP",
+            "Y": "TYR",
         }
         atoms = []
         for i, ch in enumerate(sequence):
             rn = aa_map.get(ch.upper(), "ALA")
             for aname, offset in [("N", -1.2), ("CA", 0.0), ("C", 1.2)]:
-                atoms.append(struc.Atom(
-                    [i * 3.8 + offset, 0.0, 0.0],
-                    chain_id="A", res_id=i + 1, res_name=rn,
-                    atom_name=aname, element=aname[0],
-                ))
+                atoms.append(
+                    struc.Atom(
+                        [i * 3.8 + offset, 0.0, 0.0],
+                        chain_id="A",
+                        res_id=i + 1,
+                        res_name=rn,
+                        atom_name=aname,
+                        element=aname[0],
+                    )
+                )
         return struc.array(atoms)
 
     def test_embed_structure_returns_correct_shape(self):
@@ -411,7 +447,9 @@ class TestStructureInput(unittest.TestCase):
         emb_seq = self.embedder.embed(seq)
 
         np.testing.assert_allclose(
-            emb_struct, emb_seq, rtol=1e-5,
+            emb_struct,
+            emb_seq,
+            rtol=1e-5,
             err_msg="embed_structure and embed(seq) give different results for the same sequence",
         )
 

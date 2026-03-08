@@ -6,14 +6,14 @@ Uses exact string replacement on function signatures — no logic changes.
 import ast
 from pathlib import Path
 
-ROOT = Path(__file__).parent.parent / 'synth_pdb'
+ROOT = Path(__file__).parent.parent / "synth_pdb"
 
 PATCHES: dict[str, list[tuple[str, str]]] = {}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # physics.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['physics.py'] = [
+PATCHES["physics.py"] = [
     # __init__
     (
         "def __init__(self, forcefield_name='amber14-all.xml', solvent_model='app.OBC2', box_size=1.0):",
@@ -74,7 +74,7 @@ PATCHES['physics.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # validator.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['validator.py'] = [
+PATCHES["validator.py"] = [
     # __init__ — params already typed, just add return
     (
         "def __init__(self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None):",
@@ -120,11 +120,11 @@ PATCHES['validator.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # generator.py  (PeptideGenerator and PeptideResult classes)
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['generator.py'] = [
+PATCHES["generator.py"] = [
     # PeptideGenerator.__init__
     (
-        "def __init__(self, sequence: str = \"ALA-GLY-SER\", **kwargs):",
-        "def __init__(self, sequence: str = \"ALA-GLY-SER\", **kwargs: Any) -> None:",
+        'def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs):',
+        'def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs: Any) -> None:',
     ),
     # PeptideResult.__init__
     (
@@ -141,7 +141,7 @@ PATCHES['generator.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # dataset.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['dataset.py'] = [
+PATCHES["dataset.py"] = [
     (
         "def _generate_single_sample_task(args):",
         "def _generate_single_sample_task(args: tuple) -> Optional[Dict[str, Any]]:",
@@ -163,7 +163,7 @@ PATCHES['dataset.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # decoys.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['decoys.py'] = [
+PATCHES["decoys.py"] = [
     (
         "def __init__(self):\n        pass",
         "def __init__(self) -> None:\n        pass",
@@ -181,7 +181,7 @@ PATCHES['decoys.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # geometry.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['geometry.py'] = [
+PATCHES["geometry.py"] = [
     (
         "def njit(func=None, **kwargs):",
         "def njit(func: Optional[Any] = None, **kwargs: Any) -> Any:",
@@ -199,7 +199,7 @@ PATCHES['geometry.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # batch_generator.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['batch_generator.py'] = [
+PATCHES["batch_generator.py"] = [
     (
         "def save_pdb(self, path: str, index: int = 0):",
         "def save_pdb(self, path: str, index: int = 0) -> None:",
@@ -209,7 +209,7 @@ PATCHES['batch_generator.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # packing.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['packing.py'] = [
+PATCHES["packing.py"] = [
     (
         "def __init__(self, steps: int = 500, temperature: float = 0.5):",
         "def __init__(self, steps: int = 500, temperature: float = 0.5) -> None:",
@@ -223,7 +223,7 @@ PATCHES['packing.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # biophysics.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['biophysics.py'] = [
+PATCHES["biophysics.py"] = [
     (
         "def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0)",
         "def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]",
@@ -233,17 +233,17 @@ PATCHES['biophysics.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # contact.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['contact.py'] = [
+PATCHES["contact.py"] = [
     (
-        "def compute_contact_map(structure, method=\"ca\", threshold=8.0, power=None):",
-        "def compute_contact_map(structure: Any, method: str = \"ca\", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:",
+        'def compute_contact_map(structure, method="ca", threshold=8.0, power=None):',
+        'def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:',
     ),
 ]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # torsion.py  (the function already has typed params, just needs return)
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['torsion.py'] = [
+PATCHES["torsion.py"] = [
     (
         "def export_torsion_angles(data: List[Dict[str, Any]], output_file: str",
         "def export_torsion_angles(data: List[Dict[str, Any]], output_file: str",
@@ -251,17 +251,17 @@ PATCHES['torsion.py'] = [
     ),
 ]
 # Reset — will handle in the script logic instead
-PATCHES['torsion.py'] = []
+PATCHES["torsion.py"] = []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # distogram.py  (same: params typed, return missing)
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['distogram.py'] = []
+PATCHES["distogram.py"] = []
 
 # ─────────────────────────────────────────────────────────────────────────────
 # evolution.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['evolution.py'] = [
+PATCHES["evolution.py"] = [
     (
         "def write_msa(sequences: List[str], filename: str):",
         "def write_msa(sequences: List[str], filename: str) -> None:",
@@ -271,7 +271,7 @@ PATCHES['evolution.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # docking.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['docking.py'] = [
+PATCHES["docking.py"] = [
     (
         "def __init__(self, forcefield_name='amber14-all.xml'):",
         "def __init__(self, forcefield_name: str = 'amber14-all.xml') -> None:",
@@ -281,7 +281,7 @@ PATCHES['docking.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # plm.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['plm.py'] = [
+PATCHES["plm.py"] = [
     (
         "def _extract_sequence(structure) -> str:",
         "def _extract_sequence(structure: Any) -> str:",
@@ -291,7 +291,7 @@ PATCHES['plm.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # quality/classifier.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['quality/classifier.py'] = [
+PATCHES["quality/classifier.py"] = [
     (
         "def __init__(self, model_path: Optional[str] = None):",
         "def __init__(self, model_path: Optional[str] = None) -> None:",
@@ -305,7 +305,7 @@ PATCHES['quality/classifier.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # quality/interpolate.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['quality/interpolate.py'] = [
+PATCHES["quality/interpolate.py"] = [
     (
         "def _reconstruct_backbone(phi, psi, omega):",
         "def _reconstruct_backbone(phi: np.ndarray, psi: np.ndarray, omega: np.ndarray) -> np.ndarray:",
@@ -323,7 +323,7 @@ PATCHES['quality/interpolate.py'] = [
 # ─────────────────────────────────────────────────────────────────────────────
 # quality/gnn/model.py
 # ─────────────────────────────────────────────────────────────────────────────
-PATCHES['quality/gnn/model.py'] = [
+PATCHES["quality/gnn/model.py"] = [
     (
         "def _check_pyg():",
         "def _check_pyg() -> None:",
@@ -340,7 +340,7 @@ PATCHES['quality/gnn/model.py'] = [
 # need return type on the closing paren (they're multi-line)
 # ─────────────────────────────────────────────────────────────────────────────
 MULTILINE_PATCHES: dict[str, list[tuple[str, str]]] = {
-    'validator.py': [
+    "validator.py": [
         # validate_steric_clashes — add return type at end of closing paren
         (
             "        min_ca_distance: float = 3.0,\n    ):",
@@ -352,14 +352,14 @@ MULTILINE_PATCHES: dict[str, list[tuple[str, str]]] = {
             "        max_hydrophobic_stretch: int = 10,\n    ) -> Dict[str, Any]:",
         ),
     ],
-    'torsion.py': [
+    "torsion.py": [
         # export_torsion_angles — add return type at closing paren
         (
             "    fmt: str = 'csv',\n):",
             "    fmt: str = 'csv',\n) -> None:",
         ),
     ],
-    'distogram.py': [
+    "distogram.py": [
         # export_distogram
         (
             "    fmt: str = 'csv',\n):",
@@ -372,25 +372,30 @@ MULTILINE_PATCHES: dict[str, list[tuple[str, str]]] = {
 def ensure_typing_imports(text: str, path: Path) -> str:
     """Make sure Any, Union, Optional, Tuple, List, Dict are imported where needed."""
     needed = set()
-    if 'Any' in text and 'Any' not in text.split('from typing import')[1].split('\n')[0] if 'from typing import' in text else True:
-        needed.add('Any')
+    if (
+        "Any" in text and "Any" not in text.split("from typing import")[1].split("\n")[0]
+        if "from typing import" in text
+        else True
+    ):
+        needed.add("Any")
     # Just check if Union is now referenced but not imported
-    for name in ['Any', 'Union', 'Tuple']:
-        if f': {name}' in text or f'[{name}' in text or f'{name},' in text:
+    for name in ["Any", "Union", "Tuple"]:
+        if f": {name}" in text or f"[{name}" in text or f"{name}," in text:
             needed.add(name)
 
-    if not needed or 'from typing import' not in text:
+    if not needed or "from typing import" not in text:
         return text
 
     # Find existing typing import line and augment it
     import re
-    m = re.search(r'from typing import ([^\n]+)', text)
+
+    m = re.search(r"from typing import ([^\n]+)", text)
     if m:
-        existing = [x.strip() for x in m.group(1).split(',')]
+        existing = [x.strip() for x in m.group(1).split(",")]
         new_ones = [n for n in sorted(needed) if n not in existing]
         if new_ones:
-            new_import = 'from typing import ' + ', '.join(sorted(set(existing + new_ones)))
-            text = text[:m.start()] + new_import + text[m.end():]
+            new_import = "from typing import " + ", ".join(sorted(set(existing + new_ones)))
+            text = text[: m.start()] + new_import + text[m.end() :]
     return text
 
 
@@ -405,7 +410,7 @@ for rel_path, patches in list(PATCHES.items()) + list(MULTILINE_PATCHES.items())
     if not path.exists():
         print(f"SKIP (not found): {rel_path}")
         continue
-    text = path.read_text(encoding='utf-8')
+    text = path.read_text(encoding="utf-8")
     applied = 0
     for old, new in patches:
         if old in text:
@@ -421,7 +426,7 @@ for rel_path, patches in list(PATCHES.items()) + list(MULTILINE_PATCHES.items())
         except SyntaxError as e:
             print(f"  SYNTAX ERROR in {rel_path}: {e}")
             continue
-        path.write_text(text, encoding='utf-8')
+        path.write_text(text, encoding="utf-8")
         total_applied += applied
         print(f"  {rel_path}: {applied} annotations added")
 

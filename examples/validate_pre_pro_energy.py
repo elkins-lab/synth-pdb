@@ -6,7 +6,7 @@ import sys
 import time
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import tempfile
 
@@ -16,20 +16,21 @@ from synth_pdb.physics import EnergyMinimizer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("validate_energy")
 
+
 def measure_energy(pdb_content, name):
     """
     Minimizes structure and returns time taken.
     Uses EnergyMinimizer class which requires file I/O.
     """
     # Create temp files
-    with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False, mode='w') as temp_in:
+    with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False, mode="w") as temp_in:
         temp_in.write(pdb_content)
         temp_in_path = temp_in.name
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False) as temp_out:
         temp_out_path = temp_out.name
 
-    minimizer = EnergyMinimizer(forcefield_name='amber14-all.xml')
+    minimizer = EnergyMinimizer(forcefield_name="amber14-all.xml")
 
     start_time = time.time()
     try:
@@ -53,6 +54,7 @@ def measure_energy(pdb_content, name):
             os.remove(temp_in_path)
         if os.path.exists(temp_out_path):
             os.remove(temp_out_path)
+
 
 def run_experiment():
     # Sequence: ALA-PRO-ALA-PRO-ALA-PRO
@@ -80,7 +82,7 @@ def run_experiment():
     # Since we set PRE_PRO preference to 75% Beta, it should pick Beta mostly.
 
     logger.info("--- Generating 'Good' Geometry (Default/Pre-Pro Bias) ---")
-    good_pdb = generate_pdb_content(sequence_str=seq, conformation='random', seed=42)
+    good_pdb = generate_pdb_content(sequence_str=seq, conformation="random", seed=42)
     good_time, good_success = measure_energy(good_pdb, "GOOD (Pre-Pro Bias)")
 
     print("\n=== RESULTS ===")
@@ -91,6 +93,7 @@ def run_experiment():
         print(f"--> Improvement: {(bad_time - good_time)/bad_time * 100:.1f}% faster minimization!")
     else:
         print("--> No significant speedup detected (noise or minimal clash cost).")
+
 
 if __name__ == "__main__":
     run_experiment()

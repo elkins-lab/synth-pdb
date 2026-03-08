@@ -1,4 +1,3 @@
-
 from synth_pdb.data import RAMACHANDRAN_POLYGONS
 from synth_pdb.validator import PDBValidator
 
@@ -11,7 +10,7 @@ class TestRamachandranPolygons:
 
     def test_alpha_helix_is_favored_general(self):
         """Standard Alpha Helix (-60, -45) should be in General/Favored."""
-        validator = PDBValidator(parsed_atoms=[]) # Dummy init
+        validator = PDBValidator(parsed_atoms=[])  # Dummy init
 
         # Point: (Phi, Psi)
         point = (-60.0, -47.0)
@@ -29,7 +28,7 @@ class TestRamachandranPolygons:
     def test_beta_sheet_is_favored_general(self):
         """Standard Beta Sheet (-120, 120) should be in General/Favored."""
         validator = PDBValidator(parsed_atoms=[])
-        point = (-135.0, 135.0) # Typical Beta
+        point = (-135.0, 135.0)  # Typical Beta
 
         polygons = RAMACHANDRAN_POLYGONS["General"]["Favored"]
         is_inside = any(validator._is_point_in_polygon(point, poly) for poly in polygons)
@@ -47,7 +46,7 @@ class TestRamachandranPolygons:
     def test_glycine_allows_left_handed_alpha(self):
         """Glycine SHOULD allow Left-handed Alpha (60, 45)."""
         validator = PDBValidator(parsed_atoms=[])
-        point = (60.0, 45.0) # Alpha-L center ish
+        point = (60.0, 45.0)  # Alpha-L center ish
 
         polygons = RAMACHANDRAN_POLYGONS["GLY"]["Favored"]
         is_inside = any(validator._is_point_in_polygon(point, poly) for poly in polygons)
@@ -60,13 +59,15 @@ class TestRamachandranPolygons:
         # Allowed Proline: (-60, -30) or (-60, 150)
         good_point = (-60.0, -30.0)
         polygons = RAMACHANDRAN_POLYGONS["PRO"]["Favored"]
-        assert any(validator._is_point_in_polygon(good_point, p) for p in polygons), \
-            "Proline should allow (-60, -30)"
+        assert any(
+            validator._is_point_in_polygon(good_point, p) for p in polygons
+        ), "Proline should allow (-60, -30)"
 
         # Forbidden Proline: (-120, 120) -> Standard Beta but Proline phi can't do -120
         bad_point = (-120.0, 120.0)
-        assert not any(validator._is_point_in_polygon(bad_point, p) for p in polygons), \
-            "Proline should NOT allow Phi=-120"
+        assert not any(
+            validator._is_point_in_polygon(bad_point, p) for p in polygons
+        ), "Proline should NOT allow Phi=-120"
 
     def test_boundary_conditions(self):
         """Test points exactly on vertices or edges (simple check)."""

@@ -1,4 +1,3 @@
-
 import io
 import unittest
 
@@ -22,7 +21,8 @@ from synth_pdb.geometry import calculate_dihedral_angle
 # We use the midpoint and a ±0.010 Å delta to stay robust across CI environments.
 TEMPLATE_N_CA = 1.471  # midpoint of observed range; vs E&H 1.458
 TEMPLATE_CA_C = 1.505  # vs E&H 1.525
-SKELETON_C_N  = 1.329  # Matches E&H 1.329 exactly (controlled by NeRF)
+SKELETON_C_N = 1.329  # Matches E&H 1.329 exactly (controlled by NeRF)
+
 
 class TestScientificRigor(unittest.TestCase):
     """
@@ -72,7 +72,9 @@ class TestScientificRigor(unittest.TestCase):
         """
         # Generate 1000 Alanines
         n_residues = 1000
-        pdb_content = generate_pdb_content(sequence_str="A" * n_residues, conformation="alpha", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            sequence_str="A" * n_residues, conformation="alpha", minimize_energy=False
+        )
         structure = self._get_structure(pdb_content)
 
         # Calculate bond lengths
@@ -92,7 +94,12 @@ class TestScientificRigor(unittest.TestCase):
         print(f"\n[Geometry] N-CA Mean: {mean_n_ca:.4f} (Ref: {TEMPLATE_N_CA})")
 
         # We expect exact match to Template average (low variance)
-        self.assertAlmostEqual(mean_n_ca, TEMPLATE_N_CA, delta=0.010, msg="N-CA bond length deviates from Biotite Template")
+        self.assertAlmostEqual(
+            mean_n_ca,
+            TEMPLATE_N_CA,
+            delta=0.010,
+            msg="N-CA bond length deviates from Biotite Template",
+        )
         self.assertLess(std_n_ca, 0.01, "N-CA bond length variance is too high")
 
         # 2. CA-C (Internal to residue -> Template)
@@ -114,7 +121,6 @@ class TestScientificRigor(unittest.TestCase):
         # This MUST match the E&H constant defined in data.py because it's set by NeRF
         self.assertAlmostEqual(mean_c_n, SKELETON_C_N, delta=0.010)
 
-
     def test_rotamer_distribution_chi_square(self):
         """
         Verify Valine rotamer distribution in Alpha Helix matches library probabilities
@@ -122,15 +128,19 @@ class TestScientificRigor(unittest.TestCase):
         """
         # Target Distribution for VAL Alpha
         # From data.py: g- (0.90), t (0.05), g+ (0.05)
-        expected_probs = {'g-': 0.90, 't': 0.05, 'g+': 0.05}
-        n_samples = 500  # 500 is sufficient for chi-squared power; 2000 overflows PDB z-coordinate columns
+        expected_probs = {"g-": 0.90, "t": 0.05, "g+": 0.05}
+        n_samples = (
+            500  # 500 is sufficient for chi-squared power; 2000 overflows PDB z-coordinate columns
+        )
 
         # Generate Poly-Valine Helix (seed for determinism — test is otherwise stochastic)
-        pdb_content = generate_pdb_content(sequence_str="V" * n_samples, conformation="alpha", minimize_energy=False, seed=42)
+        pdb_content = generate_pdb_content(
+            sequence_str="V" * n_samples, conformation="alpha", minimize_energy=False, seed=42
+        )
         structure = self._get_structure(pdb_content)
 
         # Measure Chi1 angles
-        counts = {'g-': 0, 't': 0, 'g+': 0}
+        counts = {"g-": 0, "t": 0, "g+": 0}
 
         # We need N, CA, CB, CG1/CG2
         # VAL has CG1 and CG2. Usually Chi1 is defined by N-CA-CB-CG1.
@@ -138,10 +148,9 @@ class TestScientificRigor(unittest.TestCase):
 
         np.where(structure.atom_name == "N")[0]
 
-
         for i in range(n_samples):
             # Extract atoms for this residue
-            res_atoms = structure[structure.res_id == (i+1)]
+            res_atoms = structure[structure.res_id == (i + 1)]
 
             try:
                 n = res_atoms[res_atoms.atom_name == "N"][0]
@@ -149,7 +158,7 @@ class TestScientificRigor(unittest.TestCase):
                 cb = res_atoms[res_atoms.atom_name == "CB"][0]
                 cg1 = res_atoms[res_atoms.atom_name == "CG1"][0]
             except IndexError:
-                continue # Skip malformed
+                continue  # Skip malformed
 
             angle = calculate_dihedral_angle(n.coord, ca.coord, cb.coord, cg1.coord)
 
@@ -159,23 +168,25 @@ class TestScientificRigor(unittest.TestCase):
             # g+: 60 +/- 30 -> [30, 90]
 
             # Normalize to [-180, 180]
-            if angle > 180: angle -= 360
-            if angle < -180: angle += 360
+            if angle > 180:
+                angle -= 360
+            if angle < -180:
+                angle += 360
 
             if -90 <= angle <= -30:
-                counts['g-'] += 1
+                counts["g-"] += 1
             elif (150 <= angle <= 180) or (-180 <= angle <= -150):
-                counts['t'] += 1
+                counts["t"] += 1
             elif 30 <= angle <= 90:
-                counts['g+'] += 1
+                counts["g+"] += 1
             # else: outlier
 
         total_observed = sum(counts.values())
         print(f"\n[Rotamer Stats] Observed: {counts} (Total Valid: {total_observed})")
 
         # Expected counts
-        exp_counts_list = [total_observed * expected_probs[k] for k in ['g-', 't', 'g+']]
-        obs_counts_list = [counts['g-'], counts['t'], counts['g+']]
+        exp_counts_list = [total_observed * expected_probs[k] for k in ["g-", "t", "g+"]]
+        obs_counts_list = [counts["g-"], counts["t"], counts["g+"]]
 
         # Chi-Squared Test
         # Null Hypothesis: The observed distribution matches the expected distribution.
@@ -186,9 +197,11 @@ class TestScientificRigor(unittest.TestCase):
         print(f"[Rotamer Stats] Chi2: {chi2_stat:.4f}, p-value: {p_val:.4f}")
 
         # Critical Check:
-        self.assertGreater(p_val, 0.001,
+        self.assertGreater(
+            p_val,
+            0.001,
             f"Rotamer distribution significantly differs from Theory (p={p_val:.4f} < 0.001). "
-            f"Observed: {obs_counts_list}, Expected: {exp_counts_list}"
+            f"Observed: {obs_counts_list}, Expected: {exp_counts_list}",
         )
 
     def test_ramachandran_peaks(self):
@@ -197,7 +210,9 @@ class TestScientificRigor(unittest.TestCase):
         and NOT just anywhere in the "allowed" region.
         """
         n_samples = 100
-        pdb_content = generate_pdb_content(sequence_str="A" * n_samples, conformation="alpha", minimize_energy=False)
+        pdb_content = generate_pdb_content(
+            sequence_str="A" * n_samples, conformation="alpha", minimize_energy=False
+        )
         structure = self._get_structure(pdb_content)
 
         phi, psi, omega = struc.dihedral_backbone(structure)
@@ -246,13 +261,11 @@ class TestScientificRigor(unittest.TestCase):
         # 30 residues each: enough for stable CSI statistics, small enough to be fast.
         # Poly-Ala helix (Ala is the strongest helix former; no bulky sidechain noise)
         helix_content = generate_pdb_content(
-            sequence_str="A" * 30, conformation="alpha",
-            minimize_energy=False, seed=7
+            sequence_str="A" * 30, conformation="alpha", minimize_energy=False, seed=7
         )
         # Poly-Val strand (Val strongly prefers beta; high beta propensity)
         strand_content = generate_pdb_content(
-            sequence_str="V" * 30, conformation="beta",
-            minimize_energy=False, seed=7
+            sequence_str="V" * 30, conformation="beta", minimize_energy=False, seed=7
         )
 
         helix_struct = self._get_structure(helix_content)
@@ -267,52 +280,77 @@ class TestScientificRigor(unittest.TestCase):
         helix_csi = calculate_csi(helix_shifts, helix_struct)
         strand_csi = calculate_csi(strand_shifts, strand_struct)
 
-        helix_vals = list(helix_csi.get('A', {}).values())
-        strand_vals = list(strand_csi.get('A', {}).values())
+        helix_vals = list(helix_csi.get("A", {}).values())
+        strand_vals = list(strand_csi.get("A", {}).values())
 
-        self.assertGreater(len(helix_vals), 20,
-            f"Too few helix CSI values ({len(helix_vals)}), check chain ID / residue coverage.")
-        self.assertGreater(len(strand_vals), 20,
-            f"Too few strand CSI values ({len(strand_vals)}), check chain ID / residue coverage.")
+        self.assertGreater(
+            len(helix_vals),
+            20,
+            f"Too few helix CSI values ({len(helix_vals)}), check chain ID / residue coverage.",
+        )
+        self.assertGreater(
+            len(strand_vals),
+            20,
+            f"Too few strand CSI values ({len(strand_vals)}), check chain ID / residue coverage.",
+        )
 
         helix_mean = np.mean(helix_vals)
         strand_mean = np.mean(strand_vals)
 
-        print(f"\n[CSI] Helix  CA mean: {helix_mean:+.3f} ppm  "
-              f"(frac > +0.7: {sum(v > 0.7 for v in helix_vals)/len(helix_vals):.2f})")
-        print(f"[CSI] Strand CA mean: {strand_mean:+.3f} ppm  "
-              f"(frac < -0.7: {sum(v < -0.7 for v in strand_vals)/len(strand_vals):.2f})")
+        print(
+            f"\n[CSI] Helix  CA mean: {helix_mean:+.3f} ppm  "
+            f"(frac > +0.7: {sum(v > 0.7 for v in helix_vals)/len(helix_vals):.2f})"
+        )
+        print(
+            f"[CSI] Strand CA mean: {strand_mean:+.3f} ppm  "
+            f"(frac < -0.7: {sum(v < -0.7 for v in strand_vals)/len(strand_vals):.2f})"
+        )
 
         # ── Assertions (Wishart & Sykes 1994 thresholds) ───────────────────────
         # 1. Helix: mean Cα CSI must be clearly positive
-        self.assertGreater(helix_mean, 0.7,
+        self.assertGreater(
+            helix_mean,
+            0.7,
             f"Helix mean Cα CSI ({helix_mean:+.3f} ppm) should be > +0.7 ppm. "
-            "This suggests backbone phi/psi angles are not in the helical region.")
+            "This suggests backbone phi/psi angles are not in the helical region.",
+        )
 
         # 2. Strand: mean Cα CSI must be clearly negative
-        self.assertLess(strand_mean, -0.7,
+        self.assertLess(
+            strand_mean,
+            -0.7,
             f"Strand mean Cα CSI ({strand_mean:+.3f} ppm) should be < -0.7 ppm. "
-            "This suggests backbone phi/psi angles are not in the sheet region.")
+            "This suggests backbone phi/psi angles are not in the sheet region.",
+        )
 
         # 3. Per-residue consistency: ≥80% of helix residues should be helix-like,
         #    ≥80% of strand residues should be sheet-like
         helix_fraction = sum(v > 0.7 for v in helix_vals) / len(helix_vals)
         strand_fraction = sum(v < -0.7 for v in strand_vals) / len(strand_vals)
 
-        self.assertGreater(helix_fraction, 0.80,
+        self.assertGreater(
+            helix_fraction,
+            0.80,
             f"Only {helix_fraction:.0%} of helix residues have Cα CSI > +0.7 ppm "
-            f"(expected ≥80%). The backbone conformation is inconsistent.")
+            f"(expected ≥80%). The backbone conformation is inconsistent.",
+        )
 
-        self.assertGreater(strand_fraction, 0.80,
+        self.assertGreater(
+            strand_fraction,
+            0.80,
             f"Only {strand_fraction:.0%} of strand residues have Cα CSI < -0.7 ppm "
-            f"(expected ≥80%). The backbone conformation is inconsistent.")
+            f"(expected ≥80%). The backbone conformation is inconsistent.",
+        )
 
         # 4. The two distributions must be well separated (Δmean ≥ 2.0 ppm)
         separation = helix_mean - strand_mean
-        self.assertGreater(separation, 2.0,
+        self.assertGreater(
+            separation,
+            2.0,
             f"Helix–Strand CSI separation ({separation:.2f} ppm) is too small. "
-            "The generator is not producing sufficiently distinct secondary structures.")
+            "The generator is not producing sufficiently distinct secondary structures.",
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

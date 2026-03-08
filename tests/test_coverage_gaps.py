@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 from unittest.mock import MagicMock, patch
@@ -28,7 +27,7 @@ class TestCoverageGaps:
             "ATOM    103  O1P SEP A  10      11.111  22.222  33.333  1.00  0.00           O  ",
         ]
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as tf:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as tf:
             tf.writelines([l + "\n" for l in pdb_lines])
             input_path = tf.name
 
@@ -43,7 +42,8 @@ class TestCoverageGaps:
                 try:
                     minimizer._run_simulation(input_path, "out.pdb")
                 except Exception as e:
-                    if str(e) != "Stop execution after strip check": raise
+                    if str(e) != "Stop execution after strip check":
+                        raise
 
                 written_lines = mock_tf.__enter__.return_value.writelines.call_args[0][0]
 
@@ -57,7 +57,8 @@ class TestCoverageGaps:
                 assert any("SER" in line and " CA " in line for line in written_lines)
 
         finally:
-            if os.path.exists(input_path): os.unlink(input_path)
+            if os.path.exists(input_path):
+                os.unlink(input_path)
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
@@ -86,7 +87,7 @@ class TestCoverageGaps:
         # Mock Positions
         mock_pos = MagicMock()
         mock_pos.__len__.return_value = 1
-        mock_pos.value_in_unit.return_value = [[1,1,1]]
+        mock_pos.value_in_unit.return_value = [[1, 1, 1]]
         mock_pdb.positions = mock_pos
 
         # Mock Modeller
@@ -111,7 +112,9 @@ class TestCoverageGaps:
         assert minimizer._run_simulation("dummy.pdb", "out.pdb") is None
 
         # 2. NaN Position check
-        mock_state.getPotentialEnergy.return_value.value_in_unit.return_value = 100.0 # Valid energy
+        mock_state.getPotentialEnergy.return_value.value_in_unit.return_value = (
+            100.0  # Valid energy
+        )
         mock_nan_pos = MagicMock()
         mock_nan_pos.__len__.return_value = 1
         mock_nan_pos.value_in_unit.return_value = [[np.nan, 1, 1]]
@@ -125,6 +128,7 @@ class TestCoverageGaps:
         Verify that extremely high energy triggers a warning but allows success.
         """
         import logging
+
         caplog.set_level(logging.WARNING)
 
         mock_ff = MagicMock()
@@ -142,7 +146,7 @@ class TestCoverageGaps:
         mock_pdb.topology = mock_topo
         mock_pos = MagicMock()
         mock_pos.__len__.return_value = 1
-        mock_pos.value_in_unit.return_value = [[1,1,1]]
+        mock_pos.value_in_unit.return_value = [[1, 1, 1]]
         mock_pdb.positions = mock_pos
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
@@ -174,26 +178,27 @@ class TestCoverageGaps:
             "ATOM      5  CA  GLY A   1       4.000   4.000   4.000  1.00  0.00           C  \n"
         )
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as tf:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as tf:
             tf.write(min_pdb_content)
             out_pdb_path = tf.name
 
         try:
             with patch("synth_pdb.generator.EnergyMinimizer") as mock_min_class:
                 mock_min = mock_min_class.return_value
+
                 def side_effect(input_path, output_path, **kwargs):
-                    with open(output_path, 'w') as f:
+                    with open(output_path, "w") as f:
                         f.write(min_pdb_content)
                     return True
+
                 mock_min.add_hydrogens_and_minimize.side_effect = side_effect
 
                 content = generate_pdb_content(
-                    sequence_str="SEP",
-                    minimize_energy=True,
-                    forcefield="amber14-all.xml"
+                    sequence_str="SEP", minimize_energy=True, forcefield="amber14-all.xml"
                 )
 
                 assert "SEP" in content
                 assert "ACE" in content
         finally:
-            if os.path.exists(out_pdb_path): os.unlink(out_pdb_path)
+            if os.path.exists(out_pdb_path):
+                os.unlink(out_pdb_path)

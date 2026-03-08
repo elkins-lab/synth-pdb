@@ -5,6 +5,7 @@ Tests for synth_pdb/quality/classifier.py — targeting all uncovered lines:
   - Lines 51-53: load_model when joblib.load raises an exception
   - Line 65:  predict() when self.model is None (raises RuntimeError)
 """
+
 import logging
 from unittest.mock import MagicMock, patch
 
@@ -13,6 +14,7 @@ import pytest
 # ---------------------------------------------------------------------------
 # ProteinQualityClassifier.__init__ — no model file present
 # ---------------------------------------------------------------------------
+
 
 class TestClassifierInit:
 
@@ -31,9 +33,9 @@ class TestClassifierInit:
         # Model should be None because there's no .joblib file in the package
         # (in CI / fresh checkouts the model file is not bundled)
         if clf.model is None:
-            assert any("No model found" in r.message for r in caplog.records), (
-                "Expected a 'No model found' warning when no model file exists"
-            )
+            assert any(
+                "No model found" in r.message for r in caplog.records
+            ), "Expected a 'No model found' warning when no model file exists"
 
     def test_explicit_model_path_triggers_load(self, tmp_path):
         """
@@ -41,6 +43,7 @@ class TestClassifierInit:
         We use a path that doesn't exist; load_model should catch the exception.
         """
         from synth_pdb.quality.classifier import ProteinQualityClassifier
+
         fake_path = str(tmp_path / "nonexistent.joblib")
 
         # Should not raise — load_model catches exceptions
@@ -52,6 +55,7 @@ class TestClassifierInit:
 # ---------------------------------------------------------------------------
 # ProteinQualityClassifier.load_model — joblib missing (lines 43-46)
 # ---------------------------------------------------------------------------
+
 
 class TestLoadModelImportError:
 
@@ -74,9 +78,9 @@ class TestLoadModelImportError:
                 clf.load_model(fake_path)
 
         assert clf.model is None
-        assert any("joblib" in r.message.lower() for r in caplog.records), (
-            "Expected an error log mentioning 'joblib' when the import fails"
-        )
+        assert any(
+            "joblib" in r.message.lower() for r in caplog.records
+        ), "Expected an error log mentioning 'joblib' when the import fails"
 
     def test_load_model_exception_sets_model_none(self, tmp_path, caplog):
         """
@@ -102,14 +106,15 @@ class TestLoadModelImportError:
                 clf.load_model(fake_path)
 
         assert clf.model is None, "load_model must set model=None on exception"
-        assert any("Failed to load" in r.message for r in caplog.records), (
-            "Expected an error log when joblib.load raises"
-        )
+        assert any(
+            "Failed to load" in r.message for r in caplog.records
+        ), "Expected an error log when joblib.load raises"
 
 
 # ---------------------------------------------------------------------------
 # ProteinQualityClassifier.predict — model is None (line 65)
 # ---------------------------------------------------------------------------
+
 
 class TestPredictNoModel:
 
@@ -122,12 +127,15 @@ class TestPredictNoModel:
         clf.feature_names = []
 
         with pytest.raises(RuntimeError, match="not loaded"):
-            clf.predict("ATOM   1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\n")
+            clf.predict(
+                "ATOM   1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\n"
+            )
 
 
 # ---------------------------------------------------------------------------
 # ProteinQualityClassifier — happy path with mocked joblib
 # ---------------------------------------------------------------------------
+
 
 class TestPredictHappyPath:
 
@@ -140,8 +148,9 @@ class TestPredictHappyPath:
         from synth_pdb.generator import generate_pdb_content
         from synth_pdb.quality.classifier import ProteinQualityClassifier
 
-        pdb_str = generate_pdb_content(sequence_str="ACDEFGHIK", conformation="alpha",
-                                       minimize_energy=False)
+        pdb_str = generate_pdb_content(
+            sequence_str="ACDEFGHIK", conformation="alpha", minimize_energy=False
+        )
 
         # Build a mock sklearn RandomForestClassifier
         mock_model = MagicMock()
@@ -149,6 +158,7 @@ class TestPredictHappyPath:
 
         clf = ProteinQualityClassifier.__new__(ProteinQualityClassifier)
         from synth_pdb.quality.features import get_feature_names
+
         clf.feature_names = get_feature_names()
         clf.model = mock_model
 
@@ -158,7 +168,7 @@ class TestPredictHappyPath:
         assert isinstance(prob, float)
         assert isinstance(feat_dict, dict)
         assert 0.0 <= prob <= 1.0
-        assert is_good   # 0.7 > 0.5
+        assert is_good  # 0.7 > 0.5
 
     def test_predict_low_score_is_bad(self, tmp_path):
         """When model gives P(good)=0.2, is_good should be False."""
@@ -167,14 +177,16 @@ class TestPredictHappyPath:
         from synth_pdb.generator import generate_pdb_content
         from synth_pdb.quality.classifier import ProteinQualityClassifier
 
-        pdb_str = generate_pdb_content(sequence_str="ACDEFGHIK", conformation="alpha",
-                                       minimize_energy=False)
+        pdb_str = generate_pdb_content(
+            sequence_str="ACDEFGHIK", conformation="alpha", minimize_energy=False
+        )
 
         mock_model = MagicMock()
         mock_model.predict_proba.return_value = np.array([[0.8, 0.2]])
 
         clf = ProteinQualityClassifier.__new__(ProteinQualityClassifier)
         from synth_pdb.quality.features import get_feature_names
+
         clf.feature_names = get_feature_names()
         clf.model = mock_model
 

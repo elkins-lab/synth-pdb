@@ -1,4 +1,3 @@
-
 import biotite.structure as struc
 from synth_nmr.chemical_shifts import RANDOM_COIL_SHIFTS, predict_empirical_shifts
 
@@ -15,31 +14,36 @@ def create_mock_phe_system():
         ("N", [0, 10, 0], "N"),
         ("CA", [0, 10, 0], "C"),
         ("C", [0, 10, 0], "C"),
-
         # Ring Atoms (Benzene-like roughly)
         # Center is 0,0,0
-        ("CG",  [0.0, 1.40, 0.0], "C"),
+        ("CG", [0.0, 1.40, 0.0], "C"),
         ("CD1", [1.21, 0.70, 0.0], "C"),
         ("CD2", [-1.21, 0.70, 0.0], "C"),
         ("CE1", [1.21, -0.70, 0.0], "C"),
         ("CE2", [-1.21, -0.70, 0.0], "C"),
-        ("CZ",  [0.0, -1.40, 0.0], "C"),
+        ("CZ", [0.0, -1.40, 0.0], "C"),
     ]
 
     atoms = []
     for name, coord, element in phe_atoms:
-        atom = struc.Atom(coord, atom_name=name, res_name="PHE", res_id=1, chain_id="A", element=element)
+        atom = struc.Atom(
+            coord, atom_name=name, res_name="PHE", res_id=1, chain_id="A", element=element
+        )
         atoms.append(atom)
 
     # 2. Add a Probe Proton directly ABOVE the ring (Shielded Zone)
     # Position: (0, 0, 3.0) - On the normal vector
     # We call it "HA" of residue 2 (ALA) for simplicity
-    probe_shielded = struc.Atom([0.0, 0.0, 3.0], atom_name="HA", res_name="ALA", res_id=2, chain_id="A", element="H")
+    probe_shielded = struc.Atom(
+        [0.0, 0.0, 3.0], atom_name="HA", res_name="ALA", res_id=2, chain_id="A", element="H"
+    )
     atoms.append(probe_shielded)
 
     # 3. Add a Probe Proton in the PLANE of the ring (Deshielded Zone)
     # Position: (0, 4.0, 0.0) - Extended from CG
-    probe_deshielded = struc.Atom([0.0, 4.0, 0.0], atom_name="HA", res_name="ALA", res_id=3, chain_id="A", element="H")
+    probe_deshielded = struc.Atom(
+        [0.0, 4.0, 0.0], atom_name="HA", res_name="ALA", res_id=3, chain_id="A", element="H"
+    )
     atoms.append(probe_deshielded)
 
     array = struc.array(atoms)
@@ -50,6 +54,7 @@ def create_mock_phe_system():
     # But chemical_shifts.py handles missing SS by defaulting to coil.
 
     return array
+
 
 def test_ring_current_shielding():
     """
@@ -84,8 +89,10 @@ def test_ring_current_shielding():
     # The current code (without RC) will just return base_shift +/- noise (0.15)
 
     # Ensure it's not just noise
-    assert probe_shift < (base_shift - 0.2), \
-        f"Probe above ring should be shielded! (Got {probe_shift}, Base {base_shift})"
+    assert probe_shift < (
+        base_shift - 0.2
+    ), f"Probe above ring should be shielded! (Got {probe_shift}, Base {base_shift})"
+
 
 def test_ring_current_deshielding():
     """
@@ -109,5 +116,6 @@ def test_ring_current_deshielding():
     print(f"Deshielded Probe: {probe_shift}")
 
     # Ring Current Effect should be POSITIVE (Downfield Shift)
-    assert probe_shift > (base_shift + 0.2), \
-        f"Probe in ring plane should be deshielded! (Got {probe_shift}, Base {base_shift})"
+    assert probe_shift > (
+        base_shift + 0.2
+    ), f"Probe in ring plane should be deshielded! (Got {probe_shift}, Base {base_shift})"

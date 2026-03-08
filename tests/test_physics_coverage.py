@@ -1,4 +1,3 @@
-
 import sys
 from unittest.mock import MagicMock, mock_open, patch
 
@@ -26,11 +25,12 @@ class TestPhysicsCoverage:
     def test_init_missing_openmm_returns_early(self):
         """When HAS_OPENMM is False, __init__ returns early without setting attrs."""
         # Use patch to mock HAS_OPENMM at the module level
-        with patch('synth_pdb.physics.HAS_OPENMM', False):
+        with patch("synth_pdb.physics.HAS_OPENMM", False):
             from synth_pdb.physics import EnergyMinimizer
+
             minimizer = EnergyMinimizer()
             # If it returned early, it didn't set self.forcefield_name
-            assert not hasattr(minimizer, 'forcefield_name')
+            assert not hasattr(minimizer, "forcefield_name")
 
     def test_init_unknown_solvent_model_falls_back_to_explicit(self, caplog):
         """Unknown implicit solvent model logs a warning and defaults to 'explicit'."""
@@ -63,7 +63,7 @@ class TestPhysicsCoverage:
         """
         # ForceField constructor raises Exception
         mock_app.ForceField.side_effect = Exception("XML file missing")
-        mock_app.OBC2 = "OBC2" # Needed for defaults
+        mock_app.OBC2 = "OBC2"  # Needed for defaults
 
         with pytest.raises(Exception, match="XML file missing"):
             synth_pdb.physics.EnergyMinimizer()
@@ -92,6 +92,7 @@ class TestPhysicsCoverage:
         and restoring them after addHydrogens.
         """
         import logging
+
         caplog.set_level(logging.INFO)
 
         minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -104,7 +105,7 @@ class TestPhysicsCoverage:
         mock_pdb = MagicMock()
         mock_topology = MagicMock()
         mock_pdb.topology = mock_topology
-        mock_positions = [1, 2, 3] # Dummy list
+        mock_positions = [1, 2, 3]  # Dummy list
         mock_pdb.positions = mock_positions
 
         mock_app.PDBFile.return_value = mock_pdb
@@ -113,7 +114,7 @@ class TestPhysicsCoverage:
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
         mock_modeller.topology = mock_topology
-        mock_modeller.positions = mock_positions # Initially same
+        mock_modeller.positions = mock_positions  # Initially same
 
         # Setup residues in topology:
         # 1. Protein residue (ALA)
@@ -137,16 +138,18 @@ class TestPhysicsCoverage:
         # Mock addHydrogens behavior
         # After addHydrogens is called, we simulate the Modeller losing the ZN residue
         def side_effect_add_hydrogens(*args, **kwargs):
-             mock_topology.residues.side_effect = None
-             # Only ALA is left after hydrogen addition
-             # Reset atoms iterator to only return ALA atoms
-             mock_topology.residues.return_value = [mock_res_ala]
-             mock_topology.atoms.side_effect = lambda: iter([MagicMock()])
+            mock_topology.residues.side_effect = None
+            # Only ALA is left after hydrogen addition
+            # Reset atoms iterator to only return ALA atoms
+            mock_topology.residues.return_value = [mock_res_ala]
+            mock_topology.atoms.side_effect = lambda: iter([MagicMock()])
 
-             def side_effect_add_atom(*args, **kwargs):
-                  pass
-             mock_topology.addAtom.side_effect = side_effect_add_atom
-             return
+            def side_effect_add_atom(*args, **kwargs):
+                pass
+
+            mock_topology.addAtom.side_effect = side_effect_add_atom
+            return
+
         mock_modeller.addHydrogens.side_effect = side_effect_add_hydrogens
 
         # Setup Mock Residues
@@ -201,16 +204,26 @@ class TestPhysicsCoverage:
         mock_simulation.topology = mock_topology
 
         # Patch sys.modules
-        with patch.dict(sys.modules, {
-            "biotite": mock_biotite,
-            "biotite.structure": mock_biotite_structure,
-            "biotite.structure.io": MagicMock(),
-            "biotite.structure.io.pdb": mock_biotite_pdb_module,
-            "synth_pdb.cofactors": mock_cofactors,
-            "synth_pdb.biophysics": mock_biophysics
-        }), patch("builtins.open", mock_open(read_data="ATOM      1  N   ALA A   1       0.000   0.000   0.000\nHETATM    2 ZN    ZN A   2       5.000   5.000   5.000  1.00 20.00          ZN\n")), patch("os.path.exists", return_value=True):
-             # Run internal simulation method
-             minimizer._run_simulation("dummy.pdb", "out.pdb", add_hydrogens=True)
+        with patch.dict(
+            sys.modules,
+            {
+                "biotite": mock_biotite,
+                "biotite.structure": mock_biotite_structure,
+                "biotite.structure.io": MagicMock(),
+                "biotite.structure.io.pdb": mock_biotite_pdb_module,
+                "synth_pdb.cofactors": mock_cofactors,
+                "synth_pdb.biophysics": mock_biophysics,
+            },
+        ), patch(
+            "builtins.open",
+            mock_open(
+                read_data="ATOM      1  N   ALA A   1       0.000   0.000   0.000\nHETATM    2 ZN    ZN A   2       5.000   5.000   5.000  1.00 20.00          ZN\n"
+            ),
+        ), patch(
+            "os.path.exists", return_value=True
+        ):
+            # Run internal simulation method
+            minimizer._run_simulation("dummy.pdb", "out.pdb", add_hydrogens=True)
 
         # Verifications
         # 1. Did we detect ZN and try to restore it?
@@ -226,11 +239,20 @@ class TestPhysicsCoverage:
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
         # Mock the internal _run_simulation method
-        with patch.object(minimizer, '_run_simulation', return_value=True) as mock_run:
+        with patch.object(minimizer, "_run_simulation", return_value=True) as mock_run:
             result = minimizer.minimize("in.pdb", "out.pdb", max_iterations=50, tolerance=5.0)
 
             assert result is True
-            mock_run.assert_called_once_with("in.pdb", "out.pdb", max_iterations=50, tolerance=5.0, add_hydrogens=False, cyclic=False, disulfides=None, coordination=None)
+            mock_run.assert_called_once_with(
+                "in.pdb",
+                "out.pdb",
+                max_iterations=50,
+                tolerance=5.0,
+                add_hydrogens=False,
+                cyclic=False,
+                disulfides=None,
+                coordination=None,
+            )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
@@ -239,6 +261,7 @@ class TestPhysicsCoverage:
         Test that _run_simulation returns False if topology has 0 atoms.
         """
         import logging
+
         caplog.set_level(logging.ERROR)
 
         minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -250,7 +273,7 @@ class TestPhysicsCoverage:
         mock_pdb.positions = []
 
         mock_app.PDBFile.return_value = mock_pdb
-        mock_topology.atoms.return_value = iter([]) # Empty iterator
+        mock_topology.atoms.return_value = iter([])  # Empty iterator
 
         # Mock Modeller to also return empty atoms
         mock_modeller = MagicMock()
@@ -269,6 +292,7 @@ class TestPhysicsCoverage:
         Test that we catch empty positions returned by OpenMM state.
         """
         import logging
+
         caplog.set_level(logging.ERROR)
 
         minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -276,9 +300,9 @@ class TestPhysicsCoverage:
         # Setup successful initialization but empty positions at end
         mock_pdb = MagicMock()
         mock_app.PDBFile.return_value = mock_pdb
-        mock_pdb.topology.atoms.return_value = iter([MagicMock()]) # Not empty initially
+        mock_pdb.topology.atoms.return_value = iter([MagicMock()])  # Not empty initially
 
-        mock_modeller = MagicMock() # Modeller
+        mock_modeller = MagicMock()  # Modeller
         mock_app.Modeller.return_value = mock_modeller
         # IMPORTANT: Use lambda to return NEW iterator on every call
         mock_modeller.topology.atoms.side_effect = lambda: iter([MagicMock()])
@@ -296,12 +320,15 @@ class TestPhysicsCoverage:
         minimizer.forcefield = MagicMock()
 
         # Mock internal dependencies to avoid import errors or side effects
-        with patch.dict(sys.modules, {
-            "biotite": MagicMock(),
-            "synth_pdb.cofactors": MagicMock(),
-            "synth_pdb.biophysics": MagicMock()
-        }):
-             result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
+        with patch.dict(
+            sys.modules,
+            {
+                "biotite": MagicMock(),
+                "synth_pdb.cofactors": MagicMock(),
+                "synth_pdb.biophysics": MagicMock(),
+            },
+        ):
+            result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
 
         assert result is None
         assert "OpenMM returned empty positions" in caplog.text
@@ -314,6 +341,7 @@ class TestPhysicsCoverage:
         Test that salt bridge forces are applied when bridges are detected.
         """
         import logging
+
         caplog.set_level(logging.DEBUG)
 
         minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -326,16 +354,24 @@ class TestPhysicsCoverage:
         mock_app.PDBFile.return_value = mock_pdb
 
         # Setup Atoms: Residue 1 (LYS), Residue 10 (ASP)
-        atom1 = MagicMock(); atom1.index = 0; atom1.name = "NZ"; atom1.residue.id = "1"; atom1.residue.name = "LYS"
-        atom2 = MagicMock(); atom2.index = 1; atom2.name = "OD1"; atom2.residue.id = "10"; atom2.residue.name = "ASP"
+        atom1 = MagicMock()
+        atom1.index = 0
+        atom1.name = "NZ"
+        atom1.residue.id = "1"
+        atom1.residue.name = "LYS"
+        atom2 = MagicMock()
+        atom2.index = 1
+        atom2.name = "OD1"
+        atom2.residue.id = "10"
+        atom2.residue.name = "ASP"
 
-        mock_topology.atoms.return_value = iter([atom1, atom2]) # Used in Modeller init
+        mock_topology.atoms.return_value = iter([atom1, atom2])  # Used in Modeller init
 
         # Mock Modeller to return same atoms
         mock_modeller = MagicMock()
         mock_app.Modeller.return_value = mock_modeller
         mock_modeller.topology.atoms.side_effect = lambda: iter([atom1, atom2])
-        mock_modeller.topology.residues.return_value = [] # No ion checks needed
+        mock_modeller.topology.residues.return_value = []  # No ion checks needed
 
         # Mock find_salt_bridges return value
         mock_biophysics = MagicMock()
@@ -354,13 +390,16 @@ class TestPhysicsCoverage:
         mock_simulation.context.getState.return_value.getPositions.return_value = [1]
 
         # Mock Dependencies
-        with patch.dict(sys.modules, {
-            "biotite": MagicMock(),
-            "biotite.structure": MagicMock(),
-            "biotite.structure.io.pdb": MagicMock(),
-            "synth_pdb.cofactors": MagicMock(),
-            "synth_pdb.biophysics": mock_biophysics
-        }):
+        with patch.dict(
+            sys.modules,
+            {
+                "biotite": MagicMock(),
+                "biotite.structure": MagicMock(),
+                "biotite.structure.io.pdb": MagicMock(),
+                "synth_pdb.cofactors": MagicMock(),
+                "synth_pdb.biophysics": mock_biophysics,
+            },
+        ):
             minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
 
         # Verify Force Creation
@@ -375,8 +414,6 @@ class TestPhysicsCoverage:
         # Check logs for debug message
         assert "Found 1 salt bridges" in caplog.text
 
-
-
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_wrapper_methods(self, mock_app):
@@ -386,17 +423,34 @@ class TestPhysicsCoverage:
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
         # Test add_hydrogens_and_minimize
-        with patch.object(minimizer, '_run_simulation', return_value=True) as mock_run:
+        with patch.object(minimizer, "_run_simulation", return_value=True) as mock_run:
             minimizer.add_hydrogens_and_minimize("in.pdb", "out.pdb")
-            mock_run.assert_called_with("in.pdb", "out.pdb", add_hydrogens=True, max_iterations=0, tolerance=10.0, cyclic=False, disulfides=None, coordination=None)
+            mock_run.assert_called_with(
+                "in.pdb",
+                "out.pdb",
+                add_hydrogens=True,
+                max_iterations=0,
+                tolerance=10.0,
+                cyclic=False,
+                disulfides=None,
+                coordination=None,
+            )
 
         # Test equilibrate with steps
         # This requires mocking _run_simulation internals to verify simulation.step(steps) is called
         # But _run_simulation handles that logic. We just need to check if _run_simulation
         # was called with correct equilibration_steps arg by the wrapper
-        with patch.object(minimizer, '_run_simulation', return_value=True) as mock_run:
+        with patch.object(minimizer, "_run_simulation", return_value=True) as mock_run:
             minimizer.equilibrate("in.pdb", "out.pdb", steps=500)
-            mock_run.assert_called_with("in.pdb", "out.pdb", add_hydrogens=True, equilibration_steps=500, cyclic=False, disulfides=None, coordination=None)
+            mock_run.assert_called_with(
+                "in.pdb",
+                "out.pdb",
+                add_hydrogens=True,
+                equilibration_steps=500,
+                cyclic=False,
+                disulfides=None,
+                coordination=None,
+            )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
@@ -425,7 +479,14 @@ class TestPhysicsCoverage:
 
         minimizer.forcefield = MagicMock()
 
-        with patch.dict(sys.modules, {"biotite": MagicMock(), "synth_pdb.cofactors": MagicMock(), "synth_pdb.biophysics": MagicMock()}):
+        with patch.dict(
+            sys.modules,
+            {
+                "biotite": MagicMock(),
+                "synth_pdb.cofactors": MagicMock(),
+                "synth_pdb.biophysics": MagicMock(),
+            },
+        ):
             result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
 
         assert result is not None
@@ -434,6 +495,3 @@ class TestPhysicsCoverage:
         assert minimizer.forcefield.createSystem.call_count == 1
         called_kwargs = minimizer.forcefield.createSystem.call_args[1]
         assert "implicitSolvent" not in called_kwargs
-
-
-

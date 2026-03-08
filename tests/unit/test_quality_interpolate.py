@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 import unittest
@@ -18,7 +17,7 @@ class TestQualityInterpolate(unittest.TestCase):
         self.bad_pdb_path = os.path.join(self.test_dir, "bad.pdb")
 
         # Create dummy structure 1 (len 5)
-        atoms1 = struc.AtomArray(20) # 5 res * 4 atoms
+        atoms1 = struc.AtomArray(20)  # 5 res * 4 atoms
         atoms1.coord = np.zeros((20, 3))
         atoms1.atom_name = np.tile(["N", "CA", "C", "O"], 5)
         atoms1.res_id = np.repeat(range(1, 6), 4)
@@ -49,6 +48,7 @@ class TestQualityInterpolate(unittest.TestCase):
 
     def tearDown(self):
         import shutil
+
         shutil.rmtree(self.test_dir)
 
     def test_interpolate_length_mismatch(self):
@@ -64,5 +64,6 @@ class TestQualityInterpolate(unittest.TestCase):
         for i in range(3):
             self.assertTrue(os.path.exists(f"{out_prefix}_{i}.pdb"))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

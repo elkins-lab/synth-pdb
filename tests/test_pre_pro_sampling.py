@@ -1,4 +1,3 @@
-
 import numpy as np
 import pytest
 
@@ -12,16 +11,20 @@ def test_sample_ramachandran_arguments():
     Currently this will fail with TypeError.
     """
     try:
-        phi, psi = _sample_ramachandran_angles('ALA', next_res_name='PRO')
+        phi, psi = _sample_ramachandran_angles("ALA", next_res_name="PRO")
     except TypeError:
         pytest.fail("Function does not accept 'next_res_name' argument")
+
 
 def test_pre_pro_definitions_exist():
     """
     TDD: Verify PRE_PRO definitions exist in data.py.
     Currently fails because key is missing.
     """
-    assert 'PRE_PRO' in RAMACHANDRAN_REGIONS, "PRE_PRO distribution missing from RAMACHANDRAN_REGIONS"
+    assert (
+        "PRE_PRO" in RAMACHANDRAN_REGIONS
+    ), "PRE_PRO distribution missing from RAMACHANDRAN_REGIONS"
+
 
 def test_pre_pro_distribution_bias():
     """
@@ -36,7 +39,7 @@ def test_pre_pro_distribution_bias():
 
     # We expect the function to handle the logic: if next is PRO, use PRE_PRO distribution
     for _ in range(1000):
-        p, s = _sample_ramachandran_angles('ALA', next_res_name='PRO')
+        p, s = _sample_ramachandran_angles("ALA", next_res_name="PRO")
         phis.append(p)
         psis.append(s)
 
@@ -66,6 +69,7 @@ def test_pre_pro_distribution_bias():
     assert beta_frac > alpha_frac, "Pre-Pro should favor Beta/Extended over Alpha"
     assert beta_frac > 0.50, "Pre-Pro should be predominately Extended/Beta"
 
+
 def test_gly_pro_exception():
     """
     TDD: GLY and PRO as current residues have their own strong preferences
@@ -79,11 +83,13 @@ def test_gly_pro_exception():
     # Sample GLY before PRO
     phis = []
     for _ in range(500):
-        p, s = _sample_ramachandran_angles('GLY', next_res_name='PRO')
+        p, s = _sample_ramachandran_angles("GLY", next_res_name="PRO")
         phis.append(p)
 
     # Glycine has positive Phi values (left side of plot). General/Pre-Pro does not.
     # If we see significant positive Phis, we know it's using GLY map.
     pos_phi_frac = np.sum(np.array(phis) > 0) / 500.0
 
-    assert pos_phi_frac > 0.1, "GLY-PRO should still retain GLY characteristics (positive Phi allowed)"
+    assert (
+        pos_phi_frac > 0.1
+    ), "GLY-PRO should still retain GLY characteristics (positive Phi allowed)"

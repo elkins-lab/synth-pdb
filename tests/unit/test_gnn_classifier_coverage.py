@@ -5,6 +5,7 @@ Tests for synth_pdb/quality/gnn/gnn_classifier.py — targeting uncovered lines:
   - Lines 280-281: load() ImportError when torch is absent
   - Lines 303-305: load() exception path
 """
+
 import os
 from unittest.mock import patch
 
@@ -17,20 +18,24 @@ torch = pytest.importorskip("torch", reason="PyTorch not installed; skipping GNN
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_fresh_classifier():
     """Return a GNNQualityClassifier with a randomly-initialized model (no checkpoint)."""
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
+
     return GNNQualityClassifier()  # no checkpoint → uses _init_fresh_model()
 
 
 def _make_helix_pdb(length: int = 12) -> str:
     from synth_pdb.generator import generate_pdb_content
+
     return generate_pdb_content(length=length, conformation="alpha", minimize_energy=False)
 
 
 # ---------------------------------------------------------------------------
 # predict() — torch ImportError (lines 185-186)
 # ---------------------------------------------------------------------------
+
 
 class TestGNNPredictImportError:
 
@@ -47,7 +52,9 @@ class TestGNNPredictImportError:
         pdb_str = _make_helix_pdb()
 
         # Hide torch inside the gnn_classifier module scope
-        with patch.dict("sys.modules", {"torch": None, "torch_geometric": None, "torch_geometric.data": None}):
+        with patch.dict(
+            "sys.modules", {"torch": None, "torch_geometric": None, "torch_geometric.data": None}
+        ):
             with pytest.raises(ImportError, match="torch"):
                 clf.predict(pdb_str)
 
@@ -55,6 +62,7 @@ class TestGNNPredictImportError:
 # ---------------------------------------------------------------------------
 # save() / load() round-trip (lines 240-241, 280-305)
 # ---------------------------------------------------------------------------
+
 
 class TestGNNSaveLoad:
 
@@ -121,6 +129,7 @@ class TestGNNSaveLoad:
 # predict() — happy path with fresh (untrained) model
 # ---------------------------------------------------------------------------
 
+
 class TestGNNPredictHappyPath:
 
     def test_predict_returns_correct_types(self):
@@ -138,6 +147,7 @@ class TestGNNPredictHappyPath:
     def test_predict_feature_dict_has_expected_keys(self):
         """Feature dict must contain exactly the 8 expected feature names."""
         from synth_pdb.quality.gnn.gnn_classifier import _FEATURE_NAMES
+
         clf = _make_fresh_classifier()
         pdb_str = _make_helix_pdb(10)
 
@@ -185,4 +195,3 @@ class TestGNNPredictHappyPath:
                     assert "No pre-trained GNN checkpoint found at" in caplog.text
                     assert "Classifier initialised with a random-weight model" in caplog.text
                     mock_init.assert_called_once()
-

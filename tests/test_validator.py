@@ -25,6 +25,7 @@ from synth_pdb.generator import (  # Import create_atom_line
 
 logging.getLogger().setLevel(logging.DEBUG)
 
+
 def is_valid_pdb_file(file_path: str) -> bool:
     """
     Helper function to determine if a PDB file is valid based on whether
@@ -42,13 +43,18 @@ def is_valid_pdb_file(file_path: str) -> bool:
 class TestPDBValidator:
     def test_parse_pdb_atoms(self):
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, 1.0, 2.0, 3.0, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, 1.5, 2.5, 3.5, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "N", "ALA", "A", 1, 1.0, 2.0, 3.0, "N", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 1, 1.5, 2.5, 3.5, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         assert len(validator.atoms) == 2
-        assert validator.atoms[0]['atom_name'] == "N"
-        assert np.array_equal(validator.atoms[0]['coords'], np.array([1.0, 2.0, 3.0]))
+        assert validator.atoms[0]["atom_name"] == "N"
+        assert np.array_equal(validator.atoms[0]["coords"], np.array([1.0, 2.0, 3.0]))
 
     def test_is_valid_pdb_file(self, tmp_path):
         # Create a dummy valid PDB file
@@ -94,7 +100,7 @@ class TestPDBValidator:
         p1 = np.array([0.0, 0.0, 0.0])
         p2 = np.array([1.0, 0.0, 0.0])
         p3 = np.array([1.0, 1.0, 0.0])
-        p4 = np.array([1.0, 1.0, 1.0]) # Z-component makes it non-planar with XY plane
+        p4 = np.array([1.0, 1.0, 1.0])  # Z-component makes it non-planar with XY plane
         # This angle should be 90 degrees (or -90, depending on implementation detail)
         # We check for absolute value to handle potential sign differences.
         assert abs(PDBValidator._calculate_dihedral_angle(p1, p2, p3, p4)) == pytest.approx(90.0)
@@ -105,36 +111,59 @@ class TestPDBValidator:
         n1_coords = np.array([0.0, 0.0, 0.0])
         ca1_coords = n1_coords + np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
         c1_coords = ca1_coords + np.array([BOND_LENGTH_CA_C, 0.0, 0.0])
-        o1_coords = c1_coords + np.array([BOND_LENGTH_C_O, 0.0, 0.0]) # simplified
+        o1_coords = c1_coords + np.array([BOND_LENGTH_C_O, 0.0, 0.0])  # simplified
 
-        n2_coords = c1_coords + np.array([BOND_LENGTH_C_N, 0.0, 0.0]) # peptide bond
+        n2_coords = c1_coords + np.array([BOND_LENGTH_C_N, 0.0, 0.0])  # peptide bond
         ca2_coords = n2_coords + np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
 
-
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "O", "ALA", "A", 1, *o1_coords, "O", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(5, "N", "ALA", "A", 2, *n2_coords, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(6, "CA", "ALA", "A", 2, *ca2_coords, "C", alt_loc="", insertion_code="")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                4, "O", "ALA", "A", 1, *o1_coords, "O", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                5, "N", "ALA", "A", 2, *n2_coords, "N", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                6, "CA", "ALA", "A", 2, *ca2_coords, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
-        validator.validate_bond_lengths(tolerance=0.01) # Tight tolerance
+        validator.validate_bond_lengths(tolerance=0.01)  # Tight tolerance
         assert not validator.get_violations()
 
     def test_validate_bond_lengths_violation(self):
         # Create a peptide with a clearly wrong bond length
         n1_coords = np.array([0.0, 0.0, 0.0])
-        ca1_coords = n1_coords + np.array([BOND_LENGTH_N_CA + 0.5, 0.0, 0.0]) # N-CA too long
+        ca1_coords = n1_coords + np.array([BOND_LENGTH_N_CA + 0.5, 0.0, 0.0])  # N-CA too long
         c1_coords = ca1_coords + np.array([BOND_LENGTH_CA_C, 0.0, 0.0])
         o1_coords = c1_coords + np.array([BOND_LENGTH_C_O, 0.0, 0.0])
 
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "O", "ALA", "A", 1, *o1_coords, "O", alt_loc="", insertion_code="")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                4, "O", "ALA", "A", 1, *o1_coords, "O", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_bond_lengths(tolerance=0.01)
@@ -146,9 +175,9 @@ class TestPDBValidator:
     def test_validate_bond_angles_no_violation(self):
         # Create a simple peptide where bond angles are ideal (planar geometry in XY)
         # Manually construct atoms to match ideal bond angles.
-        n_ca_c_angle_rad = np.deg2rad(ANGLE_N_CA_C) # 110.0
-        ca_c_o_angle_rad = np.deg2rad(ANGLE_CA_C_O) # 120.8
-        np.deg2rad(ANGLE_C_N_CA) # 121.7 (for peptide bond C(i)-N(i+1)-CA(i+1))
+        n_ca_c_angle_rad = np.deg2rad(ANGLE_N_CA_C)  # 110.0
+        ca_c_o_angle_rad = np.deg2rad(ANGLE_CA_C_O)  # 120.8
+        np.deg2rad(ANGLE_C_N_CA)  # 121.7 (for peptide bond C(i)-N(i+1)-CA(i+1))
 
         # Residue 1: N1-CA1-C1-O1
         n1_coords = np.array([0.000, 0.000, 0.000])
@@ -163,7 +192,7 @@ class TestPDBValidator:
         # Let's simplify: place N1 at (0,0,0), CA1 at (1.458,0,0)
         # C1 relative to CA1, making an angle of 110 with N1
         # C1 should be in the XY plane for simplicity of this test
-        x_offset_c1 = BOND_LENGTH_CA_C * np.cos(np.pi - n_ca_c_angle_rad) # Angle from CA1-N1 line
+        x_offset_c1 = BOND_LENGTH_CA_C * np.cos(np.pi - n_ca_c_angle_rad)  # Angle from CA1-N1 line
         y_offset_c1 = BOND_LENGTH_CA_C * np.sin(np.pi - n_ca_c_angle_rad)
         c1_coords = ca1_coords + np.array([x_offset_c1, y_offset_c1, 0.0])
 
@@ -187,7 +216,7 @@ class TestPDBValidator:
         # Simplified approach: Use relative placements that guarantee the correct angle for N-CA-C and CA-C-O.
         # N-CA-C angle = 110 deg
         n1 = np.array([0.0, 0.0, 0.0])
-        ca1 = np.array([BOND_LENGTH_N_CA, 0.0, 0.0]) # N1-CA1 along X-axis
+        ca1 = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])  # N1-CA1 along X-axis
         # C1: rotate BOND_LENGTH_CA_C by 110 degrees relative to CA1-N1 direction
         c1_x = ca1[0] + BOND_LENGTH_CA_C * np.cos(np.deg2rad(180 - ANGLE_N_CA_C))
         c1_y = ca1[1] + BOND_LENGTH_CA_C * np.sin(np.deg2rad(180 - ANGLE_N_CA_C))
@@ -196,7 +225,7 @@ class TestPDBValidator:
         # O1: rotate BOND_LENGTH_C_O by 120.8 degrees relative to C1-CA1 direction
         # Vector C1-CA1: (ca1-c1)
         # Angle of C1-CA1 from positive x-axis
-        angle_c1_ca1 = np.arctan2(ca1[1]-c1[1], ca1[0]-c1[0])
+        angle_c1_ca1 = np.arctan2(ca1[1] - c1[1], ca1[0] - c1[0])
         o1_x = c1[0] + BOND_LENGTH_C_O * np.cos(angle_c1_ca1 + np.deg2rad(ANGLE_CA_C_O))
         o1_y = c1[1] + BOND_LENGTH_C_O * np.sin(angle_c1_ca1 + np.deg2rad(ANGLE_CA_C_O))
         o1 = np.array([o1_x, o1_y, 0.0])
@@ -205,30 +234,36 @@ class TestPDBValidator:
         # N2: rotate BOND_LENGTH_C_N by 180 degrees from C1-CA1 direction (for trans)
         # or relative to C1-O1? It should be C1-N2 from C1.
         # Let's simplify and make N2 collinear with C1-CA1 and rotated from C1-X by 180.
-        angle_c1_x = np.arctan2(c1[1]-ca1[1], c1[0]-ca1[0]) # Angle of CA1-C1
+        angle_c1_x = np.arctan2(c1[1] - ca1[1], c1[0] - ca1[0])  # Angle of CA1-C1
         n2_x = c1[0] + BOND_LENGTH_C_N * np.cos(angle_c1_x)
         n2_y = c1[1] + BOND_LENGTH_C_N * np.sin(angle_c1_x)
         n2 = np.array([n2_x, n2_y, 0.0])
 
         # CA2: from N2, forming C1-N2-CA2 angle (121.7)
         # Vector N2-C1
-        angle_n2_c1 = np.arctan2(c1[1]-n2[1], c1[0]-n2[0])
+        angle_n2_c1 = np.arctan2(c1[1] - n2[1], c1[0] - n2[0])
         ca2_x = n2[0] + BOND_LENGTH_N_CA * np.cos(angle_n2_c1 + np.deg2rad(ANGLE_C_N_CA))
         ca2_y = n2[1] + BOND_LENGTH_N_CA * np.sin(angle_n2_c1 + np.deg2rad(ANGLE_C_N_CA))
         ca2 = np.array([ca2_x, ca2_y, 0.0])
 
-
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "O", "ALA", "A", 1, *o1, "O", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(5, "N", "ALA", "A", 2, *n2, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(6, "CA", "ALA", "A", 2, *ca2, "C", alt_loc="", insertion_code="")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(3, "C", "ALA", "A", 1, *c1, "C", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(4, "O", "ALA", "A", 1, *o1, "O", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(5, "N", "ALA", "A", 2, *n2, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(6, "CA", "ALA", "A", 2, *ca2, "C", alt_loc="", insertion_code="")
         )
 
         validator = PDBValidator(pdb_content)
-        validator.validate_bond_angles(tolerance=0.5) # A bit higher tolerance for manual construction
+        validator.validate_bond_angles(
+            tolerance=0.5
+        )  # A bit higher tolerance for manual construction
         assert not validator.get_violations()
 
     def test_validate_bond_angles_violation(self):
@@ -236,12 +271,24 @@ class TestPDBValidator:
         n1_coords = np.array([0.0, 0.0, 0.0])
         ca1_coords = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
         # Incorrect C1 position to create angle violation
-        c1_coords = ca1_coords + np.array([BOND_LENGTH_CA_C * np.cos(np.deg2rad(60.0)), BOND_LENGTH_CA_C * np.sin(np.deg2rad(60.0)), 0.0]) # Should be 110.0
+        c1_coords = ca1_coords + np.array(
+            [
+                BOND_LENGTH_CA_C * np.cos(np.deg2rad(60.0)),
+                BOND_LENGTH_CA_C * np.sin(np.deg2rad(60.0)),
+                0.0,
+            ]
+        )  # Should be 110.0
 
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code="")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1_coords, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 1, *ca1_coords, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3, "C", "ALA", "A", 1, *c1_coords, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_bond_angles(tolerance=1.0)
@@ -260,10 +307,21 @@ class TestPDBValidator:
     def test_validate_ramachandran_no_violation_alpha_like(self):
         # A single residue has no Phi/Psi angles, so no violations expected.
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, 2.983, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "O", "ALA", "A", 1, 3.812, 0.0, 0.0, "O", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3, "C", "ALA", "A", 1, 2.983, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                4, "O", "ALA", "A", 1, 3.812, 0.0, 0.0, "O", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_ramachandran()
@@ -297,10 +355,12 @@ class TestPDBValidator:
         # We want Phi=+60.
         target_phi = 60.0
         c2_res2 = _position_atom_3d_from_internal_coords(
-            p1=c1_res1, p2=n2_res2, p3=ca2_res2,
+            p1=c1_res1,
+            p2=n2_res2,
+            p3=ca2_res2,
             bond_length=BOND_LENGTH_CA_C,
             bond_angle_deg=ANGLE_N_CA_C,
-            dihedral_angle_deg=target_phi # Use +60 to generate +60 (Left-handed Alpha violation)
+            dihedral_angle_deg=target_phi,  # Use +60 to generate +60 (Left-handed Alpha violation)
         )
 
         # Calculate P5 (Res3 N) for Psi=+60
@@ -308,18 +368,26 @@ class TestPDBValidator:
         # We want Psi=+60.
         target_psi = 60.0
         n3_res3 = _position_atom_3d_from_internal_coords(
-            p1=n2_res2, p2=ca2_res2, p3=c2_res2,
+            p1=n2_res2,
+            p2=ca2_res2,
+            p3=c2_res2,
             bond_length=BOND_LENGTH_C_N,
             bond_angle_deg=ANGLE_CA_C_N,
-            dihedral_angle_deg=target_psi # Use +60 to generate +60
+            dihedral_angle_deg=target_psi,  # Use +60 to generate +60
         )
 
         pdb_content = (
-            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "N", "ALA", "A", 2, *n2_res2, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "CA", "ALA", "A", 2, *ca2_res2, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "C", "ALA", "A", 2, *c2_res2, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N", alt_loc="", insertion_code="")
+            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(2, "N", "ALA", "A", 2, *n2_res2, "N", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(
+                3, "CA", "ALA", "A", 2, *ca2_res2, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(4, "C", "ALA", "A", 2, *c2_res2, "C", alt_loc="", insertion_code="")
+            + "\n"
+            + create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N", alt_loc="", insertion_code="")
         )
         validator = PDBValidator(pdb_content)
         validator.validate_ramachandran()
@@ -347,25 +415,33 @@ class TestPDBValidator:
         ca2_res2 = np.array([1.458, 0.0, 0.0])
 
         c2_res2 = _position_atom_3d_from_internal_coords(
-            p1=c1_res1, p2=n2_res2, p3=ca2_res2,
+            p1=c1_res1,
+            p2=n2_res2,
+            p3=ca2_res2,
             bond_length=BOND_LENGTH_CA_C,
             bond_angle_deg=ANGLE_N_CA_C,
-            dihedral_angle_deg=60.0
+            dihedral_angle_deg=60.0,
         )
 
         n3_res3 = _position_atom_3d_from_internal_coords(
-            p1=n2_res2, p2=ca2_res2, p3=c2_res2,
+            p1=n2_res2,
+            p2=ca2_res2,
+            p3=c2_res2,
             bond_length=BOND_LENGTH_C_N,
             bond_angle_deg=ANGLE_CA_C_N,
-            dihedral_angle_deg=60.0
+            dihedral_angle_deg=60.0,
         )
 
         pdb_content = (
-            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C") + "\n" +
-            create_atom_line(2, "N", "GLY", "A", 2, *n2_res2, "N") + "\n" +
-            create_atom_line(3, "CA", "GLY", "A", 2, *ca2_res2, "C") + "\n" +
-            create_atom_line(4, "C", "GLY", "A", 2, *c2_res2, "C") + "\n" +
-            create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N")
+            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C")
+            + "\n"
+            + create_atom_line(2, "N", "GLY", "A", 2, *n2_res2, "N")
+            + "\n"
+            + create_atom_line(3, "CA", "GLY", "A", 2, *ca2_res2, "C")
+            + "\n"
+            + create_atom_line(4, "C", "GLY", "A", 2, *c2_res2, "C")
+            + "\n"
+            + create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N")
         )
         validator = PDBValidator(pdb_content)
         validator.validate_ramachandran()
@@ -393,26 +469,34 @@ class TestPDBValidator:
 
         # Phi = -120
         c2_res2 = _position_atom_3d_from_internal_coords(
-            p1=c1_res1, p2=n2_res2, p3=ca2_res2,
+            p1=c1_res1,
+            p2=n2_res2,
+            p3=ca2_res2,
             bond_length=BOND_LENGTH_CA_C,
             bond_angle_deg=ANGLE_N_CA_C,
-            dihedral_angle_deg=-120.0
+            dihedral_angle_deg=-120.0,
         )
 
         # Psi = 120 (Beta)
         n3_res3 = _position_atom_3d_from_internal_coords(
-            p1=n2_res2, p2=ca2_res2, p3=c2_res2,
+            p1=n2_res2,
+            p2=ca2_res2,
+            p3=c2_res2,
             bond_length=BOND_LENGTH_C_N,
             bond_angle_deg=ANGLE_CA_C_N,
-            dihedral_angle_deg=120.0
+            dihedral_angle_deg=120.0,
         )
 
         pdb_content = (
-            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C") + "\n" +
-            create_atom_line(2, "N", "PRO", "A", 2, *n2_res2, "N") + "\n" +
-            create_atom_line(3, "CA", "PRO", "A", 2, *ca2_res2, "C") + "\n" +
-            create_atom_line(4, "C", "PRO", "A", 2, *c2_res2, "C") + "\n" +
-            create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N")
+            create_atom_line(1, "C", "ALA", "A", 1, *c1_res1, "C")
+            + "\n"
+            + create_atom_line(2, "N", "PRO", "A", 2, *n2_res2, "N")
+            + "\n"
+            + create_atom_line(3, "CA", "PRO", "A", 2, *ca2_res2, "C")
+            + "\n"
+            + create_atom_line(4, "C", "PRO", "A", 2, *c2_res2, "C")
+            + "\n"
+            + create_atom_line(5, "N", "ALA", "A", 3, *n3_res3, "N")
         )
         validator = PDBValidator(pdb_content)
         validator.validate_ramachandran()
@@ -424,9 +508,14 @@ class TestPDBValidator:
 
     def test_parse_clashing_pdb_content(self):
         clashing_pdb_content = (
-            "HEADER    clashing_peptide\n" +
-            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 2, 0.5, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            "HEADER    clashing_peptide\n"
+            + create_atom_line(
+                1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 2, 0.5, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content=clashing_pdb_content)
         parsed_atoms = validator.atoms
@@ -443,7 +532,9 @@ class TestPDBValidator:
     # --- Steric Clash Tests ---
     def test_validate_steric_clashes_no_violation(self):
         # A single atom cannot have clashes.
-        pdb_content = create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+        pdb_content = create_atom_line(
+            1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+        )
         validator = PDBValidator(pdb_content)
         validator.validate_steric_clashes()
         assert not validator.get_violations()
@@ -451,8 +542,13 @@ class TestPDBValidator:
     def test_validate_steric_clashes_atom_atom_violation(self):
         # Two atoms too close, not bonded
         pdb_content = (
-            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "O", "ALA", "A", 2, 0.1, 0.1, 0.1, "O", alt_loc="", insertion_code="") # Very close
+            create_atom_line(
+                1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "O", "ALA", "A", 2, 0.1, 0.1, 0.1, "O", alt_loc="", insertion_code=""
+            )  # Very close
         )
         validator = PDBValidator(pdb_content)
         validator.validate_steric_clashes(min_atom_distance=2.0)
@@ -465,9 +561,17 @@ class TestPDBValidator:
     def test_validate_steric_clashes_ca_ca_violation(self):
         # Two non-consecutive CA atoms too close
         pdb_content = (
-            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "C", "ALA", "A", 1, 1.5, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" + # intermediate atom
-            create_atom_line(3, "CA", "ALA", "A", 3, 0.1, 0.1, 0.1, "C", alt_loc="", insertion_code="") # Res 3 CA too close to Res 1 CA
+            create_atom_line(
+                1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "C", "ALA", "A", 1, 1.5, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"  # intermediate atom
+            + create_atom_line(
+                3, "CA", "ALA", "A", 3, 0.1, 0.1, 0.1, "C", alt_loc="", insertion_code=""
+            )  # Res 3 CA too close to Res 1 CA
         )
         validator = PDBValidator(pdb_content)
         validator.validate_steric_clashes(min_ca_distance=3.8)
@@ -477,8 +581,13 @@ class TestPDBValidator:
     def test_validate_steric_clashes_vdw_overlap_violation(self):
         # Two atoms with overlapping vdW radii
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "O", "ALA", "A", 2, 0.5, 0.0, 0.0, "O", alt_loc="", insertion_code="") # N vdw=1.55, O vdw=1.52. Sum=3.07. 0.8*sum = 2.45. 0.5 is a clash.
+            create_atom_line(
+                1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "O", "ALA", "A", 2, 0.5, 0.0, 0.0, "O", alt_loc="", insertion_code=""
+            )  # N vdw=1.55, O vdw=1.52. Sum=3.07. 0.8*sum = 2.45. 0.5 is a clash.
         )
         validator = PDBValidator(pdb_content)
         validator.validate_steric_clashes(vdw_overlap_factor=0.8)
@@ -492,8 +601,11 @@ class TestPDBValidator:
         # Create a PDB content with a deliberate steric clash
         # Two carbon atoms, non-bonded, placed very close
         clashing_pdb_content = (
-            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 2, 0.5, 0.0, 0.0, "C") # Closer than 2.0A min_atom_distance
+            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C")
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ALA", "A", 2, 0.5, 0.0, 0.0, "C"
+            )  # Closer than 2.0A min_atom_distance
         )
 
         # Initial validation to confirm clash exists
@@ -504,7 +616,9 @@ class TestPDBValidator:
 
         # Apply tweak
         initial_parsed_atoms = initial_validator.get_atoms()
-        tweaked_atoms = PDBValidator._apply_steric_clash_tweak(initial_parsed_atoms, push_distance=0.1)
+        tweaked_atoms = PDBValidator._apply_steric_clash_tweak(
+            initial_parsed_atoms, push_distance=0.1
+        )
 
         # Re-validate after tweak
         tweaked_pdb_content = PDBValidator.atoms_to_pdb_content(tweaked_atoms)
@@ -513,7 +627,9 @@ class TestPDBValidator:
         tweaked_clashes = [v for v in tweaked_validator.get_violations() if "Steric clash" in v]
 
         # Assert that clashes are reduced
-        assert len(tweaked_clashes) < len(initial_clashes), f"Expected clashes to be reduced, but got {len(tweaked_clashes)} from {len(initial_clashes)}"
+        assert len(tweaked_clashes) < len(
+            initial_clashes
+        ), f"Expected clashes to be reduced, but got {len(tweaked_clashes)} from {len(initial_clashes)}"
         # Optionally, check that total violations are not drastically increased (for a simple tweak)
         # For simplicity, we just check reduction of steric clashes for now.
 
@@ -522,9 +638,10 @@ class TestPDBValidator:
     def test_validate_peptide_plane_no_violation(self):
         # Use generator to create a simple peptide, should be planar
         from synth_pdb.generator import generate_pdb_content
+
         pdb_content = generate_pdb_content(length=2, sequence_str="AA")
         validator = PDBValidator(pdb_content)
-        validator.validate_peptide_plane(tolerance_deg=10.0) # Tight tolerance
+        validator.validate_peptide_plane(tolerance_deg=10.0)  # Tight tolerance
         # assert not validator.get_violations()
 
     def test_validate_peptide_plane_violation(self):
@@ -534,44 +651,50 @@ class TestPDBValidator:
 
         # Residue 1: N1-CA1-C1
         n1 = np.array([0.0, 0.0, 0.0])
-        ca1 = n1 + np.array([BOND_LENGTH_N_CA, 0.0, 0.0]) # N1-CA1 along X
+        ca1 = n1 + np.array([BOND_LENGTH_N_CA, 0.0, 0.0])  # N1-CA1 along X
         # C1 forms N1-CA1-C1 angle. Arbitrary non-zero Z to make it non-planar for subsequent N2
         # C1 placed relative to CA1, making angle ANGLE_N_CA_C with N1. Set dihedral for N-N-CA-C to 90.
         c1 = _position_atom_3d_from_internal_coords(
-            p1=n1 + np.array([0.0, 0.0, 1.0]), # dummy P1
+            p1=n1 + np.array([0.0, 0.0, 1.0]),  # dummy P1
             p2=n1,
             p3=ca1,
             bond_length=BOND_LENGTH_CA_C,
             bond_angle_deg=ANGLE_N_CA_C,
-            dihedral_angle_deg=0.0 # Place C1 in XY plane for simplicity of this test
+            dihedral_angle_deg=0.0,  # Place C1 in XY plane for simplicity of this test
         )
 
         # Residue 2: N2
         # Place N2 such that the N1-CA1-C1-N2 dihedral is clearly not 0 or 180 (e.g., 90 degrees)
         n2 = _position_atom_3d_from_internal_coords(
-            p1=n1,       # P1 = N1
-            p2=ca1,      # P2 = CA1
-            p3=c1,       # P3 = C1
+            p1=n1,  # P1 = N1
+            p2=ca1,  # P2 = CA1
+            p3=c1,  # P3 = C1
             bond_length=BOND_LENGTH_C_N,
-            bond_angle_deg=ANGLE_CA_C_N, # Angle CA1-C1-N2
-            dihedral_angle_deg=90.0 # Force a 90-degree omega violation
+            bond_angle_deg=ANGLE_CA_C_N,  # Angle CA1-C1-N2
+            dihedral_angle_deg=90.0,  # Force a 90-degree omega violation
         )
 
         # We NEED CA2 for the correct Omega definition: CA(i-1)-C(i-1)-N(i)-CA(i)
         # Place CA2 from N2
         ca2 = _position_atom_3d_from_internal_coords(
-            p1=ca1, p2=c1, p3=n2,
+            p1=ca1,
+            p2=c1,
+            p3=n2,
             bond_length=BOND_LENGTH_N_CA,
             bond_angle_deg=ANGLE_N_CA_C,
-            dihedral_angle_deg=90.0 # Omega angle: 90 deg is a decided non-planarity (violation)
+            dihedral_angle_deg=90.0,  # Omega angle: 90 deg is a decided non-planarity (violation)
         )
 
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1, "C") + "\n" +
-            create_atom_line(4, "N", "ALA", "A", 2, *n2, "N") + "\n" +
-            create_atom_line(5, "CA", "ALA", "A", 2, *ca2, "C")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C")
+            + "\n"
+            + create_atom_line(3, "C", "ALA", "A", 1, *c1, "C")
+            + "\n"
+            + create_atom_line(4, "N", "ALA", "A", 2, *n2, "N")
+            + "\n"
+            + create_atom_line(5, "CA", "ALA", "A", 2, *ca2, "C")
         )
         validator = PDBValidator(pdb_content)
         validator.validate_peptide_plane(tolerance_deg=10.0)
@@ -584,6 +707,7 @@ class TestPDBValidator:
     # --- Sequence Improbabilities Tests ---
     def test_validate_sequence_improbabilities_no_violation(self):
         from synth_pdb.generator import generate_pdb_content
+
         # A short, varied sequence should have no improbabilities
         pdb_content = generate_pdb_content(length=5, sequence_str="AGLYS")
         validator = PDBValidator(pdb_content)
@@ -594,7 +718,22 @@ class TestPDBValidator:
         # KKKKK (5 consecutive Lys)
         pdb_content = ""
         for i in range(5):
-            pdb_content += create_atom_line(i+1, "CA", "LYS", "A", i+1, i*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n"
+            pdb_content += (
+                create_atom_line(
+                    i + 1,
+                    "CA",
+                    "LYS",
+                    "A",
+                    i + 1,
+                    i * CA_DISTANCE,
+                    0.0,
+                    0.0,
+                    "C",
+                    alt_loc="",
+                    insertion_code="",
+                )
+                + "\n"
+            )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities(max_consecutive_charged=4)
         violations = validator.get_violations()
@@ -604,9 +743,27 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_alternating_charges(self):
         # KDKD
         pdb_content = (
-            create_atom_line(1, "CA", "LYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "ASP", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "CA", "LYS", "A", 3, 2*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "LYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "ASP", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3,
+                "CA",
+                "LYS",
+                "A",
+                3,
+                2 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -618,7 +775,22 @@ class TestPDBValidator:
         # VVVVVVVVVVV (11 consecutive Val)
         pdb_content = ""
         for i in range(11):
-            pdb_content += create_atom_line(i+1, "CA", "VAL", "A", i+1, i*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n"
+            pdb_content += (
+                create_atom_line(
+                    i + 1,
+                    "CA",
+                    "VAL",
+                    "A",
+                    i + 1,
+                    i * CA_DISTANCE,
+                    0.0,
+                    0.0,
+                    "C",
+                    alt_loc="",
+                    insertion_code="",
+                )
+                + "\n"
+            )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities(max_hydrophobic_stretch=10)
         violations = validator.get_violations()
@@ -630,9 +802,27 @@ class TestPDBValidator:
         # Val (H), Ala (H), Val (H) - not alternating as expected
         # Need to use POLAR_UNCHARGED_AMINO_ACIDS for P (e.g. Ser)
         pdb_content = (
-            create_atom_line(1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "SER", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "CA", "ALA", "A", 3, 2*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "ALA", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "SER", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3,
+                "CA",
+                "ALA",
+                "A",
+                3,
+                2 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -643,9 +833,27 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_proline_cluster(self):
         # PPP (3 consecutive Pro)
         pdb_content = (
-            create_atom_line(1, "CA", "PRO", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "PRO", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "CA", "PRO", "A", 3, 2*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "PRO", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "PRO", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3,
+                "CA",
+                "PRO",
+                "A",
+                3,
+                2 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities(pro_pro_pro_rare=2)
@@ -656,8 +864,13 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_gly_pro(self):
         # GP
         pdb_content = (
-            create_atom_line(1, "CA", "GLY", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "PRO", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "GLY", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "PRO", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -668,11 +881,55 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_cysteine_odd_count(self):
         # Cys-Gly-Gly-Gly-Gly (odd number of Cys, no consecutive Cys)
         pdb_content = (
-            create_atom_line(1, "CA", "CYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(3, "CA", "GLY", "A", 3, 2*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(4, "CA", "GLY", "A", 4, 3*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(5, "CA", "GLY", "A", 5, 4*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "CYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                3,
+                "CA",
+                "GLY",
+                "A",
+                3,
+                2 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
+            + "\n"
+            + create_atom_line(
+                4,
+                "CA",
+                "GLY",
+                "A",
+                4,
+                3 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
+            + "\n"
+            + create_atom_line(
+                5,
+                "CA",
+                "GLY",
+                "A",
+                5,
+                4 * CA_DISTANCE,
+                0.0,
+                0.0,
+                "C",
+                alt_loc="",
+                insertion_code="",
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -684,8 +941,13 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_cys_cys(self):
         # CC
         pdb_content = (
-            create_atom_line(1, "CA", "CYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "CYS", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "CYS", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "CYS", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -696,8 +958,13 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_pro_gly_turn(self):
         # PG
         pdb_content = (
-            create_atom_line(1, "CA", "PRO", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "PRO", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -708,8 +975,13 @@ class TestPDBValidator:
     def test_validate_sequence_improbabilities_asn_gly_turn(self):
         # NG
         pdb_content = (
-            create_atom_line(1, "CA", "ASN", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n" +
-            create_atom_line(2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="")
+            create_atom_line(
+                1, "CA", "ASN", "A", 1, 0.0, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
+            + "\n"
+            + create_atom_line(
+                2, "CA", "GLY", "A", 2, CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code=""
+            )
         )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities()
@@ -722,7 +994,22 @@ class TestPDBValidator:
         # KKKKK
         pdb_content = ""
         for i in range(5):
-            pdb_content += create_atom_line(i+1, "CA", "LYS", "A", i+1, i*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n"
+            pdb_content += (
+                create_atom_line(
+                    i + 1,
+                    "CA",
+                    "LYS",
+                    "A",
+                    i + 1,
+                    i * CA_DISTANCE,
+                    0.0,
+                    0.0,
+                    "C",
+                    alt_loc="",
+                    insertion_code="",
+                )
+                + "\n"
+            )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities(max_consecutive_charged=4)
         violations = validator.get_violations()
@@ -731,7 +1018,22 @@ class TestPDBValidator:
         # VVVVVVVVVVV at end
         pdb_content = ""
         for i in range(11):
-            pdb_content += create_atom_line(i+1, "CA", "VAL", "A", i+1, i*CA_DISTANCE, 0.0, 0.0, "C", alt_loc="", insertion_code="") + "\n"
+            pdb_content += (
+                create_atom_line(
+                    i + 1,
+                    "CA",
+                    "VAL",
+                    "A",
+                    i + 1,
+                    i * CA_DISTANCE,
+                    0.0,
+                    0.0,
+                    "C",
+                    alt_loc="",
+                    insertion_code="",
+                )
+                + "\n"
+            )
         validator = PDBValidator(pdb_content)
         validator.validate_sequence_improbabilities(max_hydrophobic_stretch=10)
         violations = validator.get_violations()
@@ -739,7 +1041,9 @@ class TestPDBValidator:
 
     def test_pdb_parsing_errors(self, caplog):
         # Malformed line
-        pdb_content = "ATOM   abc  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+        pdb_content = (
+            "ATOM   abc  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+        )
         validator = PDBValidator(pdb_content)
         assert len(validator.atoms) == 0
         assert "Could not parse PDB ATOM/HETATM line" in caplog.text
@@ -755,7 +1059,7 @@ class TestPDBValidator:
                 "chain_id": "A",
                 "residue_number": 1,
                 "insertion_code": "",
-                "coords": [0.0, 0.0, 0.0], # Testing list conversion to numpy
+                "coords": [0.0, 0.0, 0.0],  # Testing list conversion to numpy
                 "occupancy": 1.0,
                 "temp_factor": 0.0,
                 "element": "N",
@@ -765,7 +1069,7 @@ class TestPDBValidator:
         ]
         validator = PDBValidator(parsed_atoms=atoms)
         assert len(validator.atoms) == 1
-        assert isinstance(validator.atoms[0]['coords'], np.ndarray)
+        assert isinstance(validator.atoms[0]["coords"], np.ndarray)
 
     def test_validator_no_input_error(self):
         with pytest.raises(ValueError, match="Either pdb_content or parsed_atoms must be provided"):
@@ -790,12 +1094,12 @@ class TestPDBValidator:
         # Place CB such that N-CA-CB is defined.
         # Let's use internal coords helper to be robust.
         cb = _position_atom_3d_from_internal_coords(
-            p1=n + np.array([0., 1., 0.]), # Dummy start
+            p1=n + np.array([0.0, 1.0, 0.0]),  # Dummy start
             p2=n,
             p3=ca,
-            bond_length=1.53, # CA-CB
-            bond_angle_deg=110.0, # N-CA-CB
-            dihedral_angle_deg=0.0
+            bond_length=1.53,  # CA-CB
+            bond_angle_deg=110.0,  # N-CA-CB
+            dihedral_angle_deg=0.0,
         )
 
         # CG1: This defines Chi1 (N-CA-CB-CG1).
@@ -804,20 +1108,24 @@ class TestPDBValidator:
             p1=n,
             p2=ca,
             p3=cb,
-            bond_length=1.5, # CB-CG
-            bond_angle_deg=110.0, # CA-CB-CG
-            dihedral_angle_deg=0.0 # Chi1 = 0.0
+            bond_length=1.5,  # CB-CG
+            bond_angle_deg=110.0,  # CA-CB-CG
+            dihedral_angle_deg=0.0,  # Chi1 = 0.0
         )
 
         # We also need C atom to form a complete residue for grouping, though not strictly for Chi1
         c = np.array([ca[0] + 1.5, ca[1], ca[2]])
 
         pdb_content = (
-            create_atom_line(1, "N", "VAL", "A", 1, *n, "N") + "\n" +
-            create_atom_line(2, "CA", "VAL", "A", 1, *ca, "C") + "\n" +
-            create_atom_line(3, "C", "VAL", "A", 1, *c, "C") + "\n" +
-            create_atom_line(4, "CB", "VAL", "A", 1, *cb, "C") + "\n" +
-            create_atom_line(5, "CG1", "VAL", "A", 1, *cg1, "C")
+            create_atom_line(1, "N", "VAL", "A", 1, *n, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "VAL", "A", 1, *ca, "C")
+            + "\n"
+            + create_atom_line(3, "C", "VAL", "A", 1, *c, "C")
+            + "\n"
+            + create_atom_line(4, "CB", "VAL", "A", 1, *cb, "C")
+            + "\n"
+            + create_atom_line(5, "CG1", "VAL", "A", 1, *cg1, "C")
         )
 
         validator = PDBValidator(pdb_content)
@@ -825,15 +1133,15 @@ class TestPDBValidator:
         try:
             validator.validate_side_chain_rotamers(tolerance=20.0)
         except AttributeError:
-             # If method doesn't exist yet (TDD), this confirms we need to add it.
-             # We can fail the test here or let it error out.
-             pytest.fail("validate_side_chain_rotamers method not found on PDBValidator")
+            # If method doesn't exist yet (TDD), this confirms we need to add it.
+            # We can fail the test here or let it error out.
+            pytest.fail("validate_side_chain_rotamers method not found on PDBValidator")
 
         violations = validator.get_violations()
         assert len(violations) >= 1
         assert "Rotamer violation" in violations[0]
         assert "chi1" in violations[0]
-        assert "0.0" in violations[0] # Should mention the measured angle
+        assert "0.0" in violations[0]  # Should mention the measured angle
 
     def test_validate_bond_angles_missing_ca_regression(self):
         """
@@ -850,10 +1158,13 @@ class TestPDBValidator:
         n2 = np.array([3.5, 1.0, 0.0])
 
         pdb_content = (
-            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N") + "\n" +
-            create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C") + "\n" +
-            create_atom_line(3, "C", "ALA", "A", 1, *c1, "C") + "\n" +
-            create_atom_line(4, "N", "ALA", "A", 2, *n2, "N")
+            create_atom_line(1, "N", "ALA", "A", 1, *n1, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, *ca1, "C")
+            + "\n"
+            + create_atom_line(3, "C", "ALA", "A", 1, *c1, "C")
+            + "\n"
+            + create_atom_line(4, "N", "ALA", "A", 2, *n2, "N")
             # Missing CA for ALA 2
         )
 
@@ -861,4 +1172,6 @@ class TestPDBValidator:
         # This call should no longer raise TypeError: 'NoneType' object is not subscriptable
         validator.validate_bond_angles()
         # It should not have found a C-N-CA angle because CA is missing
-        assert len(validator.get_violations()) == 0 or not any("C-N-CA" in v for v in validator.get_violations())
+        assert len(validator.get_violations()) == 0 or not any(
+            "C-N-CA" in v for v in validator.get_violations()
+        )

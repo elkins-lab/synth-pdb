@@ -1,4 +1,3 @@
-
 import shutil
 import tempfile
 import unittest
@@ -25,7 +24,7 @@ class TestDatasetNPZ(unittest.TestCase):
             min_length=10,
             max_length=15,
             seed=42,
-            dataset_format='npz'  # This argument doesn't exist yet -> EXPECTED FAILURE
+            dataset_format="npz",  # This argument doesn't exist yet -> EXPECTED FAILURE
         )
         generator.generate()
 
@@ -43,9 +42,9 @@ class TestDatasetNPZ(unittest.TestCase):
             output_dir=self.test_dir,
             num_samples=1,
             min_length=10,
-            max_length=10, # Fixed length for easier checking
+            max_length=10,  # Fixed length for easier checking
             seed=42,
-            dataset_format='npz'
+            dataset_format="npz",
         )
         generator.generate()
 
@@ -56,15 +55,15 @@ class TestDatasetNPZ(unittest.TestCase):
         data = np.load(file_path)
 
         # Check Keys
-        expected_keys = {'coords', 'sequence', 'contact_map'}
+        expected_keys = {"coords", "sequence", "contact_map"}
         self.assertTrue(expected_keys.issubset(data.files), f"Missing keys. Found: {data.files}")
 
         # Check Shapes
         # Length is 10
         L = 10
-        coords = data['coords']
-        sequence = data['sequence']
-        cmap = data['contact_map']
+        coords = data["coords"]
+        sequence = data["sequence"]
+        cmap = data["contact_map"]
 
         self.assertEqual(coords.shape, (L, 5, 3), "Coords should be (L, 5, 3) -> [N, CA, C, O, CB]")
         self.assertEqual(sequence.shape, (L, 20), "Sequence should be one-hot (L, 20)")
@@ -72,10 +71,13 @@ class TestDatasetNPZ(unittest.TestCase):
 
         # Check Values (Basic sanity)
         # One-hot sequence should sum to 1 per residue
-        self.assertTrue(np.allclose(np.sum(sequence, axis=1), 1.0), "Sequence rows must sum to 1 (one-hot)")
+        self.assertTrue(
+            np.allclose(np.sum(sequence, axis=1), 1.0), "Sequence rows must sum to 1 (one-hot)"
+        )
 
         # Contact map diagonal should be 0
         self.assertTrue(np.allclose(np.diag(cmap), 0.0), "Contact map diagonal should be 0")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

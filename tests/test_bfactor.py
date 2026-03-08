@@ -45,21 +45,19 @@ class TestBfactorCalculation:
         total_residues = 20
 
         # Backbone atom
-        _calculate_bfactor('CA', residue_num, total_residues, 'ALA')
+        _calculate_bfactor("CA", residue_num, total_residues, "ALA")
 
         # Side chain atom
-        _calculate_bfactor('CB', residue_num, total_residues, 'ALA')
+        _calculate_bfactor("CB", residue_num, total_residues, "ALA")
 
         # Side chains should generally have higher B-factors
         # Using average over multiple calls to account for random variation
-        backbone_avg = np.mean([
-            _calculate_bfactor('CA', residue_num, total_residues, 'ALA')
-            for _ in range(10)
-        ])
-        sidechain_avg = np.mean([
-            _calculate_bfactor('CB', residue_num, total_residues, 'ALA')
-            for _ in range(10)
-        ])
+        backbone_avg = np.mean(
+            [_calculate_bfactor("CA", residue_num, total_residues, "ALA") for _ in range(10)]
+        )
+        sidechain_avg = np.mean(
+            [_calculate_bfactor("CB", residue_num, total_residues, "ALA") for _ in range(10)]
+        )
 
         assert sidechain_avg > backbone_avg
 
@@ -74,27 +72,24 @@ class TestBfactorCalculation:
         total_residues = 20
 
         # N-terminus (Low S2)
-        _calculate_bfactor('CA', 1, total_residues, 'ALA', s2=0.45)
+        _calculate_bfactor("CA", 1, total_residues, "ALA", s2=0.45)
 
         # Middle (High S2)
-        _calculate_bfactor('CA', 10, total_residues, 'ALA', s2=0.85)
+        _calculate_bfactor("CA", 10, total_residues, "ALA", s2=0.85)
 
         # C-terminus (Low S2)
-        _calculate_bfactor('CA', 20, total_residues, 'ALA', s2=0.45)
+        _calculate_bfactor("CA", 20, total_residues, "ALA", s2=0.45)
 
         # Average over multiple calls
-        n_term_avg = np.mean([
-            _calculate_bfactor('CA', 1, total_residues, 'ALA', s2=0.45)
-            for _ in range(10)
-        ])
-        middle_avg = np.mean([
-            _calculate_bfactor('CA', 10, total_residues, 'ALA', s2=0.85)
-            for _ in range(10)
-        ])
-        c_term_avg = np.mean([
-            _calculate_bfactor('CA', 20, total_residues, 'ALA', s2=0.45)
-            for _ in range(10)
-        ])
+        n_term_avg = np.mean(
+            [_calculate_bfactor("CA", 1, total_residues, "ALA", s2=0.45) for _ in range(10)]
+        )
+        middle_avg = np.mean(
+            [_calculate_bfactor("CA", 10, total_residues, "ALA", s2=0.85) for _ in range(10)]
+        )
+        c_term_avg = np.mean(
+            [_calculate_bfactor("CA", 20, total_residues, "ALA", s2=0.45) for _ in range(10)]
+        )
 
         # Termini should have higher B-factors
         assert n_term_avg > middle_avg
@@ -109,14 +104,8 @@ class TestBfactorCalculation:
         freedom and higher mobility than other amino acids.
         """
         # Average over multiple calls
-        gly_avg = np.mean([
-            _calculate_bfactor('CA', 10, 20, 'GLY', s2=0.85)
-            for _ in range(10)
-        ])
-        ala_avg = np.mean([
-            _calculate_bfactor('CA', 10, 20, 'ALA', s2=0.85)
-            for _ in range(10)
-        ])
+        gly_avg = np.mean([_calculate_bfactor("CA", 10, 20, "GLY", s2=0.85) for _ in range(10)])
+        ala_avg = np.mean([_calculate_bfactor("CA", 10, 20, "ALA", s2=0.85) for _ in range(10)])
 
         assert gly_avg > ala_avg
 
@@ -129,14 +118,8 @@ class TestBfactorCalculation:
         restricts backbone flexibility, making it more rigid.
         """
         # Average over multiple calls
-        pro_avg = np.mean([
-            _calculate_bfactor('CA', 10, 20, 'PRO', s2=0.85)
-            for _ in range(10)
-        ])
-        ala_avg = np.mean([
-            _calculate_bfactor('CA', 10, 20, 'ALA', s2=0.85)
-            for _ in range(10)
-        ])
+        pro_avg = np.mean([_calculate_bfactor("CA", 10, 20, "PRO", s2=0.85) for _ in range(10)])
+        ala_avg = np.mean([_calculate_bfactor("CA", 10, 20, "ALA", s2=0.85) for _ in range(10)])
 
         assert pro_avg < ala_avg
 
@@ -155,19 +138,20 @@ class TestBfactorCalculation:
         """
         # Test various scenarios
         test_cases = [
-            ('CA', 1, 20, 'ALA'),   # N-terminus backbone
-            ('CB', 1, 20, 'ALA'),   # N-terminus sidechain
-            ('CA', 10, 20, 'ALA'),  # Middle backbone
-            ('CB', 10, 20, 'ALA'),  # Middle sidechain
-            ('CA', 20, 20, 'ALA'),  # C-terminus backbone
-            ('CA', 10, 20, 'GLY'),  # Glycine
-            ('CA', 10, 20, 'PRO'),  # Proline
+            ("CA", 1, 20, "ALA"),  # N-terminus backbone
+            ("CB", 1, 20, "ALA"),  # N-terminus sidechain
+            ("CA", 10, 20, "ALA"),  # Middle backbone
+            ("CB", 10, 20, "ALA"),  # Middle sidechain
+            ("CA", 20, 20, "ALA"),  # C-terminus backbone
+            ("CA", 10, 20, "GLY"),  # Glycine
+            ("CA", 10, 20, "PRO"),  # Proline
         ]
 
         for atom_name, res_num, total_res, res_name in test_cases:
             bfactor = _calculate_bfactor(atom_name, res_num, total_res, res_name)
-            assert 5.0 <= bfactor <= 100.0, \
-                f"B-factor {bfactor} out of range for {res_name} {atom_name}"
+            assert (
+                5.0 <= bfactor <= 100.0
+            ), f"B-factor {bfactor} out of range for {res_name} {atom_name}"
 
     def test_bfactor_in_generated_pdb(self):
         """
@@ -177,15 +161,15 @@ class TestBfactorCalculation:
         B-factors appear in columns 61-66 of ATOM records in PDB format.
         They should not all be 0.00 (which indicates missing data).
         """
-        pdb_content = generate_pdb_content(length=10, conformation='alpha')
+        pdb_content = generate_pdb_content(length=10, conformation="alpha")
 
         # Extract B-factors from ATOM lines
         bfactors = []
         MIN_BFACTOR = 5.0
-        MAX_BFACTOR = 100.0 # Updated for Model-Free physics (Termini can be highly flexible)
+        MAX_BFACTOR = 100.0  # Updated for Model-Free physics (Termini can be highly flexible)
 
-        for line in pdb_content.split('\n'):
-            if line.startswith('ATOM'):
+        for line in pdb_content.split("\n"):
+            if line.startswith("ATOM"):
                 # B-factor is in columns 61-66 (0-indexed: 60-66)
                 bfactor_str = line[60:66].strip()
                 if bfactor_str:
@@ -198,16 +182,13 @@ class TestBfactorCalculation:
         assert len(bfactors) > 0, "No B-factors found in PDB"
 
         # Should not all be 0.00
-        assert not all(b == 0.0 for b in bfactors), \
-            "All B-factors are 0.00 (not realistic)"
+        assert not all(b == 0.0 for b in bfactors), "All B-factors are 0.00 (not realistic)"
 
         # Should be in realistic range
-        assert all(5.0 <= b <= 100.0 for b in bfactors), \
-            f"Some B-factors out of range: {bfactors}"
+        assert all(5.0 <= b <= 100.0 for b in bfactors), f"Some B-factors out of range: {bfactors}"
 
         # Should show variation (not all the same)
-        assert len(set(bfactors)) > 1, \
-            "All B-factors are identical (should vary)"
+        assert len(set(bfactors)) > 1, "All B-factors are identical (should vary)"
 
     def test_bfactor_variation_along_chain(self):
         """
@@ -219,12 +200,12 @@ class TestBfactorCalculation:
         - Vary between backbone and side chains
         - Show local variations due to structure
         """
-        pdb_content = generate_pdb_content(length=20, conformation='alpha')
+        pdb_content = generate_pdb_content(length=20, conformation="alpha")
 
         # Extract CA B-factors by residue number
         ca_bfactors = {}
-        for line in pdb_content.split('\n'):
-            if line.startswith('ATOM') and ' CA ' in line:
+        for line in pdb_content.split("\n"):
+            if line.startswith("ATOM") and " CA " in line:
                 res_num = int(line[22:26].strip())
                 bfactor = float(line[60:66].strip())
                 ca_bfactors[res_num] = bfactor
@@ -239,5 +220,6 @@ class TestBfactorCalculation:
         c_term_avg = np.mean([ca_bfactors[i] for i in range(18, 21)])
 
         # At least one terminus should be higher than middle
-        assert (n_term_avg > middle_avg) or (c_term_avg > middle_avg), \
-            "Termini should have higher B-factors than middle"
+        assert (n_term_avg > middle_avg) or (
+            c_term_avg > middle_avg
+        ), "Termini should have higher B-factors than middle"

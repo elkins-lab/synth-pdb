@@ -50,24 +50,34 @@ from synth_pdb.generator import create_atom_line
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _minimal_pdb_with_nh():
     """Minimal PDB with a backbone N and H atom so RDC calculation is possible."""
     return (
         "HEADER    rdc_test\n"
-        + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N") + "\n"
-        + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C") + "\n"
-        + create_atom_line(3, "C", "ALA", "A", 1, 2.500, 0.0, 0.0, "C") + "\n"
-        + create_atom_line(4, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H") + "\n"
-        + create_atom_line(5, "N", "GLY", "A", 2, 3.8, 0.0, 0.0, "N") + "\n"
-        + create_atom_line(6, "CA", "GLY", "A", 2, 5.258, 0.0, 0.0, "C") + "\n"
-        + create_atom_line(7, "C", "GLY", "A", 2, 6.783, 0.0, 0.0, "C") + "\n"
-        + create_atom_line(8, "H", "GLY", "A", 2, 3.8, 1.02, 0.0, "H") + "\n"
+        + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N")
+        + "\n"
+        + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C")
+        + "\n"
+        + create_atom_line(3, "C", "ALA", "A", 1, 2.500, 0.0, 0.0, "C")
+        + "\n"
+        + create_atom_line(4, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H")
+        + "\n"
+        + create_atom_line(5, "N", "GLY", "A", 2, 3.8, 0.0, 0.0, "N")
+        + "\n"
+        + create_atom_line(6, "CA", "GLY", "A", 2, 5.258, 0.0, 0.0, "C")
+        + "\n"
+        + create_atom_line(7, "C", "GLY", "A", 2, 6.783, 0.0, 0.0, "C")
+        + "\n"
+        + create_atom_line(8, "H", "GLY", "A", 2, 3.8, 1.02, 0.0, "H")
+        + "\n"
     )
 
 
 # ---------------------------------------------------------------------------
 # --output-rdcs flag tests
 # ---------------------------------------------------------------------------
+
 
 class TestOutputRDCsFlag:
     """Verify that the --output-rdcs flag triggers RDC calculation and CSV export."""
@@ -83,8 +93,7 @@ class TestOutputRDCsFlag:
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
 
         # Spy on the RDC calculation so we can verify it is called
         mock_calc = mocker.patch(
@@ -94,9 +103,12 @@ class TestOutputRDCsFlag:
 
         test_args = [
             "synth_pdb",
-            "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
+            "--length",
+            "2",
+            "--output",
+            str(output_pdb),
+            "--output-rdcs",
+            str(output_csv),
         ]
         mocker.patch("sys.argv", test_args)
         mocker.patch("sys.exit")
@@ -111,15 +123,17 @@ class TestOutputRDCsFlag:
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
         mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={1: 5.3, 2: -2.1})
 
         test_args = [
             "synth_pdb",
-            "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
+            "--length",
+            "2",
+            "--output",
+            str(output_pdb),
+            "--output-rdcs",
+            str(output_csv),
         ]
         mocker.patch("sys.argv", test_args)
         mocker.patch("sys.exit")
@@ -133,40 +147,51 @@ class TestOutputRDCsFlag:
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
         mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={1: 5.3, 2: -2.1})
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "2",
+                "--output",
+                str(output_pdb),
+                "--output-rdcs",
+                str(output_csv),
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
 
         with open(output_csv) as f:
             header = f.readline().strip()
-        assert header == "res_id,residue,RDC_NH_Hz", (
-            f"Expected 'res_id,residue,RDC_NH_Hz', got '{header}'"
-        )
+        assert (
+            header == "res_id,residue,RDC_NH_Hz"
+        ), f"Expected 'res_id,residue,RDC_NH_Hz', got '{header}'"
 
     def test_output_rdcs_csv_has_data_rows(self, mocker, tmp_path):
         """CSV must contain at least one data row with the computed RDC values."""
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
-        mocker.patch("synth_pdb.rdc.calculate_rdcs",
-                     return_value={1: 5.3000, 2: -2.1000})
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={1: 5.3000, 2: -2.1000})
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "2",
+                "--output",
+                str(output_pdb),
+                "--output-rdcs",
+                str(output_csv),
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
@@ -187,15 +212,21 @@ class TestOutputRDCsFlag:
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
         mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={1: 5.3})
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "2",
+                "--output",
+                str(output_pdb),
+                "--output-rdcs",
+                str(output_csv),
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
@@ -206,17 +237,21 @@ class TestOutputRDCsFlag:
         """Without --output-rdcs, calculate_rdcs must NOT be called."""
         output_pdb = tmp_path / "no_rdc.pdb"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
         # If import is attempted at all, this still works — we only verify it
         # is never called when the flag is absent.
-        mock_calc = mocker.patch("synth_pdb.rdc.calculate_rdcs",
-                                 return_value={})
+        mock_calc = mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={})
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "2",
-            "--output", str(output_pdb),
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "2",
+                "--output",
+                str(output_pdb),
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
@@ -235,33 +270,39 @@ class TestOutputRDCsFlag:
         output_pdb = tmp_path / "rdc_custom.pdb"
         output_csv = tmp_path / "rdc_custom.csv"
 
-        mocker.patch("synth_pdb.main.generate_pdb_content",
-                     return_value=_minimal_pdb_with_nh())
-        mock_calc = mocker.patch("synth_pdb.rdc.calculate_rdcs",
-                                 return_value={1: 3.0})
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=_minimal_pdb_with_nh())
+        mock_calc = mocker.patch("synth_pdb.rdc.calculate_rdcs", return_value={1: 3.0})
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "2",
-            "--output", str(output_pdb),
-            "--output-rdcs", str(output_csv),
-            "--rdc-da", "15.0",
-            "--rdc-r", "0.3",
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "2",
+                "--output",
+                str(output_pdb),
+                "--output-rdcs",
+                str(output_csv),
+                "--rdc-da",
+                "15.0",
+                "--rdc-r",
+                "0.3",
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
 
         mock_calc.assert_called_once()
         _, call_kwargs = mock_calc.call_args
-        assert call_kwargs.get("Da") == pytest.approx(15.0), \
-            "Da should be 15.0 Hz as specified"
-        assert call_kwargs.get("R") == pytest.approx(0.3), \
-            "R should be 0.3 as specified"
+        assert call_kwargs.get("Da") == pytest.approx(15.0), "Da should be 15.0 Hz as specified"
+        assert call_kwargs.get("R") == pytest.approx(0.3), "R should be 0.3 as specified"
 
 
 # ---------------------------------------------------------------------------
 # --shift-predictor flag tests
 # ---------------------------------------------------------------------------
+
 
 class TestShiftPredictorFlag:
     """
@@ -291,18 +332,25 @@ class TestShiftPredictorFlag:
         output_pdb = tmp_path / "shifts_test.pdb"
         pdb_with_h = (
             "HEADER    shift_test\n"
-            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N") + "\n"
-            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C") + "\n"
-            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H") + "\n"
+            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C")
+            + "\n"
+            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H")
+            + "\n"
         )
         mocker.patch("synth_pdb.main.generate_pdb_content", return_value=pdb_with_h)
         mocker.patch("synth_pdb.nef_io.write_nef_chemical_shifts")
 
         args = [
-            "synth_pdb", "--length", "1",
-            "--output", str(output_pdb),
+            "synth_pdb",
+            "--length",
+            "1",
+            "--output",
+            str(output_pdb),
             "--gen-shifts",
-            "--shift-predictor", predictor,
+            "--shift-predictor",
+            predictor,
         ]
         mocker.patch("sys.argv", args)
         mocker.patch("sys.exit")
@@ -320,9 +368,9 @@ class TestShiftPredictorFlag:
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert call_kwargs.get("use_shiftx2") is True, (
-            "--shift-predictor shiftx2 must pass use_shiftx2=True"
-        )
+        assert (
+            call_kwargs.get("use_shiftx2") is True
+        ), "--shift-predictor shiftx2 must pass use_shiftx2=True"
 
     def test_shift_predictor_empirical_passes_use_shiftx2_false(self, mocker, tmp_path):
         """
@@ -336,9 +384,9 @@ class TestShiftPredictorFlag:
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert call_kwargs.get("use_shiftx2") is False, (
-            "--shift-predictor empirical must pass use_shiftx2=False"
-        )
+        assert (
+            call_kwargs.get("use_shiftx2") is False
+        ), "--shift-predictor empirical must pass use_shiftx2=False"
 
     def test_shift_predictor_default_is_shiftx2(self, mocker, tmp_path):
         """
@@ -348,9 +396,12 @@ class TestShiftPredictorFlag:
         output_pdb = tmp_path / "default_pred.pdb"
         pdb_with_h = (
             "HEADER    default_pred\n"
-            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N") + "\n"
-            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C") + "\n"
-            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H") + "\n"
+            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C")
+            + "\n"
+            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H")
+            + "\n"
         )
         mocker.patch("synth_pdb.main.generate_pdb_content", return_value=pdb_with_h)
         mock_predict = mocker.patch(
@@ -359,21 +410,27 @@ class TestShiftPredictorFlag:
         )
         mocker.patch("synth_pdb.nef_io.write_nef_chemical_shifts")
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "1",
-            "--output", str(output_pdb),
-            "--gen-shifts",
-            # NOTE: --shift-predictor intentionally omitted
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "1",
+                "--output",
+                str(output_pdb),
+                "--gen-shifts",
+                # NOTE: --shift-predictor intentionally omitted
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert call_kwargs.get("use_shiftx2") is True, (
-            "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
-        )
+        assert (
+            call_kwargs.get("use_shiftx2") is True
+        ), "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
 
     def test_shift_predictor_appears_in_command_string(self, mocker, tmp_path):
         """
@@ -390,26 +447,36 @@ class TestShiftPredictorFlag:
         output_pdb = tmp_path / "remark_test.pdb"
         pdb_with_h = (
             "HEADER    remark_test\n"
-            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N") + "\n"
-            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C") + "\n"
-            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H") + "\n"
+            + create_atom_line(1, "N", "ALA", "A", 1, 0.0, 0.0, 0.0, "N")
+            + "\n"
+            + create_atom_line(2, "CA", "ALA", "A", 1, 1.458, 0.0, 0.0, "C")
+            + "\n"
+            + create_atom_line(3, "H", "ALA", "A", 1, 0.0, 1.02, 0.0, "H")
+            + "\n"
         )
         mocker.patch("synth_pdb.main.generate_pdb_content", return_value=pdb_with_h)
         mocker.patch("synth_pdb.chemical_shifts.predict_chemical_shifts", return_value={})
         mocker.patch("synth_pdb.nef_io.write_nef_chemical_shifts")
 
-        mocker.patch("sys.argv", [
-            "synth_pdb", "--length", "1",
-            "--output", str(output_pdb),
-            "--gen-shifts",
-            "--shift-predictor", "empirical",
-        ])
+        mocker.patch(
+            "sys.argv",
+            [
+                "synth_pdb",
+                "--length",
+                "1",
+                "--output",
+                str(output_pdb),
+                "--gen-shifts",
+                "--shift-predictor",
+                "empirical",
+            ],
+        )
         mocker.patch("sys.exit")
 
         main.main()
 
         with open(output_pdb) as f:
             content = f.read()
-        assert "empirical" in content or "shift-predictor" in content.lower(), (
-            "The PDB REMARK header must record the --shift-predictor value"
-        )
+        assert (
+            "empirical" in content or "shift-predictor" in content.lower()
+        ), "The PDB REMARK header must record the --shift-predictor value"

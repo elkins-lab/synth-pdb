@@ -4,14 +4,13 @@ import ast
 import sys
 from pathlib import Path
 
-GENERATOR = Path(__file__).parent.parent / 'synth_pdb' / 'generator.py'
-PHYSICS   = Path(__file__).parent.parent / 'synth_pdb' / 'physics.py'
+GENERATOR = Path(__file__).parent.parent / "synth_pdb" / "generator.py"
+PHYSICS = Path(__file__).parent.parent / "synth_pdb" / "physics.py"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # GENERATOR.PY REPLACEMENTS
 # ─────────────────────────────────────────────────────────────────────────────
 GEN_REPLACEMENTS = [
-
     # 1. Input Validation note (in _resolve_conformation_map, before valid_conformations)
     (
         "    valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random']\n    if conformation not in valid_conformations:",
@@ -23,7 +22,6 @@ GEN_REPLACEMENTS = [
     valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random']
     if conformation not in valid_conformations:""",
     ),
-
     # 2. Per-Residue Conformation Assignment note (in _resolve_conformation_map)
     (
         "    if structure:\n        residue_conformations = _parse_structure_regions(structure, sequence_length)",
@@ -37,7 +35,6 @@ GEN_REPLACEMENTS = [
     if structure:
         residue_conformations = _parse_structure_regions(structure, sequence_length)""",
     ),
-
     # 3. Gap Handling note (in _resolve_conformation_map)
     (
         "        for i in range(sequence_length):\n            if i not in residue_conformations:\n                residue_conformations[i] = conformation",
@@ -50,7 +47,6 @@ GEN_REPLACEMENTS = [
             if i not in residue_conformations:
                 residue_conformations[i] = conformation""",
     ),
-
     # 4. Why We Don't Validate Conformations note (at end of _resolve_conformation_map, before return)
     (
         "    return residue_conformations\n\n\ndef _build_peptide_chain(",
@@ -64,10 +60,8 @@ GEN_REPLACEMENTS = [
 
 def _build_peptide_chain(""",
     ),
-
     # 5. D-Amino Acid Handling note (in _build_peptide_chain, already there but checking)
     # (already present at line 776, skip)
-
     # 6. Peptide Bond Chemistry + Terminal Atom Management notes
     (
         "        # Remove terminal atoms that are incompatible with internal peptide bonds\n        if i < len(sequence) - 1 or cyclic:",
@@ -88,7 +82,6 @@ def _build_peptide_chain(""",
         # Remove terminal atoms that are incompatible with internal peptide bonds
         if i < len(sequence) - 1 or cyclic:""",
     ),
-
     # 7. Rotamer Selection Strategy note
     (
         "        # ── Rotamer selection ────────────────────────────────────────────────\n        rotamers = None",
@@ -103,10 +96,9 @@ def _build_peptide_chain(""",
         # ── Rotamer selection ────────────────────────────────────────────────
         rotamers = None""",
     ),
-
     # 8. Sidechain Rotation note (inside gamma_atom_name block, before chi1 computation)
     (
-        "                if gamma_atom_name:\n                    ca_atom = ref_res_template[ref_res_template.atom_name == \"CA\"][0]",
+        '                if gamma_atom_name:\n                    ca_atom = ref_res_template[ref_res_template.atom_name == "CA"][0]',
         """\
                 if gamma_atom_name:
                     # EDUCATIONAL NOTE - Sidechain Rotation:
@@ -116,7 +108,6 @@ def _build_peptide_chain(""",
                     # rotation_angle = target - current (standard IUPAC convention).
                     ca_atom = ref_res_template[ref_res_template.atom_name == "CA"][0]""",
     ),
-
     # 9. AHA MOMENT - Superimposition Direction
     (
         "        _, transformation = struc.superimpose(target_backbone_constructed, mobile_backbone_from_template)\n        transformed_res = ref_res_template",
@@ -129,10 +120,9 @@ def _build_peptide_chain(""",
         _, transformation = struc.superimpose(target_backbone_constructed, mobile_backbone_from_template)
         transformed_res = ref_res_template""",
     ),
-
     # 10. Chiral Mirroring strategy note
     (
-        "        # ── D-amino acid chiral mirroring ─────────────────────────────────\n        if is_d and res_name != \"GLY\":",
+        '        # ── D-amino acid chiral mirroring ─────────────────────────────────\n        if is_d and res_name != "GLY":',
         """\
         # EDUCATIONAL NOTE - Chiral Mirroring strategy:
         # -------------------------------------------
@@ -150,7 +140,6 @@ def _build_peptide_chain(""",
         # ── D-amino acid chiral mirroring ─────────────────────────────────
         if is_d and res_name != "GLY":""",
     ),
-
     # 11. D-Residue Naming note (before the L_TO_D_MAPPING assignment)
     (
         "        transformed_res.res_id[:] = res_id\n        if is_d:\n            transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)",
@@ -163,7 +152,6 @@ def _build_peptide_chain(""",
         if is_d:
             transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)""",
     ),
-
     # 12. Biophysical Realism (Phase 2) note in _apply_biophysical_mods
     (
         "    # EDUCATIONAL NOTE - Side-Chain Optimization:\n    # If requested, run Monte Carlo optimization to fix steric clashes.\n    if optimize_sidechains:",
@@ -178,7 +166,6 @@ def _build_peptide_chain(""",
     # This is "Phase 1" of biophysical realism.
     if optimize_sidechains:""",
     ),
-
     # 13. Metal Ion Coordination (Phase 15) note in _apply_biophysical_mods
     (
         "    # EDUCATIONAL NOTE - Metal Ion Coordination:\n    # Inorganic cofactors like Zn2+ are automatically detected and injected.",
@@ -188,10 +175,9 @@ def _build_peptide_chain(""",
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.""",
     ),
-
     # 14. Energy Minimization (Phase 2) note in _do_energy_minimization
     (
-        "    logger.info(\"Running energy minimization (OpenMM)...\")\n    try:",
+        '    logger.info("Running energy minimization (OpenMM)...")\n    try:',
         """\
     # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
     # OpenMM requires a file-based interaction for easy topology handling from PDB.
@@ -199,7 +185,6 @@ def _build_peptide_chain(""",
     logger.info("Running energy minimization (OpenMM)...")
     try:""",
     ),
-
     # 15. B-factors and Occupancy notes in _assemble_pdb_output (currently one combined note)
     (
         "    # EDUCATIONAL NOTE - Adding Realistic B-factors & Occupancy:\n    # Biotite sets B-factors to 0.00 and occupancy to 1.00 by default.\n    # We post-process to insert physically meaningful values derived from S2.",
@@ -221,7 +206,7 @@ def _build_peptide_chain(""",
 PHYS_REPLACEMENTS = [
     # 1. "We do NOT add the bond to the Topology here" note
     (
-        "        if cyclic:\n            logger.info(\"Cyclizing peptide via harmonic restraints (Restraint-First approach).\")",
+        '        if cyclic:\n            logger.info("Cyclizing peptide via harmonic restraints (Restraint-First approach).")',
         """\
         # EDUCATIONAL NOTE: We do NOT add the bond to the Topology here.
         # Adding it here causes OpenMM's template-matcher to fail ("Too many external bonds").
@@ -231,7 +216,7 @@ PHYS_REPLACEMENTS = [
     ),
     # 2. GHOSTING THE TOPOLOGICAL BOND comment
     (
-        "                    if n_idx != -1 and c_idx != -1:\n                        pull_force.addBond(n_idx, c_idx, [0.133 * unit.nanometers])\n                        logger.info(f\"Added massive cyclic pull force: {n_idx} -- {c_idx}\")\n\n                        # Ghost the welded topological bond",
+        '                    if n_idx != -1 and c_idx != -1:\n                        pull_force.addBond(n_idx, c_idx, [0.133 * unit.nanometers])\n                        logger.info(f"Added massive cyclic pull force: {n_idx} -- {c_idx}")\n\n                        # Ghost the welded topological bond',
         """\
                     if n_idx != -1 and c_idx != -1:
                         pull_force.addBond(n_idx, c_idx, [0.133 * unit.nanometers])
@@ -275,7 +260,7 @@ apply_replacements(PHYSICS, PHYS_REPLACEMENTS)
 import re
 
 for path, label in [(GENERATOR, "generator.py"), (PHYSICS, "physics.py")]:
-    notes = re.findall(r'EDUCATIONAL NOTE|AHA MOMENT', path.read_text())
+    notes = re.findall(r"EDUCATIONAL NOTE|AHA MOMENT", path.read_text())
     print(f"  {label}: {len(notes)} EDUCATIONAL NOTE / AHA MOMENT occurrences")
 
 print("\nDone.")

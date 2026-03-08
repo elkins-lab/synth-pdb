@@ -21,7 +21,9 @@ def run_demo():
     # 1. Generate a simple peptide "CYS-GLY-GLY-CYS" (CGGC)
     #    The loop is short, so it's easy to bend.
     print("1. Generating initial backbone for sequence 'CGGC' (extended)...")
-    content = generate_pdb_content(sequence_str="CGGC", conformation="extended", optimize_sidechains=False)
+    content = generate_pdb_content(
+        sequence_str="CGGC", conformation="extended", optimize_sidechains=False
+    )
 
     # Load into Biotite structure
     pdb_file = pdb.PDBFile.read(io.StringIO(content))
@@ -32,8 +34,8 @@ def run_demo():
     #    Here we "mock" a folded state to test the physics engine's response.
 
     # Let's say we want to bond CYS 1 (N-term) and CYS 4 (C-term).
-    cys1_mask = (structure.res_id == 1)
-    cys4_mask = (structure.res_id == 4)
+    cys1_mask = structure.res_id == 1
+    cys4_mask = structure.res_id == 4
 
     # Get SG coordinates
     sg1 = structure[cys1_mask & (structure.atom_name == "SG")][0]
@@ -43,7 +45,7 @@ def run_demo():
     # This distorts the backbone between 3 and 4, but the minimizer handles that.
     sg4 = structure[cys4_mask & (structure.atom_name == "SG")][0]
 
-    target_pos = sg1.coord + np.array([0.0, 0.0, 2.05]) # Place 2.05 A away in Z
+    target_pos = sg1.coord + np.array([0.0, 0.0, 2.05])  # Place 2.05 A away in Z
     shift_vector = target_pos - sg4.coord
 
     structure.coord[cys4_mask] += shift_vector
@@ -91,12 +93,15 @@ def run_demo():
         if ssbonds:
             print(f"   Found SSBOND Record:\n   {ssbonds[0].strip()}")
         else:
-            print("   Warning: SSBOND record not found in header (Generator might need update to write it from topology)")
+            print(
+                "   Warning: SSBOND record not found in header (Generator might need update to write it from topology)"
+            )
             # Note: The generator.py logic writes SSBONDs, but here we ran physics.py directly.
             # physics.py writes the file using OpenMM -> PDB. OpenMM's PDBFile writer usually handles SSBONDs if they exist in topology?
             # Actually, OpenMM PDBFile.writeFile DOES write CONECT records but SSBOND records are not standardly written by it
             # unless we preserve the header or add it manually.
             # However, the physical bond exists!
+
 
 if __name__ == "__main__":
     run_demo()

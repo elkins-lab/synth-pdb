@@ -1,4 +1,3 @@
-
 import biotite.structure as struc
 import numpy as np
 import pytest
@@ -11,6 +10,7 @@ try:
 except ImportError:
     biophysics = None
 
+
 def create_his_peptide():
     """Creates a simple ALA-HIS-ALA peptide."""
     # Mocking structure with minimal atoms for renaming test
@@ -20,6 +20,7 @@ def create_his_peptide():
     atoms.chain_id = np.array(["A", "A", "A"])
     atoms.atom_name = np.array(["CA", "CA", "CA"])
     return atoms
+
 
 class TestBiophysics:
 
@@ -67,34 +68,35 @@ class TestBiophysics:
         # ALA-ALA
         # We need N, CA, C coords to avoid IndexError in biophysics.py
         # Using dummy coords
-        n1 = struc.Atom([0,0,0], atom_name="N", res_id=1, res_name="ALA", element="N")
-        ca1 = struc.Atom([1.4,0,0], atom_name="CA", res_id=1, res_name="ALA", element="C")
-        c1 = struc.Atom([2.0,1.2,0], atom_name="C", res_id=1, res_name="ALA", element="C")
+        n1 = struc.Atom([0, 0, 0], atom_name="N", res_id=1, res_name="ALA", element="N")
+        ca1 = struc.Atom([1.4, 0, 0], atom_name="CA", res_id=1, res_name="ALA", element="C")
+        c1 = struc.Atom([2.0, 1.2, 0], atom_name="C", res_id=1, res_name="ALA", element="C")
 
-        n2 = struc.Atom([2.8,1.2,0], atom_name="N", res_id=2, res_name="ALA", element="N")
-        ca2 = struc.Atom([3.5,2.4,0], atom_name="CA", res_id=2, res_name="ALA", element="C")
-        c2 = struc.Atom([4.5,2.4,1.2], atom_name="C", res_id=2, res_name="ALA", element="C")
+        n2 = struc.Atom([2.8, 1.2, 0], atom_name="N", res_id=2, res_name="ALA", element="N")
+        ca2 = struc.Atom([3.5, 2.4, 0], atom_name="CA", res_id=2, res_name="ALA", element="C")
+        c2 = struc.Atom([4.5, 2.4, 1.2], atom_name="C", res_id=2, res_name="ALA", element="C")
 
         atoms = struc.array([n1, ca1, c1, n2, ca2, c2])
-        atoms.chain_id = np.array(["A"]*6)
+        atoms.chain_id = np.array(["A"] * 6)
 
         capped = biophysics.cap_termini(atoms)
 
         # Check for ACE
         assert "ACE" in capped.res_name
         ace_atoms = capped[capped.res_name == "ACE"]
-        assert len(ace_atoms) == 3 # C, O, CH3
+        assert len(ace_atoms) == 3  # C, O, CH3
         # Check ACE geometry exists (not 0,0,0 unless inputs were)
         # Inputs were close to 0 but distinct.
 
         # Check for NME
         assert "NME" in capped.res_name
         nme_atoms = capped[capped.res_name == "NME"]
-        assert len(nme_atoms) == 2 # N, CH3
+        assert len(nme_atoms) == 2  # N, CH3
 
         # Check total length
         # original 6 + 3 ACE + 2 NME = 11
         assert len(capped) == 11
+
 
 def test_find_salt_bridges_simple():
     """
@@ -126,6 +128,7 @@ def test_find_salt_bridges_simple():
     # It might pick OD1 or OD2 depending on which is closer (TDD logic chooses closest)
     assert any(x in [bridge["atom_a"], bridge["atom_b"]] for x in ["OD1", "OD2"])
 
+
 def test_find_salt_bridges_cutoff():
     """
     Test that salt bridges outside the cutoff are ignored.
@@ -139,6 +142,7 @@ def test_find_salt_bridges_cutoff():
     structure = struc.array(atoms)
     bridges = find_salt_bridges(structure, cutoff=4.0)
     assert len(bridges) == 0
+
 
 def test_find_salt_bridges_arg_glu():
     """
@@ -157,6 +161,7 @@ def test_find_salt_bridges_arg_glu():
     assert bridges[0]["res_ia"] == 5
     assert bridges[0]["res_ib"] == 10
 
+
 def test_find_salt_bridges_ignore_same_residue():
     """
     Ensure we don't detect fake bridges within the same residue.
@@ -170,13 +175,14 @@ def test_find_salt_bridges_ignore_same_residue():
     bridges = find_salt_bridges(structure, cutoff=4.0)
     assert len(bridges) == 0
 
+
 def test_apply_ph_titration():
     """Test Histidine protonation states at different pH."""
     from synth_pdb.biophysics import apply_ph_titration
 
     atoms = [
-        struc.Atom([0,0,0], res_id=1, res_name="HIS", atom_name="CA", element="C"),
-        struc.Atom([0,0,0], res_id=2, res_name="HIS", atom_name="CA", element="C")
+        struc.Atom([0, 0, 0], res_id=1, res_name="HIS", atom_name="CA", element="C"),
+        struc.Atom([0, 0, 0], res_id=2, res_name="HIS", atom_name="CA", element="C"),
     ]
     structure = struc.array(atoms)
 
@@ -188,6 +194,7 @@ def test_apply_ph_titration():
     structure.res_name[:] = "HIS"
     structure = apply_ph_titration(structure, ph=8.0)
     assert np.all(np.isin(structure.res_name, ["HIE", "HID"]))
+
 
 def test_cap_termini():
     """Test that capping adds ACE and NME residues."""

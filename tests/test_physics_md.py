@@ -30,9 +30,11 @@ class TestMDEquilibration:
         class FakeQuantity:
             def value_in_unit(self, u):
                 return 100.0
+
         class FakeState:
             def getPotentialEnergy(self):
                 return FakeQuantity()
+
             def getPositions(self):
                 # Provide a list-like object for length checks
                 return [FakeQuantity()] * 10
@@ -53,11 +55,7 @@ class TestMDEquilibration:
 
         # 2. Patch sys.modules safely using patch.dict
         # We need to map 'openmm', 'openmm.app', 'openmm.unit'
-        modules_to_patch = {
-            "openmm": openmm_mock,
-            "openmm.app": app_mock,
-            "openmm.unit": unit_mock
-        }
+        modules_to_patch = {"openmm": openmm_mock, "openmm.app": app_mock, "openmm.unit": unit_mock}
 
         with patch.dict(sys.modules, modules_to_patch):
             # 3. Reload physics inside the patch context so it imports the mocks
@@ -72,7 +70,7 @@ class TestMDEquilibration:
             # Since imports succeeded (mocks), HAS_OPENMM should be True.
 
             if not hasattr(minimizer, "equilibrate"):
-                 pytest.fail("equilibrate method not implemented")
+                pytest.fail("equilibrate method not implemented")
 
             input_pdb = str(tmp_path / "input.pdb")
             output_pdb = str(tmp_path / "output.pdb")

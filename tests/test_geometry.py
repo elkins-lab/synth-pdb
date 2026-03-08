@@ -19,7 +19,7 @@ def test_reconstruct_sidechain_basic():
     # CYS chi1 targets
     res_id = 2
     target_chi1 = 60.0
-    rotamer = {'chi1': [target_chi1]}
+    rotamer = {"chi1": [target_chi1]}
 
     # Capture original coordinates
     orig_coords = peptide.coord[peptide.res_id == res_id].copy()
@@ -29,7 +29,9 @@ def test_reconstruct_sidechain_basic():
 
     # Check that coordinates changed
     new_coords = peptide.coord[peptide.res_id == res_id]
-    assert not np.array_equal(orig_coords, new_coords), "Sidechain coordinates did not change after reconstruction."
+    assert not np.array_equal(
+        orig_coords, new_coords
+    ), "Sidechain coordinates did not change after reconstruction."
 
     # Verify new Chi1
     n_coord = peptide[(peptide.res_id == res_id) & (peptide.atom_name == "N")].coord[0]
@@ -41,10 +43,13 @@ def test_reconstruct_sidechain_basic():
     calc_chi1 = np.rad2deg(struc.dihedral(n_coord, ca_coord, cb_coord, sg_coord))
 
     # Wrap to match target_chi1 (usually -180 to 180)
-    if calc_chi1 < 0: calc_chi1 += 360
-    if target_chi1 < 0: target_chi1 += 360
+    if calc_chi1 < 0:
+        calc_chi1 += 360
+    if target_chi1 < 0:
+        target_chi1 += 360
 
     assert pytest.approx(calc_chi1, abs=0.5) == target_chi1
+
 
 def test_reconstruct_sidechain_branched_val():
     """Test sidechain reconstruction for branched residue (VAL)."""
@@ -54,7 +59,7 @@ def test_reconstruct_sidechain_branched_val():
 
     res_id = 2
     target_chi1 = 180.0
-    rotamer = {'chi1': [target_chi1]}
+    rotamer = {"chi1": [target_chi1]}
 
     reconstruct_sidechain(peptide, res_id, rotamer)
 
@@ -66,10 +71,13 @@ def test_reconstruct_sidechain_branched_val():
 
     calc_chi1 = np.rad2deg(struc.dihedral(n_coord, ca_coord, cb_coord, cg1_coord))
 
-    if calc_chi1 < 0: calc_chi1 += 360
-    if target_chi1 < 0: target_chi1 += 360
+    if calc_chi1 < 0:
+        calc_chi1 += 360
+    if target_chi1 < 0:
+        target_chi1 += 360
 
     assert pytest.approx(calc_chi1, abs=0.5) == target_chi1
+
 
 def test_reconstruct_sidechain_branched_leu():
     """Test sidechain reconstruction for residue with CG (LEU)."""
@@ -78,8 +86,8 @@ def test_reconstruct_sidechain_branched_leu():
     peptide = pdb_file.get_structure(model=1)
 
     res_id = 2
-    target_chi1 = 60.0 # Common staggered
-    rotamer = {'chi1': [target_chi1]}
+    target_chi1 = 60.0  # Common staggered
+    rotamer = {"chi1": [target_chi1]}
 
     reconstruct_sidechain(peptide, res_id, rotamer)
 
@@ -90,10 +98,13 @@ def test_reconstruct_sidechain_branched_leu():
 
     calc_chi1 = np.rad2deg(struc.dihedral(n_coord, ca_coord, cb_coord, cg_coord))
 
-    if calc_chi1 < 0: calc_chi1 += 360
-    if target_chi1 < 0: target_chi1 += 360
+    if calc_chi1 < 0:
+        calc_chi1 += 360
+    if target_chi1 < 0:
+        target_chi1 += 360
 
     assert pytest.approx(calc_chi1, abs=0.5) == target_chi1
+
 
 def test_reconstruct_sidechain_invalid_residue():
     """Test error handling for non-existent residue."""
@@ -102,7 +113,8 @@ def test_reconstruct_sidechain_invalid_residue():
     peptide = pdb_file.get_structure(model=1)
 
     with pytest.raises(ValueError):
-        reconstruct_sidechain(peptide, 999, {'chi1': [60.0]})
+        reconstruct_sidechain(peptide, 999, {"chi1": [60.0]})
+
 
 def test_reconstruct_sidechain_missing_backbone():
     """Test graceful failure when backbone atoms are missing."""
@@ -114,8 +126,9 @@ def test_reconstruct_sidechain_missing_backbone():
     peptide = peptide[peptide.atom_name != "CA"]
 
     # Should log warning and return None
-    result = reconstruct_sidechain(peptide, 1, {'chi1': [60.0]})
+    result = reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})
     assert result is None
+
 
 def test_calculate_angle():
     """Test the calculate_angle utility."""
@@ -124,6 +137,7 @@ def test_calculate_angle():
     p3 = np.array([0.0, 1.0, 0.0])
     angle = calculate_angle(p1, p2, p3)
     assert pytest.approx(angle) == 90.0
+
 
 def test_calculate_dihedral_angle():
     """Test the calculate_dihedral_angle utility."""
@@ -151,6 +165,7 @@ def test_calculate_dihedral_angle():
     dihedral = calculate_dihedral_angle(p1, p2, p3, p4)
     assert pytest.approx(abs(dihedral)) == 90.0
 
+
 def test_reconstruct_sidechain_unknown_residue(caplog, monkeypatch):
     """Test warning for unknown residue."""
     import biotite.structure as struc
@@ -162,17 +177,18 @@ def test_reconstruct_sidechain_unknown_residue(caplog, monkeypatch):
     monkeypatch.setattr(info, "residue", mock_residue)
 
     # Create a dummy structure
-    atom = struc.Atom(
-        res_id=1, res_name="XXX", atom_name="CA", coord=[0,0,0], chain_id="A"
-    )
+    atom = struc.Atom(res_id=1, res_name="XXX", atom_name="CA", coord=[0, 0, 0], chain_id="A")
     peptide = struc.array([atom])
-    peptide += struc.array([
-        struc.Atom(res_id=1, res_name="XXX", atom_name="N", coord=[-1,0,0], chain_id="A"),
-        struc.Atom(res_id=1, res_name="XXX", atom_name="C", coord=[0,1,0], chain_id="A")
-    ])
+    peptide += struc.array(
+        [
+            struc.Atom(res_id=1, res_name="XXX", atom_name="N", coord=[-1, 0, 0], chain_id="A"),
+            struc.Atom(res_id=1, res_name="XXX", atom_name="C", coord=[0, 1, 0], chain_id="A"),
+        ]
+    )
 
-    reconstruct_sidechain(peptide, 1, {'chi1': [60.0]})
+    reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})
     assert "Unknown residue XXX" in caplog.text
+
 
 def test_reconstruct_sidechain_no_chi1():
     """Test that it returns early if chi1 is missing."""
@@ -181,12 +197,14 @@ def test_reconstruct_sidechain_no_chi1():
     peptide = pdb_file.get_structure(model=1)
 
     orig_coords = peptide.coord.copy()
-    reconstruct_sidechain(peptide, 2, {'chi2': [180.0]}) # No chi1
+    reconstruct_sidechain(peptide, 2, {"chi2": [180.0]})  # No chi1
     assert np.array_equal(orig_coords, peptide.coord)
+
 
 def test_position_atom_3d_consistency():
     """Test position_atom_3d_from_internal_coords returns consistent values."""
     from synth_pdb.geometry import position_atom_3d_from_internal_coords
+
     p1 = np.array([0.0, 0.0, 0.0])
     p2 = np.array([1.5, 0.0, 0.0])
     p3 = np.array([2.0, 1.0, 0.0])

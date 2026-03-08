@@ -10,6 +10,7 @@ try:
 except ImportError:
     distogram = None
 
+
 def create_triangle_structure():
     """
     Creates a simple 3-residue structure forming a right triangle.
@@ -20,13 +21,10 @@ def create_triangle_structure():
     atoms = struc.AtomArray(3)
     atoms.res_name = np.array(["ALA", "ALA", "ALA"])
     atoms.res_id = np.array([1, 2, 3])
-    atoms.atom_name = np.array(["CA", "CA", "CA"]) # Use CA for distance
-    atoms.coord = np.array([
-        [0.0, 0.0, 0.0],
-        [3.0, 0.0, 0.0],
-        [0.0, 4.0, 0.0]
-    ])
+    atoms.atom_name = np.array(["CA", "CA", "CA"])  # Use CA for distance
+    atoms.coord = np.array([[0.0, 0.0, 0.0], [3.0, 0.0, 0.0], [0.0, 4.0, 0.0]])
     return atoms
+
 
 class TestDistogramExport:
 
@@ -72,8 +70,8 @@ class TestDistogramExport:
 
         assert outfile.exists()
         data = json.loads(outfile.read_text())
-        assert len(data) == 3 # 3 rows
-        assert len(data[0]) == 3 # 3 cols
+        assert len(data) == 3  # 3 rows
+        assert len(data[0]) == 3  # 3 cols
         assert np.isclose(data[0][1], 3.0)
 
     def test_export_csv_format(self, tmp_path):
@@ -111,8 +109,8 @@ class TestDistogramExport:
         # Verify load
         loaded = np.load(str(outfile))
         # Typically npz stores files inside. We might save as 'distogram'.
-        assert 'distogram' in loaded
-        assert np.allclose(loaded['distogram'], matrix)
+        assert "distogram" in loaded
+        assert np.allclose(loaded["distogram"], matrix)
 
     def test_distogram_calculation_cb(self):
         """Test calculation using CB atoms (and fallback)."""

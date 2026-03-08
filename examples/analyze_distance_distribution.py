@@ -25,7 +25,7 @@ def analyze_distances(sequence, n_trials=100):
                 sequence_str=sequence,
                 conformation="random",
                 optimize_sidechains=True,
-                minimize_energy=False # Don't minimize yet
+                minimize_energy=False,  # Don't minimize yet
             )
 
             pdb_file = pdb.PDBFile.read(io.StringIO(content))
@@ -48,6 +48,7 @@ def analyze_distances(sequence, n_trials=100):
     print(f"Count < 5.0 A: {np.sum(distances < 5.0)}")
     print(f"Count < 8.0 A: {np.sum(distances < 8.0)}")
     print(f"Count < 10.0 A: {np.sum(distances < 10.0)}")
+
 
 if __name__ == "__main__":
     analyze_distances("CGGC", n_trials=100)

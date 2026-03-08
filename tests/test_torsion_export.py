@@ -62,18 +62,18 @@ END
 
         # Check structure of return
         assert isinstance(df, list)
-        assert len(df) == 3 # 3 residues
+        assert len(df) == 3  # 3 residues
 
         # First residue has no Phi
-        assert df[0]['phi'] is None or np.isnan(df[0]['phi'])
-        assert df[0]['psi'] is not None
+        assert df[0]["phi"] is None or np.isnan(df[0]["phi"])
+        assert df[0]["psi"] is not None
 
         # Second residue has both
-        assert df[1]['phi'] is not None
-        assert df[1]['psi'] is not None
+        assert df[1]["phi"] is not None
+        assert df[1]["psi"] is not None
 
         # Last residue has no Psi
-        assert df[2]['psi'] is None or np.isnan(df[2]['psi'])
+        assert df[2]["psi"] is None or np.isnan(df[2]["psi"])
 
     def test_export_csv(self, tmp_path):
         """Test export to CSV format."""
@@ -81,8 +81,8 @@ END
             pytest.skip("Module not implemented")
 
         data = [
-            {'residue': 'ALA', 'res_id': 1, 'phi': np.nan, 'psi': -57.0, 'omega': 180.0},
-            {'residue': 'GLY', 'res_id': 2, 'phi': -60.0, 'psi': -45.0, 'omega': 180.0},
+            {"residue": "ALA", "res_id": 1, "phi": np.nan, "psi": -57.0, "omega": 180.0},
+            {"residue": "GLY", "res_id": 2, "phi": -60.0, "psi": -45.0, "omega": 180.0},
         ]
 
         outfile = tmp_path / "angles.csv"
@@ -99,7 +99,7 @@ END
             pytest.skip("Module not implemented")
 
         data = [
-            {'residue': 'ALA', 'res_id': 1, 'phi': None, 'psi': -57.0},
+            {"residue": "ALA", "res_id": 1, "phi": None, "psi": -57.0},
         ]
 
         outfile = tmp_path / "angles.json"
@@ -107,5 +107,6 @@ END
 
         assert outfile.exists()
         import json
+
         loaded = json.loads(outfile.read_text())
-        assert loaded[0]['residue'] == 'ALA'
+        assert loaded[0]["residue"] == "ALA"

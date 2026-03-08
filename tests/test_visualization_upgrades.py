@@ -1,4 +1,3 @@
-
 from unittest.mock import patch
 
 from synth_pdb.generator import generate_pdb_content
@@ -26,28 +25,31 @@ class TestVisualizationUpgrades:
 
         # Check structure of hbond dict
         first_bond = hbonds[0]
-        assert 'start_resi' in first_bond
-        assert 'end_resi' in first_bond
-        assert first_bond['start_resi'] < first_bond['end_resi']
+        assert "start_resi" in first_bond
+        assert "end_resi" in first_bond
+        assert first_bond["start_resi"] < first_bond["end_resi"]
 
     def test_highlights_in_html(self):
         """
         Verify that passing 'highlights' to _create_3dmol_html generates addStyle commands.
         """
-        pdb_content = "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N"
+        pdb_content = (
+            "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N"
+        )
 
         highlights = [
-            {'start': 3, 'end': 6, 'color': 'purple', 'style': 'stick', 'label': 'Type II Turn'}
+            {"start": 3, "end": 6, "color": "purple", "style": "stick", "label": "Type II Turn"}
         ]
 
-        html = _create_3dmol_html(pdb_content, "test.pdb", "cartoon", "spectrum", highlights=highlights)
+        html = _create_3dmol_html(
+            pdb_content, "test.pdb", "cartoon", "spectrum", highlights=highlights
+        )
 
         # Check for specific JS commands
         # Match partial strings to avoid whitespace/quote issues
         assert "viewer.addStyle" in html
         assert "resi:[3, 4, 5, 6]" in html or "resi: [3, 4, 5, 6]" in html
         assert "stick:{colorscheme:'purple'" in html or "color:'purple'" in html
-
 
     def test_ptm_labeling(self):
         """
@@ -56,7 +58,7 @@ class TestVisualizationUpgrades:
         # Manually create PDB content with a SEP residue
         pdb_content = (
             "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N  \n"
-            "ATOM      2  N   SEP A   2       3.000   0.000   0.000  1.00  0.00           N  \n" # Phosphoserine
+            "ATOM      2  N   SEP A   2       3.000   0.000   0.000  1.00  0.00           N  \n"  # Phosphoserine
             "ATOM      3  P   SEP A   2       4.000   1.000   0.000  1.00  0.00           P  \n"
         )
 
@@ -67,24 +69,25 @@ class TestVisualizationUpgrades:
         assert 'viewer.addLabel("SEP"' in html or "viewer.addLabel('SEP'" in html
         assert "backgroundColor:'orange'" in html or "backgroundColor: 'orange'" in html
 
-
     def test_hbond_visualization_in_html(self):
         """
         Verify that detected H-bonds are rendered as cylinders.
         """
         # Mock _find_hbonds to return a known bond
-        with patch('synth_pdb.viewer._find_hbonds') as mock_find:
-            mock_find.return_value = [{'start_resi': 1, 'end_resi': 5, 'start_atom': 'O', 'end_atom': 'N'}]
+        with patch("synth_pdb.viewer._find_hbonds") as mock_find:
+            mock_find.return_value = [
+                {"start_resi": 1, "end_resi": 5, "start_atom": "O", "end_atom": "N"}
+            ]
 
-            html = _create_3dmol_html("dummy_pdb", "test.pdb", "cartoon", "spectrum", show_hbonds=True)
-
+            html = _create_3dmol_html(
+                "dummy_pdb", "test.pdb", "cartoon", "spectrum", show_hbonds=True
+            )
 
             # Check for line addition (dashed, magenta)
             assert "viewer.addLine" in html
             assert "color: 'magenta'" in html
             assert "dashed: true" in html
             assert "linewidth: 10" in html
-
 
     def test_ssbond_visualization_in_html(self):
         """
@@ -97,14 +100,14 @@ class TestVisualizationUpgrades:
         )
 
         # We also need to mock _find_ssbonds to rely on its output rather than parsing the dummy PDB content
-        with patch('synth_pdb.viewer._find_ssbonds') as mock_find_ss:
-             mock_find_ss.return_value = [{'c1': 'A', 'r1': 1, 'c2': 'A', 'r2': 2}]
+        with patch("synth_pdb.viewer._find_ssbonds") as mock_find_ss:
+            mock_find_ss.return_value = [{"c1": "A", "r1": 1, "c2": "A", "r2": 2}]
 
-             html = _create_3dmol_html(pdb_content, "test.pdb", "cartoon", "spectrum")
+            html = _create_3dmol_html(pdb_content, "test.pdb", "cartoon", "spectrum")
 
-             # Check for Yellow Cylinder
-             assert "viewer.addCylinder" in html
-             assert "color: 'yellow'" in html
+            # Check for Yellow Cylinder
+            assert "viewer.addCylinder" in html
+            assert "color: 'yellow'" in html
 
-             # Check for Stick Style (Polish fix)
-             assert "stick:{radius:0.2}" in html or "stick:{radius: 0.2}" in html
+            # Check for Stick Style (Polish fix)
+            assert "stick:{radius:0.2}" in html or "stick:{radius: 0.2}" in html

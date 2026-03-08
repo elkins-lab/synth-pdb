@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from synth_pdb.coupling import calculate_hn_ha_coupling, predict_couplings_from_structure
@@ -39,7 +38,7 @@ class TestJCoupling:
     def test_periodicity(self):
         """Karplus equation should be periodic (360 degrees)."""
         j1 = calculate_hn_ha_coupling(-60.0)
-        j2 = calculate_hn_ha_coupling(300.0) # -60 + 360
+        j2 = calculate_hn_ha_coupling(300.0)  # -60 + 360
         assert np.isclose(j1, j2), "Karplus function is not periodic!"
 
     def test_predict_from_dummy_structure(self):
@@ -51,8 +50,8 @@ class TestJCoupling:
 
         phis = {
             2: -57.0,  # Helix
-            3: -120.0, # Sheet
-            4: np.nan  # Undefined (e.g. Proline or missing)
+            3: -120.0,  # Sheet
+            4: np.nan,  # Undefined (e.g. Proline or missing)
         }
 
         couplings = predict_couplings_from_structure(phis)

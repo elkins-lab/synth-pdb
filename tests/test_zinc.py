@@ -1,4 +1,3 @@
-
 import pytest
 
 from synth_pdb.generator import generate_pdb_content
@@ -12,9 +11,7 @@ def test_zinc_finger_generation():
 
     # Generate with mental ions auto (default) and minimization
     pdb_content = generate_pdb_content(
-        sequence_str=sequence,
-        minimize_energy=True,
-        metal_ions="auto"
+        sequence_str=sequence, minimize_energy=True, metal_ions="auto"
     )
 
     # 1. Verify ZN is in the PDB
@@ -34,6 +31,7 @@ def test_zinc_finger_generation():
     assert "HETATM" in reconstructed
     assert "ZN" in reconstructed
 
+
 def test_zinc_coordination_restraints_detection():
     """Test that ligands are detected and restrained correctly."""
     # We check if the physics.py logic actually runs without crashing
@@ -43,26 +41,22 @@ def test_zinc_coordination_restraints_detection():
     # Generate but only verify it doesn't crash
     # (The internal logs would show "Applying harmonic coordination constraints")
     try:
-        generate_pdb_content(
-            sequence_str=sequence,
-            minimize_energy=True,
-            metal_ions="auto"
-        )
+        generate_pdb_content(sequence_str=sequence, minimize_energy=True, metal_ions="auto")
     except Exception as e:
         pytest.fail(f"Zinc finger generation crashed: {e}")
+
 
 def test_no_metal_ions_flag():
     """Test that --metal-ions none actually prevents ion injection."""
     sequence = "CPYCKKRFHSH"
     pdb_content = generate_pdb_content(
-        sequence_str=sequence,
-        minimize_energy=True,
-        metal_ions="none"
+        sequence_str=sequence, minimize_energy=True, metal_ions="none"
     )
 
     assert "ZN" not in pdb_content
     # We check for ZN specifically. HETATM records might exist for titratable HIS (HID/HIE),
     # so we don't do a broad "HETATM not in pdb_content" check here anymore.
+
 
 def test_validator_hetatm_type_preservation():
     """Strict test for HETATM vs ATOM record type in Validator."""

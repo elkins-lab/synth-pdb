@@ -1,4 +1,3 @@
-
 import logging
 import time
 
@@ -10,14 +9,14 @@ def run_benchmark():
     logger = logging.getLogger("benchmark")
 
     length = 100
-    sequence = "A" * length # Poly-Alanine
+    sequence = "A" * length  # Poly-Alanine
 
     logger.info(f" Benchmarking generation of {length}-residue peptide (Minimization ON)...")
 
     start_time = time.time()
     pdb_content = generate_pdb_content(
         sequence_str=sequence,
-        minimize_energy=True, # This triggers the physics engine
+        minimize_energy=True,  # This triggers the physics engine
     )
     end_time = time.time()
 
@@ -28,10 +27,7 @@ def run_benchmark():
     logger.info(" Benchmarking Optimized Generation (Tol=100.0, MaxIter=500)...")
     start_time = time.time()
     generate_pdb_content(
-        sequence_str=sequence,
-        minimize_energy=True,
-        minimization_k=100.0,
-        minimization_max_iter=500
+        sequence_str=sequence, minimize_energy=True, minimization_k=100.0, minimization_max_iter=500
     )
     end_time = time.time()
     duration_opt = end_time - start_time
@@ -40,6 +36,7 @@ def run_benchmark():
 
     if len(pdb_content) < 100:
         logger.error("Generated content seems too short!")
+
 
 if __name__ == "__main__":
     run_benchmark()

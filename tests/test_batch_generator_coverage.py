@@ -32,6 +32,7 @@ def test_batched_peptide_utility_methods():
     assert len(sub_batch) == 2
     assert sub_batch.coords.shape == (2, 10, 3)
 
+
 def test_batched_peptide_save_pdb():
     bg = BatchedGenerator("ALA-GLY", n_batch=2)
     batch = bg.generate_batch()
@@ -44,6 +45,7 @@ def test_batched_peptide_save_pdb():
             content = f.read()
             assert "ATOM      1  N   ALA A   1" in content
             assert "END" in content
+
 
 def test_batched_generator_drift():
     # Test that drift > 0 actually modifies coordinates
@@ -68,6 +70,7 @@ def test_batched_generator_drift():
     # So members ARE different if drift > 0.
     assert not np.allclose(b2.coords[0], b2.coords[1])
 
+
 def test_batched_generator_template_error():
     # Use full_atom=True to trigger template lookup
     # and provide a sequence that is not in the library
@@ -75,6 +78,7 @@ def test_batched_generator_template_error():
         # We need to bypass the ONE_TO_THREE_LETTER_CODE fallback to "ALA"
         # We can do this by passing a sequence with "-"
         BatchedGenerator("ALA-INVALID", full_atom=True)
+
 
 def test_batched_generator_resolving_sequence():
     # Test 1-letter vs 3-letter split
