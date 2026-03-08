@@ -5,6 +5,7 @@ try:
     import openmm as mm
     import openmm.app as app
     from openmm import unit
+
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False
@@ -57,7 +58,12 @@ class EnergyMinimizer:
     This module performs that final "geometry regularization" step.
     """
 
-    def __init__(self, forcefield_name: str = 'amber14-all.xml', solvent_model: str = 'app.OBC2', box_size: float = 1.0) -> None:
+    def __init__(
+        self,
+        forcefield_name: str = "amber14-all.xml",
+        solvent_model: str = "app.OBC2",
+        box_size: float = 1.0,
+    ) -> None:
         """
         Initialize the Minimizer with a Forcefield and Solvent Model.
 
@@ -95,32 +101,40 @@ class EnergyMinimizer:
             return
 
         # Robust Validation
-        valid_implicit = ['app.OBC2', 'app.OBC1', 'app.GBn', 'app.GBn2', 'app.HCT']
-        if solvent_model != 'explicit' and solvent_model not in valid_implicit and not hasattr(app, str(solvent_model).split('.')[-1]):
-             logger.warning(f"Unknown solvent model '{solvent_model}'. Defaulting to 'explicit'.")
-             solvent_model = 'explicit'
+        valid_implicit = ["app.OBC2", "app.OBC1", "app.GBn", "app.GBn2", "app.HCT"]
+        if (
+            solvent_model != "explicit"
+            and solvent_model not in valid_implicit
+            and not hasattr(app, str(solvent_model).split(".")[-1])
+        ):
+            logger.warning(f"Unknown solvent model '{solvent_model}'. Defaulting to 'explicit'.")
+            solvent_model = "explicit"
 
         if box_size <= 0:
             raise ValueError("box_size must be positive (nm).")
 
         self.forcefield_name = forcefield_name
-        self.water_model = 'amber14/tip3pfb.xml'
+        self.water_model = "amber14/tip3pfb.xml"
         self.solvent_model = solvent_model
         self.box_size = box_size * unit.nanometers
         ff_files = [self.forcefield_name]
 
-        if self.solvent_model == 'explicit':
+        if self.solvent_model == "explicit":
             ff_files.append(self.water_model)
         else:
             solvent_xml_map = {
-                app.OBC2: 'implicit/obc2.xml',
-                app.OBC1: 'implicit/obc1.xml',
-                app.GBn:  'implicit/gbn.xml',
-                app.GBn2: 'implicit/gbn2.xml',
-                app.HCT:  'implicit/hct.xml',
+                app.OBC2: "implicit/obc2.xml",
+                app.OBC1: "implicit/obc1.xml",
+                app.GBn: "implicit/gbn.xml",
+                app.GBn2: "implicit/gbn2.xml",
+                app.HCT: "implicit/hct.xml",
             }
             # Resolve if passed as string or object
-            self.implicit_solvent_enum = solvent_model if not isinstance(solvent_model, str) else getattr(app, str(solvent_model).split('.')[-1], None)
+            self.implicit_solvent_enum = (
+                solvent_model
+                if not isinstance(solvent_model, str)
+                else getattr(app, str(solvent_model).split(".")[-1], None)
+            )
             if self.implicit_solvent_enum in solvent_xml_map:
                 ff_files.append(solvent_xml_map[self.implicit_solvent_enum])
                 # The solvent is fully configured via the XML file above.
@@ -135,7 +149,16 @@ class EnergyMinimizer:
             logger.error(f"Failed to load forcefield: {e}")
             raise
 
-    def minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
+    def minimize(
+        self,
+        pdb_file_path: str,
+        output_path: str,
+        max_iterations: int = 0,
+        tolerance: float = 10.0,
+        cyclic: bool = False,
+        disulfides: Optional[List] = None,
+        coordination: Optional[List] = None,
+    ) -> bool:
         """
         Run energy minimization to regularize geometry and resolve clashes.
 
@@ -194,10 +217,27 @@ class EnergyMinimizer:
         if not HAS_OPENMM:
             logger.error("Cannot minimize: OpenMM not found.")
             return False
-        res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=False, max_iterations=max_iterations, tolerance=tolerance, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
+        res = self._run_simulation(
+            pdb_file_path,
+            output_path,
+            add_hydrogens=False,
+            max_iterations=max_iterations,
+            tolerance=tolerance,
+            cyclic=cyclic,
+            disulfides=disulfides,
+            coordination=coordination,
+        )
         return res is not None
 
-    def equilibrate(self, pdb_file_path: str, output_path: str, steps: int = 1000, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
+    def equilibrate(
+        self,
+        pdb_file_path: str,
+        output_path: str,
+        steps: int = 1000,
+        cyclic: bool = False,
+        disulfides: Optional[List] = None,
+        coordination: Optional[List] = None,
+    ) -> bool:
         """
         Run Thermal Equilibration (MD) at 300K.
 
@@ -212,12 +252,29 @@ class EnergyMinimizer:
             True if successful.
         """
         if not HAS_OPENMM:
-             logger.error("Cannot equilibrate: OpenMM not found.")
-             return False
-        res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=True, equilibration_steps=steps, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
+            logger.error("Cannot equilibrate: OpenMM not found.")
+            return False
+        res = self._run_simulation(
+            pdb_file_path,
+            output_path,
+            add_hydrogens=True,
+            equilibration_steps=steps,
+            cyclic=cyclic,
+            disulfides=disulfides,
+            coordination=coordination,
+        )
         return res is not None
 
-    def add_hydrogens_and_minimize(self, pdb_file_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> bool:
+    def add_hydrogens_and_minimize(
+        self,
+        pdb_file_path: str,
+        output_path: str,
+        max_iterations: int = 0,
+        tolerance: float = 10.0,
+        cyclic: bool = False,
+        disulfides: Optional[List] = None,
+        coordination: Optional[List] = None,
+    ) -> bool:
         """
         Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
 
@@ -245,12 +302,23 @@ class EnergyMinimizer:
             True if successful.
         """
         if not HAS_OPENMM:
-             logger.error("Cannot add hydrogens: OpenMM not found.")
-             return False
-        res = self._run_simulation(pdb_file_path, output_path, add_hydrogens=True, max_iterations=max_iterations, tolerance=tolerance, cyclic=cyclic, disulfides=disulfides, coordination=coordination)
+            logger.error("Cannot add hydrogens: OpenMM not found.")
+            return False
+        res = self._run_simulation(
+            pdb_file_path,
+            output_path,
+            add_hydrogens=True,
+            max_iterations=max_iterations,
+            tolerance=tolerance,
+            cyclic=cyclic,
+            disulfides=disulfides,
+            coordination=coordination,
+        )
         return res is not None
 
-    def calculate_energy(self, input_data: Union[str, Any], cyclic: bool = False) -> Optional[float]:
+    def calculate_energy(
+        self, input_data: Union[str, Any], cyclic: bool = False
+    ) -> Optional[float]:
         """
         Calculates the potential energy of a structure.
 
@@ -269,13 +337,18 @@ class EnergyMinimizer:
         temp_file = None
 
         try:
-            if isinstance(input_data, str) and input_data.endswith('.pdb') and os.path.exists(input_data):
+            if (
+                isinstance(input_data, str)
+                and input_data.endswith(".pdb")
+                and os.path.exists(input_data)
+            ):
                 pdb_path = input_data
             else:
                 # Treat as PDB content or object with .pdb property
-                content = input_data.pdb if hasattr(input_data, 'pdb') else str(input_data)
+                content = input_data.pdb if hasattr(input_data, "pdb") else str(input_data)
                 import tempfile
-                temp_file = tempfile.NamedTemporaryFile(suffix='.pdb', mode='w', delete=False)
+
+                temp_file = tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False)
                 temp_file.write(content)
                 temp_file.close()
                 pdb_path = temp_file.name
@@ -300,19 +373,21 @@ class EnergyMinimizer:
                 except Exception:
                     pass
 
-    def _create_system_robust(self, topology: Any, constraints: Any, modeller: Optional[Any] = None) -> Tuple[Any, Any, Any]:
+    def _create_system_robust(
+        self, topology: Any, constraints: Any, modeller: Optional[Any] = None
+    ) -> Tuple[Any, Any, Any]:
         """
         Creates an OpenMM system, with robust fallbacks for template mismatches
         and incompatible forcefield arguments. Returns (system, topology, positions).
         """
-        if not hasattr(self, '_suppressed_args'):
+        if not hasattr(self, "_suppressed_args"):
             self._suppressed_args: set[str] = set()
 
-        sys_kwargs = {
-            "nonbondedMethod": app.NoCutoff,
-            "constraints": constraints
-        }
-        if self.implicit_solvent_enum is not None and "implicitSolvent" not in self._suppressed_args:
+        sys_kwargs = {"nonbondedMethod": app.NoCutoff, "constraints": constraints}
+        if (
+            self.implicit_solvent_enum is not None
+            and "implicitSolvent" not in self._suppressed_args
+        ):
             sys_kwargs["implicitSolvent"] = self.implicit_solvent_enum
 
         current_topo = topology
@@ -329,7 +404,9 @@ class EnergyMinimizer:
                 if "was specified to createSystem() but was never used" in msg:
                     for arg in ["implicitSolvent"]:
                         if arg in msg and arg in kwargs:
-                            logger.warning(f"Forcefield does not support {arg}. Retrying without it and suppressing for future calls...")
+                            logger.warning(
+                                f"Forcefield does not support {arg}. Retrying without it and suppressing for future calls..."
+                            )
                             self._suppressed_args.add(arg)
                             del kwargs[arg]
                             return cast(Tuple[Any, Any, Any], _try_create(topo, **kwargs))
@@ -337,9 +414,15 @@ class EnergyMinimizer:
                 # Fallback 2: Template mismatch (Hydrogen issues)
                 if "No template found" in msg and modeller is not None:
                     try:
-                        logger.warning(f"Template mismatch: {msg}. Attempting re-protonation repair...")
+                        logger.warning(
+                            f"Template mismatch: {msg}. Attempting re-protonation repair..."
+                        )
                         # Strip and re-add hydrogens
-                        h_atoms = [a for a in modeller.topology.atoms() if a.element and a.element.symbol == 'H']
+                        h_atoms = [
+                            a
+                            for a in modeller.topology.atoms()
+                            if a.element and a.element.symbol == "H"
+                        ]
                         if h_atoms:
                             modeller.delete(h_atoms)
                         modeller.addHydrogens(self.forcefield)
@@ -354,12 +437,17 @@ class EnergyMinimizer:
         try:
             return cast(Tuple[Any, Any, Any], _try_create(current_topo, **sys_kwargs))
         except Exception as final_e:
-            logger.warning(f"Robust system creation failed, final fallback to no constraints: {final_e}")
-            sys = self.forcefield.createSystem(current_topo, nonbondedMethod=app.NoCutoff, constraints=None)
+            logger.warning(
+                f"Robust system creation failed, final fallback to no constraints: {final_e}"
+            )
+            sys = self.forcefield.createSystem(
+                current_topo, nonbondedMethod=app.NoCutoff, constraints=None
+            )
             return cast(Tuple[Any, Any, Any], (sys, current_topo, current_pos))
 
-
-    def _preprocess_pdb_for_simulation(self, input_path: str, cyclic: bool, disulfides_param: Optional[List]) -> Tuple[Any, Any, List[str], Dict[Any, Any]]:
+    def _preprocess_pdb_for_simulation(
+        self, input_path: str, cyclic: bool, disulfides_param: Optional[List]
+    ) -> Tuple[Any, Any, List[str], Dict[Any, Any]]:
         """Load and sanitize the input PDB for OpenMM; return OpenMM topology/positions.
 
         Performs PTM residue renaming (SEP→SER, etc.), HETATM ion stripping,
@@ -396,12 +484,31 @@ class EnergyMinimizer:
         # their standard counterparts BEFORE loading. We preserve the original
         # identity in `original_metadata` for final restoration.
         ptm_map = {
-            'SEP': 'SER', 'TPO': 'THR', 'PTR': 'TYR',
-            'HIE': 'HIS', 'HID': 'HIS', 'HIP': 'HIS',
-            'DAL': 'ALA', 'DAR': 'ARG', 'DAN': 'ASN', 'DAS': 'ASP', 'DCY': 'CYS',
-            'DGL': 'GLU', 'DGN': 'GLN', 'DHI': 'HIS', 'DIL': 'ILE', 'DLE': 'LEU',
-            'DLY': 'LYS', 'DME': 'MET', 'DPH': 'PHE', 'DPR': 'PRO', 'DSE': 'SER',
-            'DTH': 'THR', 'DTR': 'TRP', 'DTY': 'TYR', 'DVA': 'VAL',
+            "SEP": "SER",
+            "TPO": "THR",
+            "PTR": "TYR",
+            "HIE": "HIS",
+            "HID": "HIS",
+            "HIP": "HIS",
+            "DAL": "ALA",
+            "DAR": "ARG",
+            "DAN": "ASN",
+            "DAS": "ASP",
+            "DCY": "CYS",
+            "DGL": "GLU",
+            "DGN": "GLN",
+            "DHI": "HIS",
+            "DIL": "ILE",
+            "DLE": "LEU",
+            "DLY": "LYS",
+            "DME": "MET",
+            "DPH": "PHE",
+            "DPR": "PRO",
+            "DSE": "SER",
+            "DTH": "THR",
+            "DTR": "TRP",
+            "DTY": "TYR",
+            "DVA": "VAL",
         }
         ptm_atom_names = ["P", "O1P", "O2P", "O3P"]
 
@@ -418,7 +525,7 @@ class EnergyMinimizer:
 
             atom_lines = [line for line in pdb_lines if line.startswith("ATOM")]
             first_res_id = atom_lines[0][22:26].strip() if atom_lines else None
-            last_res_id  = atom_lines[-1][22:26].strip() if atom_lines else None
+            last_res_id = atom_lines[-1][22:26].strip() if atom_lines else None
 
             # EDUCATIONAL NOTE - Cyclic CONECT Stripping:
             # OpenMM's PDB reader creates CONECT records for all explicit bonds.
@@ -429,7 +536,7 @@ class EnergyMinimizer:
             c_coords, c_line_template = None, None
             if cyclic and atom_lines:
                 for line in atom_lines:
-                    res_id   = line[22:26].strip()
+                    res_id = line[22:26].strip()
                     atom_name = line[12:16].strip()
                     if res_id == first_res_id and atom_name == "N":
                         n_term_serial = line[6:11].strip()
@@ -442,18 +549,17 @@ class EnergyMinimizer:
                 if line.startswith("CONECT") and cyclic and n_term_serial and c_term_serial:
                     parts = line.split()
                     if len(parts) >= 3:
-                        if (
-                            (parts[1] == n_term_serial and parts[2] == c_term_serial)
-                            or (parts[1] == c_term_serial and parts[2] == n_term_serial)
+                        if (parts[1] == n_term_serial and parts[2] == c_term_serial) or (
+                            parts[1] == c_term_serial and parts[2] == n_term_serial
                         ):
                             print(f"DEBUG: Skipping cyclic CONECT: {line.strip()}")
                             continue
 
                 if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
-                    res_name  = line[17:20].strip()
-                    res_id    = line[22:26].strip()
-                    chain_id  = line[21] if len(line) > 21 else " "
-                    res_key   = (res_id, chain_id)
+                    res_name = line[17:20].strip()
+                    res_id = line[22:26].strip()
+                    chain_id = line[21] if len(line) > 21 else " "
+                    res_key = (res_id, chain_id)
                     atom_name = line[12:16].strip()
 
                     if res_key != last_res_key:
@@ -465,7 +571,7 @@ class EnergyMinimizer:
                     # Ions like Zn2+, Fe2+, Mg2+ crash Modeller.addHydrogens()
                     # because they have no hydrogen template. We stash them in
                     # hetatm_lines and re-append them after minimization.
-                    if res_name_upper in ['ZN', 'FE', 'MG', 'CA', 'NA', 'CL']:
+                    if res_name_upper in ["ZN", "FE", "MG", "CA", "NA", "CL"]:
                         hetatm_lines.append(line)
                         logger.info(f"Restoring lost HETATM: {res_name_upper}")
                         continue
@@ -473,7 +579,7 @@ class EnergyMinimizer:
                     if res_name in ptm_map:
                         new_name = ptm_map[res_name]
                         line = line[:17] + f"{new_name: >3}" + line[20:]
-                        if res_name in ['SEP', 'TPO', 'PTR'] and len(line) >= 16:
+                        if res_name in ["SEP", "TPO", "PTR"] and len(line) >= 16:
                             if atom_name in ptm_atom_names:
                                 continue
                 modified_lines.append(line)
@@ -495,7 +601,7 @@ class EnergyMinimizer:
                     res_id_full = c_line_template[21:26]
                     oxt_line = (
                         f"ATOM   9999  OXT {res_name_c} {res_id_full}    "
-                        f"{x+1.2:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00           O\n"
+                        f"{x + 1.2:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00           O\n"
                     )
                     modified_lines.insert(insert_idx, oxt_line)
                     logger.info(
@@ -503,7 +609,7 @@ class EnergyMinimizer:
                         f"(Renamed: {res_name_c.strip()})"
                     )
 
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as tf:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as tf:
                 tf.writelines(modified_lines)
                 temp_input_path = tf.name
 
@@ -533,13 +639,11 @@ class EnergyMinimizer:
             if len(res_list) >= 2:
                 first_res, last_res = res_list[0], res_list[-1]
                 for bond in topology.bonds():
-                    if (
-                        (bond[0].residue == first_res and bond[1].residue == last_res)
-                        or (bond[0].residue == last_res and bond[1].residue == first_res)
+                    if (bond[0].residue == first_res and bond[1].residue == last_res) or (
+                        bond[0].residue == last_res and bond[1].residue == first_res
                     ):
-                        if (
-                            (bond[0].name == "N" and bond[1].name == "C")
-                            or (bond[0].name == "C" and bond[1].name == "N")
+                        if (bond[0].name == "N" and bond[1].name == "C") or (
+                            bond[0].name == "C" and bond[1].name == "N"
                         ):
                             bonds_to_remove.append(bond)
             if bonds_to_remove:
@@ -552,8 +656,13 @@ class EnergyMinimizer:
         return topology, positions, hetatm_lines, original_metadata
 
     def _setup_openmm_modeller(
-        self, topology: Any, positions: Any, add_hydrogens: bool,
-        cyclic: bool, coordination_param: Optional[List], atom_list: List[Any]
+        self,
+        topology: Any,
+        positions: Any,
+        add_hydrogens: bool,
+        cyclic: bool,
+        coordination_param: Optional[List],
+        atom_list: List[Any],
     ) -> Tuple[Any, List, List, List, List[Any]]:
         """Build the OpenMM Modeller, apply H handling, detect disulfides and salt bridges.
 
@@ -617,8 +726,8 @@ class EnergyMinimizer:
             }
             for i in range(len(residues) - 1):
                 res1, res2 = residues[i], residues[i + 1]
-                c_s = next((a for a in res1.atoms() if a.name == 'C'), None)
-                n_s = next((a for a in res2.atoms() if a.name == 'N'), None)
+                c_s = next((a for a in res1.atoms() if a.name == "C"), None)
+                n_s = next((a for a in res2.atoms() if a.name == "N"), None)
                 if c_s and n_s and frozenset([c_s.index, n_s.index]) not in existing_bonds:
                     logger.debug(
                         f"Stitching missing backbone bond: "
@@ -632,10 +741,13 @@ class EnergyMinimizer:
         added_bonds: list = []
         if add_hydrogens:
             try:
-                modeller.delete([
-                    a for a in modeller.topology.atoms()
-                    if a.element is not None and a.element.symbol == "H"
-                ])
+                modeller.delete(
+                    [
+                        a
+                        for a in modeller.topology.atoms()
+                        if a.element is not None and a.element.symbol == "H"
+                    ]
+                )
             except Exception as e:
                 logger.debug(f"H deletion failed: {e}")
 
@@ -648,14 +760,11 @@ class EnergyMinimizer:
         # to bring them into the ideal covalent distance.
         # Disulfide bond detection by SG proximity
         try:
-            cys_residues = [
-                r for r in modeller.topology.residues()
-                if r.name in ('CYS', 'CYX')
-            ]
+            cys_residues = [r for r in modeller.topology.residues() if r.name in ("CYS", "CYX")]
             res_to_sg = {
-                r.index: [a for a in r.atoms() if a.name == 'SG'][0]
+                r.index: [a for a in r.atoms() if a.name == "SG"][0]
                 for r in cys_residues
-                if any(a.name == 'SG' for a in r.atoms())
+                if any(a.name == "SG" for a in r.atoms())
             }
             potential_bonds = []
             for i in range(len(cys_residues)):
@@ -696,6 +805,7 @@ class EnergyMinimizer:
         try:
             from .biophysics import find_salt_bridges
             from .cofactors import find_metal_binding_sites
+
             tmp_io = _io.StringIO()
             app.PDBFile.writeFile(modeller.topology, modeller.positions, tmp_io)
             tmp_io.seek(0)
@@ -735,9 +845,7 @@ class EnergyMinimizer:
             # Salt bridges
             try:
                 salt_bridges = find_salt_bridges(b_struc, cutoff=5.0)
-                logger.info(
-                    f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges"
-                )
+                logger.info(f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges")
                 if salt_bridges:
                     current_atoms = list(modeller.topology.atoms())
                     for br in salt_bridges:
@@ -781,8 +889,8 @@ class EnergyMinimizer:
                 res = list(modeller.topology.residues())
                 if len(res) >= 2:
                     res1, res_n = res[0], res[-1]
-                    c_at = next((a for a in res_n.atoms() if a.name == 'C'), None)
-                    n_at = next((a for a in res1.atoms() if a.name == 'N'), None)
+                    c_at = next((a for a in res_n.atoms() if a.name == "C"), None)
+                    n_at = next((a for a in res1.atoms() if a.name == "N"), None)
                     if c_at and n_at:
                         modeller.topology.addBond(c_at, n_at)
                         logger.info(
@@ -793,16 +901,15 @@ class EnergyMinimizer:
                         for a in res_n.atoms():
                             if a.name in ["OXT", "OT1", "OT2", "HXT"]:
                                 to_delete.append(a)
-                        n_hyds = [
-                            a for a in res1.atoms()
-                            if a.name in ["H1", "H2", "H3", "H"]
-                        ]
+                        n_hyds = [a for a in res1.atoms() if a.name in ["H1", "H2", "H3", "H"]]
                         if len(n_hyds) > 1:
                             sorted_hyds = sorted(n_hyds, key=lambda x: x.name)
                             to_delete.extend(sorted_hyds[1:])
                         if to_delete:
                             modeller.delete(to_delete)
-                            logger.info(f"Purged {len(to_delete)} terminal atoms for cyclic closure.")
+                            logger.info(
+                                f"Purged {len(to_delete)} terminal atoms for cyclic closure."
+                            )
             except Exception as e:
                 logger.debug(f"Cyclic welding failed: {e}")
 
@@ -820,9 +927,9 @@ class EnergyMinimizer:
             for id1, id2 in added_bonds:
                 for rid in [id1, id2]:
                     residue_obj = res_map.get(rid)
-                    if residue_obj and residue_obj.name == 'CYS':
-                        residue_obj.name = 'CYX'
-                        hg_to_delete.extend([a for a in residue_obj.atoms() if a.name == 'HG'])
+                    if residue_obj and residue_obj.name == "CYS":
+                        residue_obj.name = "CYX"
+                        hg_to_delete.extend([a for a in residue_obj.atoms() if a.name == "HG"])
             if hg_to_delete:
                 modeller.delete(hg_to_delete)
 
@@ -836,8 +943,13 @@ class EnergyMinimizer:
         return modeller, added_bonds, salt_bridge_restraints, coordination_restraints, atom_list
 
     def _build_simulation_context(
-        self, modeller: Any, cyclic: bool, added_bonds: List,
-        salt_bridge_restraints: List, coordination_restraints: List, atom_list: List[Any]
+        self,
+        modeller: Any,
+        cyclic: bool,
+        added_bonds: List,
+        salt_bridge_restraints: List,
+        coordination_restraints: List,
+        atom_list: List[Any],
     ) -> Tuple[Any, Any, int, int, Any, Any]:
         """Create OpenMM System + Simulation, apply forces, return context objects.
 
@@ -868,19 +980,20 @@ class EnergyMinimizer:
         # System creation
         try:
             current_constraints = None if cyclic else app.HBonds
-            if self.solvent_model == 'explicit':
+            if self.solvent_model == "explicit":
                 logger.info(
-                    f"Adding explicit solvent (TIP3P water) with a "
-                    f"{self.box_size} nm padding..."
+                    f"Adding explicit solvent (TIP3P water) with a {self.box_size} nm padding..."
                 )
                 modeller.addSolvent(
-                    self.forcefield, model='tip3p',
-                    padding=self.box_size, ionicStrength=0.1 * unit.molar,
+                    self.forcefield,
+                    model="tip3p",
+                    padding=self.box_size,
+                    ionicStrength=0.1 * unit.molar,
                 )
                 topology = modeller.topology
                 positions = modeller.positions
                 if os.getenv("SYNTH_PDB_DEBUG_SAVE_INTERMEDIATE") == "1":
-                    with open("intermediate_debug.pdb", 'w') as f:
+                    with open("intermediate_debug.pdb", "w") as f:
                         app.PDBFile.writeFile(topology, positions, f)
                 system = self.forcefield.createSystem(
                     topology,
@@ -919,15 +1032,13 @@ class EnergyMinimizer:
         n_idx, c_idx = -1, -1
         if cyclic:
             try:
-                nb_force = next(
-                    f for f in system.getForces() if isinstance(f, mm.NonbondedForce)
-                )
+                nb_force = next(f for f in system.getForces() if isinstance(f, mm.NonbondedForce))
                 residues = list(topology.residues())
                 if len(residues) >= 2:
                     res1 = residues[0]
                     res_n = residues[-1]
                     ats_first = list(res1.atoms())
-                    ats_last  = list(res_n.atoms())
+                    ats_last = list(res_n.atoms())
                     logger.info(
                         f"Ghosting entire residues {res1.name}{res1.id} and "
                         f"{res_n.name}{res_n.id} for closure."
@@ -942,21 +1053,27 @@ class EnergyMinimizer:
                     if isinstance(force, mm.HarmonicBondForce):
                         for i in range(force.getNumBonds()):
                             p1, p2, r0, k = force.getBondParameters(i)
-                            if (
-                                top_atoms[p1].residue.name in ['ACE', 'NME']
-                                or top_atoms[p2].residue.name in ['ACE', 'NME']
-                            ):
+                            if top_atoms[p1].residue.name in ["ACE", "NME"] or top_atoms[
+                                p2
+                            ].residue.name in ["ACE", "NME"]:
                                 force.setBondParameters(i, p1, p2, r0, 0.0)
                     elif isinstance(force, mm.HarmonicAngleForce):
                         for i in range(force.getNumAngles()):
                             p1, p2, p3, theta, k = force.getAngleParameters(i)
-                            if any(top_atoms[p].residue.name in ['ACE', 'NME'] for p in [p1, p2, p3]):
+                            if any(
+                                top_atoms[p].residue.name in ["ACE", "NME"] for p in [p1, p2, p3]
+                            ):
                                 force.setAngleParameters(i, p1, p2, p3, theta, 0.0)
                     elif isinstance(force, mm.PeriodicTorsionForce):
                         for i in range(force.getNumTorsions()):
                             p1, p2, p3, p4, periodicity, phase, k = force.getTorsionParameters(i)
-                            if any(top_atoms[p].residue.name in ['ACE', 'NME'] for p in [p1, p2, p3, p4]):
-                                force.setTorsionParameters(i, p1, p2, p3, p4, periodicity, phase, 0.0)
+                            if any(
+                                top_atoms[p].residue.name in ["ACE", "NME"]
+                                for p in [p1, p2, p3, p4]
+                            ):
+                                force.setTorsionParameters(
+                                    i, p1, p2, p3, p4, periodicity, phase, 0.0
+                                )
 
                 logger.info("Excised non-bonded interactions between termini for cyclic closure.")
             except Exception as e:
@@ -965,9 +1082,7 @@ class EnergyMinimizer:
         # Coordination restraints
         if coordination_restraints:
             f = mm.CustomBondForce("0.5*k*(r-r0)^2")
-            f.addGlobalParameter(
-                "k", 50000.0 * unit.kilojoules_per_mole / unit.nanometer ** 2
-            )
+            f.addGlobalParameter("k", 50000.0 * unit.kilojoules_per_mole / unit.nanometer**2)
             f.addPerBondParameter("r0")
             new_ats = list(topology.atoms())
             for i_o, l_o in coordination_restraints:
@@ -980,7 +1095,8 @@ class EnergyMinimizer:
                         nl = a.index
                 if ni != -1 and nl != -1:
                     f.addBond(
-                        ni, nl,
+                        ni,
+                        nl,
                         [(0.23 if new_ats[nl].name == "SG" else 0.21) * unit.nanometers],
                     )
             system.addForce(f)
@@ -1004,18 +1120,28 @@ class EnergyMinimizer:
             pull_force = mm.CustomBondForce("0.5*k_pull*(r-r0)^2")
             pull_force.addGlobalParameter(
                 "k_pull",
-                100000000.0 * unit.kilojoules_per_mole / unit.nanometer ** 2,
+                100000000.0 * unit.kilojoules_per_mole / unit.nanometer**2,
             )
             pull_force.addPerBondParameter("r0")
 
             if cyclic:
                 solvent_names = [
-                    'HOH', 'WAT', 'SOL', 'TIP3', 'POP', 'NA', 'CL',
-                    'ZN', 'FE', 'MG', 'CA',
+                    "HOH",
+                    "WAT",
+                    "SOL",
+                    "TIP3",
+                    "POP",
+                    "NA",
+                    "CL",
+                    "ZN",
+                    "FE",
+                    "MG",
+                    "CA",
                 ]
                 real_residues = [
-                    r for r in list(topology.residues())
-                    if r.name.strip().upper() not in (['ACE', 'NME'] + solvent_names)
+                    r
+                    for r in list(topology.residues())
+                    if r.name.strip().upper() not in (["ACE", "NME"] + solvent_names)
                 ]
                 if real_residues:
                     r_first, r_last = real_residues[0], real_residues[-1]
@@ -1024,11 +1150,11 @@ class EnergyMinimizer:
                         f"{r_first.name}{r_first.id} and {r_last.name}{r_last.id}"
                     )
                     for a in r_first.atoms():
-                        if a.name == 'N':
+                        if a.name == "N":
                             n_idx = a.index
                             break
                     for a in r_last.atoms():
-                        if a.name == 'C':
+                        if a.name == "C":
                             c_idx = a.index
                             break
                     logger.info(f"CYCLIC: Indices: N={n_idx}, C={c_idx}")
@@ -1050,17 +1176,17 @@ class EnergyMinimizer:
                         elif isinstance(force, mm.HarmonicAngleForce):
                             for i in range(force.getNumAngles()):
                                 p1, p2, p3, theta, k = force.getAngleParameters(i)
-                                if (
-                                    any(p == n_idx for p in [p1, p2, p3])
-                                    and any(p == c_idx for p in [p1, p2, p3])
+                                if any(p == n_idx for p in [p1, p2, p3]) and any(
+                                    p == c_idx for p in [p1, p2, p3]
                                 ):
                                     force.setAngleParameters(i, p1, p2, p3, theta, 0.0)
                         elif isinstance(force, mm.PeriodicTorsionForce):
                             for i in range(force.getNumTorsions()):
-                                p1, p2, p3, p4, periodicity, phase, k = force.getTorsionParameters(i)
-                                if (
-                                    any(p == n_idx for p in [p1, p2, p3, p4])
-                                    and any(p == c_idx for p in [p1, p2, p3, p4])
+                                p1, p2, p3, p4, periodicity, phase, k = force.getTorsionParameters(
+                                    i
+                                )
+                                if any(p == n_idx for p in [p1, p2, p3, p4]) and any(
+                                    p == c_idx for p in [p1, p2, p3, p4]
                                 ):
                                     force.setTorsionParameters(
                                         i, p1, p2, p3, p4, periodicity, phase, 0.0
@@ -1073,12 +1199,12 @@ class EnergyMinimizer:
                     for res in topology.residues():
                         if str(res.id).strip() == id1:
                             for a in res.atoms():
-                                if a.name == 'SG':
+                                if a.name == "SG":
                                     s1 = a.index
                                     break
                         if str(res.id).strip() == id2:
                             for a in res.atoms():
-                                if a.name == 'SG':
+                                if a.name == "SG":
                                     s2 = a.index
                                     break
                     if s1 != -1 and s2 != -1:
@@ -1103,11 +1229,11 @@ class EnergyMinimizer:
         )
         platform = None
         props: dict = {}
-        for name in ['CUDA', 'Metal', 'OpenCL']:
+        for name in ["CUDA", "Metal", "OpenCL"]:
             try:
                 platform = mm.Platform.getPlatformByName(name)
-                if name in ['CUDA', 'OpenCL']:
-                    props = {'Precision': 'mixed'}
+                if name in ["CUDA", "OpenCL"]:
+                    props = {"Precision": "mixed"}
                 logger.info(f"Using OpenMM Platform: {name}")
                 break
             except Exception:
@@ -1126,9 +1252,15 @@ class EnergyMinimizer:
         return simulation, system, n_idx, c_idx, topology, positions
 
     def _finalize_output(
-        self, output_path: str, simulation: Any, cyclic: bool, added_bonds: List,
-        coordination_restraints: List, hetatm_lines: List[str],
-        original_metadata: Dict[Any, Any], atom_list: List[Any]
+        self,
+        output_path: str,
+        simulation: Any,
+        cyclic: bool,
+        added_bonds: List,
+        coordination_restraints: List,
+        hetatm_lines: List[str],
+        original_metadata: Dict[Any, Any],
+        atom_list: List[Any],
     ) -> Optional[bool]:
         """Write the post-simulation structure to *output_path*.
 
@@ -1151,11 +1283,11 @@ class EnergyMinimizer:
         import io as _io
 
         state = simulation.context.getState(getPositions=True)
-        pos   = state.getPositions()
-        final_topology  = simulation.topology
+        pos = state.getPositions()
+        final_topology = simulation.topology
         final_positions = pos
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             # Macrocycle Cleanup
             if cyclic:
                 try:
@@ -1164,35 +1296,44 @@ class EnergyMinimizer:
                     residues = list(mod_modeller.topology.residues())
                     if residues:
                         to_prune_caps = [
-                            a for r in residues
-                            if r.name in ['ACE', 'NME']
-                            for a in r.atoms()
+                            a for r in residues if r.name in ["ACE", "NME"] for a in r.atoms()
                         ]
                         if to_prune_caps:
                             mod_modeller.delete(to_prune_caps)
-                            final_topology  = mod_modeller.topology
+                            final_topology = mod_modeller.topology
                             final_positions = mod_modeller.positions
                             residues = list(final_topology.residues())
 
                         solvent_names = [
-                            'HOH', 'WAT', 'SOL', 'TIP3', 'POP',
-                            'NA', 'CL', 'ZN', 'FE', 'MG', 'CA',
+                            "HOH",
+                            "WAT",
+                            "SOL",
+                            "TIP3",
+                            "POP",
+                            "NA",
+                            "CL",
+                            "ZN",
+                            "FE",
+                            "MG",
+                            "CA",
                         ]
                         amino_residues = [
-                            r for r in residues
-                            if r.name.strip().upper() not in (['ACE', 'NME'] + solvent_names)
+                            r
+                            for r in residues
+                            if r.name.strip().upper() not in (["ACE", "NME"] + solvent_names)
                         ]
 
                         if amino_residues:
                             res1, res_n = amino_residues[0], amino_residues[-1]
                             to_prune = []
 
-                            n1 = next((a for a in res1.atoms() if a.name == 'N'), None)
+                            n1 = next((a for a in res1.atoms() if a.name == "N"), None)
                             if n1:
                                 h_on_n1 = [
-                                    a for a in res1.atoms()
+                                    a
+                                    for a in res1.atoms()
                                     if a.element is not None
-                                    and a.element.symbol == 'H'
+                                    and a.element.symbol == "H"
                                     and any(
                                         b.atom1 == n1 or b.atom2 == n1
                                         for b in final_topology.bonds()
@@ -1200,13 +1341,13 @@ class EnergyMinimizer:
                                     )
                                 ]
                                 if len(h_on_n1) == 1:
-                                    h_on_n1[0].name = 'H'
-                            oxt = next((a for a in res_n.atoms() if a.name == 'OXT'), None)
+                                    h_on_n1[0].name = "H"
+                            oxt = next((a for a in res_n.atoms() if a.name == "OXT"), None)
                             if oxt:
                                 to_prune.append(oxt)
                             if to_prune:
                                 mod_modeller.delete(to_prune)
-                                final_topology  = mod_modeller.topology
+                                final_topology = mod_modeller.topology
                                 final_positions = mod_modeller.positions
                 except Exception as e:
                     logger.warning(f"Macrocycle cleanup failed: {e}")
@@ -1229,7 +1370,7 @@ class EnergyMinimizer:
                 res_key = (str(res.id).strip(), res.chain.id)
                 if res_key in original_metadata:
                     res.name = original_metadata[res_key]["name"]
-                    res.id   = original_metadata[res_key]["id"]
+                    res.id = original_metadata[res_key]["id"]
 
             if added_bonds:
                 for s, (id1, id2) in enumerate(added_bonds, 1):
@@ -1244,7 +1385,7 @@ class EnergyMinimizer:
             # Build PDB buffer
             pdb_buffer = _io.StringIO()
             app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
-            pdb_lines = pdb_buffer.getvalue().split('\n')
+            pdb_lines = pdb_buffer.getvalue().split("\n")
 
             # EDUCATIONAL NOTE - CONECT Records & Visualization:
             # CONECT records are critical for molecular viewers (PyMOL, Chimera)
@@ -1255,14 +1396,14 @@ class EnergyMinimizer:
             extra_conects = []
             for bond in final_topology.bonds():
                 a1, a2 = bond.atom1, bond.atom2
-                if a1.name == 'SG' and a2.name == 'SG':
+                if a1.name == "SG" and a2.name == "SG":
                     extra_conects.append((a1.index + 1, a2.index + 1))
             for id1, id2 in coordination_restraints:
                 extra_conects.append((id1 + 1, id2 + 1))
 
             final_lines = []
             for line in pdb_lines:
-                if line.startswith('END') or line.startswith('CONECT'):
+                if line.startswith("END") or line.startswith("CONECT"):
                     continue
                 if line.strip():
                     final_lines.append(line)
@@ -1285,10 +1426,10 @@ class EnergyMinimizer:
                     )
 
             # EDUCATIONAL NOTE - HETATM Restoration:
-        # Metal ions were stripped before addHydrogens() (they crash it).
-        # Re-append them verbatim at the end of the PDB file so downstream
-        # tools (viewers, NMR shift predictors) can see them correctly.
-        # Restore stripped ions
+            # Metal ions were stripped before addHydrogens() (they crash it).
+            # Re-append them verbatim at the end of the PDB file so downstream
+            # tools (viewers, NMR shift predictors) can see them correctly.
+            # Restore stripped ions
             if hetatm_lines:
                 for line in hetatm_lines:
                     res_name = line[17:20].strip().upper()
@@ -1299,16 +1440,27 @@ class EnergyMinimizer:
             f.write("\n".join(final_lines) + "\n")
         return True
 
-
-    def _run_simulation(self, input_path: str, output_path: str, max_iterations: int = 0, tolerance: float = 10.0, add_hydrogens: bool = True, equilibration_steps: int = 0, cyclic: bool = False, disulfides: Optional[List] = None, coordination: Optional[List] = None) -> Optional[float]:
+    def _run_simulation(
+        self,
+        input_path: str,
+        output_path: str,
+        max_iterations: int = 0,
+        tolerance: float = 10.0,
+        add_hydrogens: bool = True,
+        equilibration_steps: int = 0,
+        cyclic: bool = False,
+        disulfides: Optional[List] = None,
+        coordination: Optional[List] = None,
+    ) -> Optional[float]:
         """Internal engine. Returns final_energy if successful, else None."""
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
 
         # ── Stage 1: PDB preprocessing ──────────────────────────────────────
         try:
-            topology, positions, hetatm_lines, original_metadata = \
+            topology, positions, hetatm_lines, original_metadata = (
                 self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
+            )
             atom_list = list(topology.atoms())
         except Exception as e:
             logger.error(f"PDB Pre-processing failed: {e}")
@@ -1317,18 +1469,26 @@ class EnergyMinimizer:
         # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
         try:
             coordination_param = coordination if coordination is not None else []
-            modeller, added_bonds, salt_bridge_restraints, coordination_restraints, atom_list = \
+            modeller, added_bonds, salt_bridge_restraints, coordination_restraints, atom_list = (
                 self._setup_openmm_modeller(
-                    topology, positions, add_hydrogens, cyclic,
-                    coordination_param, atom_list,
+                    topology,
+                    positions,
+                    add_hydrogens,
+                    cyclic,
+                    coordination_param,
+                    atom_list,
                 )
+            )
 
             # ── Stage 3: System + forces + Simulation context ───────────────
-            simulation, system, n_idx, c_idx, topology, positions = \
-                self._build_simulation_context(
-                    modeller, cyclic, added_bonds,
-                    salt_bridge_restraints, coordination_restraints, atom_list,
-                )
+            simulation, system, n_idx, c_idx, topology, positions = self._build_simulation_context(
+                modeller,
+                cyclic,
+                added_bonds,
+                salt_bridge_restraints,
+                coordination_restraints,
+                atom_list,
+            )
 
             # Health check
             if len(list(topology.atoms())) == 0:
@@ -1340,8 +1500,7 @@ class EnergyMinimizer:
             # Single-point energy calculation (bypass minimization)
             if max_iterations < 0:
                 logger.info(
-                    "Single-point energy calculation (max_iterations < 0). "
-                    "Skipping minimization."
+                    "Single-point energy calculation (max_iterations < 0). Skipping minimization."
                 )
                 state = simulation.context.getState(getEnergy=True)
                 return float(state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole))
@@ -1351,15 +1510,14 @@ class EnergyMinimizer:
             if cyclic or added_bonds or salt_bridge_restraints:
                 cyc_iter = 0
                 logger.info(
-                    "Macrocycle/Disulfide Optimization: "
-                    "Running unlimited iterations for closure."
+                    "Macrocycle/Disulfide Optimization: Running unlimited iterations for closure."
                 )
 
                 if salt_bridge_restraints:
                     sb_force = mm.CustomBondForce("0.5*k_sb*(r-r0)^2")
                     sb_force.addGlobalParameter(
                         "k_sb",
-                        10000.0 * unit.kilojoules_per_mole / unit.nanometer ** 2,
+                        10000.0 * unit.kilojoules_per_mole / unit.nanometer**2,
                     )
                     sb_force.addPerBondParameter("r0")
                     new_ats = list(topology.atoms())
@@ -1406,24 +1564,26 @@ class EnergyMinimizer:
                         if len(pos) > 0:
                             pos_np = (
                                 np.array(pos.value_in_unit(unit.nanometers))
-                                if hasattr(pos, 'value_in_unit')
+                                if hasattr(pos, "value_in_unit")
                                 else np.array(pos)
                             )
                             noise = np.random.normal(0, 0.05, (len(pos_np), 3))
                             simulation.context.setPositions((pos_np + noise) * unit.nanometers)
                             simulation.minimizeEnergy(
                                 maxIterations=cyc_iter,
-                                tolerance=(tolerance * 0.1) * unit.kilojoule / (unit.mole * unit.nanometer),
+                                tolerance=(tolerance * 0.1)
+                                * unit.kilojoule
+                                / (unit.mole * unit.nanometer),
                             )
                     except Exception as e:
                         logger.debug(f"Thermal jiggling failed (likely mocked): {e}")
 
-                    logger.info(
-                        "Iterative Closure: Reinforcing pull force and refining geometry."
-                    )
+                    logger.info("Iterative Closure: Reinforcing pull force and refining geometry.")
                     simulation.minimizeEnergy(
                         maxIterations=0,
-                        tolerance=(tolerance * 0.01) * unit.kilojoule / (unit.mole * unit.nanometer),
+                        tolerance=(tolerance * 0.01)
+                        * unit.kilojoule
+                        / (unit.mole * unit.nanometer),
                     )
 
                     logger.info(
@@ -1433,7 +1593,9 @@ class EnergyMinimizer:
                     simulation.context.reinitialize(preserveState=True)
                     simulation.minimizeEnergy(
                         maxIterations=0,
-                        tolerance=(tolerance * 0.001) * unit.kilojoule / (unit.mole * unit.nanometer),
+                        tolerance=(tolerance * 0.001)
+                        * unit.kilojoule
+                        / (unit.mole * unit.nanometer),
                     )
             else:
                 simulation.minimizeEnergy(
@@ -1447,7 +1609,7 @@ class EnergyMinimizer:
 
             try:
                 final_pos = simulation.context.getState(getPositions=True).getPositions()
-                if hasattr(final_pos, 'value_in_unit'):
+                if hasattr(final_pos, "value_in_unit"):
                     check_pos = np.array(final_pos.value_in_unit(unit.nanometers))
                     if check_pos.size > 0 and np.any(np.isnan(check_pos)):
                         logger.error("Health Check Failed: Atomic Coordinates contain NaNs!")
@@ -1479,8 +1641,14 @@ class EnergyMinimizer:
 
             # ── Stage 5: Write output PDB ────────────────────────────────────
             write_ok = self._finalize_output(
-                output_path, simulation, cyclic, added_bonds,
-                coordination_restraints, hetatm_lines, original_metadata, atom_list,
+                output_path,
+                simulation,
+                cyclic,
+                added_bonds,
+                coordination_restraints,
+                hetatm_lines,
+                original_metadata,
+                atom_list,
             )
             if write_ok is False:
                 return None
@@ -1491,7 +1659,12 @@ class EnergyMinimizer:
             return None
 
 
-def simulate_trajectory(pdb_content: str, temperature_kelvin: float = 300.0, steps: int = 1000, report_interval: int = 20) -> List[str]:
+def simulate_trajectory(
+    pdb_content: str,
+    temperature_kelvin: float = 300.0,
+    steps: int = 1000,
+    report_interval: int = 20,
+) -> List[str]:
     """
     Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
 
@@ -1512,19 +1685,17 @@ def simulate_trajectory(pdb_content: str, temperature_kelvin: float = 300.0, ste
     from openmm import app, unit
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", delete=False) as f:
-        f.write(pdb_content.encode('utf-8'))
+        f.write(pdb_content.encode("utf-8"))
         temp_pdb = f.name
 
     try:
         pdb = app.PDBFile(temp_pdb)
-        forcefield = app.ForceField('amber14-all.xml', 'implicit/obc2.xml')
+        forcefield = app.ForceField("amber14-all.xml", "implicit/obc2.xml")
         system = forcefield.createSystem(
             pdb.topology, nonbondedMethod=app.NoCutoff, constraints=app.HBonds
         )
         integrator = mm.LangevinMiddleIntegrator(
-            temperature_kelvin * unit.kelvin,
-            1.0 / unit.picosecond,
-            2.0 * unit.femtoseconds
+            temperature_kelvin * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
         )
         simulation = app.Simulation(pdb.topology, system, integrator)
         simulation.context.setPositions(pdb.positions)
@@ -1553,4 +1724,3 @@ def simulate_trajectory(pdb_content: str, temperature_kelvin: float = 300.0, ste
     finally:
         if os.path.exists(temp_pdb):
             os.unlink(temp_pdb)
-

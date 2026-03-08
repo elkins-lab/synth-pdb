@@ -9,6 +9,7 @@ from .scoring import calculate_clash_score
 
 logger = logging.getLogger(__name__)
 
+
 class SideChainPacker:
     """
     Optimizes amino acid side-chain conformations to minimize steric clashes.
@@ -91,11 +92,13 @@ class SideChainPacker:
 
         for _step in range(self.steps):
             # Pick random residue
-            target_res_id, target_res_name = optimizable_residues[np.random.randint(len(optimizable_residues))]
+            target_res_id, target_res_name = optimizable_residues[
+                np.random.randint(len(optimizable_residues))
+            ]
 
             # Pick random new rotamer
             rotamer_options = ROTAMER_LIBRARY[target_res_name]
-            weights = [r.get('prob', 1.0) for r in rotamer_options]
+            weights = [r.get("prob", 1.0) for r in rotamer_options]
             # Normalize weights
             weights = np.array(weights) / np.sum(weights)
 
@@ -154,8 +157,11 @@ class SideChainPacker:
                 # Revert
                 peptide.coord[indices] = old_coords
 
-        logger.info(f"Optimization complete. Final Clash Score: {current_score:.4f} (Moves accepted: {accepted_moves})")
+        logger.info(
+            f"Optimization complete. Final Clash Score: {current_score:.4f} (Moves accepted: {accepted_moves})"
+        )
         return peptide
+
 
 def optimize_sidechains(peptide: struc.AtomArray, steps: int = 500) -> struc.AtomArray:
     """Convenience wrapper."""

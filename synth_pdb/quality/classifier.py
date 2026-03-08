@@ -6,6 +6,7 @@ from .features import extract_quality_features, get_feature_names
 
 logger = logging.getLogger(__name__)
 
+
 class ProteinQualityClassifier:
     """
     Random Forest classifier to predict if a protein structure is "High Quality"
@@ -30,7 +31,9 @@ class ProteinQualityClassifier:
             self.load_model(model_path)
         else:
             # Try to load default model included in package
-            default_path = os.path.join(os.path.dirname(__file__), "models", "quality_filter_v1.joblib")
+            default_path = os.path.join(
+                os.path.dirname(__file__), "models", "quality_filter_v1.joblib"
+            )
             if os.path.exists(default_path):
                 self.load_model(default_path)
             else:
@@ -41,7 +44,9 @@ class ProteinQualityClassifier:
         try:
             import joblib
         except ImportError:
-            logger.error("joblib is not installed. Install synth-pdb[ai] to use the quality filter.")
+            logger.error(
+                "joblib is not installed. Install synth-pdb[ai] to use the quality filter."
+            )
             self.model = None
             return
 

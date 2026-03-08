@@ -8,6 +8,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
+
 def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]]:
     """
     Calculate backbone torsion angles (phi, psi, omega) for a given structure.
@@ -62,17 +63,12 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
         if np.isnan(o):
             o = None
 
-        entry = {
-            'residue': res_name,
-            'res_id': res_id,
-            'phi': p,
-            'psi': ps,
-            'omega': o
-        }
+        entry = {"residue": res_name, "res_id": res_id, "phi": p, "psi": ps, "omega": o}
         results.append(entry)
 
     logger.info(f"Calculated angles for {len(results)} residues.")
     return results
+
 
 def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str = "csv") -> None:
     """
@@ -86,12 +82,12 @@ def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str
     logger.info(f"Exporting torsion angles to {output_file} ({fmt})...")
 
     if fmt.lower() == "json":
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(data, f, indent=2)
 
     elif fmt.lower() == "csv":
-        fieldnames = ['residue', 'res_id', 'phi', 'psi', 'omega']
-        with open(output_file, 'w', newline='') as f:
+        fieldnames = ["residue", "res_id", "phi", "psi", "omega"]
+        with open(output_file, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for row in data:

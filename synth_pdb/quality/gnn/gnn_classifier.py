@@ -73,20 +73,18 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 # Default checkpoint path (bundled inside the package after training)
-_DEFAULT_CHECKPOINT = os.path.join(
-    os.path.dirname(__file__), "..", "models", "gnn_quality_v1.pt"
-)
+_DEFAULT_CHECKPOINT = os.path.join(os.path.dirname(__file__), "..", "models", "gnn_quality_v1.pt")
 
 # Feature names matching graph.py's node feature ordering.
 # Used to build the feature dict returned by predict() — useful for debugging
 # and for producing human-readable explanations of a prediction.
 _FEATURE_NAMES = [
-    "sin_phi",        # backbone dihedral φ — sine component
-    "cos_phi",        # backbone dihedral φ — cosine component
-    "sin_psi",        # backbone dihedral ψ — sine component
-    "cos_psi",        # backbone dihedral ψ — cosine component
+    "sin_phi",  # backbone dihedral φ — sine component
+    "cos_phi",  # backbone dihedral φ — cosine component
+    "sin_psi",  # backbone dihedral ψ — sine component
+    "cos_psi",  # backbone dihedral ψ — cosine component
     "b_factor_norm",  # normalised crystallographic temperature factor
-    "seq_position",   # normalised sequence position (0=N-term, 1=C-term)
+    "seq_position",  # normalised sequence position (0=N-term, 1=C-term)
     "is_n_terminus",  # 1 if this is the N-terminal residue, else 0
     "is_c_terminus",  # 1 if this is the C-terminal residue, else 0
 ]
@@ -203,9 +201,7 @@ class GNNQualityClassifier:
         assert self.model is not None, "Model not loaded"
         self.model.eval()
         with torch.no_grad():
-            log_probs = self.model(
-                batch.x, batch.edge_index, batch.edge_attr, batch.batch
-            )
+            log_probs = self.model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
             # .exp() undoes the log: converts log P(class) → P(class)
             # Index 1 = "Good" class (matching the training label convention)
             prob_good = float(log_probs.exp()[0, 1].item())
@@ -219,8 +215,7 @@ class GNNQualityClassifier:
         # interpretation you would extract individual rows of graph.x.
         node_feats = graph.x.numpy()
         feat_dict = {
-            name: float(np.mean(node_feats[:, i]))
-            for i, name in enumerate(_FEATURE_NAMES)
+            name: float(np.mean(node_feats[:, i])) for i, name in enumerate(_FEATURE_NAMES)
         }
 
         return bool(is_good), prob_good, feat_dict
@@ -254,8 +249,8 @@ class GNNQualityClassifier:
                 # the original constructor arguments.
                 "node_features": self.model.node_features,
                 "edge_features": self.model.edge_features,
-                "hidden_dim":    self.model.hidden_dim,
-                "num_classes":   self.model.num_classes,
+                "hidden_dim": self.model.hidden_dim,
+                "num_classes": self.model.num_classes,
             },
             path,
         )
@@ -293,12 +288,16 @@ class GNNQualityClassifier:
 
             # Re-create the model architecture from stored metadata
             import typing
-            self.model = typing.cast(Any, ProteinGNN(
-                node_features=checkpoint["node_features"],
-                edge_features=checkpoint["edge_features"],
-                hidden_dim=checkpoint["hidden_dim"],
-                num_classes=checkpoint["num_classes"],
-            ))
+
+            self.model = typing.cast(
+                Any,
+                ProteinGNN(
+                    node_features=checkpoint["node_features"],
+                    edge_features=checkpoint["edge_features"],
+                    hidden_dim=checkpoint["hidden_dim"],
+                    num_classes=checkpoint["num_classes"],
+                ),
+            )
             # Copy the trained weights into the fresh model skeleton
             self.model.load_state_dict(checkpoint["state_dict"])
             self.model.eval()
@@ -327,5 +326,8 @@ class GNNQualityClassifier:
         import typing
 
         from .model import ProteinGNN
-        self.model = typing.cast(Any, ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2))
+
+        self.model = typing.cast(
+            Any, ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2)
+        )
         self.model.eval()

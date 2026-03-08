@@ -1,4 +1,3 @@
-
 """
 Distogram (Distance Matrix) Export Module.
 
@@ -22,6 +21,7 @@ import biotite.structure as struc
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
 
 def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.ndarray:
     """
@@ -48,8 +48,8 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
         # For now, let's implement CA-only default as indicated by test.
         atoms = structure[structure.atom_name == "CB"]
         if len(atoms) == 0:
-             logger.warning("No CB atoms found. Falling back to CA.")
-             atoms = structure[structure.atom_name == "CA"]
+            logger.warning("No CB atoms found. Falling back to CA.")
+            atoms = structure[structure.atom_name == "CA"]
     else:
         atoms = structure[structure.atom_name == "CA"]
 
@@ -59,15 +59,17 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
     # SciPy pdist is standard.
     # Or simple broadcasting in numpy (N,1,3) - (1,N,3)
 
-    coords = atoms.coord # Shape (N, 3)
+    coords = atoms.coord  # Shape (N, 3)
 
     # Efficient calculation:
     # d = sqrt( sum( (xi - xj)^2 ) )
-    delta = coords[:, np.newaxis, :] - coords[np.newaxis, :, :] # (N, N, 3)
-    dist_matrix = np.sqrt(np.sum(delta**2, axis=-1)) # (N, N)
+    delta = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]  # (N, N, 3)
+    dist_matrix = np.sqrt(np.sum(delta**2, axis=-1))  # (N, N)
 
     from typing import cast
+
     return cast(np.ndarray, dist_matrix)
+
 
 def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
     """

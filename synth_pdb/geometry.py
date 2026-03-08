@@ -28,6 +28,7 @@ except ImportError:
 # This algorithm is the engine of our protein builder, allowing us to
 # "walk down" the chain atom-by-atom with mathematical precision.
 
+
 @njit
 def position_atom_3d_from_internal_coords(
     p1: np.ndarray,
@@ -108,10 +109,8 @@ def position_atom_3d_from_internal_coords(
 # 3. Efficiency: By avoiding the Python interpreter loop for each structure, we
 #    reach throughput levels required for "Foundation Model" training in proteomics.
 
-def superimpose_batch(
-    sources: np.ndarray,
-    targets: np.ndarray
-) -> Tuple[np.ndarray, np.ndarray]:
+
+def superimpose_batch(sources: np.ndarray, targets: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Vectorized Kabsch algorithm to find the optimal rotation and translation
     that aligns a batch of source point sets to target point sets.
@@ -139,8 +138,8 @@ def superimpose_batch(
     b = sources.shape[0]
 
     # 1. Centroids
-    source_centroid = np.mean(sources, axis=1, keepdims=True) # (B, 1, 3)
-    target_centroid = np.mean(targets, axis=1, keepdims=True) # (B, 1, 3)
+    source_centroid = np.mean(sources, axis=1, keepdims=True)  # (B, 1, 3)
+    target_centroid = np.mean(targets, axis=1, keepdims=True)  # (B, 1, 3)
 
     s_centered = sources - source_centroid
     t_centered = targets - target_centroid
@@ -249,9 +248,7 @@ def position_atoms_batch(
 
 
 @njit
-def calculate_angle(
-    coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray
-) -> float:
+def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
     """
     Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex.
     """
@@ -359,7 +356,7 @@ def batched_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndar
     b2 = p4 - p3
 
     # Normalize b1
-    b1 /= (np.linalg.norm(b1, axis=-1, keepdims=True) + 1e-9)
+    b1 /= np.linalg.norm(b1, axis=-1, keepdims=True) + 1e-9
 
     # Vector rejections
     # v = p - (p.b1) / (b1.b1) * b1
@@ -372,11 +369,12 @@ def batched_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndar
 
     return np.degrees(np.arctan2(y, x))  # type: ignore[no-any-return]
 
+
 def reconstruct_sidechain(
     peptide: struc.AtomArray,
     res_id: int,
     rotamer: Dict[str, Union[float, List[float]]],
-    res_name: Optional[str] = None
+    res_name: Optional[str] = None,
 ) -> None:
     """
     Reconstructs the sidechain of a specific residue in the peptide using the provided rotamer angles.
@@ -403,7 +401,9 @@ def reconstruct_sidechain(
         ca_idx = np.where((peptide.res_id == res_id) & (peptide.atom_name == "CA"))[0][0]
         c_idx = np.where((peptide.res_id == res_id) & (peptide.atom_name == "C"))[0][0]
     except IndexError:
-        logger.warning(f"Residue {res_id} missing backbone atoms (N, CA, C). Cannot reconstruct sidechain.")
+        logger.warning(
+            f"Residue {res_id} missing backbone atoms (N, CA, C). Cannot reconstruct sidechain."
+        )
         return
 
     if res_name is None:
@@ -415,19 +415,19 @@ def reconstruct_sidechain(
         # Just use 'INTERNAL' for geometry reconstruction usually works fine unless it's PRO N-term
         ref_res_template = struc.info.residue(res_name).copy()
     except KeyError:
-         logger.warning(f"Unknown residue {res_name}, cannot reconstruct.")
-         return
+        logger.warning(f"Unknown residue {res_name}, cannot reconstruct.")
+        return
 
     # Check for Chi1; extract safely from Union[float, List[float]]
-    if 'chi1' not in rotamer:
-        return # distinct from glycine which has no chi1, this means 'no change' or 'unknown'
+    if "chi1" not in rotamer:
+        return  # distinct from glycine which has no chi1, this means 'no change' or 'unknown'
 
     # Apply rotamers to the *template* first (in its local frame)
     # This logic mimics generator.py but generalized
 
     # We need to apply chi1, chi2, etc. sequentially
     # Common angles needed for construction
-    _chi1_val = rotamer['chi1']
+    _chi1_val = rotamer["chi1"]
     chi1_target = _chi1_val[0] if isinstance(_chi1_val, list) else float(_chi1_val)
 
     has_cg = len(ref_res_template[ref_res_template.atom_name == "CG"]) > 0
@@ -463,8 +463,7 @@ def reconstruct_sidechain(
         b_ang = calculate_angle(ca_t.coord, cb_t.coord, cg_t.coord)
 
         new_cg = position_atom_3d_from_internal_coords(
-            n_t.coord, ca_t.coord, cb_t.coord,
-            b_len, b_ang, chi1_target
+            n_t.coord, ca_t.coord, cb_t.coord, b_len, b_ang, chi1_target
         )
         ref_res_template.coord[ref_res_template.atom_name == "CG"] = new_cg
 
@@ -519,7 +518,9 @@ def reconstruct_sidechain(
 
     # Helper to rotate points about an axis
     @njit
-    def rotate_points(points: np.ndarray, axis_p1: np.ndarray, axis_p2: np.ndarray, angle_deg: float) -> np.ndarray:
+    def rotate_points(
+        points: np.ndarray, axis_p1: np.ndarray, axis_p2: np.ndarray, angle_deg: float
+    ) -> np.ndarray:
         # Translate to origin
         v = (axis_p2 - axis_p1).astype(np.float64)
         v_norm = np.sqrt(np.sum(v**2))
@@ -556,7 +557,7 @@ def reconstruct_sidechain(
     mob_c = ref_res_template[ref_res_template.atom_name == "C"]
 
     # Skip if missing atoms
-    if len(mob_n)==0 or len(mob_ca)==0 or len(mob_c)==0:
+    if len(mob_n) == 0 or len(mob_ca) == 0 or len(mob_c) == 0:
         return
 
     mobile_bb = struc.array([mob_n[0], mob_ca[0], mob_c[0]])
@@ -566,7 +567,7 @@ def reconstruct_sidechain(
     ref_res_template.coord = transformation.apply(ref_res_template.coord)
 
     # 2. Apply Chi1 rotation
-    if 'chi1' in rotamer and len(ref_res_template[ref_res_template.atom_name == "CB"]) > 0:
+    if "chi1" in rotamer and len(ref_res_template[ref_res_template.atom_name == "CB"]) > 0:
         # Axis is N-CA? No, Chi1 is rotation about N-CA-CB-CG dihedral, i.e., rotation about CA-CB bond
         # We need to measure current dihedral and rotate by difference.
         # OR just rotate atoms downstream of CB.
@@ -582,27 +583,41 @@ def reconstruct_sidechain(
             # Calculate current Chi1
             # We need N, CA, CB, CG (or OG, SG etc)
             # Find a gamma atom
-            gamma_atoms = [a for a in ref_res_template if a.atom_name.startswith("CG") or a.atom_name.startswith("OG") or a.atom_name.startswith("SG")]
+            gamma_atoms = [
+                a
+                for a in ref_res_template
+                if a.atom_name.startswith("CG")
+                or a.atom_name.startswith("OG")
+                or a.atom_name.startswith("SG")
+            ]
             if gamma_atoms:
                 g_atom = gamma_atoms[0]
                 n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
 
-                curr_chi1 = struc.dihedral(n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord) # Radians
+                curr_chi1 = struc.dihedral(
+                    n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
+                )  # Radians
                 curr_chi1_deg = np.rad2deg(curr_chi1)
 
-                _chi1_val_r = rotamer['chi1']
-                target_chi1 = _chi1_val_r[0] if isinstance(_chi1_val_r, list) else float(_chi1_val_r)
+                _chi1_val_r = rotamer["chi1"]
+                target_chi1 = (
+                    _chi1_val_r[0] if isinstance(_chi1_val_r, list) else float(_chi1_val_r)
+                )
                 delta_deg = target_chi1 - curr_chi1_deg
 
                 # Rotate sidechain atoms about CA-CB axis
                 sidechain_indices = np.where(sidechain_mask)[0]
                 coords_to_rot = ref_res_template.coord[sidechain_indices]
 
-                rotated_coords = rotate_points(coords_to_rot, ca_atom.coord, cb_atom.coord, delta_deg)
+                rotated_coords = rotate_points(
+                    coords_to_rot, ca_atom.coord, cb_atom.coord, delta_deg
+                )
                 ref_res_template.coord[sidechain_indices] = rotated_coords
 
     # 3. Apply Chi2 (rotation about CB-CG)
-    if 'chi2' in rotamer and 'chi1' in rotamer: # Assuming we need chi1 to locate CG correctly first?
+    if (
+        "chi2" in rotamer and "chi1" in rotamer
+    ):  # Assuming we need chi1 to locate CG correctly first?
         # Similar logic... simplistic for now, implementing just Chi1 is a big step up from broken geometry
         pass
 
@@ -614,4 +629,3 @@ def reconstruct_sidechain(
         temp_idx = np.where(ref_res_template.atom_name == atom_name)[0]
         if len(temp_idx) > 0:
             peptide.coord[i] = ref_res_template.coord[temp_idx[0]]
-

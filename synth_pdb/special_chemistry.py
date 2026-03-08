@@ -1,4 +1,3 @@
-
 """
 Special Chemistry & Post-Translational Modifications Module.
 
@@ -36,6 +35,7 @@ logger = logging.getLogger(__name__)
 # This module provides the tools to detect and (eventually) simulate this
 # covalent modification in synthetic structures.
 
+
 def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
     """
     Scans the structure for the Ser-Tyr-Gly motif that forms the GFP chromophore.
@@ -59,12 +59,14 @@ def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
 
     for i in range(len(res_names) - 2):
         # Check for the S-Y-G sequence
-        if res_names[i] == "SER" and res_names[i+1] == "TYR" and res_names[i+2] == "GLY":
+        if res_names[i] == "SER" and res_names[i + 1] == "TYR" and res_names[i + 2] == "GLY":
             ser_res_id = res_ids[i]
-            tyr_res_id = res_ids[i+1]
-            gly_res_id = res_ids[i+2]
+            tyr_res_id = res_ids[i + 1]
+            gly_res_id = res_ids[i + 2]
 
-            logger.info(f"Found potential GFP chromophore motif: SER({ser_res_id})-TYR({tyr_res_id})-GLY({gly_res_id})")
+            logger.info(
+                f"Found potential GFP chromophore motif: SER({ser_res_id})-TYR({tyr_res_id})-GLY({gly_res_id})"
+            )
             return {
                 "ser_res_id": ser_res_id,
                 "tyr_res_id": tyr_res_id,
@@ -72,6 +74,7 @@ def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
             }
 
     return None
+
 
 def form_gfp_chromophore(structure: struc.AtomArray, motif: dict) -> struc.AtomArray:
     """

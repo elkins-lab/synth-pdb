@@ -1,4 +1,3 @@
-
 """
 Biophysical Realism Module.
 
@@ -32,6 +31,7 @@ from .data import (
 from .geometry import position_atom_3d_from_internal_coords
 
 logger = logging.getLogger(__name__)
+
 
 def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.AtomArray:
     """
@@ -84,9 +84,12 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
             structure.res_name[res_mask] = new_name
 
         if his_res_ids:
-             logger.info(f" assigned tautomers (HIE/HID) to {len(his_res_ids)} Histidines (pH {ph} > 6.0)")
+            logger.info(
+                f" assigned tautomers (HIE/HID) to {len(his_res_ids)} Histidines (pH {ph} > 6.0)"
+            )
 
     return structure
+
 
 def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     """
@@ -142,11 +145,10 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # Dihedral: C(ace)-N-CA-C. This corresponds to the Phi angle definition (C_prev-N-CA-C).
         # We'll assume a standard Extended conformation (Phi=-135) or similar to avoid clashes.
         # Or even better, 180 (Trans) relative to CA-C for maximum clearance.
-        phi_assume = -135.0 # Beta sheet-like, safe usually
+        phi_assume = -135.0  # Beta sheet-like, safe usually
 
         c_ace_coord = position_atom_3d_from_internal_coords(
-            c_1.coord, ca_1.coord, n_1.coord,
-            BOND_LENGTH_C_N, ANGLE_C_N_CA, phi_assume
+            c_1.coord, ca_1.coord, n_1.coord, BOND_LENGTH_C_N, ANGLE_C_N_CA, phi_assume
         )
 
         # 2. Place ACE O (Carbonyl Oxygen)
@@ -157,8 +159,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # Actually in trans peptide bond, O and H are trans. atomic config: O=C-N-H.
         # O and CA are usually 'trans' (180).
         o_ace_coord = position_atom_3d_from_internal_coords(
-            ca_1.coord, n_1.coord, c_ace_coord,
-            BOND_LENGTH_C_O, 123.0, 180.0
+            ca_1.coord, n_1.coord, c_ace_coord, BOND_LENGTH_C_O, 123.0, 180.0
         )
 
         # 3. Place ACE CH3 (Methyl)
@@ -166,17 +167,37 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # Angle: CH3-C-N = 116.0 deg
         # Dihedral: CH3-C-N-CA (Omega). Standard Trans = 180.
         ch3_ace_coord = position_atom_3d_from_internal_coords(
-            ca_1.coord, n_1.coord, c_ace_coord,
-            1.50, 116.0, 180.0
+            ca_1.coord, n_1.coord, c_ace_coord, 1.50, 116.0, 180.0
         )
 
         # Create ACE atoms (Residue ID: n_term_id - 1)
         # If n_term_id is 1, ACE is 0.
         ace_res_id = n_term_id - 1
         ace_atoms = [
-            struc.Atom(ch3_ace_coord, atom_name="CH3", res_id=ace_res_id, res_name="ACE", element="C", hetero=False),
-            struc.Atom(c_ace_coord, atom_name="C", res_id=ace_res_id, res_name="ACE", element="C", hetero=False),
-            struc.Atom(o_ace_coord, atom_name="O", res_id=ace_res_id, res_name="ACE", element="O", hetero=False),
+            struc.Atom(
+                ch3_ace_coord,
+                atom_name="CH3",
+                res_id=ace_res_id,
+                res_name="ACE",
+                element="C",
+                hetero=False,
+            ),
+            struc.Atom(
+                c_ace_coord,
+                atom_name="C",
+                res_id=ace_res_id,
+                res_name="ACE",
+                element="C",
+                hetero=False,
+            ),
+            struc.Atom(
+                o_ace_coord,
+                atom_name="O",
+                res_id=ace_res_id,
+                res_name="ACE",
+                element="O",
+                hetero=False,
+            ),
         ]
         ace_structure = struc.array(ace_atoms)
         ace_structure.chain_id[:] = "A"
@@ -184,7 +205,6 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     except IndexError:
         logger.warning("Could not build ACE cap: Missing N/CA/C on N-terminus.")
         ace_structure = None
-
 
     # --- NME (N-Methylamide) at C-terminus ---
     # Attaches to C of last residue.
@@ -205,8 +225,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         psi_assume = 135.0
 
         n_nme_coord = position_atom_3d_from_internal_coords(
-            n_last.coord, ca_last.coord, c_last.coord,
-            BOND_LENGTH_C_N, ANGLE_CA_C_N, psi_assume
+            n_last.coord, ca_last.coord, c_last.coord, BOND_LENGTH_C_N, ANGLE_CA_C_N, psi_assume
         )
 
         # 2. Place NME CH3
@@ -215,15 +234,28 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # Dihedral: CH3-N-C-CA.
         # Standard Trans peptide bond (Omega = 180).
         ch3_nme_coord = position_atom_3d_from_internal_coords(
-            ca_last.coord, c_last.coord, n_nme_coord,
-            1.45, 122.0, 180.0
+            ca_last.coord, c_last.coord, n_nme_coord, 1.45, 122.0, 180.0
         )
 
         # Create NME atoms
         nme_res_id = c_term_id + 1
         nme_atoms = [
-            struc.Atom(n_nme_coord, atom_name="N", res_id=nme_res_id, res_name="NME", element="N", hetero=False),
-            struc.Atom(ch3_nme_coord, atom_name="CH3", res_id=nme_res_id, res_name="NME", element="C", hetero=False),
+            struc.Atom(
+                n_nme_coord,
+                atom_name="N",
+                res_id=nme_res_id,
+                res_name="NME",
+                element="N",
+                hetero=False,
+            ),
+            struc.Atom(
+                ch3_nme_coord,
+                atom_name="CH3",
+                res_id=nme_res_id,
+                res_name="NME",
+                element="C",
+                hetero=False,
+            ),
         ]
         nme_structure = struc.array(nme_atoms)
         nme_structure.chain_id[:] = "A"
@@ -231,7 +263,6 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     except IndexError:
         logger.warning("Could not build NME cap: Missing N/CA/C on C-terminus.")
         nme_structure = None
-
 
     # Combine
     final_structure = structure
@@ -257,6 +288,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
 
     return final_structure
 
+
 # EDUCATIONAL NOTE: Salt Bridges
 # ------------------------------
 # A salt bridge is a combination of two non-covalent interactions:
@@ -280,6 +312,7 @@ BASIC_RESIDUES = ["LYS", "ARG", "HIS"]
 ACIDIC_ATOMS = ["OD1", "OD2", "OE1", "OE2"]
 BASIC_ATOMS = ["NZ", "NH1", "NH2", "ND1", "NE2"]
 
+
 def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]:
     """
     Automatically detects potential salt bridges in a protein structure.
@@ -300,8 +333,12 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
             - distance: The measured distance
     """
     # Filter for Acidic and Basic atoms only to speed up search
-    acid_mask = np.isin(structure.res_name, ACIDIC_RESIDUES) & np.isin(structure.atom_name, ACIDIC_ATOMS)
-    base_mask = np.isin(structure.res_name, BASIC_RESIDUES) & np.isin(structure.atom_name, BASIC_ATOMS)
+    acid_mask = np.isin(structure.res_name, ACIDIC_RESIDUES) & np.isin(
+        structure.atom_name, ACIDIC_ATOMS
+    )
+    base_mask = np.isin(structure.res_name, BASIC_RESIDUES) & np.isin(
+        structure.atom_name, BASIC_ATOMS
+    )
 
     acids = structure[acid_mask]
     bases = structure[base_mask]
@@ -318,7 +355,7 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
     # Find pairs within cutoff
     indices = np.where(dists < cutoff)
 
-    found_pairs: Dict[Tuple[int, int], Dict[str, Any]] = {} # (res_ia, res_ib) -> bridge_dict
+    found_pairs: Dict[Tuple[int, int], Dict[str, Any]] = {}  # (res_ia, res_ib) -> bridge_dict
 
     for acid_idx, base_idx in zip(*indices):
         a_atom = acids[acid_idx]
@@ -338,7 +375,7 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
                 "res_ib": int(b_atom.res_id),
                 "atom_a": a_atom.atom_name,
                 "atom_b": b_atom.atom_name,
-                "distance": float(dist)
+                "distance": float(dist),
             }
 
     return list(found_pairs.values())

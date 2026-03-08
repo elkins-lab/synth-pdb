@@ -6,15 +6,16 @@ from openmm import unit
 
 logger = logging.getLogger(__name__)
 
+
 class DockingPrep:
     """
     Utilities for preparing PDB structures for molecular docking.
     """
 
-    def __init__(self, forcefield_name: str = 'amber14-all.xml') -> None:
+    def __init__(self, forcefield_name: str = "amber14-all.xml") -> None:
         self.forcefield_name = forcefield_name
         try:
-            self.forcefield = app.ForceField(self.forcefield_name, 'amber14/tip3pfb.xml')
+            self.forcefield = app.ForceField(self.forcefield_name, "amber14/tip3pfb.xml")
         except Exception as e:
             logger.error(f"Failed to load forcefield '{forcefield_name}': {e}")
             raise
@@ -36,14 +37,34 @@ class DockingPrep:
         try:
             import os
             import tempfile
+
             # 0. PDB PRE-PROCESSING (Standardize residues for OpenMM)
             ptm_map = {
-                'SEP': 'SER', 'TPO': 'THR', 'PTR': 'TYR',
-                'HIE': 'HIS', 'HID': 'HIS', 'HIP': 'HIS',
-                'DAL': 'ALA', 'DAR': 'ARG', 'DAN': 'ASN', 'DAS': 'ASP', 'DCY': 'CYS',
-                'DGL': 'GLU', 'DGN': 'GLN', 'DHI': 'HIS', 'DIL': 'ILE', 'DLE': 'LEU',
-                'DLY': 'LYS', 'DME': 'MET', 'DPH': 'PHE', 'DPR': 'PRO', 'DSE': 'SER',
-                'DTH': 'THR', 'DTR': 'TRP', 'DTY': 'TYR', 'DVA': 'VAL'
+                "SEP": "SER",
+                "TPO": "THR",
+                "PTR": "TYR",
+                "HIE": "HIS",
+                "HID": "HIS",
+                "HIP": "HIS",
+                "DAL": "ALA",
+                "DAR": "ARG",
+                "DAN": "ASN",
+                "DAS": "ASP",
+                "DCY": "CYS",
+                "DGL": "GLU",
+                "DGN": "GLN",
+                "DHI": "HIS",
+                "DIL": "ILE",
+                "DLE": "LEU",
+                "DLY": "LYS",
+                "DME": "MET",
+                "DPH": "PHE",
+                "DPR": "PRO",
+                "DSE": "SER",
+                "DTH": "THR",
+                "DTR": "TRP",
+                "DTY": "TYR",
+                "DVA": "VAL",
             }
             ptm_atom_names = ["P", "O1P", "O2P", "O3P"]
 
@@ -57,13 +78,13 @@ class DockingPrep:
                     if res_name in ptm_map:
                         new_name = ptm_map[res_name]
                         line = line[:17] + f"{new_name: >3}" + line[20:]
-                        if res_name in ['SEP', 'TPO', 'PTR']:
+                        if res_name in ["SEP", "TPO", "PTR"]:
                             atom_name = line[12:16].strip()
                             if atom_name in ptm_atom_names:
                                 continue
                 modified_lines.append(line)
 
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.pdb', delete=False) as tf:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as tf:
                 tf.writelines(modified_lines)
                 temp_input_path = tf.name
 
@@ -84,15 +105,18 @@ class DockingPrep:
             # 2. Add Hydrogens (Crucial for correct charge assignment)
             modeller = app.Modeller(topology, positions)
             # STRIP existing H to avoid template mismatches/conflicts
-            modeller.delete([a for a in modeller.topology.atoms() if a.element is not None and a.element.symbol == "H"])
-            modeller.addHydrogens(self.forcefield, pH=7.4) # Physiological pH
+            modeller.delete(
+                [
+                    a
+                    for a in modeller.topology.atoms()
+                    if a.element is not None and a.element.symbol == "H"
+                ]
+            )
+            modeller.addHydrogens(self.forcefield, pH=7.4)  # Physiological pH
 
             # 3. Create System to get forces (charges/sigmas)
             system = self.forcefield.createSystem(
-                modeller.topology,
-                nonbondedMethod=app.NoCutoff,
-                constraints=None,
-                rigidWater=False
+                modeller.topology, nonbondedMethod=app.NoCutoff, constraints=None, rigidWater=False
             )
 
             # 4. Extract NonbondedForce
@@ -111,7 +135,7 @@ class DockingPrep:
             # But converting OpenMM Topology -> Biotite AtomArray is verbose.
             # Let's write manually by iterating OpenMM topology.
 
-            with open(output_pqr, 'w') as f:
+            with open(output_pqr, "w") as f:
                 atom_idx = 0
                 for chain in modeller.topology.chains():
                     for residue in chain.residues():
@@ -152,9 +176,11 @@ class DockingPrep:
 
                             # Template for robust alignment (8.3f for coords, 8.4f for Q and R)
                             # PQR is often whitespace-separated, but fixed-width is more compatible.
-                            line = (f"{'ATOM':<6}{atom_idx:>5} {atom.name:<4} {residue.name:<3} "
-                                    f"{chain.id:<1}{residue.id:>4}    "
-                                    f"{x:8.3f}{y:8.3f}{z:8.3f}{q:8.4f}{r_angstrom:8.4f}\n")
+                            line = (
+                                f"{'ATOM':<6}{atom_idx:>5} {atom.name:<4} {residue.name:<3} "
+                                f"{chain.id:<1}{residue.id:>4}    "
+                                f"{x:8.3f}{y:8.3f}{z:8.3f}{q:8.4f}{r_angstrom:8.4f}\n"
+                            )
                             f.write(line)
 
             logger.info(f"Successfully wrote PQR to {output_pqr}")

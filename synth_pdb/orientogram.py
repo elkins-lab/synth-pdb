@@ -6,10 +6,7 @@ from .geometry import batched_angle, batched_dihedral, position_atoms_batch
 
 
 def compute_6d_orientations(
-    coords: np.ndarray,
-    atom_names: list,
-    residue_indices: list,
-    n_residues: int
+    coords: np.ndarray, atom_names: list, residue_indices: list, n_residues: int
 ) -> Dict[str, np.ndarray]:
     """
     Computes 6D inter-residue orientations for all pairs of residues.
@@ -57,11 +54,11 @@ def compute_6d_orientations(
     # For robust extraction, we assume input is exactly N, CA, C, Cb -> (b, l*4, 3)
 
     if coords.shape[1] == length * 4:
-        n_coords = coords[:, 0::4, :]   # (b, length, 3)
+        n_coords = coords[:, 0::4, :]  # (b, length, 3)
         ca_coords = coords[:, 1::4, :]  # (b, length, 3)
-        c_coords = coords[:, 2::4, :]   # (b, length, 3)
+        c_coords = coords[:, 2::4, :]  # (b, length, 3)
         cb_coords = coords[:, 3::4, :]  # (b, length, 3)
-        has_cb = np.ones(length, dtype=bool) # All residues have CB if input is 4 atoms per residue
+        has_cb = np.ones(length, dtype=bool)  # All residues have CB if input is 4 atoms per residue
     else:
         # Fallback to standard CA-only or different encoding (Placeholder)
         # Using vectorized boolean masking for speed
@@ -72,7 +69,7 @@ def compute_6d_orientations(
         has_cb = np.zeros(length, dtype=bool)
 
         atom_names_arr = np.array(atom_names)
-        res_indices_arr = np.array(residue_indices) - 1 # 0-indexed
+        res_indices_arr = np.array(residue_indices) - 1  # 0-indexed
 
         # Create masks for each atom type
         n_mask = atom_names_arr == "N"
@@ -94,7 +91,7 @@ def compute_6d_orientations(
     missing_cb = np.where(~has_cb)[0]
     if len(missing_cb) > 0:
         # Vectorized reconstruction across B batches for all missing residues
-        p1 = n_coords[:, missing_cb] # (B, num_missing, 3)
+        p1 = n_coords[:, missing_cb]  # (B, num_missing, 3)
         p2 = c_coords[:, missing_cb]
         p3 = ca_coords[:, missing_cb]
 
@@ -139,9 +136,4 @@ def compute_6d_orientations(
     # D. Phi: Dihedral ni-cai-cbi-cbj (B, L, L)
     phi = batched_dihedral(ni_b, cai_b, cbi_b, cbj_b)
 
-    return {
-        'dist': dist,
-        'omega': omega,
-        'theta': theta,
-        'phi': phi
-    }
+    return {"dist": dist, "omega": omega, "theta": theta, "phi": phi}

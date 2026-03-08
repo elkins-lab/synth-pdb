@@ -35,9 +35,9 @@ def _build_command_string(args: argparse.Namespace) -> str:
 
     if args.plausible_frequencies:
         cmd_parts.append("--plausible-frequencies")
-    if args.conformation != 'alpha':  # Only add if not default
+    if args.conformation != "alpha":  # Only add if not default
         cmd_parts.append(f"--conformation {args.conformation}")
-    if hasattr(args, 'structure') and args.structure:  # NEW: add structure if provided
+    if hasattr(args, "structure") and args.structure:  # NEW: add structure if provided
         cmd_parts.append(f"--structure '{args.structure}'")
     if args.validate:
         cmd_parts.append("--validate")
@@ -475,13 +475,13 @@ def main() -> None:
     parser.add_argument(
         "--cap-termini",
         action="store_true",
-        help="Add N-terminal Acetyl (ACE) and C-terminal N-methylamide (NME) caps."
+        help="Add N-terminal Acetyl (ACE) and C-terminal N-methylamide (NME) caps.",
     )
     parser.add_argument(
         "--ph",
         type=float,
         default=7.4,
-        help="pH for determining protonation states (default: 7.4). Affects Histidine (HIS/HIP/HIE)."
+        help="pH for determining protonation states (default: 7.4). Affects Histidine (HIS/HIP/HIE).",
     )
     parser.add_argument(
         "--cis-proline-frequency",
@@ -500,7 +500,7 @@ def main() -> None:
     parser.add_argument(
         "--equilibrate",
         action="store_true",
-        help="Run Molecular Dynamics equilibration (at 300K) after minimization. Requires OpenMM."
+        help="Run Molecular Dynamics equilibration (at 300K) after minimization. Requires OpenMM.",
     )
 
     # Phase 15: Bulk Dataset Generation (ML)
@@ -508,31 +508,31 @@ def main() -> None:
         "--num-samples",
         type=int,
         default=100,
-        help="Number of samples to generate for the dataset (for --mode dataset). Default: 100."
+        help="Number of samples to generate for the dataset (for --mode dataset). Default: 100.",
     )
     parser.add_argument(
         "--min-length",
         type=int,
         default=10,
-        help="Minimum sequence length for dataset samples (for --mode dataset). Default: 10."
+        help="Minimum sequence length for dataset samples (for --mode dataset). Default: 10.",
     )
     parser.add_argument(
         "--max-length",
         type=int,
         default=50,
-        help="Maximum sequence length for dataset samples (for --mode dataset). Default: 50."
+        help="Maximum sequence length for dataset samples (for --mode dataset). Default: 50.",
     )
     parser.add_argument(
         "--train-ratio",
         type=float,
         default=0.8,
-        help="Ratio of samples to split into training set (for --mode dataset). Default: 0.8."
+        help="Ratio of samples to split into training set (for --mode dataset). Default: 0.8.",
     )
     parser.add_argument(
         "--md-steps",
         type=int,
         default=1000,
-        help="Number of MD steps for equilibration (default: 1000 approx 2ps)."
+        help="Number of MD steps for equilibration (default: 1000 approx 2ps).",
     )
     parser.add_argument(
         "--dataset-format",
@@ -606,18 +606,24 @@ def main() -> None:
     # If --best-of-N is set, it overrides --guarantee-valid and implies --validate.
     if args.best_of_N > 1:
         args.validate = True
-        args.guarantee_valid = False # Disable guarantee-valid if best-of-N is used
-        logger.info(f"--best-of-N is set to {args.best_of_N}. Generating multiple PDBs to find the one with fewest violations.")
-    elif args.guarantee_valid: # Only apply if best-of-N is not active
+        args.guarantee_valid = False  # Disable guarantee-valid if best-of-N is used
+        logger.info(
+            f"--best-of-N is set to {args.best_of_N}. Generating multiple PDBs to find the one with fewest violations."
+        )
+    elif args.guarantee_valid:  # Only apply if best-of-N is not active
         args.validate = True
         logger.info("--guarantee-valid is set. Will attempt to generate a valid PDB.")
 
     if args.refine_clashes > 0:
-        args.validate = True # Refinement implies validation during initial generation
-        logger.info(f"--refine-clashes is set to {args.refine_clashes}. Validation will be performed.")
+        args.validate = True  # Refinement implies validation during initial generation
+        logger.info(
+            f"--refine-clashes is set to {args.refine_clashes}. Validation will be performed."
+        )
 
     if args.cyclic:
-        logger.info("--cyclic is set. Enabling energy minimization for ring closure and disabling terminal caps.")
+        logger.info(
+            "--cyclic is set. Enabling energy minimization for ring closure and disabling terminal caps."
+        )
         args.minimize = True
         args.cap_termini = False
 
@@ -629,12 +635,12 @@ def main() -> None:
                 # Parse structure to find maximum residue number
                 try:
                     max_residue = 0
-                    for region in args.structure.split(','):
+                    for region in args.structure.split(","):
                         region = region.strip()
-                        if ':' in region:
-                            range_part = region.split(':', 1)[0]
-                            if '-' in range_part:
-                                _, end_str = range_part.split('-', 1)
+                        if ":" in region:
+                            range_part = region.split(":", 1)[0]
+                            if "-" in range_part:
+                                _, end_str = range_part.split("-", 1)
                                 end = int(end_str)
                                 max_residue = max(max_residue, end)
 
@@ -658,8 +664,8 @@ def main() -> None:
     # Dispatch to specific modes if not generating a new structure
     if args.mode == "docking":
         if not args.input_pdb:
-             logger.error("Docking mode requires --input-pdb.")
-             sys.exit(1)
+            logger.error("Docking mode requires --input-pdb.")
+            sys.exit(1)
         prep = DockingPrep(args.forcefield)
         pqr_file = args.output if args.output else "docking_prep.pqr"
         success = prep.write_pqr(args.input_pdb, pqr_file)
@@ -686,12 +692,12 @@ def main() -> None:
         except Exception as e:
             logger.error(f"Failed to generate PyMOL script: {e}")
             sys.exit(1)
-        return # Exit after visualization generation
+        return  # Exit after visualization generation
 
     if args.mode == "decoys":
         if not args.sequence and not args.length:
-             logger.error("Decoy generation requires --sequence or --length.")
-             sys.exit(1)
+            logger.error("Decoy generation requires --sequence or --length.")
+            sys.exit(1)
 
         target_sequence = args.sequence
         if not target_sequence:
@@ -715,15 +721,14 @@ def main() -> None:
 
             logger.info(f"Generated random sequence for decoys: {target_sequence}")
 
-
         generator = DecoyGenerator()
         try:
-             rmsd_parts = args.rmsd_range.split('-')
-             rmsd_min = float(rmsd_parts[0])
-             rmsd_max = float(rmsd_parts[1])
+            rmsd_parts = args.rmsd_range.split("-")
+            rmsd_min = float(rmsd_parts[0])
+            rmsd_max = float(rmsd_parts[1])
         except Exception:
-             logger.warning(f"Invalid RMSD range '{args.rmsd_range}', using default 0-999.")
-             rmsd_min, rmsd_max = 0.0, 999.0
+            logger.warning(f"Invalid RMSD range '{args.rmsd_range}', using default 0-999.")
+            rmsd_min, rmsd_max = 0.0, 999.0
 
         out_dir = args.output if args.output else "decoys"
 
@@ -740,12 +745,13 @@ def main() -> None:
             template_sequence=args.template_sequence,
             shuffle_sequence=args.shuffle_sequence,
             drift=args.drift,
-            seed=args.seed
+            seed=args.seed,
         )
         return
 
     if args.mode == "dataset":
         from .dataset import DatasetGenerator
+
         out_dir = args.output if args.output else "dataset"
 
         logger.info(f"Starting bulk dataset generation in '{out_dir}'...")
@@ -756,7 +762,7 @@ def main() -> None:
             max_length=args.max_length,
             train_ratio=args.train_ratio,
             seed=args.seed,
-            dataset_format=args.dataset_format
+            dataset_format=args.dataset_format,
         )
         dataset_generator.generate()
         logger.info(f"Dataset generation complete. Output directory: {os.path.abspath(out_dir)}")
@@ -765,6 +771,7 @@ def main() -> None:
     if args.mode == "ai":
         if args.ai_op == "interpolate":
             from .quality.interpolate import interpolate_structures
+
             if not args.start_pdb or not args.end_pdb:
                 logger.error("Interpolation requires --start-pdb and --end-pdb.")
                 sys.exit(1)
@@ -774,7 +781,9 @@ def main() -> None:
                 interpolate_structures(args.start_pdb, args.end_pdb, args.steps, out_prefix)
                 logger.info(f"Interpolation complete. Generated {args.steps} frames.")
             except ImportError:
-                logger.error("AI modules require scikit-learn and pandas. Install with `pip install synth-pdb[ai]`.")
+                logger.error(
+                    "AI modules require scikit-learn and pandas. Install with `pip install synth-pdb[ai]`."
+                )
                 sys.exit(1)
             except Exception as e:
                 logger.error(f"Interpolation failed: {e}")
@@ -787,14 +796,15 @@ def main() -> None:
             logger.error("AI mode requires --ai-op {interpolate, cluster}.")
             sys.exit(1)
 
-
     length_for_generator = args.length if args.sequence is None else None
 
     final_pdb_content: Optional[str] = None
     final_violations: List[str] = []
-    min_violations_count = float('inf')
+    min_violations_count = float("inf")
 
-    generation_attempts = 1 if not args.guarantee_valid and args.best_of_N <= 1 else args.max_attempts
+    generation_attempts = (
+        1 if not args.guarantee_valid and args.best_of_N <= 1 else args.max_attempts
+    )
     if args.best_of_N > 1:
         generation_attempts = args.best_of_N
 
@@ -812,7 +822,6 @@ def main() -> None:
                 structure=args.structure,  # NEW: per-region conformation support
                 optimize_sidechains=args.optimize,
                 minimize_energy=args.minimize,
-
                 forcefield=args.forcefield,
                 seed=args.seed,
                 ph=args.ph,
@@ -826,41 +835,58 @@ def main() -> None:
             )
 
             if not current_pdb_content:
-                logger.warning(f"Failed to generate PDB content in attempt {attempt_num}. Skipping.")
+                logger.warning(
+                    f"Failed to generate PDB content in attempt {attempt_num}. Skipping."
+                )
                 continue
 
             if args.validate:
                 logger.info("Performing PDB validation checks for current generation...")
-                logger.debug(f"PDB content passed to validator (attempt {attempt_num}):\n{current_pdb_content}")
+                logger.debug(
+                    f"PDB content passed to validator (attempt {attempt_num}):\n{current_pdb_content}"
+                )
                 validator = PDBValidator(current_pdb_content)
                 validator.validate_all()
                 current_violations = validator.get_violations()
-                logger.debug(f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}. Content: {current_violations}")
+                logger.debug(
+                    f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}. Content: {current_violations}"
+                )
 
             if args.quality_filter:
                 try:
                     from .quality.classifier import ProteinQualityClassifier
+
                     classifier = ProteinQualityClassifier()
                     is_good, prob, _ = classifier.predict(current_pdb_content)
 
                     if prob < args.quality_score_cutoff:
-                        logger.warning(f"Quality Filter Reject (Attempt {attempt_num}): Score {prob:.2f} < {args.quality_score_cutoff}")
-                        continue # Retry
+                        logger.warning(
+                            f"Quality Filter Reject (Attempt {attempt_num}): Score {prob:.2f} < {args.quality_score_cutoff}"
+                        )
+                        continue  # Retry
                     else:
-                        logger.info(f"Quality Filter Pass (Attempt {attempt_num}): Score {prob:.2f}")
+                        logger.info(
+                            f"Quality Filter Pass (Attempt {attempt_num}): Score {prob:.2f}"
+                        )
                 except ImportError:
-                    logger.warning("Quality Filter enabled but dependencies missing. Install `synth-pdb[ai]`. Skipping filter.")
+                    logger.warning(
+                        "Quality Filter enabled but dependencies missing. Install `synth-pdb[ai]`. Skipping filter."
+                    )
                 except Exception as e:
                     logger.warning(f"Quality Filter failed: {e}. Skipping.")
 
             if args.guarantee_valid:
                 if not current_violations:
-                    logger.info(f"Successfully generated a valid PDB file after {attempt_num} attempts.")
+                    logger.info(
+                        f"Successfully generated a valid PDB file after {attempt_num} attempts."
+                    )
                     final_pdb_content = current_pdb_content
                     final_violations = current_violations
-                    break # Exit loop, valid PDB found
+                    break  # Exit loop, valid PDB found
                 else:
-                    logger.warning(f"PDB generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying...")
+                    logger.warning(
+                        f"PDB generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
+                    )
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug("--- PDB Validation Report for failed attempt ---")
                         for violation in current_violations:
@@ -871,10 +897,14 @@ def main() -> None:
                     min_violations_count = len(current_violations)
                     final_pdb_content = current_pdb_content
                     final_violations = current_violations
-                    logger.info(f"Attempt {attempt_num} yielded {len(current_violations)} violations (new minimum).")
+                    logger.info(
+                        f"Attempt {attempt_num} yielded {len(current_violations)} violations (new minimum)."
+                    )
                 else:
-                    logger.info(f"Attempt {attempt_num} yielded {len(current_violations)} violations. Current minimum is {min_violations_count}.")
-            else: # No guarantee-valid or best-of-N, just take the first one
+                    logger.info(
+                        f"Attempt {attempt_num} yielded {len(current_violations)} violations. Current minimum is {min_violations_count}."
+                    )
+            else:  # No guarantee-valid or best-of-N, just take the first one
                 # If AI filter passed (or wasn't used), we accept this one
                 final_pdb_content = current_pdb_content
                 final_violations = current_violations
@@ -892,33 +922,41 @@ def main() -> None:
             parts = args.structure.split(",")
             for part in parts:
                 if ":" in part:
-                     rng, s_type = part.split(":")
-                     if "-" in rng:
-                         start_s, end_s = rng.split("-")
-                         start, end = int(start_s), int(end_s)
+                    rng, s_type = part.split(":")
+                    if "-" in rng:
+                        start_s, end_s = rng.split("-")
+                        start, end = int(start_s), int(end_s)
 
-                         # Only highlight specific turns or interesting features
-                         if "type" in s_type or "beta" in s_type and "turn" in s_type: # e.g. typeII, beta-turn
-                             highlights.append({
-                                 'start': start,
-                                 'end': end,
-                                 'color': 'purple',
-                                 'style': 'stick', # Stick makes turn geometry visible
-                                 'label': s_type
-                             })
-                         elif "helix" in s_type or "alpha" in s_type:
-                             highlights.append({
-                                 'start': start,
-                                 'end': end,
-                                 'color': 'magenta',
-                                 'style': 'cartoon',
-                                 'label': 'Alpha Helix'
-                             })
+                        # Only highlight specific turns or interesting features
+                        if (
+                            "type" in s_type or "beta" in s_type and "turn" in s_type
+                        ):  # e.g. typeII, beta-turn
+                            highlights.append(
+                                {
+                                    "start": start,
+                                    "end": end,
+                                    "color": "purple",
+                                    "style": "stick",  # Stick makes turn geometry visible
+                                    "label": s_type,
+                                }
+                            )
+                        elif "helix" in s_type or "alpha" in s_type:
+                            highlights.append(
+                                {
+                                    "start": start,
+                                    "end": end,
+                                    "color": "magenta",
+                                    "style": "cartoon",
+                                    "label": "Alpha Helix",
+                                }
+                            )
         except Exception as e:
             logger.warning(f"Could not parse structure for highlighting: {e}")
 
     if final_pdb_content is None:
-        logger.error(f"Failed to generate a suitable PDB file after {generation_attempts} attempts.")
+        logger.error(
+            f"Failed to generate a suitable PDB file after {generation_attempts} attempts."
+        )
         sys.exit(1)
     else:
         # Extract atomic content from the initially selected PDB for subsequent refinement or final assembly.
@@ -932,7 +970,7 @@ def main() -> None:
 
         # Apply refinement if requested
         if args.refine_clashes > 0:
-            args.validate = True # Refinement implies validation
+            args.validate = True  # Refinement implies validation
             logger.info(f"Starting steric clash refinement for {args.refine_clashes} iterations.")
 
             # current_refined_atomic_content will hold only ATOM/TER lines
@@ -941,14 +979,18 @@ def main() -> None:
             initial_violations_count = len(final_violations)
 
             for refine_iter in range(args.refine_clashes):
-                logger.info(f"Refinement iteration {refine_iter + 1}/{args.refine_clashes}. Violations: {len(current_refined_violations)}")
+                logger.info(
+                    f"Refinement iteration {refine_iter + 1}/{args.refine_clashes}. Violations: {len(current_refined_violations)}"
+                )
                 if not current_refined_violations:
                     logger.info("No violations remain, stopping refinement early.")
                     break
 
                 # Parse atoms from current atomic PDB content
                 # PDBValidator._parse_pdb_atoms can work directly on atomic lines.
-                parsed_atoms_for_refinement = PDBValidator._parse_pdb_atoms(current_refined_atomic_content)
+                parsed_atoms_for_refinement = PDBValidator._parse_pdb_atoms(
+                    current_refined_atomic_content
+                )
 
                 # Apply steric clash tweak
                 modified_atoms = PDBValidator._apply_steric_clash_tweak(parsed_atoms_for_refinement)
@@ -961,34 +1003,45 @@ def main() -> None:
                 # Build command string for temporary header
                 cmd_string = _build_command_string(args)
                 temp_full_pdb = assemble_pdb_content(
-                    new_atomic_content_after_tweak, 1, command_args=cmd_string,
-                    extra_records=preserved_ssbonds # Keeps context valid if validator checks bonds
+                    new_atomic_content_after_tweak,
+                    1,
+                    command_args=cmd_string,
+                    extra_records=preserved_ssbonds,  # Keeps context valid if validator checks bonds
                 )
                 temp_validator = PDBValidator(pdb_content=temp_full_pdb)
                 temp_validator.validate_all()
                 new_violations = temp_validator.get_violations()
 
                 if len(new_violations) < len(current_refined_violations):
-                    logger.info(f"Refinement iteration {refine_iter + 1}: Reduced violations from {len(current_refined_violations)} to {len(new_violations)}.")
+                    logger.info(
+                        f"Refinement iteration {refine_iter + 1}: Reduced violations from {len(current_refined_violations)} to {len(new_violations)}."
+                    )
                     current_refined_atomic_content = new_atomic_content_after_tweak
                     current_refined_violations = new_violations
                 else:
-                    logger.info(f"Refinement iteration {refine_iter + 1}: No further reduction in violations ({len(new_violations)}). Stopping refinement.")
-                    break # No improvement, stop refinement
+                    logger.info(
+                        f"Refinement iteration {refine_iter + 1}: No further reduction in violations ({len(new_violations)}). Stopping refinement."
+                    )
+                    break  # No improvement, stop refinement
 
-            final_pdb_atomic_content = current_refined_atomic_content # This is now atomic-only
+            final_pdb_atomic_content = current_refined_atomic_content  # This is now atomic-only
             final_violations = current_refined_violations
             if initial_violations_count > len(final_violations):
-                logger.info(f"Refinement process completed. Reduced total violations from {initial_violations_count} to {len(final_violations)}.")
+                logger.info(
+                    f"Refinement process completed. Reduced total violations from {initial_violations_count} to {len(final_violations)}."
+                )
             elif initial_violations_count == len(final_violations):
-                logger.info(f"Refinement process completed. No change in total violations ({len(final_violations)}).")
-            else: # Should not happen if logic is correct, but for completeness
-                logger.warning(f"Refinement process completed. Violations increased from {initial_violations_count} to {len(final_violations)}. This indicates an issue with the refinement logic.")
+                logger.info(
+                    f"Refinement process completed. No change in total violations ({len(final_violations)})."
+                )
+            else:  # Should not happen if logic is correct, but for completeness
+                logger.warning(
+                    f"Refinement process completed. Violations increased from {initial_violations_count} to {len(final_violations)}. This indicates an issue with the refinement logic."
+                )
         # If no refinement was requested, final_pdb_atomic_content was already set from the initial extraction.
 
         # After successful generation (and optional validation)
         # Only proceed to file writing if final_pdb_atomic_content is not None
-
 
         # Final output handling
         if final_pdb_atomic_content is not None:
@@ -1003,17 +1056,21 @@ def main() -> None:
                 temp_full_pdb_for_length_inference = assemble_pdb_content(
                     final_pdb_atomic_content, 1, command_args=cmd_string
                 )
-                temp_validator_for_length = PDBValidator(pdb_content=temp_full_pdb_for_length_inference)
+                temp_validator_for_length = PDBValidator(
+                    pdb_content=temp_full_pdb_for_length_inference
+                )
                 # Assuming a single chain 'A' for simplicity, as per current generator
-                inferred_sequence = temp_validator_for_length._get_sequences_by_chain().get('A', [])
+                inferred_sequence = temp_validator_for_length._get_sequences_by_chain().get("A", [])
                 final_sequence_length = len(inferred_sequence) if inferred_sequence else "VARIABLE"
 
             # Assemble the full PDB content with header and footer
             cmd_string = _build_command_string(args)
             final_full_pdb_content_to_write = assemble_pdb_content(
-                final_pdb_atomic_content, final_sequence_length, command_args=cmd_string,
+                final_pdb_atomic_content,
+                final_sequence_length,
+                command_args=cmd_string,
                 extra_records=preserved_ssbonds,
-                conect_records=preserved_conects
+                conect_records=preserved_conects,
             )
 
             if args.output:
@@ -1032,27 +1089,41 @@ def main() -> None:
             try:
                 with open(output_filename, "w") as f:
                     f.write(final_full_pdb_content_to_write)
-                logger.info(
-                    "Successfully generated PDB file: %s", os.path.abspath(output_filename)
-                )
+                logger.info("Successfully generated PDB file: %s", os.path.abspath(output_filename))
 
                 # Print final validation report
                 if final_violations:
-                    logger.warning(f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---")
+                    logger.warning(
+                        f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---"
+                    )
                     logger.warning(f"Final PDB has {len(final_violations)} violations.")
                     for violation in final_violations:
                         logger.warning(violation)
                     logger.warning("--- End Validation Report ---")
                 elif args.validate:
-                    logger.info(f"No violations found in the final PDB for {os.path.abspath(output_filename)}.")
+                    logger.info(
+                        f"No violations found in the final PDB for {os.path.abspath(output_filename)}."
+                    )
 
                 # Phase 7, 8, & 9 + 10: Synthetic NMR Data & Exports
                 # We perform calculations first, so we can capture data (like restraints) for visualization if needed.
-                generated_restraints = None # To hold restraints for viewer
+                generated_restraints = None  # To hold restraints for viewer
 
-                if args.gen_nef or args.gen_relax or args.gen_shifts or args.gen_couplings or args.output_rdcs or args.export_constraints or args.export_torsion or args.gen_msa or args.export_distogram:
+                if (
+                    args.gen_nef
+                    or args.gen_relax
+                    or args.gen_shifts
+                    or args.gen_couplings
+                    or args.output_rdcs
+                    or args.export_constraints
+                    or args.export_torsion
+                    or args.gen_msa
+                    or args.export_distogram
+                ):
                     if args.mode != "generate":
-                        logger.warning("Synthetic Data Generation is currently only supported in single structure 'generate' mode.")
+                        logger.warning(
+                            "Synthetic Data Generation is currently only supported in single structure 'generate' mode."
+                        )
                     else:
                         import io
 
@@ -1064,8 +1135,8 @@ def main() -> None:
                         # NEW IMPORTS for Export
                         from .contact import compute_contact_map
                         from .distogram import calculate_distogram, export_distogram
-                        from .msa import generate_msa # NEW: Physics based generator
                         from .export import export_constraints
+                        from .msa import generate_msa  # NEW: Physics based generator
                         from .nef_io import (
                             write_nef_chemical_shifts,
                             write_nef_file,
@@ -1082,39 +1153,60 @@ def main() -> None:
                         structure = pdb_file.get_structure(model=1)
 
                         # Sequence inference
-                        res_names = [structure[structure.res_id == i][0].res_name for i in sorted(set(structure.res_id))]
+                        res_names = [
+                            structure[structure.res_id == i][0].res_name
+                            for i in sorted(set(structure.res_id))
+                        ]
                         from .data import ONE_TO_THREE_LETTER_CODE
+
                         three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
                         seq_str = "".join([three_to_one.get(r, "X") for r in res_names])
 
                         # Validation: Check for Hydrogens
-                        if not np.any(structure.element == "H") and (args.gen_nef or args.gen_relax):
-                             logger.error("Structure has no hydrogens! NEF/Relaxation requires protons. Use --minimize.")
+                        if not np.any(structure.element == "H") and (
+                            args.gen_nef or args.gen_relax
+                        ):
+                            logger.error(
+                                "Structure has no hydrogens! NEF/Relaxation requires protons. Use --minimize."
+                            )
                         else:
                             # 1. NOE Restraints (Phase 7)
                             if args.gen_nef:
                                 logger.info("Calculating NOE Restraints...")
-                                restraints = calculate_synthetic_noes(structure, cutoff=args.noe_cutoff)
-                                generated_restraints = restraints # Capture for viewer
+                                restraints = calculate_synthetic_noes(
+                                    structure, cutoff=args.noe_cutoff
+                                )
+                                generated_restraints = restraints  # Capture for viewer
 
                                 nef_filename = args.nef_output
                                 if not nef_filename:
                                     nef_filename = output_filename.replace(".pdb", ".nef")
 
                                 write_nef_file(nef_filename, seq_str, restraints)
-                                logger.info(f"NEF Restraints generated: {os.path.abspath(nef_filename)}")
+                                logger.info(
+                                    f"NEF Restraints generated: {os.path.abspath(nef_filename)}"
+                                )
 
                                 if args.gen_pymol:
                                     from .visualization import generate_pymol_script
+
                                     pml_filename = output_filename.replace(".pdb", ".pml")
-                                    generate_pymol_script(os.path.basename(output_filename), restraints, pml_filename)
-                                    logger.info(f"PyMOL Visualization Script generated: {os.path.abspath(pml_filename)}")
+                                    generate_pymol_script(
+                                        os.path.basename(output_filename), restraints, pml_filename
+                                    )
+                                    logger.info(
+                                        f"PyMOL Visualization Script generated: {os.path.abspath(pml_filename)}"
+                                    )
 
                             # 2. Relaxation Data (Phase 8)
                             if args.gen_relax:
-                                rates = calculate_relaxation_rates(structure, field_mhz=args.field, tau_m_ns=args.tumbling_time)
+                                rates = calculate_relaxation_rates(
+                                    structure, field_mhz=args.field, tau_m_ns=args.tumbling_time
+                                )
                                 relax_filename = output_filename.replace(".pdb", "_relax.nef")
-                                write_nef_relaxation(relax_filename, seq_str, rates, field_freq_mhz=args.field)
+                                write_nef_relaxation(
+                                    relax_filename, seq_str, rates, field_freq_mhz=args.field
+                                )
 
                             # 3. Chemical Shifts (Phase 9)
                             if args.gen_shifts:
@@ -1129,15 +1221,22 @@ def main() -> None:
                                 #     (Shen & Bax, 2010, J Biomol NMR 48:13). Always available
                                 #     (pure Python, no external binary). RMSD ~0.05 ppm (1H),
                                 #     ~0.55 ppm (13C). Recommended for CI/CD pipelines.
-                                use_shiftx2 = (args.shift_predictor == "shiftx2")
+                                use_shiftx2 = args.shift_predictor == "shiftx2"
                                 shifts = predict_chemical_shifts(structure, use_shiftx2=use_shiftx2)
-                                shift_filename = args.shift_output if args.shift_output else output_filename.replace(".pdb", "_shifts.nef")
+                                shift_filename = (
+                                    args.shift_output
+                                    if args.shift_output
+                                    else output_filename.replace(".pdb", "_shifts.nef")
+                                )
                                 write_nef_chemical_shifts(shift_filename, seq_str, shifts)
-                                logger.info(f"NEF Chemical Shift Data generated: {os.path.abspath(shift_filename)}")
+                                logger.info(
+                                    f"NEF Chemical Shift Data generated: {os.path.abspath(shift_filename)}"
+                                )
 
                             # 3.5 J-Couplings (Phase 9.5)
                             if args.gen_couplings:
                                 from .coupling import predict_couplings_from_structure
+
                                 # Reuse torsion calc if not already done
                                 # Ideally we'd optimize to not recalc, but calculation is cheap.
                                 angles_list = calculate_torsion_angles(structure)
@@ -1145,25 +1244,31 @@ def main() -> None:
                                 # Convert generic List[Dict] to Dict[int, float] for phis
                                 phi_map = {}
                                 for angle_data in angles_list:
-                                    if angle_data['phi'] is not None:
-                                        phi_map[angle_data['res_id']] = angle_data['phi']
+                                    if angle_data["phi"] is not None:
+                                        phi_map[angle_data["res_id"]] = angle_data["phi"]
                                     else:
-                                        phi_map[angle_data['res_id']] = np.nan
+                                        phi_map[angle_data["res_id"]] = np.nan
 
                                 couplings = predict_couplings_from_structure(phi_map)
 
-                                coupling_csv = args.coupling_output if args.coupling_output else output_filename.replace(".pdb", "_couplings.csv")
+                                coupling_csv = (
+                                    args.coupling_output
+                                    if args.coupling_output
+                                    else output_filename.replace(".pdb", "_couplings.csv")
+                                )
 
                                 with open(coupling_csv, "w") as f:
                                     f.write("res_id,residue,J_HN_HA\n")
                                     # Write sorted by resid
                                     for angle_data in angles_list:
-                                        rid = angle_data['res_id']
-                                        res = angle_data['residue']
+                                        rid = angle_data["res_id"]
+                                        res = angle_data["residue"]
                                         jval = couplings.get(rid, np.nan)
                                         f.write(f"{rid},{res},{jval:.4f}\n")
 
-                                logger.info(f"J-Couplings exported: {os.path.abspath(coupling_csv)}")
+                                logger.info(
+                                    f"J-Couplings exported: {os.path.abspath(coupling_csv)}"
+                                )
 
                             # 3.6 RDC Output (Phase 9.6)
                             if args.output_rdcs:
@@ -1182,9 +1287,8 @@ def main() -> None:
                                 # lack a backbone amide proton (their nitrogen is a
                                 # tertiary/secondary amine in the pyrrolidine ring).
                                 from .rdc import calculate_rdcs
-                                rdcs = calculate_rdcs(
-                                    structure, Da=args.rdc_da, R=args.rdc_r
-                                )
+
+                                rdcs = calculate_rdcs(structure, Da=args.rdc_da, R=args.rdc_r)
                                 rdc_csv = args.output_rdcs
                                 # Build a lookup from res_id (1-indexed) to one-letter code.
                                 # res_names is already built above as a list of 3-letter codes.
@@ -1192,68 +1296,95 @@ def main() -> None:
                                     f.write("res_id,residue,RDC_NH_Hz\n")
                                     for rid, val in sorted(rdcs.items()):
                                         # res_id is 1-based; res_names list is 0-based.
-                                        res_3letter = res_names[rid - 1] if rid - 1 < len(res_names) else "UNK"
+                                        res_3letter = (
+                                            res_names[rid - 1]
+                                            if rid - 1 < len(res_names)
+                                            else "UNK"
+                                        )
                                         res_1letter = three_to_one.get(res_3letter, "X")
                                         f.write(f"{rid},{res_1letter},{val:.4f}\n")
                                 logger.info(f"RDC data exported to: {os.path.abspath(rdc_csv)}")
 
                             # 4. Constraint Export (Phase 10)
                             if args.export_constraints:
-                                logger.info(f"Exporting Constraints in {args.constraint_format.upper()} format...")
+                                logger.info(
+                                    f"Exporting Constraints in {args.constraint_format.upper()} format..."
+                                )
                                 # Format: RR or CSV
                                 # We use compute_contact_map relative to cutoff
                                 # For Export, we typically want BINARY map if using CASP
 
                                 # Calculate Distance Matrix for export
                                 matrix = compute_contact_map(
-                                    structure,
-                                    method="ca",
-                                    threshold=args.constraint_cutoff
+                                    structure, method="ca", threshold=args.constraint_cutoff
                                 )
 
-                                content = export_constraints(matrix, seq_str, fmt=args.constraint_format, threshold=args.constraint_cutoff)
+                                content = export_constraints(
+                                    matrix,
+                                    seq_str,
+                                    fmt=args.constraint_format,
+                                    threshold=args.constraint_cutoff,
+                                )
 
                                 export_file = args.export_constraints
                                 with open(export_file, "w") as f:
                                     f.write(content)
-                                logger.info(f"Constraints exported to: {os.path.abspath(export_file)}")
+                                logger.info(
+                                    f"Constraints exported to: {os.path.abspath(export_file)}"
+                                )
 
                             # 5. Torsion Export (Phase 11)
                             if args.export_torsion:
                                 angles = calculate_torsion_angles(structure)
-                                export_torsion_angles(angles, args.export_torsion, fmt=args.torsion_format)
-                                logger.info(f"Torsion angles exported to: {os.path.abspath(args.export_torsion)}")
+                                export_torsion_angles(
+                                    angles, args.export_torsion, fmt=args.torsion_format
+                                )
+                                logger.info(
+                                    f"Torsion angles exported to: {os.path.abspath(args.export_torsion)}"
+                                )
 
                             # 6. MSA Generation (Phase 12)
                             if args.gen_msa:
-                                logger.info(f"Generating Synthetic MSA (depth: {args.msa_depth}, temp: {args.evolution_temp})...")
+                                logger.info(
+                                    f"Generating Synthetic MSA (depth: {args.msa_depth}, temp: {args.evolution_temp})..."
+                                )
                                 # 1. Extract ground-truth contact map (e.g., 8.0 Angstroms) for constraints
                                 cmap = compute_contact_map(structure, method="ca", threshold=8.0)
                                 # Convert Distogram to boolean map
                                 bool_cmap = (cmap > 0) & (cmap <= 8.0)
-                                
+
                                 # 2. Run Metropolis-Hastings Co-Evolution
                                 sequences = generate_msa(
                                     base_sequence=seq_str,
                                     contact_map=bool_cmap,
                                     num_sequences=args.msa_depth,
                                     temperature=args.evolution_temp,
-                                    steps_between_samples=100
+                                    steps_between_samples=100,
                                 )
-                                
+
                                 # 3. Write FASTA
-                                msa_filename = args.output if args.output and args.output.endswith(".fasta") else output_filename.replace(".pdb", ".fasta")
+                                msa_filename = (
+                                    args.output
+                                    if args.output and args.output.endswith(".fasta")
+                                    else output_filename.replace(".pdb", ".fasta")
+                                )
                                 with open(msa_filename, "w") as f:
                                     for idx, sq in enumerate(sequences):
                                         f.write(f">seq_{idx}\n{sq}\n")
-                                        
-                                logger.info(f"Synthetic MSA generated: {os.path.abspath(msa_filename)}")
+
+                                logger.info(
+                                    f"Synthetic MSA generated: {os.path.abspath(msa_filename)}"
+                                )
 
                             # 7. Distogram Export (Phase 13)
                             if args.export_distogram:
                                 matrix = calculate_distogram(structure)
-                                export_distogram(matrix, args.export_distogram, fmt=args.distogram_format)
-                                logger.info(f"Distogram exported to: {os.path.abspath(args.export_distogram)}")
+                                export_distogram(
+                                    matrix, args.export_distogram, fmt=args.distogram_format
+                                )
+                                logger.info(
+                                    f"Distogram exported to: {os.path.abspath(args.export_distogram)}"
+                                )
 
                 # Open 3D viewer if requested (MOVED AFTER NMR calc to access generated_restraints)
                 if args.visualize:
@@ -1264,9 +1395,9 @@ def main() -> None:
                             filename=output_filename,
                             style="cartoon",
                             color="spectrum",
-                            restraints=generated_restraints, # Pass captured restraints
-                            highlights=highlights, # Pass beta-turn highlights
-                            show_hbonds=True
+                            restraints=generated_restraints,  # Pass captured restraints
+                            highlights=highlights,  # Pass beta-turn highlights
+                            show_hbonds=True,
                         )
                     except Exception as e:
                         logger.error(f"Failed to open 3D viewer: {e}")

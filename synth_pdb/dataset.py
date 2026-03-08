@@ -1,4 +1,3 @@
-
 import concurrent.futures
 import csv
 import io
@@ -25,6 +24,7 @@ from .generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
+
 def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
     """
     Helper function to generate a single sample.
@@ -41,9 +41,7 @@ def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
         # 1. Generate Structure
         # optimize_sidechains=False for speed in bulk generation
         pdb_content = generate_pdb_content(
-            length=length,
-            conformation=conf_type,
-            optimize_sidechains=False
+            length=length, conformation=conf_type, optimize_sidechains=False
         )
 
         # 2. Calculate Contact Map
@@ -69,7 +67,7 @@ def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
         three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
         # Filter for CA to get one per residue
         ca = structure[structure.atom_name == "CA"]
-        seq_str = "".join([three_to_one.get(res, 'X') for res in ca.res_name])
+        seq_str = "".join([three_to_one.get(res, "X") for res in ca.res_name])
 
         # 3. Save Files
         with open(pdb_save_path, "w") as out:
@@ -87,15 +85,12 @@ def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
             "conformation": conf_type,
             "split": split,
             "pdb_path": str(pdb_save_path.relative_to(output_dir)),
-            "cmap_path": str(cmap_save_path.relative_to(output_dir))
+            "cmap_path": str(cmap_save_path.relative_to(output_dir)),
         }
 
     except Exception as e:
-        return {
-            "success": False,
-            "sample_id": sample_id,
-            "error": str(e)
-        }
+        return {"success": False, "sample_id": sample_id, "error": str(e)}
+
 
 class DatasetGenerator:
     """
@@ -141,7 +136,7 @@ class DatasetGenerator:
         train_ratio: float = 0.8,
         seed: Optional[int] = None,
         max_workers: Optional[int] = None,
-        dataset_format: str = 'pdb'
+        dataset_format: str = "pdb",
     ):
         self.output_dir = Path(output_dir).absolute()
         self.num_samples = num_samples
@@ -150,12 +145,11 @@ class DatasetGenerator:
         self.train_ratio = train_ratio
         self.max_workers = max_workers
 
-
         if seed is not None:
             random.seed(seed)
             np.random.seed(seed)
 
-        self.dataset_format = dataset_format.lower() if dataset_format else 'pdb'
+        self.dataset_format = dataset_format.lower() if dataset_format else "pdb"
 
     def prepare_directories(self) -> None:
         """Create the directory structure for the dataset."""
@@ -170,10 +164,12 @@ class DatasetGenerator:
         if not manifest_path.exists():
             with open(manifest_path, "w", newline="") as f:
                 writer = csv.writer(f)
-                if self.dataset_format == 'npz':
-                     writer.writerow(["id", "length", "conformation", "split", "npz_path"])
+                if self.dataset_format == "npz":
+                    writer.writerow(["id", "length", "conformation", "split", "npz_path"])
                 else:
-                     writer.writerow(["id", "length", "conformation", "split", "pdb_path", "cmap_path"])
+                    writer.writerow(
+                        ["id", "length", "conformation", "split", "pdb_path", "cmap_path"]
+                    )
 
     def generate(self) -> None:
         """Run the generation loop using multiprocessing."""
@@ -183,7 +179,9 @@ class DatasetGenerator:
         if self.max_workers is None:
             self.max_workers = max(1, multiprocessing.cpu_count() - 1)
 
-        logger.info(f"Starting bulk generation of {self.num_samples} samples using {self.max_workers} cores...")
+        logger.info(
+            f"Starting bulk generation of {self.num_samples} samples using {self.max_workers} cores..."
+        )
         self.prepare_directories()
 
         manifest_path = self.output_dir / "dataset_manifest.csv"
@@ -198,23 +196,26 @@ class DatasetGenerator:
 
             # weighted choice for conformation complexity
             conf_type = random.choices(
-                ["alpha", "beta", "random", "ppii", "extended"],
-                weights=[0.3, 0.3, 0.3, 0.05, 0.05]
+                ["alpha", "beta", "random", "ppii", "extended"], weights=[0.3, 0.3, 0.3, 0.05, 0.05]
             )[0]
 
             is_train = random.random() < self.train_ratio
             split = "train" if is_train else "test"
 
             # Pass format-specific args
-            if self.dataset_format == 'npz':
-                 tasks.append((sample_id, length, conf_type, split, str(self.output_dir), 'npz'))
+            if self.dataset_format == "npz":
+                tasks.append((sample_id, length, conf_type, split, str(self.output_dir), "npz"))
             else:
-                 tasks.append((sample_id, length, conf_type, split, str(self.output_dir), 'pdb'))
+                tasks.append((sample_id, length, conf_type, split, str(self.output_dir), "pdb"))
 
         # Execute
         completed_count = 0
         # Determine appropriate task function
-        task_func = _generate_single_sample_npz_task if self.dataset_format == 'npz' else _generate_single_sample_task
+        task_func = (
+            _generate_single_sample_npz_task
+            if self.dataset_format == "npz"
+            else _generate_single_sample_task
+        )
 
         with open(manifest_path, "a", newline="") as f:
             writer = csv.writer(f)
@@ -228,35 +229,44 @@ class DatasetGenerator:
                     try:
                         result = future.result()
                         if result["success"]:
-                            if self.dataset_format == 'npz':
-                                writer.writerow([
-                                    result["sample_id"],
-                                    result["length"],
-                                    result["conformation"],
-                                    result["split"],
-                                    result["npz_path"]
-                                ])
+                            if self.dataset_format == "npz":
+                                writer.writerow(
+                                    [
+                                        result["sample_id"],
+                                        result["length"],
+                                        result["conformation"],
+                                        result["split"],
+                                        result["npz_path"],
+                                    ]
+                                )
                             else:
-                                writer.writerow([
-                                    result["sample_id"],
-                                    result["length"],
-                                    result["conformation"],
-                                    result["split"],
-                                    result["pdb_path"],
-                                    result["cmap_path"]
-                                ])
+                                writer.writerow(
+                                    [
+                                        result["sample_id"],
+                                        result["length"],
+                                        result["conformation"],
+                                        result["split"],
+                                        result["pdb_path"],
+                                        result["cmap_path"],
+                                    ]
+                                )
                             completed_count += 1
                         else:
                             logger.error(f"Failed to generate {sample_id}: {result.get('error')}")
 
                         # Logging progress
                         if completed_count % 100 == 0:
-                            logger.info(f"Progress: {completed_count}/{self.num_samples} ({completed_count/self.num_samples*100:.1f}%)")
+                            logger.info(
+                                f"Progress: {completed_count}/{self.num_samples} ({completed_count / self.num_samples * 100:.1f}%)"
+                            )
 
                     except Exception as exc:
                         logger.error(f"Generate task generated an exception: {exc}")
 
-        logger.info(f"Bulk generation complete. Generated {completed_count}/{self.num_samples} samples.")
+        logger.info(
+            f"Bulk generation complete. Generated {completed_count}/{self.num_samples} samples."
+        )
+
 
 def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
     """
@@ -271,9 +281,7 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
     try:
         # 1. Generate Structure (in-memory string)
         pdb_content = generate_pdb_content(
-            length=length,
-            conformation=conf_type,
-            optimize_sidechains=False
+            length=length, conformation=conf_type, optimize_sidechains=False
         )
 
         # 2. Parse to Biotite Structure
@@ -288,15 +296,19 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
 
         # Standard AA mapping (alphabetical usually, or fixed order)
         # We need a robust mapping.
-        aa_list = sorted(ONE_TO_THREE_LETTER_CODE.values()) # 'ALA', 'ARG', ...
+        aa_list = sorted(ONE_TO_THREE_LETTER_CODE.values())  # 'ALA', 'ARG', ...
         aa_to_idx = {aa: i for i, aa in enumerate(aa_list)}
 
         # Mapping for variants
         variant_map = {
-            'HIE': 'HIS', 'HID': 'HIS', 'HIP': 'HIS',
-            'CYM': 'CYS', 'CYX': 'CYS',
-            'GLH': 'GLU', 'ASH': 'ASP',
-            'LYN': 'LYS'
+            "HIE": "HIS",
+            "HID": "HIS",
+            "HIP": "HIS",
+            "CYM": "CYS",
+            "CYX": "CYS",
+            "GLH": "GLU",
+            "ASH": "ASP",
+            "LYN": "LYS",
         }
 
         sequence_one_hot = np.zeros((length, 20), dtype=np.float32)
@@ -307,13 +319,13 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
             if canon_name in aa_to_idx:
                 sequence_one_hot[i, aa_to_idx[canon_name]] = 1.0
             else:
-                 # Should we log invalid? or just keep 0? Testing asserts sum=1.
-                 # If we encounter UNK, it will fail test.
-                 logger.warning(f"Unknown residue {res_name} in {sample_id}. Skipping one-hot.")
+                # Should we log invalid? or just keep 0? Testing asserts sum=1.
+                # If we encounter UNK, it will fail test.
+                logger.warning(f"Unknown residue {res_name} in {sample_id}. Skipping one-hot.")
 
         # 3.2 Coordinates (length, 5, 3) -> N, CA, C, O, CB
         coords = np.zeros((length, 5, 3), dtype=np.float32)
-        atom_types = ['N', 'CA', 'C', 'O', 'CB']
+        atom_types = ["N", "CA", "C", "O", "CB"]
 
         for i, res_id in enumerate(ca.res_id):
             res_atoms = structure[structure.res_id == res_id]
@@ -327,7 +339,7 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
                     pass
 
         # 3.3 Contact Map
-        cmap = compute_contact_map(structure, threshold=999.0) # Get all distances? Or map?
+        cmap = compute_contact_map(structure, threshold=999.0)  # Get all distances? Or map?
         # compute_contact_map returns DISTANCE MATRIX if threshold is usually high or if implemented to return floats
         # Re-checking compute_contact_map signature or behavior...
         # Assuming we want distances. If compute_contact_map returns binary, we might need to modify it or calc manually.
@@ -349,13 +361,9 @@ def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
             "length": length,
             "conformation": conf_type,
             "split": split,
-            "npz_path": str(npz_save_path.relative_to(output_dir))
+            "npz_path": str(npz_save_path.relative_to(output_dir)),
         }
 
     except Exception as e:
         logger.error(f"Error in {sample_id}: {e}")
-        return {
-            "success": False,
-            "sample_id": sample_id,
-            "error": str(e)
-        }
+        return {"success": False, "sample_id": sample_id, "error": str(e)}

@@ -7,6 +7,7 @@ from .data import VAN_DER_WAALS_RADII
 
 logger = logging.getLogger(__name__)
 
+
 def calculate_clash_score(atom_array: struc.AtomArray) -> float:
     """
     Calculate a simple clash score based on Van der Waals overlaps.
@@ -51,7 +52,7 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
     clash_score = 0.0
 
     # Pre-define backbone names for check
-    backbone_names = frozenset(['C', 'O', 'N', 'CA'])
+    backbone_names = frozenset(["C", "O", "N", "CA"])
 
     # Iterate through all atoms
     for i in range(len(atom_array)):
@@ -96,18 +97,19 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
             # We want a soft-ish repulsion to guide optimization
 
             # Distance calculation
-            dist_sq = np.sum((pos1 - pos2)**2)
+            dist_sq = np.sum((pos1 - pos2) ** 2)
             dist = np.sqrt(dist_sq)
 
             optimal_dist = r1 + r2
 
-            if dist < optimal_dist * 0.8: # Overlap threshold
+            if dist < optimal_dist * 0.8:  # Overlap threshold
                 # Severe clash
                 overlap = (optimal_dist * 0.8) - dist
                 # Cubic penalty for smoothness
                 clash_score += (overlap * 10) ** 2
 
     return clash_score
+
 
 def calculate_energy_score(atom_array: struc.AtomArray) -> float:
     """

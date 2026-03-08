@@ -27,7 +27,6 @@ def view_structure_in_browser(
     restraints: Optional[List[Any]] = None,
     highlights: Optional[List[Any]] = None,
     show_hbonds: bool = True,
-
 ) -> None:
     """
     Open 3D structure viewer in browser.
@@ -50,8 +49,9 @@ def view_structure_in_browser(
         logger.info(f"Opening 3D viewer for {filename}")
 
         # Generate HTML with embedded 3Dmol.js viewer
-        html = _create_3dmol_html(pdb_content, filename, style, color, restraints, highlights, show_hbonds)
-
+        html = _create_3dmol_html(
+            pdb_content, filename, style, color, restraints, highlights, show_hbonds
+        )
 
         # Save to temporary file
         with tempfile.NamedTemporaryFile(
@@ -77,7 +77,7 @@ def _create_3dmol_html(
     color: str,
     restraints: Optional[List[Any]] = None,
     highlights: Optional[List[Any]] = None,
-    show_hbonds: bool = False
+    show_hbonds: bool = False,
 ) -> str:
     """
     Generate HTML with embedded 3Dmol.js viewer.
@@ -131,19 +131,19 @@ def _create_3dmol_html(
     if show_hbonds:
         hbonds = _find_hbonds(pdb_data)
         if hbonds:
-             hbond_cmds += "/* Detected Backbone H-Bonds */\n"
-             for hb in hbonds:
-                 # Add dashed yellow cylinder
-                 # We use start_resi and end_resi
-                 # Note: JS indices for arrays are 0-based but 3Dmol resi selection is 1-based (PDB numbering)
+            hbond_cmds += "/* Detected Backbone H-Bonds */\n"
+            for hb in hbonds:
+                # Add dashed yellow cylinder
+                # We use start_resi and end_resi
+                # Note: JS indices for arrays are 0-based but 3Dmol resi selection is 1-based (PDB numbering)
 
-                 # 3Dmol selection needs explicit atom names for start/end
-                 start_sel = f"{{chain:'A', resi:{hb['start_resi']}, atom:'{hb['start_atom']}'}}"
-                 end_sel = f"{{chain:'A', resi:{hb['end_resi']}, atom:'{hb['end_atom']}'}}"
+                # 3Dmol selection needs explicit atom names for start/end
+                start_sel = f"{{chain:'A', resi:{hb['start_resi']}, atom:'{hb['start_atom']}'}}"
+                end_sel = f"{{chain:'A', resi:{hb['end_resi']}, atom:'{hb['end_atom']}'}}"
 
-                 # JS logic to find atoms and draw line
-                 # We wrap in a block to reuse variable names safely
-                 hbond_cmds += f"""
+                # JS logic to find atoms and draw line
+                # We wrap in a block to reuse variable names safely
+                hbond_cmds += f"""
                  {{
                      let sel1 = {start_sel};
                      let sel2 = {end_sel};
@@ -169,13 +169,13 @@ def _create_3dmol_html(
     if ssbonds:
         ssbond_cmds += "/* Detected Disulfide Bonds */\n"
         for ss in ssbonds:
-             # Add thick yellow cylinder between SG atoms
+            # Add thick yellow cylinder between SG atoms
 
-             # 3Dmol selection
-             start_sel = f"{{chain:'{ss['c1']}', resi:{ss['r1']}, atom:'SG'}}"
-             end_sel = f"{{chain:'{ss['c2']}', resi:{ss['r2']}, atom:'SG'}}"
+            # 3Dmol selection
+            start_sel = f"{{chain:'{ss['c1']}', resi:{ss['r1']}, atom:'SG'}}"
+            end_sel = f"{{chain:'{ss['c2']}', resi:{ss['r2']}, atom:'SG'}}"
 
-             ssbond_cmds += f"""
+            ssbond_cmds += f"""
              {{
                  let sel1 = {start_sel};
                  let sel2 = {end_sel};
@@ -208,7 +208,9 @@ def _create_3dmol_html(
         # Bridge the gap: style terminal backbones as sticks so they meet the ribbon
         # Ribbon ends at CA. We need path: [Ribbon End CA] --stick-- [N or C] --thick cylinder-- [...]
         # Style entire first and last residues as sticks to be robust
-        conect_cmds += "viewer.addStyle({chain:'A', resi:1}, {stick:{radius:0.18, color:'cyan'}});\n"
+        conect_cmds += (
+            "viewer.addStyle({chain:'A', resi:1}, {stick:{radius:0.18, color:'cyan'}});\n"
+        )
         conect_cmds += f"viewer.addStyle({{chain:'A', resi:{max_res}}}, {{stick:{{radius:0.18, color:'cyan'}}}});\n"
 
         # Explicitly ensure CA-C and N-CA path is visible as cyan sticks for contrast
@@ -216,7 +218,7 @@ def _create_3dmol_html(
         conect_cmds += f"viewer.addStyle({{chain:'A', resi:{max_res}, atom:['CA','C']}}, {{stick:{{radius:0.25, color:'cyan'}}}});\n"
 
         for s1, s2 in conects:
-             conect_cmds += f"""
+            conect_cmds += f"""
              {{
                  let atoms1 = viewer.selectedAtoms({{serial:{s1}}});
                  let atoms2 = viewer.selectedAtoms({{serial:{s2}}});
@@ -236,26 +238,26 @@ def _create_3dmol_html(
     # Generate Highlights JS
     highlight_cmds = ""
     if highlights:
-         for h in highlights:
-             start = h['start']
-             end = h['end']
-             h_color = h.get('color', 'purple')
-             h_style = h.get('style', 'stick')
-             h_label = h.get('label', '')
+        for h in highlights:
+            start = h["start"]
+            end = h["end"]
+            h_color = h.get("color", "purple")
+            h_style = h.get("style", "stick")
+            h_label = h.get("label", "")
 
-             # Create array of residues [3, 4, 5, 6]
-             res_array = str(list(range(start, end + 1)))
+            # Create array of residues [3, 4, 5, 6]
+            res_array = str(list(range(start, end + 1)))
 
-             # Add style override
-             if h_style == 'stick':
-                 highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{stick:{{colorscheme:'{h_color}', radius:0.2}}}});\n"
-             elif h_style == 'cartoon':
-                 highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{cartoon:{{color:'{h_color}'}}}});\n"
+            # Add style override
+            if h_style == "stick":
+                highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{stick:{{colorscheme:'{h_color}', radius:0.2}}}});\n"
+            elif h_style == "cartoon":
+                highlight_cmds += f"viewer.addStyle({{chain:'A', resi:{res_array}}}, {{cartoon:{{color:'{h_color}'}}}});\n"
 
-             # Add label at center residue
-             center_res = (start + end) // 2
-             if h_label:
-                 highlight_cmds += f"viewer.addLabel('{h_label}', {{fontSize:12, fontColor:'white', backgroundColor:'black', backgroundOpacity:0.7}}, {{chain:'A', resi:{center_res}, atom:'CA'}});\n"
+            # Add label at center residue
+            center_res = (start + end) // 2
+            if h_label:
+                highlight_cmds += f"viewer.addLabel('{h_label}', {{fontSize:12, fontColor:'white', backgroundColor:'black', backgroundOpacity:0.7}}, {{chain:'A', resi:{center_res}, atom:'CA'}});\n"
 
     # Generate PTM labels logic
     # We essentially grep the PDB for SEP/TPO/PTR and add labels
@@ -302,13 +304,13 @@ def _create_3dmol_html(
         js_restraints = "let restraints = [\n"
         for r in restraints:
             # Handle key variations
-            c1 = r.get('chain_1', 'A')
-            s1 = r.get('seq_1', r.get('residue_index_1'))
-            a1 = r.get('atom_1', r.get('atom_name_1'))
-            c2 = r.get('chain_2', 'A')
-            s2 = r.get('seq_2', r.get('residue_index_2'))
-            a2 = r.get('atom_2', r.get('atom_name_2'))
-            dist = r.get('dist', r.get('actual_distance', 5.0))
+            c1 = r.get("chain_1", "A")
+            s1 = r.get("seq_1", r.get("residue_index_1"))
+            a1 = r.get("atom_1", r.get("atom_name_1"))
+            c2 = r.get("chain_2", "A")
+            s2 = r.get("seq_2", r.get("residue_index_2"))
+            a2 = r.get("atom_2", r.get("atom_name_2"))
+            dist = r.get("dist", r.get("actual_distance", 5.0))
 
             if s1 and s2:
                 js_restraints += f"    {{ c1:'{c1}', s1:{s1}, a1:'{a1}', c2:'{c2}', s2:{s2}, a2:'{a2}', d:{dist} }},\n"
@@ -771,14 +773,11 @@ def _find_ssbonds(pdb_content: str) -> list:
 
                 try:
                     c1 = line[15]
-                    r1 = int(line[17:22].strip()) # 18-21 in spec, but generous slicing
+                    r1 = int(line[17:22].strip())  # 18-21 in spec, but generous slicing
                     c2 = line[29]
-                    r2 = int(line[31:36].strip()) # 32-35 in spec
+                    r2 = int(line[31:36].strip())  # 32-35 in spec
 
-                    ssbonds.append({
-                        'c1': c1, 'r1': r1,
-                        'c2': c2, 'r2': r2
-                    })
+                    ssbonds.append({"c1": c1, "r1": r1, "c2": c2, "r2": r2})
                 except (ValueError, IndexError):
                     continue
         return ssbonds
@@ -814,7 +813,7 @@ def _find_hbonds(pdb_content: str) -> list:
             try:
                 triplets = hbond(structure, selection1="atom_name N", selection2="atom_name O")
             except Exception:
-                pass # Fallback
+                pass  # Fallback
 
         hbonds = []
 
@@ -823,12 +822,14 @@ def _find_hbonds(pdb_content: str) -> list:
             for donor_idx, _h_idx, acceptor_idx in triplets:
                 donor = structure[donor_idx]
                 acceptor = structure[acceptor_idx]
-                hbonds.append({
-                    'start_resi': acceptor.res_id,
-                    'start_atom': acceptor.atom_name, # O
-                    'end_resi': donor.res_id,
-                    'end_atom': donor.atom_name # N
-                })
+                hbonds.append(
+                    {
+                        "start_resi": acceptor.res_id,
+                        "start_atom": acceptor.atom_name,  # O
+                        "end_resi": donor.res_id,
+                        "end_atom": donor.atom_name,  # N
+                    }
+                )
         else:
             # Fallback: Geometric distance check (O...N < 3.5 A)
             # This is "good enough" for visualization
@@ -857,12 +858,14 @@ def _find_hbonds(pdb_content: str) -> list:
                     # Check sequence separation
                     seq_sep = abs(n_atom.res_id - o_atom.res_id)
                     if seq_sep >= 3:
-                         hbonds.append({
-                            'start_resi': o_atom.res_id,
-                            'start_atom': o_atom.atom_name,
-                            'end_resi': n_atom.res_id,
-                            'end_atom': n_atom.atom_name
-                        })
+                        hbonds.append(
+                            {
+                                "start_resi": o_atom.res_id,
+                                "start_atom": o_atom.atom_name,
+                                "end_resi": n_atom.res_id,
+                                "end_atom": n_atom.atom_name,
+                            }
+                        )
 
         return hbonds
 
@@ -898,4 +901,3 @@ def _find_conects(pdb_content: str) -> list:
     except Exception as e:
         logger.warning(f"Could not parse CONECT records: {e}")
         return []
-

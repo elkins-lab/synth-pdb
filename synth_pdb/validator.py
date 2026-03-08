@@ -31,22 +31,27 @@ class PDBValidator:
     A class to validate PDB structures for various violations like bond lengths, angles,
     and Ramachandran angles.
     """
+
     atoms: List[Dict[str, Any]]
     grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]]
     sequences_by_chain: Dict[str, List[str]]
     violations: List[str]
 
-    def __init__(self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None) -> None:
+    def __init__(
+        self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None
+    ) -> None:
         if pdb_content:
             self.pdb_content = pdb_content
             self.atoms = self._parse_pdb_atoms(pdb_content)
         elif parsed_atoms is not None:
             # Ensure coords are numpy arrays if they aren't already
             for atom in parsed_atoms:
-                if isinstance(atom['coords'], list):
-                    atom['coords'] = np.array(atom['coords'])
+                if isinstance(atom["coords"], list):
+                    atom["coords"] = np.array(atom["coords"])
             self.atoms = parsed_atoms
-            self.pdb_content = self.atoms_to_pdb_content(self.atoms) # Reconstruct pdb_content for consistency
+            self.pdb_content = self.atoms_to_pdb_content(
+                self.atoms
+            )  # Reconstruct pdb_content for consistency
         else:
             raise ValueError("Either pdb_content or parsed_atoms must be provided.")
 
@@ -117,9 +122,7 @@ class PDBValidator:
                         }
                     )
                 except (ValueError, IndexError) as e:
-                    logger.warning(
-                        f"Could not parse PDB ATOM/HETATM line: {line.strip()} - {e}"
-                    )
+                    logger.warning(f"Could not parse PDB ATOM/HETATM line: {line.strip()} - {e}")
         return parsed_atoms
 
     def get_atoms(self) -> List[Dict[str, Any]]:
@@ -155,7 +158,7 @@ class PDBValidator:
         # Group atoms by chain ID, preserving order
         chains: Dict[str, List[Dict[str, Any]]] = {}
         for atom in atom_list:
-            chain_id = atom.get("chain_id", "A") # Default to 'A' if no chain_id
+            chain_id = atom.get("chain_id", "A")  # Default to 'A' if no chain_id
             if chain_id not in chains:
                 chains[chain_id] = []
             chains[chain_id].append(atom)
@@ -174,7 +177,9 @@ class PDBValidator:
                 last_atom_of_chain = chain_atoms[-1]
 
                 # Check if this chain contains any ATOM records (is a polymer)
-                has_polymer_atoms = any(atom.get("record_name", "ATOM") == "ATOM" for atom in chain_atoms)
+                has_polymer_atoms = any(
+                    atom.get("record_name", "ATOM") == "ATOM" for atom in chain_atoms
+                )
 
                 if has_polymer_atoms:
                     ter_atom_number = last_atom_of_chain.get("atom_number", 0) + 1
@@ -216,15 +221,15 @@ class PDBValidator:
             chain_sequence = []
             for res_num in sorted_res_numbers:
                 # We can use any atom in the residue to get its name, CA is common.
-                ca_atom = residues_in_chain[res_num].get('CA')
+                ca_atom = residues_in_chain[res_num].get("CA")
                 if ca_atom:
-                    chain_sequence.append(ca_atom['residue_name'])
+                    chain_sequence.append(ca_atom["residue_name"])
                 else:
                     # Fallback if CA is not present (e.g., C-alpha only models don't have side chains)
                     # Try to get residue name from first available atom
                     first_atom = next(iter(residues_in_chain[res_num].values()), None)
                     if first_atom:
-                        chain_sequence.append(first_atom['residue_name'])
+                        chain_sequence.append(first_atom["residue_name"])
             sequences[chain_id] = chain_sequence
         return sequences
 
@@ -236,9 +241,7 @@ class PDBValidator:
         return float(np.linalg.norm(coord1 - coord2))
 
     @staticmethod
-    def _calculate_angle(
-        coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray
-    ) -> float:
+    def _calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
         """
         Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex.
         """
@@ -337,9 +340,7 @@ class PDBValidator:
 
                 # Check N-CA bond
                 if n_atom and ca_atom:
-                    actual_length = self._calculate_distance(
-                        n_atom["coords"], ca_atom["coords"]
-                    )
+                    actual_length = self._calculate_distance(n_atom["coords"], ca_atom["coords"])
                     expected_length = bond_standards["N-CA"]
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
@@ -350,9 +351,7 @@ class PDBValidator:
 
                 # Check CA-C bond
                 if ca_atom and c_atom:
-                    actual_length = self._calculate_distance(
-                        ca_atom["coords"], c_atom["coords"]
-                    )
+                    actual_length = self._calculate_distance(ca_atom["coords"], c_atom["coords"])
                     expected_length = bond_standards["CA-C"]
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
@@ -363,9 +362,7 @@ class PDBValidator:
 
                 # Check C-O bond
                 if c_atom and o_atom:
-                    actual_length = self._calculate_distance(
-                        c_atom["coords"], o_atom["coords"]
-                    )
+                    actual_length = self._calculate_distance(c_atom["coords"], o_atom["coords"])
                     expected_length = bond_standards["C-O"]
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
@@ -475,7 +472,9 @@ class PDBValidator:
                             )
 
     @staticmethod
-    def _is_point_in_polygon(point: Tuple[float, float], polygon: List[Tuple[float, float]]) -> bool:
+    def _is_point_in_polygon(
+        point: Tuple[float, float], polygon: List[Tuple[float, float]]
+    ) -> bool:
         """
         Ray-casting algorithm to check if a point is inside a polygon.
         Polygon is defined by a list of (x, y) tuples.
@@ -525,7 +524,11 @@ class PDBValidator:
                 res_name = current_res_atoms.get("CA", {}).get("residue_name")
 
                 # Skip if not a standard amino acid or if info is missing
-                if not current_res_atoms.get("N") or not current_res_atoms.get("CA") or not current_res_atoms.get("C"):
+                if (
+                    not current_res_atoms.get("N")
+                    or not current_res_atoms.get("CA")
+                    or not current_res_atoms.get("C")
+                ):
                     continue
 
                 phi = None
@@ -559,14 +562,16 @@ class PDBValidator:
 
                     # Determine residue category for validation
                     # Categories: General, GLY, PRO, Pre-Pro
-                    category = "General" # Default
+                    category = "General"  # Default
                     if res_name == "GLY":
                         category = "GLY"
                     elif res_name == "PRO":
                         category = "PRO"
                     elif i < len(sorted_res_numbers) - 1:
                         next_r_num = sorted_res_numbers[i + 1]
-                        next_r_name = residues_in_chain.get(next_r_num, {}).get("CA", {}).get("residue_name")
+                        next_r_name = (
+                            residues_in_chain.get(next_r_num, {}).get("CA", {}).get("residue_name")
+                        )
                         if next_r_name == "PRO":
                             category = "Pre-Pro"
 
@@ -658,9 +663,9 @@ class PDBValidator:
             # We must map map array indices to self.atoms indices.
             # Assuming 1-to-1 mapping since both parse the same file.
 
-            bond_array = bonds.as_array() # Shape (M, 2) or (M, 3) depending on version/args
+            bond_array = bonds.as_array()  # Shape (M, 2) or (M, 3) depending on version/args
 
-            adj_list: Dict[int, List[int]] = {} # for finding 1-3
+            adj_list: Dict[int, List[int]] = {}  # for finding 1-3
 
             for row in bond_array:
                 # Handle potential 3rd column (bond type)
@@ -678,13 +683,15 @@ class PDBValidator:
 
             # Add 1-3 bonds (Angles)
             for i in adj_list:
-                for j in adj_list[i]: # i-j is a bond
-                    for k in adj_list[j]: # j-k is a bond
-                        if k != i: # i-j-k is an angle
+                for j in adj_list[i]:  # i-j is a bond
+                    for k in adj_list[j]:  # j-k is a bond
+                        if k != i:  # i-j-k is an angle
                             bonded_pairs.add(tuple(sorted((i, k))))
 
         except Exception as e:
-            logger.warning(f"Biotite bond perception failed, falling back to simple backbone heuristic: {e}")
+            logger.warning(
+                f"Biotite bond perception failed, falling back to simple backbone heuristic: {e}"
+            )
 
             # Intra-residue backbone bonds (N-CA, CA-C, C-O)
             # Inter-residue peptide bond (C(i)-N(i+1))
@@ -717,11 +724,11 @@ class PDBValidator:
         # So I should change excluded check to use (i, j) list indices.
 
         # Fallback Implementation (if Biotite fails, map atoms to indices)
-        if not bonded_pairs: # If bonded_pairs empty (failed or fallback needed)
-             # Map atom_number to index for lookup
-             atom_num_to_idx = {a['atom_number']: i for i, a in enumerate(self.atoms)}
+        if not bonded_pairs:  # If bonded_pairs empty (failed or fallback needed)
+            # Map atom_number to index for lookup
+            atom_num_to_idx = {a["atom_number"]: i for i, a in enumerate(self.atoms)}
 
-             for _chain_id, residues_in_chain in self.grouped_atoms.items():
+            for _chain_id, residues_in_chain in self.grouped_atoms.items():
                 sorted_res_numbers = sorted(residues_in_chain.keys())
                 for i, res_num in enumerate(sorted_res_numbers):
                     current_res_atoms = residues_in_chain[res_num]
@@ -732,8 +739,8 @@ class PDBValidator:
 
                     def add_pair(a1: Any, a2: Any) -> None:
                         if a1 and a2:
-                            idx1 = atom_num_to_idx.get(a1['atom_number'])
-                            idx2 = atom_num_to_idx.get(a2['atom_number'])
+                            idx1 = atom_num_to_idx.get(a1["atom_number"])
+                            idx2 = atom_num_to_idx.get(a2["atom_number"])
                             if idx1 is not None and idx2 is not None:
                                 bonded_pairs.add(tuple(sorted((idx1, idx2))))
 
@@ -743,7 +750,7 @@ class PDBValidator:
 
                     # Peptide bond
                     if i + 1 < len(sorted_res_numbers):
-                        next_res_atoms = residues_in_chain.get(sorted_res_numbers[i+1])
+                        next_res_atoms = residues_in_chain.get(sorted_res_numbers[i + 1])
                         if next_res_atoms:
                             add_pair(c, next_res_atoms.get("N"))
 
@@ -772,7 +779,9 @@ class PDBValidator:
                     continue
 
                 distance = self._calculate_distance(atom1["coords"], atom2["coords"])
-                logger.debug(f"Steric clash check between atom {atom1['atom_number']} and {atom2['atom_number']}. Distance: {distance:.2f}Å")
+                logger.debug(
+                    f"Steric clash check between atom {atom1['atom_number']} and {atom2['atom_number']}. Distance: {distance:.2f}Å"
+                )
 
                 # General atom-atom minimum distance check
                 if distance < min_atom_distance:
@@ -782,7 +791,6 @@ class PDBValidator:
                         f"Minimum allowed: {min_atom_distance:.2f}Å."
                     )
                     logger.debug(f"Added violation: {self.violations[-1]}")
-
 
                 # Calpha-Calpha minimum distance check for non-consecutive residues
                 if (
@@ -845,7 +853,9 @@ class PDBValidator:
                     p4_ca_curr = current_res_atoms.get("CA")
 
                     if p1_ca_prev and p2_c_prev and p3_n_curr and p4_ca_curr:
-                        logger.debug(f"Omega dihedral calculation for Chain {chain_id}, Residue {prev_res_num}-{current_res_num}:")
+                        logger.debug(
+                            f"Omega dihedral calculation for Chain {chain_id}, Residue {prev_res_num}-{current_res_num}:"
+                        )
                         logger.debug(f"  P1 (CA(i-1)):{p1_ca_prev['coords']}")
                         logger.debug(f"  P2 (C(i-1)): {p2_c_prev['coords']}")
                         logger.debug(f"  P3 (N(i)):   {p3_n_curr['coords']}")
@@ -853,8 +863,8 @@ class PDBValidator:
 
                         omega_angle = self._calculate_dihedral_angle(
                             p1_ca_prev["coords"],  # P1 = CA(i-1)
-                            p2_c_prev["coords"],   # P2 = C(i-1)
-                            p3_n_curr["coords"],   # P3 = N(i)
+                            p2_c_prev["coords"],  # P2 = C(i-1)
+                            p3_n_curr["coords"],  # P3 = N(i)
                             p4_ca_curr["coords"],  # P4 = CA(i)
                         )
                         logger.debug(f"  Calculated Omega Angle: {omega_angle:.2f}°")
@@ -921,8 +931,14 @@ class PDBValidator:
                     # Check for K-D-K, etc. (3 residues)
                     if i + 2 < len(sequence):
                         res3 = sequence[i + 2]
-                        if (res1 in POSITIVE_AMINO_ACIDS and res2 in NEGATIVE_AMINO_ACIDS and res3 in POSITIVE_AMINO_ACIDS) or (
-                            res1 in NEGATIVE_AMINO_ACIDS and res2 in POSITIVE_AMINO_ACIDS and res3 in NEGATIVE_AMINO_ACIDS
+                        if (
+                            res1 in POSITIVE_AMINO_ACIDS
+                            and res2 in NEGATIVE_AMINO_ACIDS
+                            and res3 in POSITIVE_AMINO_ACIDS
+                        ) or (
+                            res1 in NEGATIVE_AMINO_ACIDS
+                            and res2 in POSITIVE_AMINO_ACIDS
+                            and res3 in NEGATIVE_AMINO_ACIDS
                         ):
                             self.violations.append(
                                 f"Sequence improbability (Alternating Charges): Chain {chain_id}, "
@@ -960,8 +976,14 @@ class PDBValidator:
                 ):
                     if i + 2 < len(sequence):
                         res3 = sequence[i + 2]
-                        if (res1 in HYDROPHOBIC_AMINO_ACIDS and res2 in POLAR_UNCHARGED_AMINO_ACIDS and res3 in HYDROPHOBIC_AMINO_ACIDS) or (
-                            res1 in POLAR_UNCHARGED_AMINO_ACIDS and res2 in HYDROPHOBIC_AMINO_ACIDS and res3 in POLAR_UNCHARGED_AMINO_ACIDS
+                        if (
+                            res1 in HYDROPHOBIC_AMINO_ACIDS
+                            and res2 in POLAR_UNCHARGED_AMINO_ACIDS
+                            and res3 in HYDROPHOBIC_AMINO_ACIDS
+                        ) or (
+                            res1 in POLAR_UNCHARGED_AMINO_ACIDS
+                            and res2 in HYDROPHOBIC_AMINO_ACIDS
+                            and res3 in POLAR_UNCHARGED_AMINO_ACIDS
                         ):
                             self.violations.append(
                                 f"Sequence improbability (Alternating H-P): Chain {chain_id}, "
@@ -1085,9 +1107,11 @@ class PDBValidator:
                     next_res_atoms = residues_in_chain.get(next_res_num)
                     if c_atom and next_res_atoms and next_res_atoms.get("N"):
                         next_n_atom = next_res_atoms["N"]
-                        bonded_pairs.add(tuple(sorted((c_atom["atom_number"], next_n_atom["atom_number"]))))
+                        bonded_pairs.add(
+                            tuple(sorted((c_atom["atom_number"], next_n_atom["atom_number"])))
+                        )
 
-        clashing_atom_indices = set() # Store indices of atoms involved in a clash
+        clashing_atom_indices = set()  # Store indices of atoms involved in a clash
 
         for i in range(num_atoms):
             atom1 = modified_atoms[i]
@@ -1095,8 +1119,10 @@ class PDBValidator:
                 atom2 = modified_atoms[j]
 
                 # Skip if atoms are identical or covalently bonded
-                if atom1["atom_number"] == atom2["atom_number"] or \
-                   tuple(sorted((atom1["atom_number"], atom2["atom_number"]))) in bonded_pairs:
+                if (
+                    atom1["atom_number"] == atom2["atom_number"]
+                    or tuple(sorted((atom1["atom_number"], atom2["atom_number"]))) in bonded_pairs
+                ):
                     continue
 
                 distance = PDBValidator._calculate_distance(atom1["coords"], atom2["coords"])
@@ -1129,7 +1155,9 @@ class PDBValidator:
                     vector = atom2["coords"] - atom1["coords"]
                     norm_vector = np.linalg.norm(vector)
 
-                    if norm_vector > 1e-6: # Avoid division by zero if atoms are exactly superimposed
+                    if (
+                        norm_vector > 1e-6
+                    ):  # Avoid division by zero if atoms are exactly superimposed
                         unit_vector = vector / norm_vector
                         # Each atom moves by half the required push
                         modified_atoms[i]["coords"] -= unit_vector * (required_push / 2.0)
@@ -1139,7 +1167,9 @@ class PDBValidator:
 
         # Log how many atoms were tweaked
         if clashing_atom_indices:
-            logger.debug(f"Applied tweaks to {len(clashing_atom_indices)} atoms to resolve steric clashes.")
+            logger.debug(
+                f"Applied tweaks to {len(clashing_atom_indices)} atoms to resolve steric clashes."
+            )
 
         return modified_atoms
 
@@ -1177,20 +1207,25 @@ class PDBValidator:
                 # Needed to select Alpha vs Beta library
                 phi = None
                 if i > 0:
-                    prev_res = residues_in_chain[sorted_res_numbers[i-1]]
-                    if "C" in prev_res and "N" in current_res and "CA" in current_res and "C" in current_res:
+                    prev_res = residues_in_chain[sorted_res_numbers[i - 1]]
+                    if (
+                        "C" in prev_res
+                        and "N" in current_res
+                        and "CA" in current_res
+                        and "C" in current_res
+                    ):
                         phi = self._calculate_dihedral_angle(
                             prev_res["C"]["coords"],
                             current_res["N"]["coords"],
                             current_res["CA"]["coords"],
-                            current_res["C"]["coords"]
+                            current_res["C"]["coords"],
                         )
 
                 # Classify Backbone:
                 # -30 to -90 implies Alpha Helix. Everything else treated as Beta/Other for now.
-                backbone_type = 'beta'
+                backbone_type = "beta"
                 if phi is not None and -90.0 <= phi <= -30.0:
-                    backbone_type = 'alpha'
+                    backbone_type = "alpha"
 
                 # 2. Calculate Measure Chi Angles
                 measured_chis = {}
@@ -1198,8 +1233,8 @@ class PDBValidator:
 
                 chi_defs = AMINO_ACID_CHI_DEFINITIONS[res_name]
                 for chi_def in chi_defs:
-                    chi_name = chi_def['name']
-                    atom_names = chi_def['atoms'] # [N, CA, CB, CG]
+                    chi_name = chi_def["name"]
+                    atom_names = chi_def["atoms"]  # [N, CA, CB, CG]
 
                     coords = []
                     for name in atom_names:
@@ -1210,7 +1245,9 @@ class PDBValidator:
                             break
 
                     if missing_atoms:
-                        logger.debug(f"Skipping Rotamer check for {res_name} {res_num}: missing atoms for {chi_name}.")
+                        logger.debug(
+                            f"Skipping Rotamer check for {res_name} {res_num}: missing atoms for {chi_name}."
+                        )
                         break
 
                     # Calculate Dihedral
@@ -1222,7 +1259,9 @@ class PDBValidator:
 
                 # 3. Check against Library
                 # library_entry is a list of valid rotamers: [{'chi1': [-60], ...}, ...]
-                library_entry = BACKBONE_DEPENDENT_ROTAMER_LIBRARY.get(res_name, {}).get(backbone_type)
+                library_entry = BACKBONE_DEPENDENT_ROTAMER_LIBRARY.get(res_name, {}).get(
+                    backbone_type
+                )
 
                 if not library_entry:
                     # Fallback or skip if not found
@@ -1237,7 +1276,7 @@ class PDBValidator:
 
                     this_rotamer_matches = True
                     for key, val_list in allowed_rotamer.items():
-                        if not key.startswith('chi'):
+                        if not key.startswith("chi"):
                             continue
 
                         if key not in measured_chis:
@@ -1274,7 +1313,6 @@ class PDBValidator:
                         f"({backbone_type}-backbone). Side-chain conformation ({chi_str}) "
                         f"is an Outlier (does not match any allowed {res_name} rotamers within {tolerance}° tolerance)."
                     )
-
 
     def validate_chirality(self) -> None:
         """
@@ -1329,10 +1367,7 @@ class PDBValidator:
                 # NOTE: Current generator produces positive values (~+60°) due to coordinate system
                 # For D-amino acids, the sign will be inverted.
                 improper = self._calculate_dihedral_angle(
-                    n_atom["coords"],
-                    ca_atom["coords"],
-                    c_atom["coords"],
-                    cb_atom["coords"]
+                    n_atom["coords"], ca_atom["coords"], c_atom["coords"], cb_atom["coords"]
                 )
 
                 # Identify if this is a D-amino acid based on the residues list
@@ -1382,9 +1417,10 @@ class PDBValidator:
             import io
 
             from biotite.structure.io.pdb import PDBFile
+
             f = PDBFile.read(io.StringIO(self.pdb_content))
             structure = f.get_structure(model=1)
-        elif hasattr(input_data, 'structure'):
+        elif hasattr(input_data, "structure"):
             structure = input_data.structure
         elif isinstance(input_data, struc.AtomArray):
             structure = input_data
@@ -1393,6 +1429,7 @@ class PDBValidator:
             import io
 
             from biotite.structure.io.pdb import PDBFile
+
             f = PDBFile.read(io.StringIO(str(input_data)))
             structure = f.get_structure(model=1)
 
@@ -1405,11 +1442,7 @@ class PDBValidator:
         psi_deg = np.degrees(psi).tolist()
         omega_deg = np.degrees(omega).tolist()
 
-        return {
-            'phi': phi_deg,
-            'psi': psi_deg,
-            'omega': omega_deg
-        }
+        return {"phi": phi_deg, "psi": psi_deg, "omega": omega_deg}
 
     def validate_all(self) -> None:
         """Run all validation checks."""

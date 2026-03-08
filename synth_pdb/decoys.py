@@ -10,6 +10,7 @@ from .generator import generate_pdb_content
 
 logger = logging.getLogger(__name__)
 
+
 class DecoyGenerator:
     """
     Generates ensembles of protein structures (decoys) with specific properties.
@@ -27,12 +28,12 @@ class DecoyGenerator:
         rmsd_max: float = 999.0,
         optimize: bool = False,
         minimize: bool = False,
-        forcefield: str = 'amber14-all.xml',
+        forcefield: str = "amber14-all.xml",
         hard_mode: bool = False,
         template_sequence: Optional[str] = None,
         shuffle_sequence: bool = False,
         drift: float = 0.0,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
     ) -> list[str]:
         """
         Generates N unique decoys for a given sequence within a target RMSD range.
@@ -97,13 +98,14 @@ class DecoyGenerator:
             seed: Random seed for reproducibility.
         """
         import os
+
         os.makedirs(out_dir, exist_ok=True)
 
         generated_decoys: List[str] = []
         reference_structure = None
 
         attempts = 0
-        max_attempts = n_decoys * 10 # Avoid infinite loop
+        max_attempts = n_decoys * 10  # Avoid infinite loop
 
         logger.info(f"Generating {n_decoys} decoys for sequence length {len(sequence)}...")
 
@@ -126,8 +128,8 @@ class DecoyGenerator:
                     # Generate a template-fold structure first
                     template_pdb = generate_pdb_content(
                         sequence_str=template_sequence,
-                        conformation='random',
-                        seed=attempts + (seed if seed else 0)
+                        conformation="random",
+                        seed=attempts + (seed if seed else 0),
                     )
                     phi_list, psi_list, omega_list = self._extract_backbone_dihedrals(template_pdb)
                     # We thread 'sequence' on this fold
@@ -135,7 +137,7 @@ class DecoyGenerator:
 
                 pdb_content = generate_pdb_content(
                     sequence_str=gen_sequence,
-                    conformation='random',
+                    conformation="random",
                     optimize_sidechains=optimize,
                     minimize_energy=minimize,
                     forcefield=forcefield,
@@ -143,7 +145,7 @@ class DecoyGenerator:
                     drift=drift,
                     phi_list=phi_list,
                     psi_list=psi_list,
-                    omega_list=omega_list
+                    omega_list=omega_list,
                 )
 
                 # Handling Shuffling (Hard Decoy)
@@ -164,7 +166,7 @@ class DecoyGenerator:
 
                     # Accept it
                     filename = os.path.join(out_dir, "decoy_0.pdb")
-                    with open(filename, 'w') as f:
+                    with open(filename, "w") as f:
                         f.write(pdb_content)
                     generated_decoys.append(filename)
                     logger.info("Decoy 0 (Reference) generated.")
@@ -179,12 +181,14 @@ class DecoyGenerator:
                     if rmsd_min <= rmsd <= rmsd_max:
                         idx = len(generated_decoys)
                         filename = os.path.join(out_dir, f"decoy_{idx}.pdb")
-                        with open(filename, 'w') as f:
+                        with open(filename, "w") as f:
                             f.write(pdb_content)
                         generated_decoys.append(filename)
                         logger.info(f"Decoy {idx} accepted (RMSD={rmsd:.2f}A).")
                     else:
-                        logger.debug(f"Decoy rejected (RMSD={rmsd:.2f}A outside {rmsd_min}-{rmsd_max}).")
+                        logger.debug(
+                            f"Decoy rejected (RMSD={rmsd:.2f}A outside {rmsd_min}-{rmsd_max})."
+                        )
 
             except Exception as e:
                 logger.warning(f"Decoy generation failed attempt {attempts}: {e}")
@@ -193,7 +197,9 @@ class DecoyGenerator:
         logger.info(f"Finished. Generated {len(generated_decoys)} decoys.")
         return generated_decoys
 
-    def _extract_backbone_dihedrals(self, pdb_content: str) -> Tuple[List[float], List[float], List[float]]:
+    def _extract_backbone_dihedrals(
+        self, pdb_content: str
+    ) -> Tuple[List[float], List[float], List[float]]:
         """Extracts phi, psi, omega lists from PDB content."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
@@ -218,17 +224,18 @@ class DecoyGenerator:
 
         res_names = []
         for rid in res_ids:
-             res_names.append(structure[structure.res_id == rid].res_name[0])
+            res_names.append(structure[structure.res_id == rid].res_name[0])
 
         # Shuffle labels
         shuffled_names = res_names.copy()
         import random
+
         random.shuffle(shuffled_names)
 
         # Map back
         name_map = dict(zip(res_ids, shuffled_names))
         for i in range(len(structure)):
-             structure.res_name[i] = name_map[structure.res_id[i]]
+            structure.res_name[i] = name_map[structure.res_id[i]]
 
         out_f = pdb.PDBFile()
         out_f.set_structure(structure)

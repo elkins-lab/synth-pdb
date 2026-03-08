@@ -1,4 +1,3 @@
-
 """
 Cofactor and Metal Ion Coordination Module.
 
@@ -26,7 +25,10 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-def find_metal_binding_sites(structure: struc.AtomArray, distance_threshold: float = 10.0) -> List[Dict]:
+
+def find_metal_binding_sites(
+    structure: struc.AtomArray, distance_threshold: float = 10.0
+) -> List[Dict]:
     """
     Scans the structure for clusters of residues that could coordinate a metal ion.
 
@@ -41,9 +43,9 @@ def find_metal_binding_sites(structure: struc.AtomArray, distance_threshold: flo
 
     # Standard ligands for Zinc
     # CYS (SG), HIS (NE2 or ND1) - including HID/HIE/HIP variants
-    ligand_mask = (
-        ((structure.res_name == "CYS") & (structure.atom_name == "SG")) |
-        ((np.isin(structure.res_name, ["HIS", "HID", "HIE", "HIP"])) & ((structure.atom_name == "NE2") | (structure.atom_name == "ND1")))
+    ligand_mask = ((structure.res_name == "CYS") & (structure.atom_name == "SG")) | (
+        (np.isin(structure.res_name, ["HIS", "HID", "HIE", "HIP"]))
+        & ((structure.atom_name == "NE2") | (structure.atom_name == "ND1"))
     )
 
     candidate_indices = np.where(ligand_mask)[0]
@@ -66,7 +68,8 @@ def find_metal_binding_sites(structure: struc.AtomArray, distance_threshold: flo
         neighbor_mask = dists < distance_threshold
         # Only take neighbors that aren't already assigned
         unassigned_neighbors = [
-            candidate_indices[j] for j in range(len(candidate_indices))
+            candidate_indices[j]
+            for j in range(len(candidate_indices))
             if neighbor_mask[j] and candidate_indices[j] not in assigned_indices
         ]
 
@@ -75,16 +78,14 @@ def find_metal_binding_sites(structure: struc.AtomArray, distance_threshold: flo
         if len(unassigned_neighbors) >= 4:
             # Sort by distance to center if we had more than 4, but 4 is the sweet spot
             cluster = unassigned_neighbors[:4]
-            sites.append({
-                "type": "ZN",
-                "ligand_indices": cluster
-            })
+            sites.append({"type": "ZN", "ligand_indices": cluster})
             for idx in cluster:
                 assigned_indices.add(idx)
 
     if sites:
         logger.info(f"Found {len(sites)} potential metal binding sites.")
     return sites
+
 
 def add_metal_ion(structure: struc.AtomArray, site: Dict) -> struc.AtomArray:
     """
@@ -108,7 +109,7 @@ def add_metal_ion(structure: struc.AtomArray, site: Dict) -> struc.AtomArray:
     ion = struc.AtomArray(1)
     ion.res_name = np.array([ion_type])
     ion.atom_name = np.array([ion_type])
-    ion.element = np.array([ion_type]) # "ZN" not "Z" for Zinc
+    ion.element = np.array([ion_type])  # "ZN" not "Z" for Zinc
     ion.coord = np.array([centroid])
 
     # Metadata

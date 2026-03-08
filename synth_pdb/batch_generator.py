@@ -47,13 +47,21 @@ from .geometry import position_atoms_batch, superimpose_batch
 #    by NumPy, it is IMMEDIATELY visible to the Metal/MLX GPU without any
 #    data movement.
 
+
 class BatchedPeptide:
     """
     A lightweight container for batched protein coordinates.
     Designed for high-performance handover to ML frameworks.
     """
-    def __init__(self, coords: np.ndarray, sequence: List[str], atom_names: List[str], residue_indices: List[int]):
-        self.coords = coords # (B, N_atoms, 3)
+
+    def __init__(
+        self,
+        coords: np.ndarray,
+        sequence: List[str],
+        atom_names: List[str],
+        residue_indices: List[int],
+    ):
+        self.coords = coords  # (B, N_atoms, 3)
         self.sequence = sequence
         self.atom_names = atom_names
         self.residue_indices = residue_indices
@@ -64,14 +72,18 @@ class BatchedPeptide:
     def __len__(self) -> int:
         return int(self.n_structures)
 
-    def __getitem__(self, index: int) -> 'BatchedPeptide':
+    def __getitem__(self, index: int) -> "BatchedPeptide":
         if isinstance(index, int):
-            return BatchedPeptide(self.coords[index:index+1], self.sequence, self.atom_names, self.residue_indices)
-        return BatchedPeptide(self.coords[index], self.sequence, self.atom_names, self.residue_indices)
+            return BatchedPeptide(
+                self.coords[index : index + 1], self.sequence, self.atom_names, self.residue_indices
+            )
+        return BatchedPeptide(
+            self.coords[index], self.sequence, self.atom_names, self.residue_indices
+        )
 
     def save_pdb(self, path: str, index: int = 0) -> None:
         """Saves one structure from the batch to a PDB file."""
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.write(self.to_pdb(index))
 
     def to_pdb(self, index: int = 0) -> str:
@@ -95,13 +107,13 @@ class BatchedPeptide:
 
             # Element is the first non-numeric char of the stripped name
             import re
+
             match = re.search(r"[A-Z]", clean_name)
             element = match.group(0) if match else "C"
 
-            lines.append(fmt.format(
-                i + 1, atom_field, res_name, res_idx,
-                c[i, 0], c[i, 1], c[i, 2], element
-            ))
+            lines.append(
+                fmt.format(i + 1, atom_field, res_name, res_idx, c[i, 0], c[i, 1], c[i, 2], element)
+            )
         lines.append("TER")
         lines.append("END")
         return "\n".join(lines)
@@ -112,18 +124,18 @@ class BatchedPeptide:
         Returns a dictionary of (B, L, L) tensors: dist, omega, theta, phi.
         """
         from .orientogram import compute_6d_orientations
+
         return compute_6d_orientations(
-            self.coords,
-            self.atom_names,
-            self.residue_indices,
-            self.n_residues
+            self.coords, self.atom_names, self.residue_indices, self.n_residues
         )
+
 
 class BatchedGenerator:
     """
     High-performance vectorized protein structure generator.
     Optimized for generating millions of labeled samples for AI training.
     """
+
     def __init__(self, sequence_str: str, n_batch: int = 1, full_atom: bool = False):
         # Resolve sequence
         if "-" in sequence_str:
@@ -135,7 +147,7 @@ class BatchedGenerator:
                     skip = False
                     continue
                 if p == "D" and i + 1 < len(raw_parts):
-                    next_p = raw_parts[i+1]
+                    next_p = raw_parts[i + 1]
                     if len(next_p) == 1:
                         next_p = ONE_TO_THREE_LETTER_CODE.get(next_p, next_p)
                     resolved.append(f"D-{next_p}")
@@ -196,7 +208,9 @@ class BatchedGenerator:
 
         self.total_atoms = current_offset
 
-    def generate_batch(self, seed: Optional[int] = None, conformation: str = 'alpha', drift: float = 0.0) -> BatchedPeptide:
+    def generate_batch(
+        self, seed: Optional[int] = None, conformation: str = "alpha", drift: float = 0.0
+    ) -> BatchedPeptide:
         """
         Generates B structures in parallel.
 
@@ -214,7 +228,6 @@ class BatchedGenerator:
             np.random.seed(seed)
             random.seed(seed)
 
-
         b = self.n_batch
         length = self.n_res
 
@@ -223,19 +236,19 @@ class BatchedGenerator:
         coords = np.zeros((b, n_atoms, 3))
 
         # 1. Place first residue (N, CA, C) at origin frame
-        coords[:, 0] = [0, 0, 0] # N
-        coords[:, 1] = [BOND_LENGTH_N_CA, 0, 0] # CA
+        coords[:, 0] = [0, 0, 0]  # N
+        coords[:, 1] = [BOND_LENGTH_N_CA, 0, 0]  # CA
         ang = np.deg2rad(ANGLE_N_CA_C)
         coords[:, 2] = [
             BOND_LENGTH_N_CA - BOND_LENGTH_CA_C * np.cos(ang),
             BOND_LENGTH_CA_C * np.sin(ang),
-            0
+            0,
         ]
 
         # Resolve preset angles
-        preset = RAMACHANDRAN_PRESETS.get(conformation, RAMACHANDRAN_PRESETS['alpha'])
-        p_phi = preset['phi']
-        p_psi = preset['psi']
+        preset = RAMACHANDRAN_PRESETS.get(conformation, RAMACHANDRAN_PRESETS["alpha"])
+        p_phi = preset["phi"]
+        p_psi = preset["psi"]
 
         # Sample torsions for the entire batch (b, length)
         phi = np.full((b, length), p_phi)
@@ -245,7 +258,7 @@ class BatchedGenerator:
         if drift > 0:
             phi += np.random.normal(0, drift, (b, length))
             psi += np.random.normal(0, drift, (b, length))
-            omega += np.random.normal(0, 2.0, (b, length)) # Fixed small omega drift
+            omega += np.random.normal(0, 2.0, (b, length))  # Fixed small omega drift
 
         # EDUCATIONAL NOTE - Peptidyl Chain Walk:
         # We construct the chain N -> CA -> C iteratively.
@@ -258,28 +271,40 @@ class BatchedGenerator:
             if i == 0:
                 # Place O(0) using N(0), CA(0), C(0)
                 p1, p2, p3 = coords[:, 0], coords[:, 1], coords[:, 2]
-                bl, ba, di = np.full(b, BOND_LENGTH_C_O), np.full(b, ANGLE_CA_C_O), np.full(b, 180.0)
+                bl, ba, di = (
+                    np.full(b, BOND_LENGTH_C_O),
+                    np.full(b, ANGLE_CA_C_O),
+                    np.full(b, 180.0),
+                )
                 coords[:, 3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
             else:
                 # Place N(i) using N(i-1), CA(i-1), C(i-1)
-                p1, p2, p3 = coords[:, (i-1)*4], coords[:, (i-1)*4+1], coords[:, (i-1)*4+2]
-                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i-1]  # type: ignore[assignment]
+                p1, p2, p3 = (
+                    coords[:, (i - 1) * 4],
+                    coords[:, (i - 1) * 4 + 1],
+                    coords[:, (i - 1) * 4 + 2],
+                )
+                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i - 1]  # type: ignore[assignment]
                 coords[:, idx] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place CA(i) using CA(i-1), C(i-1), N(i)
-                p1, p2, p3 = coords[:, (i-1)*4+1], coords[:, (i-1)*4+2], coords[:, idx]
-                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i-1]  # type: ignore[assignment]
-                coords[:, idx+1] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
+                p1, p2, p3 = coords[:, (i - 1) * 4 + 1], coords[:, (i - 1) * 4 + 2], coords[:, idx]
+                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i - 1]  # type: ignore[assignment]
+                coords[:, idx + 1] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place C(i) using C(i-1), N(i), CA(i)
-                p1, p2, p3 = coords[:, (i-1)*4+2], coords[:, idx], coords[:, idx+1]
+                p1, p2, p3 = coords[:, (i - 1) * 4 + 2], coords[:, idx], coords[:, idx + 1]
                 bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]  # type: ignore[assignment]
-                coords[:, idx+2] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
+                coords[:, idx + 2] = position_atoms_batch(p1, p2, p3, bl, ba, di)  # type: ignore[assignment]
 
                 # Place O(i) using N(i), CA(i), C(i)
-                p1, p2, p3 = coords[:, idx], coords[:, idx+1], coords[:, idx+2]
-                bl, ba, di = np.full(b, BOND_LENGTH_C_O), np.full(b, ANGLE_CA_C_O), np.full(b, 180.0)
-                coords[:, idx+3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                p1, p2, p3 = coords[:, idx], coords[:, idx + 1], coords[:, idx + 2]
+                bl, ba, di = (
+                    np.full(b, BOND_LENGTH_C_O),
+                    np.full(b, ANGLE_CA_C_O),
+                    np.full(b, 180.0),
+                )
+                coords[:, idx + 3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
 
         # 3. Full-Atom Superimposition
         if self.full_atom:
@@ -289,10 +314,10 @@ class BatchedGenerator:
             for i in range(length):
                 # Target backbone frame (b, 3, 3) from the NeRF backbone
                 # NeRF backbone order: N(0), CA(1), C(2), O(3)
-                target_n = coords[:, i*4]
-                target_ca = coords[:, i*4+1]
-                target_c = coords[:, i*4+2]
-                target_bb = np.stack([target_n, target_ca, target_c], axis=1) # (b, 3, 3)
+                target_n = coords[:, i * 4]
+                target_ca = coords[:, i * 4 + 1]
+                target_c = coords[:, i * 4 + 2]
+                target_bb = np.stack([target_n, target_ca, target_c], axis=1)  # (b, 3, 3)
 
                 # Source backbone frame (3, 3)
                 template_bb = self.template_backbones[i]
@@ -314,8 +339,10 @@ class BatchedGenerator:
                 # Write to global tensor
                 offset = self.offsets[i]
                 n_res_atoms = template_coords.shape[0]
-                fa_coords[:, offset:offset+n_res_atoms] = aligned
+                fa_coords[:, offset : offset + n_res_atoms] = aligned
 
             return BatchedPeptide(fa_coords, self.sequence, self.atom_names, self.residue_indices)
 
-        return BatchedPeptide(coords, self.sequence, ["N", "CA", "C", "O"] * length, self.residue_indices)
+        return BatchedPeptide(
+            coords, self.sequence, ["N", "CA", "C", "O"] * length, self.residue_indices
+        )

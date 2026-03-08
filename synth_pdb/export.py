@@ -1,8 +1,13 @@
-
 import numpy as np
 
 
-def export_constraints(contact_map: np.ndarray, sequence: str, fmt: str = "casp", separation_cutoff: int = 0, threshold: float = 8.0) -> str:
+def export_constraints(
+    contact_map: np.ndarray,
+    sequence: str,
+    fmt: str = "casp",
+    separation_cutoff: int = 0,
+    threshold: float = 8.0,
+) -> str:
     """
     Export a Contact Map or Distance Matrix to text format for AI modeling.
 
@@ -61,10 +66,10 @@ def export_constraints(contact_map: np.ndarray, sequence: str, fmt: str = "casp"
                 val = contact_map[i, j]
                 if is_distance_matrix:
                     if val <= threshold:
-                        lines.append(f"{i+1},{j+1},{val:.5f}")
+                        lines.append(f"{i + 1},{j + 1},{val:.5f}")
                 else:
                     if val > 0.0:
-                        lines.append(f"{i+1},{j+1},{val:.5f}")
+                        lines.append(f"{i + 1},{j + 1},{val:.5f}")
 
     else:
         raise ValueError(f"Unknown format: {fmt}")

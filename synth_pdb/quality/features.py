@@ -9,7 +9,8 @@ from synth_pdb.validator import RAMACHANDRAN_POLYGONS, PDBValidator
 logger = logging.getLogger(__name__)
 
 # Re-export core function for Latent Space Explorer
-__all__ = ['compute_6d_orientations', 'extract_quality_features', 'get_feature_names']
+__all__ = ["compute_6d_orientations", "extract_quality_features", "get_feature_names"]
+
 
 def get_feature_names() -> List[str]:
     """Returns the list of feature names in the order they appear in the feature vector."""
@@ -21,8 +22,9 @@ def get_feature_names() -> List[str]:
         "bond_angle_violation_count",
         "peptide_bond_violation_count",
         "radius_of_gyration",
-        "mean_b_factor"
+        "mean_b_factor",
     ]
+
 
 def extract_quality_features(pdb_content: str) -> np.ndarray:
     """
@@ -57,7 +59,9 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
         # --- Steric Clashes ---
         # backbone_only=True reduces noise from sidechain generation artefacts.
         initial_violations = len(validator.violations)
-        validator.validate_steric_clashes(min_atom_distance=0.5, min_ca_distance=3.0, backbone_only=True)
+        validator.validate_steric_clashes(
+            min_atom_distance=0.5, min_ca_distance=3.0, backbone_only=True
+        )
         clash_count = len(validator.violations) - initial_violations
 
         # --- Bond Lengths (0.1 Å tolerance) ---
@@ -76,11 +80,13 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
         peptide_plane_count = len(validator.violations) - initial_violations
 
         # --- Global Properties ---
-        coords = np.array([atom['coords'] for atom in validator.atoms])
-        b_factors = np.array([atom['temp_factor'] for atom in validator.atoms])
+        coords = np.array([atom["coords"] for atom in validator.atoms])
+        b_factors = np.array([atom["temp_factor"] for atom in validator.atoms])
 
         # Number of residues used for per-residue normalisation of violation counts.
-        num_residues: float = float(max(1, sum(len(res_dict) for res_dict in validator.grouped_atoms.values())))
+        num_residues: float = float(
+            max(1, sum(len(res_dict) for res_dict in validator.grouped_atoms.values()))
+        )
 
         # Radius of Gyration
         rg = 0.0
@@ -90,16 +96,18 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
 
         mean_b_factor = np.mean(b_factors) if len(b_factors) > 0 else 0.0
 
-        return np.array([
-            rama_favored_pct,
-            rama_outliers_pct,
-            float(clash_count) / num_residues,
-            float(bond_len_count) / num_residues,
-            float(bond_ang_count) / num_residues,
-            float(peptide_plane_count) / num_residues,
-            rg,
-            mean_b_factor,
-        ])
+        return np.array(
+            [
+                rama_favored_pct,
+                rama_outliers_pct,
+                float(clash_count) / num_residues,
+                float(bond_len_count) / num_residues,
+                float(bond_ang_count) / num_residues,
+                float(peptide_plane_count) / num_residues,
+                rg,
+                mean_b_factor,
+            ]
+        )
 
     except Exception as e:
         logger.error(
@@ -109,6 +117,7 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
             exc_info=True,
         )
         raise
+
 
 def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
     """Extracts Phi/Psi angles from the validator's parsed atoms."""
@@ -160,7 +169,10 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
 
     return phi_list, psi_list
 
-def _analyze_ramachandran(phi_list: List[float], psi_list: List[float], validator: PDBValidator) -> Tuple[int, int]:
+
+def _analyze_ramachandran(
+    phi_list: List[float], psi_list: List[float], validator: PDBValidator
+) -> Tuple[int, int]:
     """Counts favored and outlier residues."""
     favored = 0
     outliers = 0

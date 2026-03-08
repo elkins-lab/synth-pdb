@@ -1,4 +1,3 @@
-
 """
 Evolutionary Simulation Module for Synthetic PDB.
 
@@ -27,13 +26,14 @@ logger = logging.getLogger(__name__)
 # For simulation, we classify amino acids to define "safe" mutations.
 
 # Hydrophobic Core residues (Non-polar)
-CORE_ALLOWED = {'A', 'V', 'I', 'L', 'M', 'F', 'W', 'Y'}
+CORE_ALLOWED = {"A", "V", "I", "L", "M", "F", "W", "Y"}
 # Note: Y/W are aromatic but can be buried. A is small and ambivalent.
 
 # Surface residues (Polar/Charged/All)
 # In reality any AA can be on surface, but polar/charged are favored.
 # For simplicity in Neutral Drift, we allow ANY mutation on surface, assuming water accommodates.
 ALL_AMINO_ACIDS = list("ACDEFGHIKLMNPQRSTVWY")
+
 
 def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     """
@@ -57,7 +57,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     try:
         # Get standard vdW radii for atoms
         # Biotite 0.38+ supports this
-        sasa = struc.sasa(atom_array, probe_radius=1.4) # 1.4Å is radius of water molecule
+        sasa = struc.sasa(atom_array, probe_radius=1.4)  # 1.4Å is radius of water molecule
     except Exception as e:
         logger.warning(f"SASA Check failed ({e}). Falling back to dummy SASA (all exposed).")
         # Fallback if libraries missing or structure invalid
@@ -78,21 +78,39 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     # or implement real max values.
     # Implementing approximate Max SASA (in Å²) for X in G-X-G
     max_sasa = {
-        'A': 121, 'R': 265, 'N': 187, 'D': 187, 'C': 148, 'Q': 214, 'E': 214,
-        'G': 97,  'H': 216, 'I': 195, 'L': 191, 'K': 230, 'M': 203, 'F': 228,
-        'P': 154, 'S': 143, 'T': 163, 'W': 264, 'Y': 255, 'V': 165
+        "A": 121,
+        "R": 265,
+        "N": 187,
+        "D": 187,
+        "C": 148,
+        "Q": 214,
+        "E": 214,
+        "G": 97,
+        "H": 216,
+        "I": 195,
+        "L": 191,
+        "K": 230,
+        "M": 203,
+        "F": 228,
+        "P": 154,
+        "S": 143,
+        "T": 163,
+        "W": 264,
+        "Y": 255,
+        "V": 165,
     }
 
     # Get residue names to look up max
     # We iterate residue starts
     res_names = [atom_array.res_name[i] for i in struc.get_residue_starts(atom_array)]
     from .data import ONE_TO_THREE_LETTER_CODE
+
     three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
 
     rel_sasa = []
     for i, area in enumerate(res_sasa):
         res_3 = res_names[i]
-        res_1 = three_to_one.get(res_3, 'A')
+        res_1 = three_to_one.get(res_3, "A")
         max_area = max_sasa.get(res_1, 200.0)
         rel_sasa.append(min(1.0, area / max_area))
 
@@ -103,7 +121,7 @@ def generate_msa_sequences(
     structure: struc.AtomArray,
     n_seqs: int = 100,
     mutation_rate: float = 0.1,
-    conservation_threshold: float = 0.2
+    conservation_threshold: float = 0.2,
 ) -> List[str]:
     """
     Generate synthetic homologs via simulated neutral drift.
@@ -123,8 +141,9 @@ def generate_msa_sequences(
     # Get initial sequence
     res_names = [structure.res_name[i] for i in struc.get_residue_starts(structure)]
     from .data import ONE_TO_THREE_LETTER_CODE
+
     three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
-    initial_seq = [three_to_one.get(r, 'A') for r in res_names]
+    initial_seq = [three_to_one.get(r, "A") for r in res_names]
 
     msa = []
     logger.info(f"Simulating evolution for {n_seqs} generations...")
@@ -155,6 +174,7 @@ def generate_msa_sequences(
         msa.append("".join(new_seq))
 
     return msa
+
 
 def write_msa(sequences: List[str], filename: str) -> None:
     """

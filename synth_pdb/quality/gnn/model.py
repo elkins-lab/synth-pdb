@@ -124,8 +124,7 @@ def _check_pyg() -> None:
         import torch_geometric  # noqa: F401
     except ImportError as exc:
         raise ImportError(
-            "torch and torch_geometric are required. "
-            "Install with: pip install synth-pdb[gnn]"
+            "torch and torch_geometric are required. Install with: pip install synth-pdb[gnn]"
         ) from exc
 
 
@@ -153,8 +152,13 @@ class ProteinGNN:
         # out: [batch_size, 2] log-probabilities (Good class = index 1)
     """
 
-    def __new__(cls, node_features: int = 8, edge_features: int = 2,
-                hidden_dim: int = 64, num_classes: int = 2) -> Any:
+    def __new__(
+        cls,
+        node_features: int = 8,
+        edge_features: int = 2,
+        hidden_dim: int = 64,
+        num_classes: int = 2,
+    ) -> Any:
         _check_pyg()
         import torch.nn as nn
         import torch.nn.functional as functional
@@ -196,8 +200,12 @@ class ProteinGNN:
                 # contact-graph steps.  For a 20-residue alpha helix that is
                 # typically the entire protein.
                 self.conv1 = GATConv(
-                    node_features, hidden_dim,
-                    heads=4, concat=False, edge_dim=edge_features, dropout=0.1
+                    node_features,
+                    hidden_dim,
+                    heads=4,
+                    concat=False,
+                    edge_dim=edge_features,
+                    dropout=0.1,
                 )
                 # BatchNorm1d normalises each feature across the mini-batch.
                 # This prevents "covariate shift" between layers and stabilises
@@ -205,14 +213,22 @@ class ProteinGNN:
                 self.bn1 = nn.BatchNorm1d(hidden_dim)
 
                 self.conv2 = GATConv(
-                    hidden_dim, hidden_dim,
-                    heads=4, concat=False, edge_dim=edge_features, dropout=0.1
+                    hidden_dim,
+                    hidden_dim,
+                    heads=4,
+                    concat=False,
+                    edge_dim=edge_features,
+                    dropout=0.1,
                 )
                 self.bn2 = nn.BatchNorm1d(hidden_dim)
 
                 self.conv3 = GATConv(
-                    hidden_dim, hidden_dim,
-                    heads=4, concat=False, edge_dim=edge_features, dropout=0.1
+                    hidden_dim,
+                    hidden_dim,
+                    heads=4,
+                    concat=False,
+                    edge_dim=edge_features,
+                    dropout=0.1,
                 )
                 self.bn3 = nn.BatchNorm1d(hidden_dim)
 
@@ -292,7 +308,7 @@ class ProteinGNN:
                 #     z_G = (1/N) Σ_v h_v^(3)
                 # The ``batch`` vector tells PyG which protein each node
                 # belongs to so it averages correctly across the batch.
-                x = global_mean_pool(x, batch)   # [batch_size, hidden_dim]
+                x = global_mean_pool(x, batch)  # [batch_size, hidden_dim]
 
                 # ── MLP classification head ────────────────────────────────
                 x = self.lin1(x)
@@ -300,7 +316,7 @@ class ProteinGNN:
                 # Dropout is only active during .train() mode; disabled in
                 # .eval() mode (inference), which is the correct behaviour.
                 x = self.dropout(x)
-                x = self.lin2(x)   # raw logits [batch_size, 2]
+                x = self.lin2(x)  # raw logits [batch_size, 2]
 
                 # log_softmax is numerically more stable than log(softmax(x)).
                 # Combined with nn.NLLLoss it is mathematically equivalent to

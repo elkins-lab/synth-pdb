@@ -72,22 +72,13 @@ logger = logging.getLogger(__name__)
 
 
 # This constant is used in test_generator.py for coordinate calculations.
-CA_DISTANCE = (
-    3.8  # Approximate C-alpha to C-alpha distance in Angstroms for a linear chain
-)
+CA_DISTANCE = 3.8  # Approximate C-alpha to C-alpha distance in Angstroms for a linear chain
 
 PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_name: >3} {chain_id: <1}{residue_number: >4}{insertion_code: <1}   {x_coord: >8.3f}{y_coord: >8.3f}{z_coord: >8.3f}{occupancy: >6.2f}{temp_factor: >6.2f}          {element: >2}{charge: >2}"
 
 
-
-
-
 def _calculate_bfactor(
-    atom_name: str,
-    residue_number: int,
-    total_residues: int,
-    residue_name: str,
-    s2: float = 0.85
+    atom_name: str, residue_number: int, total_residues: int, residue_name: str, s2: float = 0.85
 ) -> float:
     """
     Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
@@ -144,7 +135,7 @@ def _calculate_bfactor(
         B-factor value in Ų, rounded to 2 decimal places
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
-    backbone_atoms = {'N', 'CA', 'C', 'O', 'H', 'HA'}
+    backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
 
     # Base physics: B-factor inversely related to Order Parameter
     # Calibration:
@@ -165,9 +156,9 @@ def _calculate_bfactor(
         base_bfactor *= 1.5  # Side chains are more mobile than backbone
 
     # Residue-specific adjustments
-    if residue_name == 'GLY':
+    if residue_name == "GLY":
         base_bfactor += 5.0
-    elif residue_name == 'PRO':
+    elif residue_name == "PRO":
         base_bfactor -= 3.0
 
     # Add small random variation
@@ -183,14 +174,10 @@ def _calculate_bfactor(
 
 
 def _calculate_occupancy(
-    atom_name: str,
-    residue_number: int,
-    total_residues: int,
-    residue_name: str,
-    bfactor: float
+    atom_name: str, residue_number: int, total_residues: int, residue_name: str, bfactor: float
 ) -> float:
     """Calculate realistic occupancy for an atom (0.85-1.00)."""
-    backbone_atoms = {'N', 'CA', 'C', 'O', 'H', 'HA'}
+    backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
 
     # Base occupancy
     base_occupancy = 0.98 if atom_name in backbone_atoms else 0.95
@@ -203,9 +190,9 @@ def _calculate_occupancy(
 
     # Residue-specific
     residue_factor = 0.0
-    if residue_name in ['GLY', 'SER', 'ASN', 'GLN']:
+    if residue_name in ["GLY", "SER", "ASN", "GLN"]:
         residue_factor = -0.03
-    elif residue_name in ['PRO', 'TRP', 'PHE']:
+    elif residue_name in ["PRO", "TRP", "PHE"]:
         residue_factor = +0.02
 
     # B-factor correlation
@@ -216,7 +203,9 @@ def _calculate_occupancy(
     random_variation = np.random.uniform(-0.01, 0.01)
 
     # Calculate and clamp
-    occupancy = base_occupancy + terminal_factor + residue_factor + bfactor_correlation + random_variation
+    occupancy = (
+        base_occupancy + terminal_factor + residue_factor + bfactor_correlation + random_variation
+    )
     occupancy = max(0.85, min(1.00, occupancy))
 
     return round(occupancy, 2)
@@ -236,7 +225,7 @@ def create_atom_line(
     alt_loc: str = "",
     insertion_code: str = "",
     temp_factor: float = 0.00,  # B-factor (temperature factor) in Ų
-    occupancy: float = 1.00  # Occupancy (fraction of molecules)
+    occupancy: float = 1.00,  # Occupancy (fraction of molecules)
 ) -> str:
     """
     Create a PDB ATOM line.
@@ -253,13 +242,14 @@ def create_atom_line(
         f"{element: >2}  "
     )
 
+
 def _place_atom_with_dihedral(
     atom1: np.ndarray,
     atom2: np.ndarray,
     atom3: np.ndarray,
     bond_length: float,
     bond_angle: float,
-    dihedral: float
+    dihedral: float,
 ) -> np.ndarray:
     """
     Place a new atom using bond length, angle, and dihedral.
@@ -267,9 +257,13 @@ def _place_atom_with_dihedral(
     Wrapper around position_atom_3d_from_internal_coords with clearer naming.
     """
     import typing
-    return typing.cast(np.ndarray, position_atom_3d_from_internal_coords(
-        atom1, atom2, atom3, bond_length, bond_angle, dihedral
-    ))
+
+    return typing.cast(
+        np.ndarray,
+        position_atom_3d_from_internal_coords(
+            atom1, atom2, atom3, bond_length, bond_angle, dihedral
+        ),
+    )
 
 
 def _generate_random_amino_acid_sequence(
@@ -332,7 +326,7 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
     disulfides: List[Tuple[int, int]] = []
 
     # Find all CYS/CYX residues
-    cys_residues = peptide[(peptide.res_name == 'CYS') | (peptide.res_name == 'CYX')]
+    cys_residues = peptide[(peptide.res_name == "CYS") | (peptide.res_name == "CYX")]
 
     if len(cys_residues) < 2:
         return disulfides  # Need at least 2 CYS for a bond
@@ -342,16 +336,16 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 
     # Check all pairs of CYS residues
     for i, res_id1 in enumerate(cys_res_ids):
-        for res_id2 in cys_res_ids[i+1:]:  # Avoid duplicates
+        for res_id2 in cys_res_ids[i + 1 :]:  # Avoid duplicates
             # Get SG atoms for both residues
-            sg1 = peptide[(peptide.res_id == res_id1) & (peptide.atom_name == 'SG')]
-            sg2 = peptide[(peptide.res_id == res_id2) & (peptide.atom_name == 'SG')]
+            sg1 = peptide[(peptide.res_id == res_id1) & (peptide.atom_name == "SG")]
+            sg2 = peptide[(peptide.res_id == res_id2) & (peptide.atom_name == "SG")]
 
             if len(sg1) > 0 and len(sg2) > 0:
                 # Calculate distance
                 p1 = sg1[0].coord
                 p2 = sg2[0].coord
-                distance = np.sqrt(np.sum((p1 - p2)**2))
+                distance = np.sqrt(np.sum((p1 - p2) ** 2))
 
                 # Check if within disulfide bond range
                 # Minimized structures can be highly strained (especially small cyclic rings),
@@ -363,7 +357,7 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
     return disulfides
 
 
-def _generate_ssbond_records(disulfides: list, chain_id: str = 'A') -> str:
+def _generate_ssbond_records(disulfides: list, chain_id: str = "A") -> str:
     """
     Generate SSBOND records for PDB header.
 
@@ -417,7 +411,9 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = 'A') -> str:
 
 
 def _resolve_sequence(
-    length: Optional[int], user_sequence_str: Optional[str] = None, use_plausible_frequencies: bool = False
+    length: Optional[int],
+    user_sequence_str: Optional[str] = None,
+    use_plausible_frequencies: bool = False,
 ) -> List[str]:
     """
     Resolves the amino acid sequence, either by parsing a user-provided sequence
@@ -433,7 +429,9 @@ def _resolve_sequence(
             # we should preserve them.
 
             # Simple fix: join them back if they were part of a D- moiety
-            raw_splits = [s.strip().upper() for s in user_sequence_str_upper.split("-") if s.strip()]
+            raw_splits = [
+                s.strip().upper() for s in user_sequence_str_upper.split("-") if s.strip()
+            ]
             amino_acids = []
             skip_next = False
             for j, part in enumerate(raw_splits):
@@ -441,7 +439,7 @@ def _resolve_sequence(
                     skip_next = False
                     continue
                 if part == "D" and j + 1 < len(raw_splits):
-                    next_p = raw_splits[j+1]
+                    next_p = raw_splits[j + 1]
                     if len(next_p) == 1:
                         next_p = ONE_TO_THREE_LETTER_CODE.get(next_p, next_p)
                     amino_acids.append(f"D-{next_p}")
@@ -457,10 +455,7 @@ def _resolve_sequence(
                 if base_aa not in ALL_VALID_AMINO_ACIDS:
                     raise ValueError(f"Invalid 3-letter amino acid code: {aa}")
             return amino_acids
-        elif (
-            len(user_sequence_str_upper) == 3
-            and user_sequence_str_upper in ALL_VALID_AMINO_ACIDS
-        ):
+        elif len(user_sequence_str_upper) == 3 and user_sequence_str_upper in ALL_VALID_AMINO_ACIDS:
             # It's a single 3-letter amino acid code
             return [user_sequence_str_upper]
         else:
@@ -468,9 +463,7 @@ def _resolve_sequence(
             amino_acids = []
             for one_letter_code in user_sequence_str_upper:
                 if one_letter_code not in ONE_TO_THREE_LETTER_CODE:
-                    raise ValueError(
-                        f"Invalid 1-letter amino acid code: {one_letter_code}"
-                    )
+                    raise ValueError(f"Invalid 1-letter amino acid code: {one_letter_code}")
                 amino_acids.append(ONE_TO_THREE_LETTER_CODE[one_letter_code])
             return amino_acids
     else:
@@ -480,7 +473,9 @@ def _resolve_sequence(
         )
 
 
-def _sample_ramachandran_angles(res_name: str, next_res_name: Optional[str] = None) -> Tuple[float, float]:
+def _sample_ramachandran_angles(
+    res_name: str, next_res_name: Optional[str] = None
+) -> Tuple[float, float]:
     """
     Sample phi/psi angles from Ramachandran probability distribution.
 
@@ -506,24 +501,24 @@ def _sample_ramachandran_angles(res_name: str, next_res_name: Optional[str] = No
     if res_name in RAMACHANDRAN_REGIONS:
         # GLY or PRO specific maps take precedence
         regions = RAMACHANDRAN_REGIONS[res_name]
-    elif next_res_name == 'PRO':
+    elif next_res_name == "PRO":
         # Pre-Proline effect!
         # Standard residues (ALA, VAL, etc) before Proline have restricted conformation.
-        regions = RAMACHANDRAN_REGIONS.get('PRE_PRO', RAMACHANDRAN_REGIONS['general'])
+        regions = RAMACHANDRAN_REGIONS.get("PRE_PRO", RAMACHANDRAN_REGIONS["general"])
     else:
-        regions = RAMACHANDRAN_REGIONS['general']
+        regions = RAMACHANDRAN_REGIONS["general"]
 
     # Get favored regions
-    favored_regions = regions['favored']
-    weights = [r['weight'] for r in favored_regions]
+    favored_regions = regions["favored"]
+    weights = [r["weight"] for r in favored_regions]
 
     # Choose region based on weights
     region_idx = np.random.choice(len(favored_regions), p=weights)
     chosen_region = favored_regions[region_idx]
 
     # Sample angles from Gaussian around region center
-    phi = np.random.normal(chosen_region['phi'], chosen_region['std'])
-    psi = np.random.normal(chosen_region['psi'], chosen_region['std'])
+    phi = np.random.normal(chosen_region["phi"], chosen_region["std"])
+    psi = np.random.normal(chosen_region["psi"], chosen_region["std"])
 
     # Wrap to [-180, 180]
     phi = ((phi + 180) % 360) - 180
@@ -592,7 +587,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
 
     # Split the input string by commas to get individual region specifications
     # Example: "1-10:alpha,11-20:beta" -> ["1-10:alpha", "11-20:beta"]
-    regions = structure_str.split(',')
+    regions = structure_str.split(",")
 
     # Process each region specification
     for region in regions:
@@ -602,7 +597,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
 
         # VALIDATION STEP 1: Check for colon separator
         # Expected format: "start-end:conformation"
-        if ':' not in region:
+        if ":" not in region:
             raise ValueError(
                 f"Invalid region syntax: '{region}'. "
                 f"Expected format: 'start-end:conformation' (e.g., '1-10:alpha')"
@@ -610,11 +605,13 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
 
         # Split by colon to separate range from conformation
         # Example: "1-10:alpha" -> range_part="1-10", conformation="alpha"
-        range_part, conformation = region.split(':', 1)
+        range_part, conformation = region.split(":", 1)
 
         # VALIDATION STEP 2: Check conformation name
         # Build list of valid conformations from presets plus 'random'
-        valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random'] + list(BETA_TURN_TYPES.keys())
+        valid_conformations = (
+            list(RAMACHANDRAN_PRESETS.keys()) + ["random"] + list(BETA_TURN_TYPES.keys())
+        )
         if conformation not in valid_conformations:
             raise ValueError(
                 f"Invalid conformation '{conformation}'. "
@@ -623,15 +620,14 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
 
         # VALIDATION STEP 3: Check for dash separator in range
         # Expected format: "start-end"
-        if '-' not in range_part:
+        if "-" not in range_part:
             raise ValueError(
-                f"Invalid range syntax: '{range_part}'. "
-                f"Expected format: 'start-end' (e.g., '1-10')"
+                f"Invalid range syntax: '{range_part}'. Expected format: 'start-end' (e.g., '1-10')"
             )
 
         # Split range by dash to get start and end positions
         # Example: "1-10" -> start_str="1", end_str="10"
-        start_str, end_str = range_part.split('-', 1)
+        start_str, end_str = range_part.split("-", 1)
 
         # VALIDATION STEP 4: Parse numbers
         # Try to convert strings to integers, give clear error if they're not numbers
@@ -719,7 +715,7 @@ def _resolve_conformation_map(
     # We validate the default conformation early to give clear error messages.
     # Even if structure parameter overrides it for some residues, we need to
     # ensure the default is valid for any gaps or when structure is not provided.
-    valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ['random']
+    valid_conformations = list(RAMACHANDRAN_PRESETS.keys()) + ["random"]
     if conformation not in valid_conformations:
         raise ValueError(
             f"Invalid conformation '{conformation}'. "
@@ -800,10 +796,10 @@ def _build_peptide_chain(
 
         # Determine conformation for this residue
         res_conformation = residue_conformations.get(i, conformation)
-        if res_conformation == 'alpha' and not structure:
+        if res_conformation == "alpha" and not structure:
             cys_count = sum(1 for aa in sequence if "CYS" in aa.upper() or "DCY" in aa.upper())
             if cyclic or cys_count >= 2:
-                res_conformation = 'curved'
+                res_conformation = "curved"
 
         # Compatibility alias for rotamer selection logic downstream
         current_conformation = res_conformation
@@ -820,12 +816,12 @@ def _build_peptide_chain(
             c_coord = np.array([c_x, c_y, 0.0])
 
             if res_conformation in RAMACHANDRAN_PRESETS:
-                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
-            elif res_conformation == 'random':
+                current_psi = RAMACHANDRAN_PRESETS[res_conformation]["psi"]
+            elif res_conformation == "random":
                 next_res_name = sequence[i + 1] if i + 1 < sequence_length else None
                 _, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
             elif res_conformation in BETA_TURN_TYPES:
-                current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+                current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
             else:
                 current_psi = -47.0  # Default Alpha
 
@@ -833,9 +829,9 @@ def _build_peptide_chain(
             # Subsequent residues use internal-coordinate (NeRF) placement
             prev_res_idx = i - 1
             prev_coords = residue_coordinates[prev_res_idx]
-            prev_n_coord = prev_coords['N']
-            prev_ca_coord = prev_coords['CA']
-            prev_c_coord = prev_coords['C']
+            prev_n_coord = prev_coords["N"]
+            prev_ca_coord = prev_coords["CA"]
+            prev_c_coord = prev_coords["C"]
 
             next_full_res_name = sequence[i + 1] if i + 1 < sequence_length else None
             next_res_name = (
@@ -853,7 +849,7 @@ def _build_peptide_chain(
             pass
 
             if prev_conformation in RAMACHANDRAN_PRESETS:
-                prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]['psi']
+                prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]["psi"]
             elif prev_conformation in BETA_TURN_TYPES:
                 c_prev = prev_conformation
                 if residue_conformations.get(prev_res_idx - 1) != c_prev:
@@ -867,14 +863,14 @@ def _build_peptide_chain(
 
                 turn_angles = BETA_TURN_TYPES[prev_conformation]
                 if turn_pos == 1:
-                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+                    prev_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
                 elif turn_pos == 2:
                     prev_psi = turn_angles[0][1]
                 elif turn_pos == 3:
                     prev_psi = turn_angles[1][1]
                 else:
-                    prev_psi = RAMACHANDRAN_PRESETS['extended']['psi']
-            elif prev_conformation == 'random':
+                    prev_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
+            elif prev_conformation == "random":
                 prev_full_res_name = sequence[prev_res_idx]
                 prev_base_res_name = (
                     prev_full_res_name[2:]
@@ -883,17 +879,16 @@ def _build_peptide_chain(
                 )
                 _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name)
             else:
-                prev_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
+                prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
             # Place N(i)
             n_coord = _place_atom_with_dihedral(
-                prev_n_coord, prev_ca_coord, prev_c_coord,
-                BOND_LENGTH_C_N, ANGLE_CA_C_N, prev_psi
+                prev_n_coord, prev_ca_coord, prev_c_coord, BOND_LENGTH_C_N, ANGLE_CA_C_N, prev_psi
             )
 
             # Place CA(i) — sample omega (including cis-proline)
             omega_mean = OMEGA_TRANS
-            if res_name == 'PRO' and random.random() < cis_proline_frequency:
+            if res_name == "PRO" and random.random() < cis_proline_frequency:
                 omega_mean = 0.0
 
             if omega_list is not None and i > 0 and (i - 1) < len(omega_list):
@@ -902,20 +897,21 @@ def _build_peptide_chain(
                 omega = np.random.normal(omega_mean, OMEGA_VARIATION)
 
             ca_coord = _place_atom_with_dihedral(
-                prev_ca_coord, prev_c_coord, n_coord,
-                BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
+                prev_ca_coord, prev_c_coord, n_coord, BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
             )
 
             # Determine phi/psi for this residue
             if (
-                phi_list is not None and i < len(phi_list)
-                and psi_list is not None and i < len(psi_list)
+                phi_list is not None
+                and i < len(phi_list)
+                and psi_list is not None
+                and i < len(psi_list)
             ):
                 current_phi = phi_list[i]
                 current_psi = psi_list[i]
             elif res_conformation in RAMACHANDRAN_PRESETS:
-                current_phi = RAMACHANDRAN_PRESETS[res_conformation]['phi']
-                current_psi = RAMACHANDRAN_PRESETS[res_conformation]['psi']
+                current_phi = RAMACHANDRAN_PRESETS[res_conformation]["phi"]
+                current_psi = RAMACHANDRAN_PRESETS[res_conformation]["psi"]
             elif res_conformation in BETA_TURN_TYPES:
                 c_curr = res_conformation
                 if residue_conformations.get(i - 1) != c_curr:
@@ -928,8 +924,8 @@ def _build_peptide_chain(
                     turn_pos = 4
                 turn_angles = BETA_TURN_TYPES[res_conformation]
                 if turn_pos == 1:
-                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi']
-                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
+                    current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
+                    current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
                 elif turn_pos == 2:
                     current_phi = turn_angles[0][0]
                     current_psi = turn_angles[0][1]
@@ -937,13 +933,13 @@ def _build_peptide_chain(
                     current_phi = turn_angles[1][0]
                     current_psi = turn_angles[1][1]
                 else:
-                    current_phi = RAMACHANDRAN_PRESETS['extended']['phi']
-                    current_psi = RAMACHANDRAN_PRESETS['extended']['psi']
-            elif res_conformation == 'random':
+                    current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
+                    current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
+            elif res_conformation == "random":
                 current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
             else:
-                current_phi = RAMACHANDRAN_PRESETS['alpha']['phi']
-                current_psi = RAMACHANDRAN_PRESETS['alpha']['psi']
+                current_phi = RAMACHANDRAN_PRESETS["alpha"]["phi"]
+                current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
             # Apply hard-decoy torsion drift
             if drift > 0:
@@ -959,15 +955,14 @@ def _build_peptide_chain(
                 current_psi *= -1.0
 
             c_coord = _place_atom_with_dihedral(
-                prev_c_coord, n_coord, ca_coord,
-                BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
+                prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
             )
 
         # ── Store coordinates for next iteration ────────────────────────────
         residue_coordinates[i] = {
-            'N': n_coord,
-            'CA': ca_coord,
-            'C': c_coord,
+            "N": n_coord,
+            "CA": ca_coord,
+            "C": c_coord,
         }
 
         # Store Psi for next iteration (kept for readability; recomputed in loop)
@@ -1018,10 +1013,10 @@ def _build_peptide_chain(
             rotamers = ROTAMER_LIBRARY[res_name]
 
         if rotamers:
-            weights = [float(r.get('prob', 0.0)) for r in rotamers] # type: ignore[arg-type]
+            weights = [float(r.get("prob", 0.0)) for r in rotamers]  # type: ignore[arg-type]
             selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
 
-            if 'chi1' in selected_rotamer:
+            if "chi1" in selected_rotamer:
                 _chi1_val = selected_rotamer["chi1"]
                 chi1_target = _chi1_val[0] if isinstance(_chi1_val, list) else float(_chi1_val)
                 gamma_atom_name = None
@@ -1078,18 +1073,43 @@ def _build_peptide_chain(
                 f"Found atoms: {list(mobile_backbone_from_template.atom_name)}"
             )
 
-        target_backbone_constructed = struc.array([
-            struc.Atom(n_coord, atom_name="N", res_id=res_id, res_name=res_name, element="N", hetero=False),
-            struc.Atom(ca_coord, atom_name="CA", res_id=res_id, res_name=res_name, element="C", hetero=False),
-            struc.Atom(c_coord, atom_name="C", res_id=res_id, res_name=res_name, element="C", hetero=False),
-        ])
+        target_backbone_constructed = struc.array(
+            [
+                struc.Atom(
+                    n_coord,
+                    atom_name="N",
+                    res_id=res_id,
+                    res_name=res_name,
+                    element="N",
+                    hetero=False,
+                ),
+                struc.Atom(
+                    ca_coord,
+                    atom_name="CA",
+                    res_id=res_id,
+                    res_name=res_name,
+                    element="C",
+                    hetero=False,
+                ),
+                struc.Atom(
+                    c_coord,
+                    atom_name="C",
+                    res_id=res_id,
+                    res_name=res_name,
+                    element="C",
+                    hetero=False,
+                ),
+            ]
+        )
 
         # AHA MOMENT - Superimposition Direction:
         # In the "AI Trinity" debugging phase, we found that residues were disconnected
         # (6A-13A gaps). This was due to superimposing the backbone onto the template
         # instead of moving the template into our newly constructed global frame.
         # Fixed: target=constructed_frame, mobile=residue_template.
-        _, transformation = struc.superimpose(target_backbone_constructed, mobile_backbone_from_template)
+        _, transformation = struc.superimpose(
+            target_backbone_constructed, mobile_backbone_from_template
+        )
         transformed_res = ref_res_template
         transformed_res.coord = transformation.apply(transformed_res.coord)
 
@@ -1197,8 +1217,9 @@ def _apply_biophysical_mods(
     # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.
-    if metal_ions == 'auto':
+    if metal_ions == "auto":
         from .cofactors import add_metal_ion, find_metal_binding_sites
+
         sites = find_metal_binding_sites(peptide)
         for site in sites:
             peptide = add_metal_ion(peptide, site)
@@ -1266,13 +1287,16 @@ def _do_energy_minimization(
                     "This includes minimization."
                 )
                 success = minimizer.equilibrate(
-                    input_pdb_path, output_pdb_path,
-                    steps=equilibrate_steps, cyclic=cyclic,
+                    input_pdb_path,
+                    output_pdb_path,
+                    steps=equilibrate_steps,
+                    cyclic=cyclic,
                     disulfides=current_disulfides,
                 )
             else:
                 success = minimizer.add_hydrogens_and_minimize(
-                    input_pdb_path, output_pdb_path,
+                    input_pdb_path,
+                    output_pdb_path,
                     max_iterations=minimization_max_iter,
                     tolerance=minimization_k,
                     cyclic=cyclic,
@@ -1303,14 +1327,12 @@ def _do_energy_minimization(
                     if np.any(mask_first):
                         first_res_name_local = peptide.res_name[mask_first][0]
                         if first_res_name_local == "ACE":
-                            logger.info(
-                                "Detected N-terminal ACE cap. Applying start offset of 1."
-                            )
+                            logger.info("Detected N-terminal ACE cap. Applying start offset of 1.")
                             start_offset = 1
                 if n_min >= n_seq + start_offset:
                     for idx, res_name_target in enumerate(sequence):
                         rid = unique_res_ids[idx + start_offset]
-                        if res_name_target in ['SEP', 'TPO', 'PTR', 'HIE', 'HID', 'HIP']:
+                        if res_name_target in ["SEP", "TPO", "PTR", "HIE", "HID", "HIP"]:
                             mask = peptide.res_id == rid
                             peptide.res_name[mask] = res_name_target
             except Exception as ptm_err:
@@ -1391,7 +1413,9 @@ def _assemble_pdb_output(
                 sg_serials[res_num] = serial
 
             current_s2 = s2_map.get(res_num, 0.85)
-            bfactor = _calculate_bfactor(atom_name, res_num, total_residues, res_name, s2=current_s2)
+            bfactor = _calculate_bfactor(
+                atom_name, res_num, total_residues, res_name, s2=current_s2
+            )
             occupancy = _calculate_occupancy(atom_name, res_num, total_residues, res_name, bfactor)
             line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
 
@@ -1425,7 +1449,7 @@ def _assemble_pdb_output(
         conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
 
     disulfides = _detect_disulfide_bonds(peptide)
-    ssbond_records = _generate_ssbond_records(disulfides, chain_id='A')
+    ssbond_records = _generate_ssbond_records(disulfides, chain_id="A")
 
     if disulfides:
         for r1, r2 in disulfides:
@@ -1452,26 +1476,26 @@ def generate_pdb_content(
     length: Optional[int] = None,
     sequence_str: Optional[str] = None,
     use_plausible_frequencies: bool = False,
-    conformation: str = 'alpha',
+    conformation: str = "alpha",
     structure: Optional[str] = None,
     optimize_sidechains: bool = False,
     minimize_energy: bool = False,
-    forcefield: str = 'amber14-all.xml',
+    forcefield: str = "amber14-all.xml",
     seed: Optional[int] = None,
     ph: float = 7.4,
     cap_termini: bool = False,
     equilibrate: bool = False,
     equilibrate_steps: int = 1000,
-    metal_ions: str = 'auto',
-    minimization_k: float = 10.0, # Tolerance
-    minimization_max_iter: int = 0, # 0 = unlimited
-    cis_proline_frequency: float = 0.05, # Probability of Cis-Proline (0.05 = 5%)
-    phosphorylation_rate: float = 0.0, # Probability of S/T/Y phosphorylation
-    cyclic: bool = False, # Head-to-Tail cyclization
-    drift: float = 0.0, # Torsion angle perturbation in degrees
-    phi_list: Optional[List[float]] = None, # Explicit Phi angles
-    psi_list: Optional[List[float]] = None, # Explicit Psi angles
-    omega_list: Optional[List[float]] = None, # Explicit Omega angles
+    metal_ions: str = "auto",
+    minimization_k: float = 10.0,  # Tolerance
+    minimization_max_iter: int = 0,  # 0 = unlimited
+    cis_proline_frequency: float = 0.05,  # Probability of Cis-Proline (0.05 = 5%)
+    phosphorylation_rate: float = 0.0,  # Probability of S/T/Y phosphorylation
+    cyclic: bool = False,  # Head-to-Tail cyclization
+    drift: float = 0.0,  # Torsion angle perturbation in degrees
+    phi_list: Optional[List[float]] = None,  # Explicit Phi angles
+    psi_list: Optional[List[float]] = None,  # Explicit Psi angles
+    omega_list: Optional[List[float]] = None,  # Explicit Omega angles
 ) -> str:
     """
     Generates PDB content for a linear or cyclic peptide chain.
@@ -1564,12 +1588,12 @@ def generate_pdb_content(
     if phosphorylation_rate > 0:
         modified_sequence = []
         for aa in sequence:
-            if aa == 'SER' and random.random() < phosphorylation_rate:
-                modified_sequence.append('SEP')
-            elif aa == 'THR' and random.random() < phosphorylation_rate:
-                modified_sequence.append('TPO')
-            elif aa == 'TYR' and random.random() < phosphorylation_rate:
-                modified_sequence.append('PTR')
+            if aa == "SER" and random.random() < phosphorylation_rate:
+                modified_sequence.append("SEP")
+            elif aa == "THR" and random.random() < phosphorylation_rate:
+                modified_sequence.append("TPO")
+            elif aa == "TYR" and random.random() < phosphorylation_rate:
+                modified_sequence.append("PTR")
             else:
                 modified_sequence.append(aa)
         sequence = modified_sequence
@@ -1589,32 +1613,53 @@ def generate_pdb_content(
 
     # Build backbone + sidechains via NeRF geometry
     peptide = _build_peptide_chain(
-        sequence, residue_conformations, conformation, structure, cyclic,
-        cis_proline_frequency, drift, phi_list, psi_list, omega_list, rng,
+        sequence,
+        residue_conformations,
+        conformation,
+        structure,
+        cyclic,
+        cis_proline_frequency,
+        drift,
+        phi_list,
+        psi_list,
+        omega_list,
+        rng,
     )
 
     # Sidechain optimization, terminal capping, pH titration, metal ions
     peptide = _apply_biophysical_mods(
-        peptide, optimize_sidechains, cap_termini, cyclic, ph, metal_ions,
+        peptide,
+        optimize_sidechains,
+        cap_termini,
+        cyclic,
+        ph,
+        metal_ions,
     )
 
     # Optional energy minimization / MD equilibration via OpenMM
     atomic_and_ter_content: Optional[str] = None
     if minimize_energy:
         atomic_and_ter_content, peptide = _do_energy_minimization(
-            peptide, sequence, forcefield,
-            minimization_k, minimization_max_iter,
-            cyclic, equilibrate, equilibrate_steps,
+            peptide,
+            sequence,
+            forcefield,
+            minimization_k,
+            minimization_max_iter,
+            cyclic,
+            equilibrate,
+            equilibrate_steps,
         )
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records
     return _assemble_pdb_output(peptide, atomic_and_ter_content, sequence_length, cyclic)
+
 
 class PeptideGenerator:
     """
     Object-oriented wrapper for protein structure generation.
     Provides a cleaner API for interactive notebooks and complex workflows.
     """
+
     def __init__(self, sequence: str = "ALA-GLY-SER", **kwargs: Any) -> None:
         self.sequence = sequence
         self.config = kwargs
@@ -1626,10 +1671,7 @@ class PeptideGenerator:
         call_config = {**self.config, **overrides}
 
         # Call the functional generator
-        pdb_content = generate_pdb_content(
-            sequence_str=self.sequence,
-            **call_config
-        )
+        pdb_content = generate_pdb_content(sequence_str=self.sequence, **call_config)
 
         # Package into a Result object for easy access
         self._last_result = PeptideResult(pdb_content)
@@ -1641,6 +1683,7 @@ class PeptideResult:
     Container for generation outputs, providing easy access to
     PDB strings, Biotite structures, and metadata.
     """
+
     def __init__(self, pdb_content: str) -> None:
         self.pdb = pdb_content
         self._structure = None
@@ -1659,6 +1702,7 @@ class PeptideResult:
             import io
 
             from biotite.structure.io.pdb import PDBFile
+
             f = PDBFile.read(io.StringIO(self.pdb))
 
             # Additional check: ensure at least one model exists
@@ -1671,7 +1715,7 @@ class PeptideResult:
 
     def save(self, path: str) -> None:
         """Saves the PDB content to a file."""
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.write(self.pdb)
 
     def __repr__(self) -> str:

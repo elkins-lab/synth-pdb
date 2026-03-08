@@ -3,7 +3,9 @@ from typing import Any, Optional, cast
 import numpy as np
 
 
-def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None) -> np.ndarray:
+def compute_contact_map(
+    structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None
+) -> np.ndarray:
     """
     Computes a residue-residue contact map.
 
@@ -36,7 +38,9 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
         # Approximating as 'N' (Amide) is cheaper, but let's try to do it right?
         # Actually, calculating ALL H-H pairs is expensive (N^2 protons).
         # Let's use CB (Beta Carbon) as a robust proxy for side-chain contacts.
-        mask = (structure.atom_name == "CB") | ((structure.atom_name == "CA") & (structure.res_name == "GLY"))
+        mask = (structure.atom_name == "CB") | (
+            (structure.atom_name == "CA") & (structure.res_name == "GLY")
+        )
         atoms = structure[mask]
     else:
         raise ValueError("Method must be 'ca' or 'noe'")
@@ -56,9 +60,9 @@ def compute_contact_map(structure: Any, method: str = "ca", threshold: float = 8
     elif power == 6:
         # NOE Intensity (Physics style)
         # Avoid division by zero diagonal
-        with np.errstate(divide='ignore'):
-            intensity = 1.0 / (dist_matrix ** 6)
-        np.fill_diagonal(intensity, 0.0) # Self-peaks are irrelevant here
+        with np.errstate(divide="ignore"):
+            intensity = 1.0 / (dist_matrix**6)
+        np.fill_diagonal(intensity, 0.0)  # Self-peaks are irrelevant here
         return cast(np.ndarray, intensity)
     else:
         # Raw Distances (Heatmap style)

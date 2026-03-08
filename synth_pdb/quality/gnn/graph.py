@@ -169,8 +169,8 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
         node_feats[i, 3] = math.cos(math.radians(psi)) if psi is not None else 0.0
         node_feats[i, 4] = b_norm[i]
         node_feats[i, 5] = seq_pos[i]
-        node_feats[i, 6] = 1.0 if i == 0 else 0.0       # N-terminus flag
-        node_feats[i, 7] = 1.0 if i == n - 1 else 0.0   # C-terminus flag
+        node_feats[i, 6] = 1.0 if i == 0 else 0.0  # N-terminus flag
+        node_feats[i, 7] = 1.0 if i == n - 1 else 0.0  # C-terminus flag
 
     # ------------------------------------------------------------------
     # Step 3 — Build edge index and edge features
@@ -195,8 +195,8 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
 
     # Compute pairwise Cα distance matrix using broadcasting: O(N²) memory
     # which is fine for the short peptides synth-pdb generates (≤ 50 res).
-    diff = ca_coords[:, None, :] - ca_coords[None, :, :]   # [N, N, 3]
-    dist_matrix = np.sqrt((diff ** 2).sum(axis=-1))         # [N, N]
+    diff = ca_coords[:, None, :] - ca_coords[None, :, :]  # [N, N, 3]
+    dist_matrix = np.sqrt((diff**2).sum(axis=-1))  # [N, N]
 
     src_list, dst_list, edge_attr_list = [], [], []
     for i in range(n):
@@ -247,6 +247,7 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
 # ---------------------------------------------------------------------------
 # Internal: PDB backbone parser
 # ---------------------------------------------------------------------------
+
 
 def _parse_backbone(pdb_content: str) -> List[Dict]:
     """
@@ -330,12 +331,14 @@ def _parse_backbone(pdb_content: str) -> List[Dict]:
             if "N" in atoms and "CA" in atoms and "C" in atoms and "N" in nxt:
                 psi = _dihedral(atoms["N"], atoms["CA"], atoms["C"], nxt["N"])
 
-        residues.append({
-            "ca": atoms["CA"].astype(np.float32),
-            "b_factor": b_records.get(key, 0.0),
-            "phi": phi,
-            "psi": psi,
-        })
+        residues.append(
+            {
+                "ca": atoms["CA"].astype(np.float32),
+                "b_factor": b_records.get(key, 0.0),
+                "phi": phi,
+                "psi": psi,
+            }
+        )
 
     return residues
 
@@ -364,8 +367,8 @@ def _dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) ->
     b2 = p3 - p2
     b3 = p4 - p3
 
-    n1 = np.cross(b1, b2)   # normal to the b1-b2 plane
-    n2 = np.cross(b2, b3)   # normal to the b2-b3 plane
+    n1 = np.cross(b1, b2)  # normal to the b1-b2 plane
+    n2 = np.cross(b2, b3)  # normal to the b2-b3 plane
 
     n1_norm = np.linalg.norm(n1)
     n2_norm = np.linalg.norm(n2)

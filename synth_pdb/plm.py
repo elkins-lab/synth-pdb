@@ -122,12 +122,32 @@ _DEFAULT_MODEL = "facebook/esm2_t6_8M_UR50D"
 
 # Three-letter to one-letter code for sequence extraction from AtomArray
 _THREE_TO_ONE = {
-    "ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "CYS": "C",
-    "GLN": "Q", "GLU": "E", "GLY": "G", "HIS": "H", "ILE": "I",
-    "LEU": "L", "LYS": "K", "MET": "M", "PHE": "F", "PRO": "P",
-    "SER": "S", "THR": "T", "TRP": "W", "TYR": "Y", "VAL": "V",
+    "ALA": "A",
+    "ARG": "R",
+    "ASN": "N",
+    "ASP": "D",
+    "CYS": "C",
+    "GLN": "Q",
+    "GLU": "E",
+    "GLY": "G",
+    "HIS": "H",
+    "ILE": "I",
+    "LEU": "L",
+    "LYS": "K",
+    "MET": "M",
+    "PHE": "F",
+    "PRO": "P",
+    "SER": "S",
+    "THR": "T",
+    "TRP": "W",
+    "TYR": "Y",
+    "VAL": "V",
     # Common aliases
-    "HID": "H", "HIE": "H", "HIP": "H", "CYX": "C", "MSE": "M",
+    "HID": "H",
+    "HIE": "H",
+    "HIP": "H",
+    "CYX": "C",
+    "MSE": "M",
 }
 
 
@@ -155,8 +175,8 @@ class ESM2Embedder:
     ):
         self.model_name = model_name
         self._device_str = device  # resolved lazily
-        self._model = None       # EsmModel — loaded on first embed()
-        self._tokenizer = None   # EsmTokenizer — loaded on first embed()
+        self._model = None  # EsmModel — loaded on first embed()
+        self._tokenizer = None  # EsmTokenizer — loaded on first embed()
         self._embedding_dim: Optional[int] = None
 
     # ──────────────────────────────────────────────────────────────────────
@@ -325,8 +345,7 @@ class ESM2Embedder:
             import torch  # noqa: F401
         except ImportError as exc:
             raise ImportError(
-                "torch is required for ESM2Embedder. "
-                "Install with: pip install synth-pdb[plm]"
+                "torch is required for ESM2Embedder. Install with: pip install synth-pdb[plm]"
             ) from exc
 
         try:
@@ -344,7 +363,7 @@ class ESM2Embedder:
         if self._device_str:
             device = torch.device(self._device_str)
         elif torch.backends.mps.is_available():
-            device = torch.device("mps")   # Apple Silicon GPU
+            device = torch.device("mps")  # Apple Silicon GPU
         elif torch.cuda.is_available():
             device = torch.device("cuda")
         else:
@@ -401,8 +420,8 @@ class ESM2Embedder:
 
         # last_hidden_state: (batch=1, L+2, D)
         # Slice off [CLS] (index 0) and [EOS] (index -1) → (1, L, D)
-        hidden = outputs.last_hidden_state[:, 1:-1, :]   # remove special tokens
-        embeddings = hidden.squeeze(0)                   # (L, D)
+        hidden = outputs.last_hidden_state[:, 1:-1, :]  # remove special tokens
+        embeddings = hidden.squeeze(0)  # (L, D)
 
         return cast(np.ndarray, embeddings.cpu().numpy().astype(np.float32))
 
@@ -410,6 +429,7 @@ class ESM2Embedder:
 # ──────────────────────────────────────────────────────────────────────────
 # Utility: sequence extraction from AtomArray
 # ──────────────────────────────────────────────────────────────────────────
+
 
 def _extract_sequence(structure: Any) -> str:
     """
@@ -435,8 +455,9 @@ def _extract_sequence(structure: Any) -> str:
         if one_letter != "X":
             sequence.append(one_letter)
         else:
-            logger.debug("Unknown residue '%s' at position %d → 'X'",
-                         res_name, structure.res_id[start])
+            logger.debug(
+                "Unknown residue '%s' at position %d → 'X'", res_name, structure.res_id[start]
+            )
             sequence.append("X")
 
     return "".join(sequence)
