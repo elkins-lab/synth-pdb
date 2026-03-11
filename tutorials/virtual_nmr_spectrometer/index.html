@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -3949,7 +3949,7 @@ except ImportError as e:
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">biotite</span> <span class="o">-</span><span class="n">c</span> <span class="n">constraints</span><span class="o">.</span><span class="n">txt</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">openmm</span> <span class="n">matplotlib</span> <span class="n">ipywidgets</span> <span class="n">py3Dmol</span> <span class="o">-</span><span class="n">c</span> <span class="n">constraints</span><span class="o">.</span><span class="n">txt</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">elkins</span><span class="o">/</span><span class="n">synth</span><span class="o">-</span><span class="n">pdb</span><span class="o">.</span><span class="n">git</span><span class="nd">@master</span>
-        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span><span class="o">&gt;=</span><span class="mf">0.7.2</span>  <span class="c1"># required dependency (installs separately due to --no-deps above)</span>
+        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span><span class="o">&gt;=</span><span class="mf">0.8.0</span>  <span class="c1"># required dependency (installs separately due to --no-deps above)</span>
 
         <span class="c1"># 3. Create marker</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -3991,7 +3991,7 @@ if not os.path.exists("installed.marker"):
         !pip install -q biotite -c constraints.txt
         !pip install -q openmm matplotlib ipywidgets py3Dmol -c constraints.txt
         !pip install -q --no-deps git+https://github.com/elkins/synth-pdb.git@master
-        !pip install -q synth-nmr&gt;=0.7.2  # required dependency (installs separately due to --no-deps above)
+        !pip install -q synth-nmr&gt;=0.8.0  # required dependency (installs separately due to --no-deps above)
 
         # 3. Create marker
         with open("installed.marker", "w") as f:
