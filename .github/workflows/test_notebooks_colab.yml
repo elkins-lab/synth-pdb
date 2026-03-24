@@ -34,11 +34,10 @@ jobs:
 
     - name: Test Tutorials
       run: |
-        # Notebooks that use minimize_energy=True (hormone_lab, macrocycle_lab) may take
-        # several minutes per cell on a shared CPU — allow up to 30 min per cell.
+        # Run unique tutorials not covered in other steps
         jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
           --ExecutePreprocessor.timeout=1800 \
-          docs/tutorials/*.ipynb
+          examples/ml_integration/plm_embeddings.ipynb
 
     - name: Test Interactive Examples
       run: |

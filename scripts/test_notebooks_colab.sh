@@ -55,7 +55,6 @@ pip install umap-learn matplotlib seaborn &&
 echo 'Running notebook tests with jupyter nbconvert...' &&
 jupyter nbconvert --to notebook --execute --output-dir=/tmp/nbout \
   --ExecutePreprocessor.timeout=600 \
-  docs/tutorials/*.ipynb \
   examples/interactive_tutorials/*.ipynb \
   examples/ml_integration/*.ipynb \
   examples/ml_loading/*.ipynb

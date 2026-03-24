@@ -42,14 +42,19 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: getting-started/installation.md
+    - Installation: installation.md
     - Quick Start: getting-started/quickstart.md
     - First Structure: getting-started/first-structure.md
+    - Usage: usage.md
   - User Guides:
     - For Beginners: guides/beginners.md
     - For AI/ML Researchers: guides/ml-researchers.md
     - For NMR Spectroscopists: guides/nmr-spectroscopists.md
     - Command-Line Reference: guides/cli-reference.md
+    - Visualization: visualization.md
+    - Physics Engine: physics.md
+    - NMR Observables: nmr.md
+    - Technical Notes: technical_notes.md
   - Tutorials:
     - Interactive Tutorials:
       - IDP Conformational Ensembles: tutorials/idp_ensemble_validation.ipynb
@@ -67,6 +72,9 @@ nav:
       - Dataset Factory: tutorials/dataset_factory.ipynb
       - Neural NMR Pipeline: tutorials/neural_nmr_pipeline.ipynb
       - PLM Embeddings (ESM-2): tutorials/plm_embeddings.ipynb
+      - Bio-Active Hormone Lab: tutorials/hormone_lab.ipynb
+      - Macrocycle Design Lab: tutorials/macrocycle_lab.ipynb
+      - 6D Orientogram Lab: tutorials/orientogram_lab.ipynb
   - Examples:
     - Gallery: examples/gallery.md
     - Biologically-Inspired: examples/biological.md
@@ -99,14 +107,14 @@ nav:
     - Energy Minimization: science/energy-minimization.md
     - Protein Language Models: science/plm.md
   - Development:
-    - Contributing: development/contributing.md
+    - Contributing: contributing.md
     - Architecture: development/architecture.md
     - Testing: development/testing.md
     - Release Process: development/release.md
   - About:
     - Changelog: about/changelog.md
     - Roadmap: about/roadmap.md
-    - License: about/license.md
+    - License: license.md
     - Citation: about/citation.md
 
 # Plugins
