@@ -42,7 +42,7 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: installation.md
+    - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
     - First Structure: getting-started/first-structure.md
     - Usage: usage.md
@@ -66,6 +66,8 @@ nav:
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
       - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
       - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
+      - Coevolution MSA Factory: tutorials/coevolution_msa_factory.ipynb
+      - Executed MSA Pipeline: tutorials/executed_msa.ipynb
     - ML Integration:
       - ML Handover Demo: tutorials/ml_handover_demo.ipynb
       - Hard Decoy Challenge: tutorials/hard_decoy_challenge.ipynb
@@ -75,6 +77,11 @@ nav:
       - Bio-Active Hormone Lab: tutorials/hormone_lab.ipynb
       - Macrocycle Design Lab: tutorials/macrocycle_lab.ipynb
       - 6D Orientogram Lab: tutorials/orientogram_lab.ipynb
+      - Drug Discovery Pipeline: tutorials/drug_discovery_pipeline.ipynb
+    - Validation & Physics:
+      - Ubiquitin Chemical Shift: tutorials/ubiquitin_chemical_shift_validation.ipynb
+      - Ubiquitin J-Coupling: tutorials/ubiquitin_j_coupling_validation.ipynb
+      - Ubiquitin RDCs: tutorials/ubiquitin_rdc_validation.ipynb
   - Examples:
     - Gallery: examples/gallery.md
     - Biologically-Inspired: examples/biological.md
@@ -107,14 +114,14 @@ nav:
     - Energy Minimization: science/energy-minimization.md
     - Protein Language Models: science/plm.md
   - Development:
-    - Contributing: contributing.md
+    - Contributing: development/contributing.md
     - Architecture: development/architecture.md
     - Testing: development/testing.md
     - Release Process: development/release.md
   - About:
     - Changelog: about/changelog.md
     - Roadmap: about/roadmap.md
-    - License: license.md
+    - License: about/license.md
     - Citation: about/citation.md
 
 # Plugins
