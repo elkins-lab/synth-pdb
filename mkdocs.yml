@@ -92,6 +92,7 @@ nav:
     - Core Modules:
       - generator: api/generator.md
       - physics: api/physics.md
+      - msa: api/msa.md
       - validator: api/validator.md
       - geometry: api/geometry.md
     - Scientific Features:
@@ -113,6 +114,7 @@ nav:
     - NMR Theory: science/nmr-theory.md
     - Energy Minimization: science/energy-minimization.md
     - Protein Language Models: science/plm.md
+    - Co-Evolution & MSAs: science/coevolution.md
   - Development:
     - Contributing: development/contributing.md
     - Architecture: development/architecture.md

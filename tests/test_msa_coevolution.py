@@ -79,3 +79,28 @@ def test_msa_mutual_information_recovery():
         f"Co-evolution failed to imprint. "
         f"Contact MI: {avg_contact_mi:.4f}, Non-Contact MI: {avg_non_contact_mi:.4f}"
     )
+
+
+
+def test_sasa_selective_pressure():
+    """Verify that buried residues strongly avoid polar/charged amino acids."""
+    base_sequence = "G" * 10
+    L = len(base_sequence)
+    cmap = np.zeros((L, L), dtype=bool)
+
+    # Residues 4 and 5 are completely buried
+    rel_sasa = np.ones(L)
+    rel_sasa[4] = 0.05
+    rel_sasa[5] = 0.05
+
+    # Generate deep MSA
+    msa_sequences = generate_msa(
+        base_sequence, cmap, num_sequences=500, temperature=1.0, steps_between_samples=50, rel_sasa=rel_sasa
+    )
+
+    polar_charged = {"R", "K", "D", "E", "Q", "N", "H", "S", "T", "Y"}
+
+    for seq in msa_sequences:
+        # The buried residues must strictly avoid polar/charged amino acids
+        assert seq[4] not in polar_charged, f"Buried residue 4 mutated to polar {seq[4]}"
+        assert seq[5] not in polar_charged, f"Buried residue 5 mutated to polar {seq[5]}"
