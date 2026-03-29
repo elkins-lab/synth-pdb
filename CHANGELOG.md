@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.26.0] - 2026-03-29
+
+### Added
+- **MSA Modernization**: Completely overhauled `synth_pdb.msa` to simulate biologically grounded evolutionary constraints.
+  - Added $O(1)$ Delta-Energy evaluation (`calculate_delta_energy`) yielding a ~500x acceleration in MSA generation via Metropolis-Hastings sampling.
+  - Implemented the "Magic Step" coupled mutations allowing the MCMC simulation to simultaneously mutate contacting residues (defaults to 20% proposal rate).
+  - Added SASA Selective Pressure via `rel_sasa` enforcing geometric isolation of the hydrophobic core.
+  - Expanded Potts Model `J_ij` coupling to factor in Electrostatic Salt Bridges (rewards) and Repulsions (penalties).
+- **Expanded Physics Testing Suite**: Added dedicated `test_physics_expansion.py` boosting the physics engine coverage layout (fixing systemic segmentation faults driven by template caching errors).
+- **Formalized Docstrings**: Embedded the biological rationale of Hydrophobic Collapse and "Magic Steps" directly into the algorithm source code as dense "Educational Notes" and created a dedicated MkDocs "Co-Evolution" background page.
+
+### Fixed
+- **Type Checking Strictness**: Fixed an unhandled `mypy` typing coercion causing the energy matrices to leak generalized `Any` objects.
+
 ## [1.25.0] - 2026-03-10
 
 ### Changed

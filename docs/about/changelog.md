@@ -4,6 +4,153 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.26.0] - 2026-03-29
+
+### Added
+- **MSA Modernization**: Completely overhauled `synth_pdb.msa` to simulate biologically grounded evolutionary constraints.
+  - Added $O(1)$ Delta-Energy evaluation (`calculate_delta_energy`) yielding a ~500x acceleration in MSA generation via Metropolis-Hastings sampling.
+  - Implemented the "Magic Step" coupled mutations allowing the MCMC simulation to simultaneously mutate contacting residues (defaults to 20% proposal rate).
+  - Added SASA Selective Pressure via `rel_sasa` enforcing geometric isolation of the hydrophobic core.
+  - Expanded Potts Model `J_ij` coupling to factor in Electrostatic Salt Bridges (rewards) and Repulsions (penalties).
+- **Expanded Physics Testing Suite**: Added dedicated `test_physics_expansion.py` boosting the physics engine coverage layout (fixing systemic segmentation faults driven by template caching errors).
+- **Formalized Docstrings**: Embedded the biological rationale of Hydrophobic Collapse and "Magic Steps" directly into the algorithm source code as dense "Educational Notes" and created a dedicated MkDocs "Co-Evolution" background page.
+
+### Fixed
+- **Type Checking Strictness**: Fixed an unhandled `mypy` typing coercion causing the energy matrices to leak generalized `Any` objects.
+
+## [1.25.0] - 2026-03-10
+
+### Changed
+
+- **Dependency Update**: Required `synth-nmr>=0.8.0` to incorporate the latest NMR simulation engine improvements and physical validator updates.
+
+## [1.24.0] - 2026-03-08
+
+### Added
+
+- **Synthetic MSA Generation with Co-Evolution** (`synth_pdb/msa.py`): New generative workflow simulating Markov Chain Monte Carlo (MCMC) evolution over a 3D structural Potts Model, enabling zero-shot generation of deep multiple sequence alignments to test DCA/AlphaFold inputs.
+- **MSA Mutual Information Tutorial** (`examples/interactive_tutorials/coevolution_msa_factory.ipynb`): New interactive Jupyter notebook visually demonstrating how the physics-based MCMC sampler enforces co-evolution signals that recover the 3D contact map.
+- **High-Density Physics Documentation Suite**: Massively expanded the inline educational docstrings across `synth_pdb/physics.py` (>60% line density), exposing the physical rationale behind NVT Langevin dynamics, Amber forcefields, implicit solvents, and metadata restoration strategies.
+
+## [1.23.0] - 2026-03-07
+
+### Added
+
+- **IDP Conformational Ensembles Tutorial** (`examples/interactive_tutorials/idp_ensemble_validation.ipynb`): New interactive notebook validating synthetic IDP ensembles mathematically and visually against $1/r^6$ Paramagnetic Relaxation Enhancement (PRE) NMR phenomena.
+- **AlphaFold pLDDT vs NMR S² Tutorial** (`examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb`): New interactive notebook modeling an unstructured loop to demonstrate the inverse correlation between static AI prediction confidence (pLDDT) and physical NMR flexibility.
+- **IDP Theoretical Physics Documentation** (`docs/science/idp-dynamics.md`): Added comprehensive biophysical theory documentation explaining how the `BatchedGenerator` successfully handles intrinsically disordered regions compared to rigid crystalline tools.
+
+### Fixed
+
+- **Py3Dmol Widget Crash on Local Jupyter**: Replaced IPyWidgets `HBox` layout with Py3Dmol's native `viewergrid=(1,2)` API across tutorials. This stops localized browser javascript injection blocks from breaking dual-viewer structures (fixing "3Dmol.js failed to load" spam).
+- **GitHub Actions Formatting CI**: Ran `ruff check --fix .` across the codebase, fixing un-sorted imports and line-length breakages introduced by `physics.py` trajectory logging features, restoring a completely 'green' `test.yml` CI workflow.
+
+---
+
+## [1.22.0] - 2026-03-05
+
+### Added
+
+- **Residual Dipolar Coupling (RDC) module** (`synth_pdb/rdc.py`): New `calculate_rdcs()`
+  function implementing the Saupe-matrix formalism for computing backbone N–H RDCs given
+  an alignment tensor defined by axial component `Da` and rhombicity `R`.
+- **RDC tutorial notebook** (`examples/interactive_tutorials/rdc_tutorial.ipynb`):
+  Standalone Colab-compatible notebook demonstrating RDC calculation, Q-factor
+  validation against published ubiquitin data (1D3Z), and interactive alignment-tensor
+  exploration.
+- **Virtual NMR Spectrometer — RDC section** (`virtual_nmr_spectrometer.ipynb` cells
+  13–14): Interactive RDC fingerprint panel with `ipywidgets` sliders for `Da` and `R`,
+  and a `py3Dmol` 3D view coloured by RDC sign and magnitude.
+- **Virtual NMR Spectrometer — Shift Predictor Comparison** (cells 15–16): Side-by-side
+  HSQC scatter plots (empirical vs SHIFTX2), per-residue Δδ(¹H) bar chart, and a
+  summary statistics table with literature RMSD benchmarks. Graceful fallback when
+  SHIFTX2 is not installed.
+
+### Fixed
+
+- **`synth_pdb/physics.py` — `EnergyMinimizer`**: Eliminated a spurious
+  `WARNING: Forcefield does not support implicitSolvent` log message that fired on
+  every run. Root cause: the OBC2 implicit-solvent XML was correctly loaded at
+  construction time, but `_create_system_robust` also passed `implicitSolvent=app.OBC2`
+  as a `createSystem()` kwarg — which modern OpenMM rejects as unused. Fix: clear
+  `self.implicit_solvent_enum` after the XML is appended so the kwarg path is never
+  exercised.
+- **`synth_pdb/relaxation.py` (via `synth-nmr>=0.7.2`)**: Heteronuclear NOE values
+  were identical for every residue (a flat horizontal line) because S² cancelled
+  exactly in the ratio cross-relaxation/R₁ when `tau_f=0`. Fix in `synth-nmr 0.7.2`:
+  a per-residue fast internal motion timescale `tau_f = (1−S²)×500 ps + 50 ps` now
+  breaks the cancellation. Flexible termini correctly give low/negative HetNOE; rigid
+  helices give HetNOE ≈ 0.5–0.8. Ref: Lipari & Szabo (1982) *J Am Chem Soc* 104:4546.
+- **`virtual_nmr_spectrometer.ipynb` Colab setup**: Added explicit
+  `pip install synth-nmr>=0.7.2` to the setup cell (was silently skipped because
+  `synth-pdb` was installed with `--no-deps`), fixing a `ModuleNotFoundError: No module named 'synth_nmr'` crash on every fresh Colab runtime.
+- **`virtual_nmr_spectrometer.ipynb` Neural Shift cell**: Added a `torch_geometric`
+  availability check with a clear install hint (`pip install synth-nmr[ml]`). Previously
+  the cell crashed with `ImportError: torch_geometric is required` when the ML extras
+  were absent (the default in Colab).
+
+### Changed
+
+- **Dependency**: Tightened `synth-nmr` lower bound from `>=0.6.1` to `>=0.7.2` to
+  ensure the HetNOE bug fix and all NMR accuracy improvements are always present.
+
+---
+
+## [1.20.0] - 2026-02-21
+
+
+### Changed
+- **Numpy Compatibility**: Relaxed numpy dependency pin to `<3.0.0` to resolve binary incompatibility errors (`numpy.dtype size changed`) in Google Colab and other environments using `numpy 2.x`.
+- **Dependency Update**: Bumped `synth-nmr` dependency to `>=0.6.1` to incorporate upstream numpy compatibility fixes.
+
+---
+
+## [1.19.1] - 2026-02-19
+
+### Fixed
+- **PLM Tutorial Bug**: Fixed a `TypeError` in `docs/tutorials/plm_embeddings.ipynb` where an obsolete `ss_type` argument was used instead of `conformation` for `generate_pdb_content()`.
+
+### Changed
+- **Educational Enhancements**: Significantly expanded the PLM tutorial notebook (`plm_embeddings.ipynb`) with plain-language explanations of Protein Language Models, embeddings, similarity metrics, and UMAP clustering for chemists and biologists without machine learning backgrounds.
+
+---
+
+## [1.19.0] - 2026-02-19
+
+### Added
+- **PLM Embeddings**: Integrated ESM-2 protein language model support via `synth_pdb.quality.plm`. Generates per-residue and pooled embeddings from generated structures, enabling zero-shot quality scoring and downstream ML tasks.
+- **PLM Tutorial**: Added `docs/tutorials/plm_embeddings.ipynb` Colab-compatible notebook demonstrating ESM-2 embedding extraction and visualization.
+- New optional dependency group `[plm]` (`torch>=2.0.0`, `transformers>=4.30.0`).
+
+---
+
+## [1.18.0] - 2026-02-19
+
+### Added
+- **GNN Quality Scorer**: New `synth_pdb.quality.gnn` module with a Graph Neural Network model for protein structure quality assessment. Nodes represent residues; edges encode sequence proximity and spatial contacts.
+- **GNN Training Script**: `scripts/train_gnn_quality.py` for training the GNN on labelled structure datasets.
+- **Random Forest Baseline**: Included alongside GNN as an interpretable quality-filter baseline (`synth_pdb.quality.rf_model`).
+- New optional dependency group `[gnn]` (`torch>=2.0.0`, `torch_geometric>=2.4.0`, `scikit-learn`, `joblib`).
+
+### Changed
+- `[ai]` optional-dependency group now covers the Random Forest model; `[gnn]` covers the full GNN stack.
+
+---
+
+## [1.17.0] - 2026-02-11
+
+### Changed
+- **NMR Package Integration**: NMR functionality now provided by the [`synth-nmr`](https://github.com/elkins/synth-nmr) package
+- Maintained 100% backward compatibility via compatibility shims
+- All existing code continues to work without changes
+
+### Added
+- Dependency on `synth-nmr>=0.1.0`
+
+### Removed
+- ~1,200 lines of duplicate NMR code (now imported from synth-nmr)
+
 ## [1.15.0] - 2026-02-02
 ### Added
 - **ML Handover Notebooks**: Added zero-copy handover examples for **JAX**, **MLX**, and **PyTorch** in `examples/ml_loading/`.
