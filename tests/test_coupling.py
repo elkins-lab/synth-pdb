@@ -55,4 +55,4 @@ class TestJCoupling:
 
         assert 2.0 < couplings[2] < 6.0
         assert couplings[3] > 7.5
-        assert np.isnan(couplings[4])
+        assert 4 not in couplings
