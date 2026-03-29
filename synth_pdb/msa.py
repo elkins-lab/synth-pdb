@@ -218,7 +218,7 @@ class CoevolutionModel:
             if site2 != -1 and self.contact_map[site2, k]:
                 delta += self.couplings[site2, k, new_idx2, seq_idx_k] - self.couplings[site2, k, old_idx2, seq_idx_k]
 
-        return delta
+        return float(delta)
 
 
 class MetropolisHastingsSampler:
