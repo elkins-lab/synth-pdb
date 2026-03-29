@@ -70,6 +70,18 @@ class CoevolutionModel:
     def _build_local_fields(self, rel_sasa: np.ndarray | None) -> None:
         """Constructs the h_i local fields to enforce SASA constraints.
         Buried residues (rel_sasa < 0.2) receive massive energy penalties for Polar/Charged AAs.
+
+        Educational Note: Hydrophobic Core Collapse
+        -------------------------------------------
+        Solvent Accessible Surface Area (SASA) is the physical mechanism mapping
+        the 3D structural core back to 1D sequence constraints.
+        If a residue is statistically "buried" deep inside the protein core
+        with extreme desolvation, evolutionary drift must strictly eliminate
+        charged/polar mutations. Placing an Arginine or Aspartate in the
+        water-free hydrophobic core will rupture the hydrogen-bond network and
+        unfold the protein. We enforce this geometrically by massively penalizing
+        the h_i local fields for Hydrophilic amino acids at any position where
+        rel_sasa < 0.2.
         """
         if rel_sasa is None:
             return  # No structural pressure
@@ -105,6 +117,16 @@ class CoevolutionModel:
                                 penalty = (2 - total_vol) * 5.0  # Moderate void penalty
                             else:
                                 penalty = 0.0  # Perfect packing
+
+                            # Educational Note: Electrostatic Compatibility
+                            # ---------------------------------------------
+                            # Proteins utilize localized regions of electrical charge (Salt Bridges)
+                            # to lock their tertiary folds into favorable lower-energy states.
+                            # Conversely, slamming two like-charges together completely blows up
+                            # the stability of the construct via Coloumbic repulsion.
+                            # We deeply embed these physical phenomena directly into the J_ij
+                            # interaction couplings, rewarding +/- pairs while aggressively
+                            # destroying +/+ or -/- complexes.
 
                             # Charge Compatibility
                             if aa1 in POSITIVE_AMINO_ACIDS and aa2 in NEGATIVE_AMINO_ACIDS:
@@ -143,7 +165,23 @@ class CoevolutionModel:
 
     def calculate_delta_energy(self, current_seq: str, site1: int, new_aa1: str, site2: int | None = None, new_aa2: str | None = None) -> float:
         """Calculate the change in energy (Delta E) for 1 or 2 simultaneous mutations in O(L) time.
-        Allows for dramatic 500x speedup in long MSA generations.
+
+        Educational Note: Big-O Performance Breakthrough
+        ------------------------------------------------
+        A full evaluation of the Potts Model energy function requires summing the J_ij
+        matrix across all N residues, an O(N^2) operation. For a 200-residue sequence,
+        that's 40,000 lookups per step. Over 1 million generations, that's 40 billion operations!
+
+        Because the MCMC sampler only ever mutates 1 or 2 residues at a time, 99% of the
+        pairwise interactions remain completely unchanged. Instead of brute-force calculating
+        the new system energy entirely from scratch, we can simply calculate the difference (Delta):
+
+        1. Subtract the old energy of the mutated sites.
+        2. Add the new energy of the mutated sites.
+
+        This reduces the computational complexity to strictly O(L) (where L is the number of
+        contacts for the mutated site), saving over 500x computation time and allowing for
+        blisteringly fast synthetic MSA generation architectures.
         """
         delta = 0.0
 
@@ -218,6 +256,19 @@ class MetropolisHastingsSampler:
             return False
 
         # Decide if we do a single or double mutation taking advantage of "Magic Steps"
+        #
+        # Educational Note: The "Magic Step" coupled mutation
+        # ---------------------------------------------------
+        # Traditional MCMC walkers only jump one dimension at a time (e.g., mutating only X or Y).
+        # In evolutionary landscapes, getting from a massive [Tryptophan:Tiny] pair to a
+        # complementary [Tiny:Tryptophan] pair is impossible if you can only make one
+        # mutation at a time. The intermediate state [Tryptophan:Tryptophan] involves a massive
+        # steric clash, imposing an astronomical energy penalty that a low-temperature
+        # simulation can never mathematically cross.
+        #
+        # By proposing a "Coupled Mutation" across two contacting residues simultaneously,
+        # the simulation evaluates the Delta Energy of the final state exactly. The clash
+        # never physically occurs, capturing the hallmark of true Direct Coupling covariance.
         do_coupled = (random.random() < self.coupled_mutation_prob) and len(self.contact_list) > 0
 
         site1 = -1
