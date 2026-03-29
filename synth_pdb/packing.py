@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class SideChainPacker:
-    """
-    Optimizes amino acid side-chain conformations to minimize steric clashes.
+    """Optimizes amino acid side-chain conformations to minimize steric clashes.
     Uses a Monte Carlo approach with the specialized rotamer library.
 
     # EDUCATIONAL NOTE - Monte Carlo Optimization
@@ -33,18 +32,17 @@ class SideChainPacker:
     """
 
     def __init__(self, steps: int = 500, temperature: float = 0.5) -> None:
-        """
-        Args:
-            steps: Number of Monte Carlo steps (attempts).
-            temperature: Simulation temperature (proportional to acceptance probability of worse steps).
-                         Higher temp = more likely to accept clashes (good for escaping local minima).
+        """Args:
+        steps: Number of Monte Carlo steps (attempts).
+        temperature: Simulation temperature (proportional to acceptance probability of worse steps).
+                     Higher temp = more likely to accept clashes (good for escaping local minima).
+
         """
         self.steps = steps
         self.temperature = temperature
 
     def optimize(self, peptide: struc.AtomArray) -> struc.AtomArray:
-        """
-        Run the optimization protocol on the given peptide structure.
+        """Run the optimization protocol on the given peptide structure.
         Modifies the structure in-place.
 
         Args:
@@ -52,6 +50,7 @@ class SideChainPacker:
 
         Returns:
             The optimized structure (reference to input).
+
         """
         logger.info(f"Starting side-chain packing optimization ({self.steps} steps)...")
 

@@ -10,9 +10,8 @@ class TestTopologicalComplexity:
 
     @pytest.mark.skipif(not HAS_OPENMM, reason="Cyclization requires OpenMM physics engine")
     def test_cyclic_with_disulfide(self):
-        """
-        Verify a peptide that is both cyclic AND has a disulfide bond.
-        Sequence: C G G G G C
+        """Verify a peptide that is both cyclic AND has a disulfide bond.
+        Sequence: C G G G G C.
         """
         seq = "CGGGGC"
         pdb_content = generate_pdb_content(sequence_str=seq, cyclic=True, minimize_energy=True)

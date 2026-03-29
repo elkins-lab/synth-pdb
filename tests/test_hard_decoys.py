@@ -43,7 +43,6 @@ def test_generate_pdb_with_torsion_drift():
 
 def test_decoy_generator_threading(tmp_path):
     """Verify that threading a sequence on a template fold works."""
-
     from synth_pdb.decoys import DecoyGenerator
 
     target_seq = "AAAAAAAAAA"  # Poly-Ala
@@ -77,7 +76,6 @@ def test_decoy_generator_threading(tmp_path):
 
 def test_decoy_generator_shuffling(tmp_path):
     """Verify sequence label shuffling."""
-
     from synth_pdb.decoys import DecoyGenerator
 
     sequence = "ACDEFGHIKL"  # Unique residues

@@ -1,9 +1,8 @@
-"""
-Tests for synth_pdb/quality/gnn/gnn_classifier.py — targeting uncovered lines:
-  - Lines 185-186: predict() ImportError when torch is absent
-  - Lines 240-241: save() path (writes a checkpoint to disk)
-  - Lines 280-281: load() ImportError when torch is absent
-  - Lines 303-305: load() exception path
+"""Tests for synth_pdb/quality/gnn/gnn_classifier.py — targeting uncovered lines:
+- Lines 185-186: predict() ImportError when torch is absent
+- Lines 240-241: save() path (writes a checkpoint to disk)
+- Lines 280-281: load() ImportError when torch is absent
+- Lines 303-305: load() exception path.
 """
 
 import os
@@ -40,8 +39,7 @@ def _make_helix_pdb(length: int = 12) -> str:
 class TestGNNPredictImportError:
 
     def test_predict_raises_importerror_without_torch(self, tmp_path):
-        """
-        When torch cannot be imported inside predict(), an ImportError with a
+        """When torch cannot be imported inside predict(), an ImportError with a
         helpful message should be raised.
         """
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
@@ -98,9 +96,7 @@ class TestGNNSaveLoad:
         assert clf_b._model_path == ckpt_path
 
     def test_load_exception_path(self, tmp_path):
-        """
-        load() must re-raise if the checkpoint is corrupt (lines 303-305).
-        """
+        """load() must re-raise if the checkpoint is corrupt (lines 303-305)."""
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
 
         bad_path = str(tmp_path / "corrupt.pt")
@@ -111,8 +107,7 @@ class TestGNNSaveLoad:
             GNNQualityClassifier(model_path=bad_path)
 
     def test_load_importerror_without_torch(self, tmp_path):
-        """
-        load() must raise ImportError with a helpful message when torch is absent
+        """load() must raise ImportError with a helpful message when torch is absent
         (lines 280-281).
         """
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
@@ -177,8 +172,7 @@ class TestGNNPredictHappyPath:
                 clf.save(ckpt_path)
 
     def test_init_missing_default_model_logs_info(self, caplog):
-        """
-        Initialization without a model_path should log an info message and
+        """Initialization without a model_path should log an info message and
         create a random-weight model when the default checkpoint is missing
         (lines 136-146).
         """

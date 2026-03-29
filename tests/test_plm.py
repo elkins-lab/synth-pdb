@@ -1,5 +1,4 @@
-"""
-tests/test_plm.py
+"""tests/test_plm.py.
 -----------------
 TDD test suite for synth_pdb.plm — the ESM-2 protein language model embedder.
 
@@ -92,8 +91,7 @@ def _get_embedder():
 
 
 class TestImportSafety(unittest.TestCase):
-    """
-    The PLM module must be importable even without torch or transformers.
+    """The PLM module must be importable even without torch or transformers.
 
     WHY THIS MATTERS
     ----------------
@@ -172,8 +170,7 @@ class TestImportSafety(unittest.TestCase):
 
 
 class TestEmbeddingShape(unittest.TestCase):
-    """
-    ESM-2 produces one embedding vector per residue.
+    """ESM-2 produces one embedding vector per residue.
 
     WHY (L, D) AND NOT JUST (D,)?
     ------------------------------
@@ -252,8 +249,7 @@ class TestEmbeddingShape(unittest.TestCase):
 
 
 class TestEmbeddingValues(unittest.TestCase):
-    """
-    Sanity-check the numerical properties of the embeddings.
+    """Sanity-check the numerical properties of the embeddings.
 
     ESM-2 uses layer normalisation throughout, so embeddings have bounded
     magnitude and should not contain NaN / Inf.  Modern transformers are
@@ -296,8 +292,7 @@ class TestEmbeddingValues(unittest.TestCase):
 
 
 class TestEmbeddingSemantics(unittest.TestCase):
-    """
-    The real power of PLMs is that *meaning is encoded in geometry*.
+    """The real power of PLMs is that *meaning is encoded in geometry*.
 
     COSINE SIMILARITY IN EMBEDDING SPACE
     -------------------------------------
@@ -370,10 +365,9 @@ class TestEmbeddingSemantics(unittest.TestCase):
 
 
 class TestStructureInput(unittest.TestCase):
-    """
-    embed_structure() is a convenience wrapper that:
+    """embed_structure() is a convenience wrapper that:
       1. Extracts the amino acid sequence from a biotite AtomArray
-      2. Delegates to embed()
+      2. Delegates to embed().
 
     This keeps the core embed() clean (sequence → embeddings) while
     letting callers pass structures directly without extracting sequences

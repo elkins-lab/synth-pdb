@@ -15,8 +15,8 @@ repo_root = current_path.parent
 if (repo_root / "synth_pdb").exists():
     sys.path.insert(0, str(repo_root))
 
-from synth_pdb.batch_generator import BatchedGenerator
-from synth_pdb.generator import generate_pdb_content
+from synth_pdb.batch_generator import BatchedGenerator  # noqa: E402
+from synth_pdb.generator import generate_pdb_content  # noqa: E402
 
 
 def get_hardware_info():

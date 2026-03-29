@@ -1,5 +1,4 @@
-"""
-Special Chemistry & Post-Translational Modifications Module.
+"""Special Chemistry & Post-Translational Modifications Module.
 
 This module handles unique chemical events beyond standard amino acid chains,
 such as the formation of chromophores or other covalent modifications that
@@ -37,8 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
-    """
-    Scans the structure for the Ser-Tyr-Gly motif that forms the GFP chromophore.
+    """Scans the structure for the Ser-Tyr-Gly motif that forms the GFP chromophore.
 
     The chromophore is formed by the cyclization of residues Ser-Tyr-Gly.
     This function identifies the indices of these three consecutive residues.
@@ -49,6 +47,7 @@ def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
     Returns:
         A dictionary containing the residue IDs of S, Y, and G if the motif is found,
         otherwise None.
+
     """
     # Ensure we are working with a single protein chain
     if len(np.unique(structure.chain_id)) > 1:
@@ -77,8 +76,7 @@ def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
 
 
 def form_gfp_chromophore(structure: struc.AtomArray, motif: dict) -> struc.AtomArray:
-    """
-    Forms the GFP chromophore by cyclizing the Ser-Tyr-Gly motif.
+    """Forms the GFP chromophore by cyclizing the Ser-Tyr-Gly motif.
 
     NOTE: This is a placeholder and does not yet perform the actual chemical modification.
 
@@ -88,6 +86,7 @@ def form_gfp_chromophore(structure: struc.AtomArray, motif: dict) -> struc.AtomA
 
     Returns:
         The modified AtomArray with the chromophore.
+
     """
     logger.warning("Chromophore formation is not yet implemented. Returning original structure.")
     return structure

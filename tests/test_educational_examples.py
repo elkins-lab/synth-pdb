@@ -13,8 +13,7 @@ def run_synth_pdb(args):
 class TestEducationalExamples:
 
     def test_glucagon_alpha_helix(self, tmp_path):
-        """
-        Test Glucagon (29 residues) as an alpha-helical hormone.
+        """Test Glucagon (29 residues) as an alpha-helical hormone.
         Verifies that the generated PDB has low Ramachandran violations for an alpha helix.
         """
         output_file = tmp_path / "glucagon.pdb"
@@ -43,8 +42,7 @@ class TestEducationalExamples:
         assert len(sequences.get("A", "")) == 29
 
     def test_melittin_bent_helix(self, tmp_path):
-        """
-        Test Melittin (26 residues) with a bent helix structure.
+        """Test Melittin (26 residues) with a bent helix structure.
         Uses --structure to define regions.
         """
         output_file = tmp_path / "melittin.pdb"
@@ -78,8 +76,7 @@ class TestEducationalExamples:
         assert len(sequences.get("A", "")) == 26
 
     def test_bpti_disulfide_bonds(self, tmp_path):
-        """
-        Test BPTI (58 residues) for disulfide bond detection.
+        """Test BPTI (58 residues) for disulfide bond detection.
         BPTI has 3 disulfide bonds.
         """
         output_file = tmp_path / "bpti.pdb"
@@ -133,8 +130,7 @@ class TestEducationalExamples:
             assert sg_bonded, "SSBOND present but no SG atoms found in CONECT records"
 
     def test_ubiquitin_complex_structure(self, tmp_path):
-        """
-        Test Ubiquitin (76 residues) with mixed alpha/beta structure.
+        """Test Ubiquitin (76 residues) with mixed alpha/beta structure.
         Good stress test for clashes.
         """
         output_file = tmp_path / "ubiquitin.pdb"
@@ -166,8 +162,7 @@ class TestEducationalExamples:
         assert len(sequences.get("A", "")) == 76
 
     def test_human_egf_disulfides(self, tmp_path):
-        """
-        Test Human EGF (53 residues) for disulfide bond detection.
+        """Test Human EGF (53 residues) for disulfide bond detection.
         hEGF has 3 disulfide bonds (6-20, 14-31, 33-42).
         Verifies correct length and presence of SSBOND records.
         """

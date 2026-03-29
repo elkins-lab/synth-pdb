@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Refactor generate_pdb_content() in generator.py.
+"""Refactor generate_pdb_content() in generator.py.
 
 Extracts 5 private helpers with identical logic to the original,
 then rewrites generate_pdb_content as a ~50-line orchestrator.

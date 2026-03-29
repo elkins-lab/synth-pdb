@@ -1,5 +1,4 @@
-"""
-Residual Dipolar Couplings (RDCs) for synth-pdb.
+"""Residual Dipolar Couplings (RDCs) for synth-pdb.
 
 This module provides a compatibility shim that re-exports the RDC calculation
 engine from the synth-nmr package, following the same pattern as
@@ -61,7 +60,7 @@ The alignment tensor is parameterised with just five numbers:
   of the tensor is assumed to coincide with the coordinate frame of the
   PDB structure).
 
-REFERENCES:
+References:
   1. Tjandra, N. & Bax, A. (1997). Direct measurement of distances and
      angles in biomolecules by NMR in a dilute liquid crystalline medium.
      Science, 278, 1111–1114. DOI: 10.1126/science.278.5340.1111
@@ -83,6 +82,7 @@ REFERENCES:
   5. Bax, A. & Grishaev, A. (2005). Weak alignment NMR: a hawk-eyed view
      of biomolecular structure. Curr Opin Struct Biol, 15, 563–570.
      DOI: 10.1016/j.sbi.2005.08.006
+
 """
 
 # Re-export from synth-nmr for backward compatibility.

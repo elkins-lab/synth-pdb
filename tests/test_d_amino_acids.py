@@ -5,8 +5,7 @@ from synth_pdb.validator import PDBValidator
 
 
 def test_d_amino_acid_generation_basic():
-    """
-    Test that a sequence with D-amino acids can be parsed and generated.
+    """Test that a sequence with D-amino acids can be parsed and generated.
     The sequence 'D-ALA-ALA' should result in a 2-residue peptide.
     """
     # This should fail if D- prefix is not recognized
@@ -27,9 +26,7 @@ def test_d_amino_acid_generation_basic():
 
 
 def test_d_amino_acid_chirality_inversion():
-    """
-    Test that D-ALA has inverted chirality compared to L-ALA.
-    """
+    """Test that D-ALA has inverted chirality compared to L-ALA."""
     l_pdb = generate_pdb_content(sequence_str="ALA", length=1)
     d_pdb = generate_pdb_content(sequence_str="D-ALA", length=1)
 
@@ -58,9 +55,7 @@ def test_d_amino_acid_chirality_inversion():
 
 
 def test_d_amino_acid_validation():
-    """
-    Test that the validator correctly identifies D-amino acids if specified.
-    """
+    """Test that the validator correctly identifies D-amino acids if specified."""
     # We need a way to tell the validator that a residue is D-chiral.
     # One way is to check the Remark or have a special residue name in the validator's internal state.
     # For now, let's assume if we specify "D-ALA" in the generator,

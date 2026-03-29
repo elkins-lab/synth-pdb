@@ -1,5 +1,4 @@
-"""
-3D Molecular Viewer for synth-pdb.
+"""3D Molecular Viewer for synth-pdb.
 
 Opens generated PDB structures in browser-based 3D viewer using 3Dmol.js.
 Based on pdbstat's molecular viewer implementation.
@@ -28,8 +27,7 @@ def view_structure_in_browser(
     highlights: Optional[List[Any]] = None,
     show_hbonds: bool = True,
 ) -> None:
-    """
-    Open 3D structure viewer in browser.
+    """Open 3D structure viewer in browser.
 
     Args:
         pdb_content: PDB file contents as string
@@ -44,6 +42,7 @@ def view_structure_in_browser(
 
     Raises:
         Exception: If viewer fails to open
+
     """
     try:
         logger.info(f"Opening 3D viewer for {filename}")
@@ -79,8 +78,7 @@ def _create_3dmol_html(
     highlights: Optional[List[Any]] = None,
     show_hbonds: bool = False,
 ) -> str:
-    """
-    Generate HTML with embedded 3Dmol.js viewer.
+    """Generate HTML with embedded 3Dmol.js viewer.
 
     EDUCATIONAL NOTE - Why Browser-Based Visualization:
     Browser-based viewers are ideal for quick structure inspection because:
@@ -109,6 +107,7 @@ def _create_3dmol_html(
 
     Returns:
         Complete HTML document as string
+
     """
     # Identify max residue for backbone bridging
     res_ids = []
@@ -757,9 +756,8 @@ def _create_3dmol_html(
 
 
 def _find_ssbonds(pdb_content: str) -> list:
-    """
-    Parse SSBOND records from PDB header.
-    Returns list of dicts: {'c1', 'r1', 'c2', 'r2'}
+    """Parse SSBOND records from PDB header.
+    Returns list of dicts: {'c1', 'r1', 'c2', 'r2'}.
     """
     ssbonds = []
     try:
@@ -787,9 +785,8 @@ def _find_ssbonds(pdb_content: str) -> list:
 
 
 def _find_hbonds(pdb_content: str) -> list:
-    """
-    Find backbone hydrogen bonds (O to N) using simple geometric criteria.
-    Returns list of dicts: {'start_resi', 'start_atom', 'end_resi', 'end_atom'}
+    """Find backbone hydrogen bonds (O to N) using simple geometric criteria.
+    Returns list of dicts: {'start_resi', 'start_atom', 'end_resi', 'end_atom'}.
     """
     try:
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
@@ -875,9 +872,8 @@ def _find_hbonds(pdb_content: str) -> list:
 
 
 def _find_conects(pdb_content: str) -> list:
-    """
-    Parse CONECT records from PDB content.
-    Returns list of tuples: (serial1, serial2)
+    """Parse CONECT records from PDB content.
+    Returns list of tuples: (serial1, serial2).
     """
     conects = []
     try:

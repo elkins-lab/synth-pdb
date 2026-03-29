@@ -1,5 +1,4 @@
-"""
-synth_pdb.quality.gnn.gnn_classifier
+"""synth_pdb.quality.gnn.gnn_classifier.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Drop-in replacement for :class:`synth_pdb.quality.classifier.ProteinQualityClassifier`
 using the GNN model.
@@ -91,8 +90,7 @@ _FEATURE_NAMES = [
 
 
 class GNNQualityClassifier:
-    """
-    GNN-based protein structure quality classifier.
+    """GNN-based protein structure quality classifier.
 
     Predicts whether a PDB structure is "High Quality" (biophysically plausible,
     good Ramachandran geometry, no steric clashes) or "Low Quality".
@@ -114,12 +112,12 @@ class GNNQualityClassifier:
     """
 
     def __init__(self, model_path: Optional[str] = None):
-        """
-        Args:
-            model_path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
-                        If None, looks for the default bundled checkpoint.
-                        If no checkpoint is found, initialises a random-weight model
-                        (useful for testing graph construction without training).
+        """Args:
+        model_path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
+                    If None, looks for the default bundled checkpoint.
+                    If no checkpoint is found, initialises a random-weight model
+                    (useful for testing graph construction without training).
+
         """
         self.model: Optional[Any] = None
         self._model_path: Optional[str] = None
@@ -148,8 +146,7 @@ class GNNQualityClassifier:
     # ------------------------------------------------------------------
 
     def predict(self, pdb_content: str) -> Tuple[bool, float, Dict[str, float]]:
-        """
-        Predict the quality of a PDB structure.
+        """Predict the quality of a PDB structure.
 
         ── What happens inside ──────────────────────────────────────────
         1. build_protein_graph(pdb_content) → PyG Data object
@@ -177,6 +174,7 @@ class GNNQualityClassifier:
         Raises:
             ImportError: If torch or torch_geometric are not installed.
             ValueError: If the PDB contains too few residues to build a graph.
+
         """
         try:
             import torch
@@ -221,8 +219,7 @@ class GNNQualityClassifier:
         return bool(is_good), prob_good, feat_dict
 
     def save(self, path: str) -> None:
-        """
-        Save model weights and architecture config to a ``.pt`` checkpoint.
+        """Save model weights and architecture config to a ``.pt`` checkpoint.
 
         The checkpoint is a plain Python dict serialised with torch.save().
         It contains the architecture hyperparameters alongside the weight
@@ -230,6 +227,7 @@ class GNNQualityClassifier:
 
         Args:
             path: Destination file path (should end in .pt).
+
         """
         try:
             import torch
@@ -258,8 +256,7 @@ class GNNQualityClassifier:
         logger.info("GNN checkpoint saved to %s", path)
 
     def load(self, path: str) -> None:
-        """
-        Load model weights from a ``.pt`` checkpoint.
+        """Load model weights from a ``.pt`` checkpoint.
 
         The architecture is reconstructed from the metadata stored in the
         checkpoint, then the saved state_dict is loaded into the new model.
@@ -272,6 +269,7 @@ class GNNQualityClassifier:
         Raises:
             FileNotFoundError / RuntimeError: If the checkpoint is missing or
                 corrupt.
+
         """
         try:
             import torch
@@ -312,8 +310,7 @@ class GNNQualityClassifier:
     # ------------------------------------------------------------------
 
     def _init_fresh_model(self) -> None:
-        """
-        Initialise a randomly-weighted model.
+        """Initialise a randomly-weighted model.
 
         Used when no checkpoint is available — for example, during graph-
         construction unit tests where accuracy doesn't matter, or as the

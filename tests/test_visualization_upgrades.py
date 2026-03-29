@@ -8,9 +8,7 @@ class TestVisualizationUpgrades:
     """TDD for Visualization Upgrades (H-bonds, Beta-Turns, PTMs)."""
 
     def test_find_hbonds_alpha_helix(self):
-        """
-        Verify that _find_hbonds detects the i to i+4 pattern in an alpha helix.
-        """
+        """Verify that _find_hbonds detects the i to i+4 pattern in an alpha helix."""
         # Generate a perfect alpha helix (10 residues)
         pdb_content = generate_pdb_content(length=10, conformation="alpha")
 
@@ -30,9 +28,7 @@ class TestVisualizationUpgrades:
         assert first_bond["start_resi"] < first_bond["end_resi"]
 
     def test_highlights_in_html(self):
-        """
-        Verify that passing 'highlights' to _create_3dmol_html generates addStyle commands.
-        """
+        """Verify that passing 'highlights' to _create_3dmol_html generates addStyle commands."""
         pdb_content = (
             "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N"
         )
@@ -52,9 +48,7 @@ class TestVisualizationUpgrades:
         assert "stick:{colorscheme:'purple'" in html or "color:'purple'" in html
 
     def test_ptm_labeling(self):
-        """
-        Verify that PTMs (SEP, TPO) get labeled automatically.
-        """
+        """Verify that PTMs (SEP, TPO) get labeled automatically."""
         # Manually create PDB content with a SEP residue
         pdb_content = (
             "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N  \n"
@@ -70,9 +64,7 @@ class TestVisualizationUpgrades:
         assert "backgroundColor:'orange'" in html or "backgroundColor: 'orange'" in html
 
     def test_hbond_visualization_in_html(self):
-        """
-        Verify that detected H-bonds are rendered as cylinders.
-        """
+        """Verify that detected H-bonds are rendered as cylinders."""
         # Mock _find_hbonds to return a known bond
         with patch("synth_pdb.viewer._find_hbonds") as mock_find:
             mock_find.return_value = [
@@ -90,9 +82,7 @@ class TestVisualizationUpgrades:
             assert "linewidth: 10" in html
 
     def test_ssbond_visualization_in_html(self):
-        """
-        Verify that detected SSBONDs are rendered as yellow cylinders with stick sidechains.
-        """
+        """Verify that detected SSBONDs are rendered as yellow cylinders with stick sidechains."""
         # Create a mock PDB with clear SSBOND records
         pdb_content = (
             "SSBOND   1 CYS A    1    CYS A    2\n"

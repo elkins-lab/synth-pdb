@@ -49,8 +49,7 @@ from .geometry import position_atoms_batch, superimpose_batch
 
 
 class BatchedPeptide:
-    """
-    A lightweight container for batched protein coordinates.
+    """A lightweight container for batched protein coordinates.
     Designed for high-performance handover to ML frameworks.
     """
 
@@ -61,6 +60,15 @@ class BatchedPeptide:
         atom_names: List[str],
         residue_indices: List[int],
     ):
+        """Initialize the container.
+
+        Args:
+            coords: Coordinate tensor of shape (B, N_atoms, 3).
+            sequence: List of residue types (3-letter codes).
+            atom_names: List of atom names in the structure.
+            residue_indices: Mapping from each atom to its residue (1-indexed).
+
+        """
         self.coords = coords  # (B, N_atoms, 3)
         self.sequence = sequence
         self.atom_names = atom_names
@@ -82,12 +90,26 @@ class BatchedPeptide:
         )
 
     def save_pdb(self, path: str, index: int = 0) -> None:
-        """Saves one structure from the batch to a PDB file."""
+        """Saves one structure from the batch to a PDB file.
+
+        Args:
+            path: Target file path.
+            index: Batch index of the structure to save.
+
+        """
         with open(path, "w") as f:
             f.write(self.to_pdb(index))
 
     def to_pdb(self, index: int = 0) -> str:
-        """Converts one structure in the batch to a PDB string."""
+        """Converts one structure in the batch to a PDB string.
+
+        Args:
+            index: Batch index of the structure to convert.
+
+        Returns:
+            The PDB content as a string.
+
+        """
         lines = []
         c = self.coords[index]
         # PDB Format String: ATOM, Serial, Name, ResName, Chain, ResSeq, X, Y, Z, Occupancy, B-factor, Element
@@ -119,9 +141,15 @@ class BatchedPeptide:
         return "\n".join(lines)
 
     def get_6d_orientations(self) -> Dict[str, np.ndarray]:
-        """
-        Computes 6D inter-residue orientations (trRosetta style).
-        Returns a dictionary of (B, L, L) tensors: dist, omega, theta, phi.
+        """Computes 6D inter-residue orientations (trRosetta style).
+
+        Returns:
+            A dictionary of (B, L, L) tensors:
+                - 'dist': Cb-Cb distance.
+                - 'omega': Cb1-Ca1-Ca2-Cb2 torsion.
+                - 'theta': N1-Ca1-Cb1-Cb2 torsion.
+                - 'phi': Ca1-Cb1-Cb2 angle.
+
         """
         from .orientogram import compute_6d_orientations
 
@@ -131,12 +159,19 @@ class BatchedPeptide:
 
 
 class BatchedGenerator:
-    """
-    High-performance vectorized protein structure generator.
+    """High-performance vectorized protein structure generator.
     Optimized for generating millions of labeled samples for AI training.
     """
 
     def __init__(self, sequence_str: str, n_batch: int = 1, full_atom: bool = False):
+        """Initialize the batched generator.
+
+        Args:
+            sequence_str: The primary sequence (e.g. 'ACDEF' or 'ALA-CYS-ASP').
+            n_batch: Number of structures to generate in a single vectorized pass.
+            full_atom: If True, generates all heavy atoms (Kabsch superimposition).
+
+        """
         # Resolve sequence
         if "-" in sequence_str:
             raw_parts = [s.strip().upper() for s in sequence_str.split("-") if s.strip()]
@@ -211,8 +246,7 @@ class BatchedGenerator:
     def generate_batch(
         self, seed: Optional[int] = None, conformation: str = "alpha", drift: float = 0.0
     ) -> BatchedPeptide:
-        """
-        Generates B structures in parallel.
+        """Generates B structures in parallel.
 
         This method replaces the traditional per-residue loop with a "Batch Walk".
         Instead of placing atoms for structure 1, then structure 2... it places
@@ -223,6 +257,7 @@ class BatchedGenerator:
             conformation: The secondary structure preset to use for all members.
             drift: Gaussian noise (std dev) in degrees. Use this to generate "hard decoys"
                    that challenge AI models with near-native but slightly incorrect geometry.
+
         """
         if seed is not None:
             np.random.seed(seed)

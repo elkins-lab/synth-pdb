@@ -14,8 +14,7 @@ except ImportError:
 
 
 class SynchronousExecutor(concurrent.futures.Executor):
-    """
-    A mock executor that runs tasks synchronously in the current thread.
+    """A mock executor that runs tasks synchronously in the current thread.
     This allows mocks on generate_pdb_content to work, as they are in the same process.
     """
 
@@ -97,9 +96,7 @@ class TestDatasetGenerator:
                         assert (Path(output_dir) / "train/id_001.casp").exists()
 
     def test_generation_loop(self, output_dir):
-        """
-        Test the main generation loop using SynchronousExecutor.
-        """
+        """Test the main generation loop using SynchronousExecutor."""
         # We replace ProcessPoolExecutor with our SynchronousExecutor
         with patch("concurrent.futures.ProcessPoolExecutor", side_effect=SynchronousExecutor):
 

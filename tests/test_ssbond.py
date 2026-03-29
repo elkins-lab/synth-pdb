@@ -1,5 +1,4 @@
-"""
-Tests for disulfide bond (SSBOND) detection and annotation.
+"""Tests for disulfide bond (SSBOND) detection and annotation.
 
 EDUCATIONAL NOTE - Disulfide Bonds in Proteins
 ==============================================
@@ -61,8 +60,7 @@ class TestDisulfideBonds:
     """Test suite for disulfide bond detection and SSBOND records."""
 
     def test_detect_disulfide_bonds_function_exists(self):
-        """
-        Test that disulfide bond detection function exists.
+        """Test that disulfide bond detection function exists.
 
         EDUCATIONAL NOTE:
         We need a function to detect potential disulfide bonds by:
@@ -75,8 +73,7 @@ class TestDisulfideBonds:
         assert callable(_detect_disulfide_bonds)
 
     def test_detects_close_cysteines(self):
-        """
-        Test that close cysteine pairs are detected as disulfide bonds.
+        """Test that close cysteine pairs are detected as disulfide bonds.
 
         EDUCATIONAL NOTE - Distance Criteria:
         Disulfide bonds have very specific geometry:
@@ -126,8 +123,7 @@ class TestDisulfideBonds:
             os.remove(temp_path)
 
     def test_no_false_positives_distant_cysteines(self):
-        """
-        Test that distant cysteine pairs are NOT detected as disulfide bonds.
+        """Test that distant cysteine pairs are NOT detected as disulfide bonds.
 
         EDUCATIONAL NOTE - False Positives:
         It's important not to report disulfide bonds that don't exist:
@@ -162,8 +158,7 @@ class TestDisulfideBonds:
             os.remove(temp_path)
 
     def test_ssbond_record_format(self):
-        """
-        Test that SSBOND records are correctly formatted.
+        """Test that SSBOND records are correctly formatted.
 
         EDUCATIONAL NOTE - PDB SSBOND Format:
         SSBOND records follow strict PDB format specification:
@@ -201,7 +196,7 @@ class TestDisulfideBonds:
         assert isinstance(records, str)
 
         # Should have one record per disulfide
-        lines = [l for l in records.split("\n") if l.strip()]
+        lines = [line for line in records.split("\n") if line.strip()]
         assert len(lines) == len(disulfides)
 
         # Each line should start with SSBOND
@@ -211,16 +206,14 @@ class TestDisulfideBonds:
             assert chain_id in line
 
     def test_ssbond_in_generated_pdb(self):
-        """
-        Test that SSBOND and CONECT records appear in generated PDB files.
-        """
+        """Test that SSBOND and CONECT records appear in generated PDB files."""
         # Generate structure with cysteines
         pdb_content = generate_pdb_content(sequence_str="CCCCC", conformation="alpha")
 
         # Check if SSBOND records are present (if any disulfides detected)
         if "SSBOND" in pdb_content:
             # Verify SSBOND format
-            ssbond_lines = [l for l in pdb_content.split("\n") if l.startswith("SSBOND")]
+            ssbond_lines = [line for line in pdb_content.split("\n") if line.startswith("SSBOND")]
             assert len(ssbond_lines) > 0
 
             for line in ssbond_lines:
@@ -229,7 +222,7 @@ class TestDisulfideBonds:
 
             # Verify CONECT format (New Requirement)
             # When a disulfide is present, the SG atoms should be linked via CONECT
-            conect_lines = [l for l in pdb_content.split("\n") if l.startswith("CONECT")]
+            conect_lines = [line for line in pdb_content.split("\n") if line.startswith("CONECT")]
             assert len(conect_lines) >= 2, "Disulfide found but no CONECT records generated"
 
             # Check for reciprocity
@@ -245,9 +238,7 @@ class TestDisulfideBonds:
             assert len(conect_pairs) > 0, "No valid CONECT pairs found in records"
 
     def test_ssbond_and_conect_correlation(self):
-        """
-        Verify that SSBOND header records have corresponding CONECT records.
-        """
+        """Verify that SSBOND header records have corresponding CONECT records."""
         # We need a predictable structure. CGGGGC cyclic forces 1-6 proximity.
         from synth_pdb.physics import HAS_OPENMM
 
@@ -257,8 +248,8 @@ class TestDisulfideBonds:
         pdb_content = generate_pdb_content(sequence_str="CGGGGC", cyclic=True, minimize_energy=True)
 
         lines = pdb_content.split("\n")
-        ssbond_lines = [l for l in lines if l.startswith("SSBOND")]
-        conect_lines = [l for l in lines if l.startswith("CONECT")]
+        ssbond_lines = [line for line in lines if line.startswith("SSBOND")]
+        conect_lines = [line for line in lines if line.startswith("CONECT")]
 
         assert len(ssbond_lines) >= 1
         assert (
@@ -266,7 +257,7 @@ class TestDisulfideBonds:
         )  # 2 for N-C closure + at least 1 for S-S (bidirectional usually)
 
         # Find SG atoms for residues 1 and 6
-        atom_lines = [l for l in lines if l.startswith("ATOM")]
+        atom_lines = [line for line in lines if line.startswith("ATOM")]
         sg1_idx = None
         sg6_idx = None
         for line in atom_lines:
@@ -294,8 +285,7 @@ class TestDisulfideBonds:
         ), f"No CONECT record found between SG1 ({sg1_idx}) and SG6 ({sg6_idx})"
 
     def test_handles_no_cysteines_gracefully(self):
-        """
-        Test that structures without cysteines don't cause errors.
+        """Test that structures without cysteines don't cause errors.
 
         EDUCATIONAL NOTE - Edge Cases:
         Not all proteins have disulfide bonds:
@@ -319,8 +309,7 @@ class TestDisulfideBonds:
         assert pdb_content.strip().endswith("END")
 
     def test_multiple_disulfides(self):
-        """
-        Test handling of multiple disulfide bonds.
+        """Test handling of multiple disulfide bonds.
 
         EDUCATIONAL NOTE - Multiple Disulfides:
         Many proteins have multiple disulfide bonds:

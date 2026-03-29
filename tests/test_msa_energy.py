@@ -1,5 +1,4 @@
-"""
-Tests for the Potts Model Pseudo-Energy function used in Synthetic MSA generation.
+"""Tests for the Potts Model Pseudo-Energy function used in Synthetic MSA generation.
 Validated against statistical physics literature on Direct Coupling Analysis (DCA).
 """
 
@@ -32,11 +31,10 @@ def test_potts_model_initialization():
 
 
 def test_potts_energy_compensatory_mutation():
-    """
-    Test the core thesis of Co-evolution:
+    """Test the core thesis of Co-evolution:
     1. Base Ground State = Low Energy
     2. Single Disruption = High Energy
-    3. Compensatory Disruption = Low Energy (Rescue)
+    3. Compensatory Disruption = Low Energy (Rescue).
     """
     base_sequence = "AGTTG"
 

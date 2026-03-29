@@ -10,8 +10,7 @@ original_open = builtins.open
 
 
 def open_side_effect(file, mode="r", *args, **kwargs):
-    """
-    Side effect for open() mock.
+    """Side effect for open() mock.
     Only mocks the specific file we expect 'minimized.pdb'.
     Everything else is passed to the real open().
     """
@@ -23,11 +22,9 @@ def open_side_effect(file, mode="r", *args, **kwargs):
 
 
 def test_disulfide_detection_uses_minimized_structure():
-    """
-    Test that the generator uses the MINIMIZED structure coordinates for disulfide detection
+    """Test that the generator uses the MINIMIZED structure coordinates for disulfide detection
     when optimization is enabled.
     """
-
     # 1. Define the "Close" structure (simulating successful folding/minimization)
     minimized_structure = AtomArray(2)
     minimized_structure[0] = Atom([0, 0, 0], atom_name="SG", res_name="CYS", res_id=1, element="S")
@@ -85,8 +82,7 @@ def test_disulfide_detection_uses_minimized_structure():
 
 
 def test_disulfide_detection_fails_if_far():
-    """
-    Control test: Verify that if the structure is NOT minimized (or minimized structure is still far),
+    """Control test: Verify that if the structure is NOT minimized (or minimized structure is still far),
     NO disulfide bond is detected.
     """
     # 1. Define "Far" structure

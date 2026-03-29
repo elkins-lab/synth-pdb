@@ -1254,8 +1254,7 @@ class TestMainCLI:
         assert "Structure has no hydrogens! NEF/Relaxation requires protons" in caplog.text
 
     def test_visualization_highlights_passing(self, mocker, tmp_path, caplog):
-        """
-        Regression Test: Verify that using --visualize with --structure correctly parses
+        """Regression Test: Verify that using --visualize with --structure correctly parses
         highlights and passes them to the viewer without UnboundLocalError.
         """
         caplog.set_level(logging.INFO)

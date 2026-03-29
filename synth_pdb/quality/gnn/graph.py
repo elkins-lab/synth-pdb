@@ -1,5 +1,4 @@
-"""
-synth_pdb.quality.gnn.graph
+"""synth_pdb.quality.gnn.graph.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Converts a PDB string into a PyTorch Geometric `Data` graph for the GNN quality scorer.
 
@@ -63,8 +62,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) -> Any:
-    """
-    Parse *pdb_content* and return a :class:`torch_geometric.data.Data` object
+    """Parse *pdb_content* and return a :class:`torch_geometric.data.Data` object
     representing the protein as a residue-level contact graph.
 
     ── How this fits into the GNN pipeline ─────────────────────────────────
@@ -102,6 +100,7 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
     Raises:
         ValueError: If fewer than 2 residues with Cα atoms are found.
         ImportError: If torch or torch_geometric are not installed.
+
     """
     try:
         import torch
@@ -250,8 +249,7 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
 
 
 def _parse_backbone(pdb_content: str) -> List[Dict]:
-    """
-    Extract per-residue Cα coordinates, B-factors, and backbone dihedrals
+    """Extract per-residue Cα coordinates, B-factors, and backbone dihedrals
     from a raw PDB string.
 
     Returns a list of dicts (one per residue, sorted by chain then residue
@@ -344,8 +342,7 @@ def _parse_backbone(pdb_content: str) -> List[Dict]:
 
 
 def _dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) -> float:
-    """
-    Compute the dihedral angle (degrees) defined by four 3D points.
+    """Compute the dihedral angle (degrees) defined by four 3D points.
 
     Algorithm — the "two normal vectors" method:
     ─────────────────────────────────────────────

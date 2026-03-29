@@ -99,9 +99,7 @@ class TestBiophysics:
 
 
 def test_find_salt_bridges_simple():
-    """
-    Test detection of a simple salt bridge between ASP and LYS.
-    """
+    """Test detection of a simple salt bridge between ASP and LYS."""
     # Create simple structure: ASP 1 and LYS 2
     # ASP OD1 - LYS NZ distance ~3.5 A
 
@@ -130,9 +128,7 @@ def test_find_salt_bridges_simple():
 
 
 def test_find_salt_bridges_cutoff():
-    """
-    Test that salt bridges outside the cutoff are ignored.
-    """
+    """Test that salt bridges outside the cutoff are ignored."""
     atoms = []
     # ASP 1
     atoms.append(struc.Atom([0, 0, 0], res_id=1, res_name="ASP", atom_name="OD1", element="O"))
@@ -145,9 +141,7 @@ def test_find_salt_bridges_cutoff():
 
 
 def test_find_salt_bridges_arg_glu():
-    """
-    Test detection between GLU and ARG.
-    """
+    """Test detection between GLU and ARG."""
     atoms = []
     # GLU 5 - OE1
     atoms.append(struc.Atom([10, 10, 10], res_id=5, res_name="GLU", atom_name="OE1", element="O"))
@@ -163,9 +157,7 @@ def test_find_salt_bridges_arg_glu():
 
 
 def test_find_salt_bridges_ignore_same_residue():
-    """
-    Ensure we don't detect fake bridges within the same residue.
-    """
+    """Ensure we don't detect fake bridges within the same residue."""
     atoms = []
     # HIS 1 (if we misconfigure, it might think ND1 and NE2 are a bridge)
     atoms.append(struc.Atom([0, 0, 0], res_id=1, res_name="HIS", atom_name="ND1", element="N"))

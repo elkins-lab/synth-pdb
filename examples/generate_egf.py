@@ -6,10 +6,9 @@ from synth_pdb.main import main as synth_main
 
 
 def generate_egf_example():
-    """
-    Generate a Human Epidermal Growth Factor (EGF) protein example.
+    """Generate a Human Epidermal Growth Factor (EGF) protein example.
     Sequence: NSDSECPLSHDGYCLHDGVCMYIEALDKYACNCVVGYIGERCQYRDLKWWELR (53 aa)
-    Disulfides: C6-C20, C14-C31, C33-C42
+    Disulfides: C6-C20, C14-C31, C33-C42.
     """
     egf_seq = "NSDSECPLSHDGYCLHDGVCMYIEALDKYACNCVVGYIGERCQYRDLKWWELR"
     output_file = "egf_protein.pdb"

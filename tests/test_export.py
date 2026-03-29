@@ -60,8 +60,7 @@ def test_export_csv_format(mock_matrix):
 
 
 def test_export_casp_variety():
-    """
-    Regression test: Ensure CASP export reflects varying distances.
+    """Regression test: Ensure CASP export reflects varying distances.
     This would have caught the issue where all lines had identical '8.0' thresholds.
     """
     # Create distance matrix with varied values > 1.0

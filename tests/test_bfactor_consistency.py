@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_bfactor_reflects_dynamics():
-    """
-    Verify that B-factors in the generated PDB reflect structural dynamics.
+    """Verify that B-factors in the generated PDB reflect structural dynamics.
 
     Helical residues (rigid, high S2) should have LOW B-factors.
     Terminal residues (flexible, low S2) should have HIGH B-factors.
@@ -50,8 +49,7 @@ def test_bfactor_reflects_dynamics():
     reason="WIP: Geometry generator needs refactoring to produce reliable secondary structure for S2 prediction."
 )
 def test_bfactor_loop_vs_helix():
-    """
-    Verify that loop regions have higher B-factors than helical regions.
+    """Verify that loop regions have higher B-factors than helical regions.
 
     SKIPPED (WIP):
     Currently, generated helices often deviate from ideal Phi/Psi angles, causing

@@ -39,8 +39,7 @@ def position_atom_3d_from_internal_coords(
     bond_angle_deg: float,
     dihedral_angle_deg: float,
 ) -> np.ndarray:
-    """
-    Calculates the 3D coordinates of a new atom (P4) given the coordinates of three
+    """Calculates the 3D coordinates of a new atom (P4) given the coordinates of three
     preceding atoms (P1, P2, P3) and the internal coordinates.
 
     # EDUCATIONAL NOTE - NeRF Geometry (Natural Extension Reference Frame)
@@ -112,8 +111,7 @@ def position_atom_3d_from_internal_coords(
 
 
 def superimpose_batch(sources: np.ndarray, targets: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Vectorized Kabsch algorithm to find the optimal rotation and translation
+    """Vectorized Kabsch algorithm to find the optimal rotation and translation
     that aligns a batch of source point sets to target point sets.
 
     EDUCATIONAL NOTE - Vectorized Kabsch Algorithm:
@@ -135,6 +133,7 @@ def superimpose_batch(sources: np.ndarray, targets: np.ndarray) -> Tuple[np.ndar
     Returns:
         translations: (B, 3) centroid translations.
         rotations: (B, 3, 3) rotation matrices.
+
     """
     b = sources.shape[0]
 
@@ -188,8 +187,7 @@ def position_atoms_batch(
     bond_angles_deg: np.ndarray,
     dihedral_angles_deg: np.ndarray,
 ) -> np.ndarray:
-    """
-    Vectorized version of the NeRF algorithm for large batches of structures.
+    """Vectorized version of the NeRF algorithm for large batches of structures.
     Operates on (B, 3) coordinate tensors and (B,) internal coordinate arrays.
 
     EDUCATIONAL NOTE - GPU-First Operations:
@@ -209,6 +207,7 @@ def position_atoms_batch(
 
     Returns:
         np.ndarray: (B, 3) array of coordinates for the placed atoms (p4).
+
     """
     # Convert angles to radians
     angles_rad = np.deg2rad(bond_angles_deg)
@@ -250,9 +249,7 @@ def position_atoms_batch(
 
 @njit
 def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
-    """
-    Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex.
-    """
+    """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
     vec1 = coord1 - coord2
     vec2 = coord3 - coord2
 
@@ -275,8 +272,7 @@ def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) 
 def calculate_dihedral_angle(
     p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray
 ) -> float:
-    """
-    Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
+    """Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
     Uses the robust vector-based normal approach (IUPAC convention).
     """
     v1 = p2 - p1
@@ -320,12 +316,14 @@ def calculate_dihedral_angle(
 
 
 def batched_angle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> np.ndarray:
-    """
-    Vectorized calculation of angles for batches of point triplets.
+    """Vectorized calculation of angles for batches of point triplets.
+
     Args:
         p1, p2, p3: arrays of shape (..., 3)
+
     Returns:
         angles: array of shape (...) in degrees
+
     """
     v1 = p1 - p2
     v2 = p3 - p2
@@ -345,12 +343,14 @@ def batched_angle(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray) -> np.ndarray:
 
 
 def batched_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) -> np.ndarray:
-    """
-    Vectorized calculation of dihedral angles for batches of point quadruplets.
+    """Vectorized calculation of dihedral angles for batches of point quadruplets.
+
     Args:
         p1, p2, p3, p4: arrays of shape (..., 3)
+
     Returns:
         dihedrals: array of shape (...) in degrees
+
     """
     b0 = -1.0 * (p2 - p1)
     b1 = p3 - p2
@@ -377,8 +377,7 @@ def reconstruct_sidechain(
     rotamer: Dict[str, Union[float, List[float]]],
     res_name: Optional[str] = None,
 ) -> None:
-    """
-    Reconstructs the sidechain of a specific residue in the peptide using the provided rotamer angles.
+    """Reconstructs the sidechain of a specific residue in the peptide using the provided rotamer angles.
     Updates the coordinates in place.
 
     Args:
@@ -387,6 +386,7 @@ def reconstruct_sidechain(
         rotamer: Dictionary of chi angles e.g. {'chi1': [60.0], 'chi2': [180.0]}.
                  Note: Takes lists as values to match data.py structure, uses first element.
         res_name: Optional, if not provided it's inferred from the structure.
+
     """
     # 1. Isolate the residue atoms
     mask = peptide.res_id == res_id

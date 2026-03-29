@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-CLI entry point for the synth-pdb tool.
+"""CLI entry point for the synth-pdb tool.
 
 This module provides the main() function that serves as the command-line interface
 for generating PDB files.
@@ -104,9 +103,7 @@ def _build_command_string(args: argparse.Namespace) -> str:
 
 
 def main() -> None:
-    """
-    Main function to parse arguments and generate the PDB file.
-    """
+    """Main function to parse arguments and generate the PDB file."""
     parser = argparse.ArgumentParser(
         description="Generate a PDB file with a random linear amino acid sequence."
     )

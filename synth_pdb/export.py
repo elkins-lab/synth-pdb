@@ -8,11 +8,10 @@ def export_constraints(
     separation_cutoff: int = 0,
     threshold: float = 8.0,
 ) -> str:
-    """
-    Export a Contact Map or Distance Matrix to text format for AI modeling.
+    """Export a Contact Map or Distance Matrix to text format for AI modeling.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     contact_map : np.ndarray
         NxN matrix. Values can be Binary (0/1), Probabilities (0.0-1.0),
         or raw distances (Angstroms).
@@ -26,10 +25,11 @@ def export_constraints(
     threshold : float
         Distance cutoff for including a pair in the export.
 
-    Returns:
-    --------
+    Returns
+    -------
     content : str
         The textual content of the file.
+
     """
     n_res = contact_map.shape[0]
     lines = []

@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def calculate_clash_score(atom_array: struc.AtomArray) -> float:
-    """
-    Calculate a simple clash score based on Van der Waals overlaps.
+    """Calculate a simple clash score based on Van der Waals overlaps.
     Lower is better.
 
     Args:
@@ -32,6 +31,7 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
     # In this function, we use a simplified "Soft Sphere" or "Cubic Penalty" approach.
     # Instead of shooting to infinity (which breaks optimization math), we assume
     # the energy rises polynomially once distance < sum_of_radii.
+
     """
     if atom_array.array_length() < 2:
         return 0.0
@@ -112,8 +112,7 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
 
 
 def calculate_energy_score(atom_array: struc.AtomArray) -> float:
-    """
-    Calculate a total pseudo-energy score.
+    """Calculate a total pseudo-energy score.
     Currently just wraps clash_score, but can be extended with electrostatics/solvation.
     """
     return calculate_clash_score(atom_array)

@@ -22,8 +22,7 @@ class MockPDBFile:
 
 
 def test_disulfide_detection_uses_minimized_structure():
-    """
-    Test that IF minimization happens, the generator uses the MINIMIZED
+    """Test that IF minimization happens, the generator uses the MINIMIZED
     structure (which has ~2.0A S-S bond) rather than the initial structure
     (which might have >3A distance) for detecting disulfides.
     """

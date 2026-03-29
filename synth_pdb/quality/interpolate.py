@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 def interpolate_structures(
     start_pdb_path: str, end_pdb_path: str, steps: int, output_prefix: str
 ) -> None:
-    """
-    Interpolates between two structures by morphing their backbone torsion angles.
+    """Interpolates between two structures by morphing their backbone torsion angles.
 
     Args:
         start_pdb_path: Path to start PDB.
         end_pdb_path: Path to end PDB.
         steps: Number of intermediate frames.
         output_prefix: Prefix for output files (e.g. "morph" -> "morph_0.pdb", "morph_1.pdb"...)
+
     """
     # 1. Load structures
     pdb_file_start = pdb.PDBFile.read(start_pdb_path)

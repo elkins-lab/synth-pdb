@@ -1,5 +1,4 @@
-"""
-Chemical Shift prediction for synth-pdb.
+"""Chemical Shift prediction for synth-pdb.
 
 This module now provides compatibility shims that re-export from the synth-nmr package.
 For direct usage of NMR functionality, consider using synth-nmr directly:

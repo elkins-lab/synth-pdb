@@ -156,8 +156,7 @@ view.show()
 
 
 def calculate_pre_profile(pdb_str, label_resi=15):
-    """
-    Calculates a simplified PRE intensity ratio (I/I0) for backbone amides.
+    """Calculates a simplified PRE intensity ratio (I/I0) for backbone amides.
     In real physics (e.g. Solomon-Bloembergen equations), PRE adds a Gamma rate to R2.
     Gamma is proportional to <r^-6>.
     """

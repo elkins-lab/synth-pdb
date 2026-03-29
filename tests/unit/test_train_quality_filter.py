@@ -1,5 +1,4 @@
-"""
-TDD tests for scripts/train_quality_filter.py and synth_pdb/quality/features.py.
+"""TDD tests for scripts/train_quality_filter.py and synth_pdb/quality/features.py.
 
 These tests were written BEFORE the fixes, so they are expected to FAIL against
 the original code. They document the required behavior after the fixes are applied.
@@ -108,8 +107,7 @@ class TestRFHyperparameters(unittest.TestCase):
 
 
 class TestGenerateDatasetBalance(unittest.TestCase):
-    """
-    Fails in spirit before the fix: the fix makes failures visible and
+    """Fails in spirit before the fix: the fix makes failures visible and
     enforces a minimum yield. We test that the function at least returns
     a non-trivially-sized dataset, and that both classes are present.
     """
@@ -123,17 +121,17 @@ class TestGenerateDatasetBalance(unittest.TestCase):
         spec.loader.exec_module(mod)
 
         n_samples = 20
-        X, y = mod.generate_dataset(n_samples=n_samples)
+        x_data, y = mod.generate_dataset(n_samples=n_samples)
 
-        self.assertIsInstance(X, np.ndarray, "X must be a numpy array")
+        self.assertIsInstance(x_data, np.ndarray, "x_data must be a numpy array")
         self.assertIsInstance(y, np.ndarray, "y must be a numpy array")
 
         min_expected = int(n_samples * 0.5)
         self.assertGreaterEqual(
-            len(X),
+            len(x_data),
             min_expected,
             msg=(
-                f"generate_dataset returned only {len(X)} samples from a requested "
+                f"generate_dataset returned only {len(x_data)} samples from a requested "
                 f"{n_samples}. At least {min_expected} are required. "
                 "Check for silently swallowed exceptions."
             ),
@@ -145,11 +143,11 @@ class TestGenerateDatasetBalance(unittest.TestCase):
         self.assertIn(0, unique_labels, "No 'Bad' (label=0) samples were generated")
 
         # Feature matrix must be 2D with the correct number of features (8)
-        self.assertEqual(X.ndim, 2, "Feature matrix X must be 2D")
+        self.assertEqual(x_data.ndim, 2, "Feature matrix x_data must be 2D")
         self.assertEqual(
-            X.shape[1],
+            x_data.shape[1],
             8,
-            msg=f"Expected 8 features per sample, got {X.shape[1]}",
+            msg=f"Expected 8 features per sample, got {x_data.shape[1]}",
         )
 
 
@@ -159,8 +157,7 @@ class TestGenerateDatasetBalance(unittest.TestCase):
 
 
 class TestFeatureSeparability(unittest.TestCase):
-    """
-    Validates the medium-severity concern: 'random' conformation must produce
+    """Validates the medium-severity concern: 'random' conformation must produce
     measurably worse Ramachandran statistics than 'alpha' (Good).
     Fails if the two classes are indistinguishable on the primary feature.
     """

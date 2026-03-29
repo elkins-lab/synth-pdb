@@ -8,8 +8,7 @@ from synth_pdb.generator import generate_pdb_content
 class TestDockingRobustness:
 
     def test_pqr_generation_with_real_structure(self):
-        """
-        Verify PQR generation using a realistically generated structure from synth-pdb.
+        """Verify PQR generation using a realistically generated structure from synth-pdb.
         This ensures OpenMM templates match correctly.
         """
         # Generate a small valid peptide
@@ -44,9 +43,7 @@ class TestDockingRobustness:
                 float(radius_val)
 
     def test_ptm_to_pqr_conversion_robust(self):
-        """
-        Verify that PTMs are translated correctly by preparer before OpenMM sees them.
-        """
+        """Verify that PTMs are translated correctly by preparer before OpenMM sees them."""
         # ALA-ALA-SEP-ALA-ALA
         pdb_content = generate_pdb_content(
             length=5, sequence_str="ALA-ALA-SEP-ALA-ALA", minimize_energy=False

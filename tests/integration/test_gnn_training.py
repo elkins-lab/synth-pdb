@@ -1,5 +1,4 @@
-"""
-TDD integration tests for GNN training and checkpoint save/load.
+"""TDD integration tests for GNN training and checkpoint save/load.
 
 Written BEFORE the implementation exists — all tests should fail initially.
 """

@@ -1,5 +1,4 @@
-"""
-Evolutionary Simulation Module for Synthetic PDB.
+"""Evolutionary Simulation Module for Synthetic PDB.
 
 This module implements "In Silico Evolution" to generate synthetic Multiple Sequence Alignments (MSAs).
 It uses a Structural Bioinformatics approach:
@@ -36,8 +35,7 @@ ALL_AMINO_ACIDS = list("ACDEFGHIKLMNPQRSTVWY")
 
 
 def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
-    """
-    Calculate the Relative Solvent Accessible Surface Area (rSASA) for each residue.
+    """Calculate the Relative Solvent Accessible Surface Area (rSASA) for each residue.
 
     Why Relative?
     - Absolute SASA (in Å²) depends on the size of the amino acid.
@@ -49,6 +47,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
 
     Returns:
         np.array: Array of rSASA values (0.0 to 1.0) for each residue.
+
     """
     logger.info("Calculating Solvent Accessible Surface Area (SASA)...")
 
@@ -123,8 +122,7 @@ def generate_msa_sequences(
     mutation_rate: float = 0.1,
     conservation_threshold: float = 0.2,
 ) -> List[str]:
-    """
-    Generate synthetic homologs via simulated neutral drift.
+    """Generate synthetic homologs via simulated neutral drift.
 
     Args:
         structure: Source structure.
@@ -134,6 +132,7 @@ def generate_msa_sequences(
 
     Returns:
         List of sequence strings.
+
     """
     # 1. Analyze Structure
     rel_sasa = calculate_relative_sasa(structure)
@@ -177,9 +176,7 @@ def generate_msa_sequences(
 
 
 def write_msa(sequences: List[str], filename: str) -> None:
-    """
-    Write MSA in FASTA format.
-    """
+    """Write MSA in FASTA format."""
     with open(filename, "w") as f:
         for i, seq in enumerate(sequences):
             f.write(f">seq_{i}\n")

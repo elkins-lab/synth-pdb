@@ -4,9 +4,7 @@ import synth_pdb.generator
 
 
 def get_chi1_angle(peptide, res_id, res_name="VAL"):
-    """
-    Helper to calculate Chi1 angle (N-CA-CB-Gamma) from a generated structure.
-    """
+    """Helper to calculate Chi1 angle (N-CA-CB-Gamma) from a generated structure."""
     # Determine Gamma atom name based on residue
     gamma_map = {
         "VAL": "CG1",  # or CG2
@@ -46,8 +44,7 @@ def get_chi1_angle(peptide, res_id, res_name="VAL"):
 
 
 def sample_rotamer_distribution(conformation, res_name="VAL", n_samples=30):
-    """
-    Generates N peptides of Length 1 (Just the residue) with a specific conformation
+    """Generates N peptides of Length 1 (Just the residue) with a specific conformation
     and returns the list of observed Chi1 angles.
     """
     angles = []
@@ -74,9 +71,7 @@ def sample_rotamer_distribution(conformation, res_name="VAL", n_samples=30):
 
 
 def classify_rotamer(angle):
-    """
-    Classify angle into g+ (60), g- (-60/300), t (180).
-    """
+    """Classify angle into g+ (60), g- (-60/300), t (180)."""
     # Normalize to [-180, 180]
     angle = ((angle + 180) % 360) - 180
 
@@ -89,9 +84,7 @@ def classify_rotamer(angle):
 
 
 def test_val_rotamer_dependence_on_structure():
-    """
-    Verify that the rotamer distribution is different for Alpha Helix vs Beta Sheet (Valine).
-    """
+    """Verify that the rotamer distribution is different for Alpha Helix vs Beta Sheet (Valine)."""
     # 1. Sample Alpha Helix
     alpha_angles = sample_rotamer_distribution("alpha", res_name="VAL", n_samples=30)
     alpha_counts = Counter([classify_rotamer(a) for a in alpha_angles])
@@ -116,9 +109,7 @@ def test_val_rotamer_dependence_on_structure():
 
 
 def test_leu_rotamer_dependence_on_structure():
-    """
-    Verify LEU rotamer dependence. Expecting failure until implemented.
-    """
+    """Verify LEU rotamer dependence. Expecting failure until implemented."""
     # 1. Sample Alpha Helix
     alpha_angles = sample_rotamer_distribution("alpha", res_name="LEU", n_samples=30)
     alpha_counts = Counter([classify_rotamer(a) for a in alpha_angles])
@@ -145,9 +136,7 @@ def test_leu_rotamer_dependence_on_structure():
 
 
 def test_phe_rotamer_dependence_on_structure():
-    """
-    Verify PHE (Aromatic) rotamer dependence. Expecting failure until implemented.
-    """
+    """Verify PHE (Aromatic) rotamer dependence. Expecting failure until implemented."""
     # 1. Sample Alpha Helix
     alpha_angles = sample_rotamer_distribution("alpha", res_name="PHE", n_samples=30)
     alpha_counts = Counter([classify_rotamer(a) for a in alpha_angles])

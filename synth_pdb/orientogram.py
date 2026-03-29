@@ -8,8 +8,7 @@ from .geometry import batched_angle, batched_dihedral, position_atoms_batch
 def compute_6d_orientations(
     coords: np.ndarray, atom_names: list, residue_indices: list, n_residues: int
 ) -> Dict[str, np.ndarray]:
-    """
-    Computes 6D inter-residue orientations for all pairs of residues.
+    """Computes 6D inter-residue orientations for all pairs of residues.
     This follows the trRosetta convention: (dist, omega, theta, phi).
 
     ### EDUCATIONAL NOTE - trRosetta 6D Orientations:
@@ -41,6 +40,7 @@ def compute_6d_orientations(
             'omega': (b, l, l) - Ca_i-Cb_i-Cb_j-Ca_j dihedral
             'theta': (b, l, l) - Ca_i-Cb_i-Cb_j angle
             'phi': (b, l, l) - N_i-Ca_i-Cb_i-Cb_j dihedral
+
     """
     b = coords.shape[0]
     length = n_residues

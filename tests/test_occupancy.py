@@ -1,5 +1,4 @@
-"""
-Tests for occupancy value assignment.
+"""Tests for occupancy value assignment.
 
 EDUCATIONAL NOTE - What is Occupancy?
 =====================================
@@ -45,8 +44,7 @@ class TestOccupancyCalculation:
         assert callable(_calculate_occupancy)
 
     def test_backbone_vs_sidechain_occupancy(self):
-        """
-        Test that backbone atoms have higher occupancy than side chain atoms.
+        """Test that backbone atoms have higher occupancy than side chain atoms.
 
         EDUCATIONAL NOTE:
         Backbone atoms (N, CA, C, O) are constrained by peptide bonds and
@@ -82,8 +80,7 @@ class TestOccupancyCalculation:
         ), f"Backbone occupancy ({backbone_avg:.2f}) should be > side chain ({sidechain_avg:.2f})"
 
     def test_terminal_residues_lower_occupancy(self):
-        """
-        Test that terminal residues have lower occupancy than middle residues.
+        """Test that terminal residues have lower occupancy than middle residues.
 
         EDUCATIONAL NOTE:
         Terminal residues are more flexible because they have fewer constraints:
@@ -119,8 +116,7 @@ class TestOccupancyCalculation:
         ), f"C-terminus ({c_term_avg:.2f}) should have lower occupancy than middle ({middle_avg:.2f})"
 
     def test_flexible_residues_lower_occupancy(self):
-        """
-        Test that flexible residues have lower occupancy.
+        """Test that flexible residues have lower occupancy.
 
         EDUCATIONAL NOTE - Residue Flexibility:
         Some amino acids are inherently more flexible:
@@ -159,8 +155,7 @@ class TestOccupancyCalculation:
         ), f"GLY ({gly_avg:.2f}) should have lower occupancy than ALA ({ala_avg:.2f})"
 
     def test_rigid_residues_higher_occupancy(self):
-        """
-        Test that rigid residues have higher occupancy.
+        """Test that rigid residues have higher occupancy.
 
         EDUCATIONAL NOTE - Rigid Residues:
         Some amino acids are more constrained:
@@ -198,8 +193,7 @@ class TestOccupancyCalculation:
         ), f"PRO ({pro_avg:.2f}) should have higher occupancy than ALA ({ala_avg:.2f})"
 
     def test_occupancy_realistic_range(self):
-        """
-        Test that occupancy values are in realistic range (0.85-1.00).
+        """Test that occupancy values are in realistic range (0.85-1.00).
 
         EDUCATIONAL NOTE - Typical Occupancy Ranges:
 
@@ -233,8 +227,7 @@ class TestOccupancyCalculation:
             ), f"Occupancy {occupancy:.2f} out of range for {res_name} {atom_name}"
 
     def test_occupancy_correlates_with_bfactor(self):
-        """
-        Test that lower occupancy correlates with higher B-factors.
+        """Test that lower occupancy correlates with higher B-factors.
 
         EDUCATIONAL NOTE - Occupancy vs B-factor Relationship:
 
@@ -281,8 +274,7 @@ class TestOccupancyCalculation:
         ), f"Low B-factor occupancy ({occ_low_bf:.2f}) should be > high B-factor ({occ_high_bf:.2f})"
 
     def test_occupancy_in_generated_pdb(self):
-        """
-        Test that generated PDB files contain realistic occupancy values.
+        """Test that generated PDB files contain realistic occupancy values.
 
         EDUCATIONAL NOTE - Occupancy in PDB Files:
         Occupancy appears in columns 55-60 of ATOM records.
@@ -321,8 +313,7 @@ class TestOccupancyCalculation:
         assert len(set(occupancies)) > 1, "All occupancies are identical (should vary)"
 
     def test_occupancy_variation_along_chain(self):
-        """
-        Test that occupancy varies along the peptide chain.
+        """Test that occupancy varies along the peptide chain.
 
         EDUCATIONAL NOTE - Occupancy Gradients:
         In real structures, occupancy typically shows patterns:

@@ -4,15 +4,13 @@ from synth_pdb.coupling import calculate_hn_ha_coupling, predict_couplings_from_
 
 
 class TestJCoupling:
-    """
-    TDD Test Suite for J-Coupling Prediction.
+    """TDD Test Suite for J-Coupling Prediction.
 
     Verifies the implementation of the Karplus Equation for 3J(HN-HA) couplings.
     """
 
     def test_ideal_alpha_helix(self):
-        """
-        Test J-coupling for an ideal Alpha Helix.
+        """Test J-coupling for an ideal Alpha Helix.
         Phi approx -57 degrees.
         Expected J: Small (< 6.0 Hz).
         """
@@ -23,8 +21,7 @@ class TestJCoupling:
         assert 2.0 < j_val < 6.0, f"Helix coupling {j_val} out of expected range (2-6 Hz)"
 
     def test_ideal_beta_sheet(self):
-        """
-        Test J-coupling for an ideal Beta Sheet.
+        """Test J-coupling for an ideal Beta Sheet.
         Phi approx -139 degrees (parallel) / -119 (antiparallel).
         Expected J: Large (> 8.0 Hz).
         """

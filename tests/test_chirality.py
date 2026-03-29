@@ -38,8 +38,7 @@ logger = logging.getLogger(__name__)
 class TestChirality(unittest.TestCase):
 
     def test_all_residues_are_L_amino_acids(self):
-        """
-        Generates a random peptide and verifies that all non-Glycine residues
+        """Generates a random peptide and verifies that all non-Glycine residues
         have L-chirality.
         """
         # Generate a sufficiently long random peptide to cover many amino acid types

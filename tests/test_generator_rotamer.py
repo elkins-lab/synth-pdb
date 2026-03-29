@@ -11,9 +11,7 @@ logging.getLogger().setLevel(logging.CRITICAL)
 class TestGeneratorWithRotamers(unittest.TestCase):
 
     def test_side_chain_generation_creates_reasonable_chi_angle(self):
-        """
-        Test that side-chain generation creates a reasonable chi-1 angle for LEU.
-        """
+        """Test that side-chain generation creates a reasonable chi-1 angle for LEU."""
         # Generate a peptide with a LEU residue
         pdb_content = generate_pdb_content(sequence_str="LEU")
         atoms = PDBValidator._parse_pdb_atoms(pdb_content)

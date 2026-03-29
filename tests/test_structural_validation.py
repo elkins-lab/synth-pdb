@@ -16,9 +16,7 @@ PDB_FILE = "1UBQ.pdb"
 
 @pytest.fixture(scope="module")
 def experimental_pdb():
-    """
-    Downloads the 1UBQ PDB file if it doesn't exist locally.
-    """
+    """Downloads the 1UBQ PDB file if it doesn't exist locally."""
     if not os.path.exists(PDB_FILE):
         print(f"Downloading {PDB_URL}...")
         response = requests.get(PDB_URL)
@@ -29,12 +27,11 @@ def experimental_pdb():
 
 
 def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
-    """
-    Verifies structural fidelity of the minimized 1UBQ against the original experimental structure.
+    """Verifies structural fidelity of the minimized 1UBQ against the original experimental structure.
     Checks:
     1. Backbone RMSD (should be < 1.0 A)
     2. Phi/Psi Correlation (should be > 0.9)
-    3. Absence of severe clashes in refined structure
+    3. Absence of severe clashes in refined structure.
     """
     # 1. Load experimental structure
     exp_file = pdb.PDBFile.read(experimental_pdb)
@@ -184,8 +181,7 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
 
 
 def test_experimental_clash_comparison(experimental_pdb, tmp_path):
-    """
-    Compares steric clashes in experimental vs minimized structures.
+    """Compares steric clashes in experimental vs minimized structures.
     Shows that minimization actually improves (reduces) physical violations.
     """
     # Validate Experimental

@@ -130,7 +130,6 @@ df_rdc.head()
 
 
 import biotite.structure.io.pdb as bpdb
-import numpy as np
 
 # Load the PDB file into a Biotite AtomArray
 pdb_struct = bpdb.PDBFile.read(pdb_file).get_structure(model=1)

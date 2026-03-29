@@ -14,8 +14,7 @@ class TestCoverageGaps:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_ptm_atom_stripping_and_translation(self, mock_app):
-        """
-        Verify that PTMs (SEP, TPO, PTR) are translated to standard residues
+        """Verify that PTMs (SEP, TPO, PTR) are translated to standard residues
         and their extra atoms (P, O1P, etc.) are stripped.
         """
         minimizer = EnergyMinimizer()
@@ -64,9 +63,7 @@ class TestCoverageGaps:
     @patch("synth_pdb.physics.app")
     @patch("synth_pdb.physics.mm")
     def test_health_check_nan_handling(self, mock_mm, mock_app):
-        """
-        Verify that NaNs in energy or positions cause simulation to fail.
-        """
+        """Verify that NaNs in energy or positions cause simulation to fail."""
         # Patch ForceField constructor to avoid real file loading
         mock_ff = MagicMock()
         mock_app.ForceField.return_value = mock_ff
@@ -124,9 +121,7 @@ class TestCoverageGaps:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_health_check_high_energy_warning(self, mock_app, caplog):
-        """
-        Verify that extremely high energy triggers a warning but allows success.
-        """
+        """Verify that extremely high energy triggers a warning but allows success."""
         import logging
 
         caplog.set_level(logging.WARNING)
@@ -167,9 +162,7 @@ class TestCoverageGaps:
 
     @patch("synth_pdb.generator._detect_disulfide_bonds", return_value=[])
     def test_generator_ace_offset_mapping(self, mock_detect):
-        """
-        Verify that generator.py correctly maps PTM names even with ACE cap offsets.
-        """
+        """Verify that generator.py correctly maps PTM names even with ACE cap offsets."""
         min_pdb_content = (
             "ATOM      1  CH3 ACE A   0       0.000   0.000   0.000  1.00  0.00           C  \n"
             "ATOM      2  C   ACE A   0       1.000   1.000   1.000  1.00  0.00           C  \n"

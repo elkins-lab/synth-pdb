@@ -1,5 +1,4 @@
-"""
-Train the GNN-based protein quality classifier.
+"""Train the GNN-based protein quality classifier.
 
 Usage
 -----
@@ -22,8 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
-    """
-    Convert raw PDB strings to PyG Data objects with ground-truth labels.
+    """Convert raw PDB strings to PyG Data objects with ground-truth labels.
 
     Args:
         X_feats: Unused here (kept for API parity with RF script); the graph
@@ -33,6 +31,7 @@ def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
 
     Returns:
         List of torch_geometric.data.Data objects with .y set.
+
     """
     import torch
 
@@ -55,8 +54,7 @@ def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
 
 
 def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
-    """
-    Generate synthetic PDB strings for the four structural classes used in
+    """Generate synthetic PDB strings for the four structural classes used in
     training. Returns (pdb_list, y) rather than (X_feats, y) since the GNN
     builds its own graph features directly from the PDB atoms.
     """

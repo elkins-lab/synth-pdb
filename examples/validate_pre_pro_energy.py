@@ -18,8 +18,7 @@ logger = logging.getLogger("validate_energy")
 
 
 def measure_energy(pdb_content, name):
-    """
-    Minimizes structure and returns time taken.
+    """Minimizes structure and returns time taken.
     Uses EnergyMinimizer class which requires file I/O.
     """
     # Create temp files

@@ -27,8 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class PDBValidator:
-    """
-    A class to validate PDB structures for various violations like bond lengths, angles,
+    """A class to validate PDB structures for various violations like bond lengths, angles,
     and Ramachandran angles.
     """
 
@@ -61,8 +60,7 @@ class PDBValidator:
 
     @staticmethod
     def _parse_pdb_atoms(pdb_content: str) -> List[Dict[str, Any]]:
-        """
-        Parses the PDB content and extracts atom information, specifically coordinates.
+        """Parses the PDB content and extracts atom information, specifically coordinates.
 
         EDUCATIONAL NOTE - Physics of the Ramachandran Plot:
         ---------------------------------------------------
@@ -126,17 +124,13 @@ class PDBValidator:
         return parsed_atoms
 
     def get_atoms(self) -> List[Dict[str, Any]]:
-        """
-        Returns a deep copy of the parsed atom data.
-        """
+        """Returns a deep copy of the parsed atom data."""
         # Return a deep copy to allow external modification without affecting internal state directly
         return [atom.copy() for atom in self.atoms]
 
     @staticmethod
     def atoms_to_pdb_line(atom_data: Dict[str, Any]) -> str:
-        """
-        Converts a single atom dictionary back into a PDB ATOM line.
-        """
+        """Converts a single atom dictionary back into a PDB ATOM line."""
         x, y, z = atom_data["coords"]
         record_name = atom_data.get("record_name", "ATOM")
         return (
@@ -149,9 +143,7 @@ class PDBValidator:
 
     @staticmethod
     def atoms_to_pdb_content(atom_list: List[Dict[str, Any]]) -> str:
-        """
-        Converts a list of atom dictionaries into a PDB content string, with TER records after each chain.
-        """
+        """Converts a list of atom dictionaries into a PDB content string, with TER records after each chain."""
         if not atom_list:
             return ""
 
@@ -193,9 +185,8 @@ class PDBValidator:
         return "\n".join(pdb_lines) + "\n"
 
     def _group_atoms_by_residue(self) -> Dict[str, Dict[int, Dict[str, Dict[str, Any]]]]:
-        """
-        Groups parsed atoms by chain ID, then by residue number, then by atom name.
-        Structure: {chain_id: {residue_number: {atom_name: atom_data}}}
+        """Groups parsed atoms by chain ID, then by residue number, then by atom name.
+        Structure: {chain_id: {residue_number: {atom_name: atom_data}}}.
         """
         grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]] = {}
         for atom in self.atoms:
@@ -212,9 +203,7 @@ class PDBValidator:
         return grouped_atoms
 
     def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
-        """
-        Extracts the amino acid sequences (list of 3-letter codes) for each chain.
-        """
+        """Extracts the amino acid sequences (list of 3-letter codes) for each chain."""
         sequences = {}
         for chain_id, residues_in_chain in self.grouped_atoms.items():
             sorted_res_numbers = sorted(residues_in_chain.keys())
@@ -235,16 +224,12 @@ class PDBValidator:
 
     @staticmethod
     def _calculate_distance(coord1: np.ndarray, coord2: np.ndarray) -> float:
-        """
-        Calculates the Euclidean distance between two 3D coordinates.
-        """
+        """Calculates the Euclidean distance between two 3D coordinates."""
         return float(np.linalg.norm(coord1 - coord2))
 
     @staticmethod
     def _calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
-        """
-        Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex.
-        """
+        """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
         vec1 = coord1 - coord2
         vec2 = coord3 - coord2
 
@@ -265,8 +250,7 @@ class PDBValidator:
     def _calculate_dihedral_angle(
         p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray
     ) -> float:
-        """
-        Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
+        """Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
 
         IMPORTANT NOTE - Dihedral Conventions:
         It was discovered that simple projection math can accidentally swap
@@ -310,15 +294,11 @@ class PDBValidator:
         return float(-np.degrees(np.arctan2(y, x)))
 
     def get_violations(self) -> List[str]:
-        """
-        Returns a list of detected violations.
-        """
+        """Returns a list of detected violations."""
         return self.violations
 
     def validate_bond_lengths(self, tolerance: float = 0.05) -> None:
-        """
-        Validates backbone bond lengths (N-CA, CA-C, C-O, C-N peptide bond) against standard values.
-        """
+        """Validates backbone bond lengths (N-CA, CA-C, C-O, C-N peptide bond) against standard values."""
         logger.info("Performing bond length validation.")
 
         bond_standards = {
@@ -390,9 +370,7 @@ class PDBValidator:
                             )
 
     def validate_bond_angles(self, tolerance: float = 5.0) -> None:
-        """
-        Validates backbone bond angles (N-CA-C, CA-C-O, CA-C-N_next) against standard values.
-        """
+        """Validates backbone bond angles (N-CA-C, CA-C-O, CA-C-N_next) against standard values."""
         logger.info("Performing bond angle validation.")
 
         angle_standards = {
@@ -475,8 +453,7 @@ class PDBValidator:
     def _is_point_in_polygon(
         point: Tuple[float, float], polygon: List[Tuple[float, float]]
     ) -> bool:
-        """
-        Ray-casting algorithm to check if a point is inside a polygon.
+        """Ray-casting algorithm to check if a point is inside a polygon.
         Polygon is defined by a list of (x, y) tuples.
         """
         logger.info("Performing Ramachandran angle validation (polygonal regions).")
@@ -497,8 +474,7 @@ class PDBValidator:
         return inside
 
     def validate_ramachandran(self) -> None:
-        """
-        Validates Ramachandran angles (Phi, Psi) against MolProbity-defined polygonal regions.
+        """Validates Ramachandran angles (Phi, Psi) against MolProbity-defined polygonal regions.
         Checks if angles fall within simplified "Favored" (98%) or "Allowed" (99.8%) polygons.
 
         ### Educational Note - Computational Efficiency & Convergence:
@@ -613,8 +589,7 @@ class PDBValidator:
         vdw_overlap_factor: float = 0.6,
         backbone_only: bool = False,
     ) -> None:
-        """
-        Implements steric clash checks including:
+        """Implements steric clash checks including:
         - General atom-atom minimum distance (any atom-atom > min_atom_distance).
         - Calpha-Calpha minimum distance (Calpha-Calpha > min_ca_distance for non-consecutive residues).
         - Van der Waals radius overlap check (Debug only).
@@ -828,8 +803,7 @@ class PDBValidator:
                     # self.violations.append(...) - DISABLED
 
     def validate_peptide_plane(self, tolerance_deg: float = 30.0) -> None:
-        """
-        Validates peptide bond planarity by checking the omega (ω) dihedral angle.
+        """Validates peptide bond planarity by checking the omega (ω) dihedral angle.
         The omega angle is defined by N(i-1) - CA(i-1) - C(i-1) - N(i).
         Ideal trans-peptide omega is ~180 degrees, cis-peptide is ~0 degrees.
         A violation is flagged if the angle deviates significantly from these values.
@@ -891,9 +865,7 @@ class PDBValidator:
         max_hydrophobic_stretch: int = 10,
         pro_pro_pro_rare: int = 2,
     ) -> None:
-        """
-        Checks for biologically improbable amino acid sequence patterns.
-        """
+        """Checks for biologically improbable amino acid sequence patterns."""
         logger.info("Performing sequence improbability validation.")
 
         for chain_id, sequence in self.sequences_by_chain.items():
@@ -1061,8 +1033,7 @@ class PDBValidator:
         min_atom_distance: float = 2.0,
         vdw_overlap_factor: float = 0.8,
     ) -> List[Dict[str, Any]]:
-        """
-        Applies a simple heuristic to alleviate steric clashes by pushing clashing atoms apart.
+        """Applies a simple heuristic to alleviate steric clashes by pushing clashing atoms apart.
         Modifies a copy of the input parsed_atoms list.
         """
         modified_atoms = [atom.copy() for atom in parsed_atoms]
@@ -1174,8 +1145,7 @@ class PDBValidator:
         return modified_atoms
 
     def validate_side_chain_rotamers(self, tolerance: float = 40.0) -> None:
-        """
-        Validates side-chain rotamers against the Backbone-Dependent Library.
+        """Validates side-chain rotamers against the Backbone-Dependent Library.
 
         Educational Note - Side Chain Packing:
         --------------------------------------
@@ -1315,8 +1285,7 @@ class PDBValidator:
                     )
 
     def validate_chirality(self) -> None:
-        """
-        Validate L-amino acid chirality at C-alpha.
+        """Validate L-amino acid chirality at C-alpha.
 
         Uses improper dihedral N-CA-C-CB to check stereochemistry.
         L-amino acids should have negative improper dihedral (~-120° to -60°).
@@ -1398,8 +1367,7 @@ class PDBValidator:
                     )
 
     def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
-        """
-        Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
+        """Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
 
         Args:
             input_data: Optional. If provided, uses this as the source (can be PDB content,
@@ -1407,6 +1375,7 @@ class PDBValidator:
 
         Returns:
             Dict[str, List[float]]: Dictionary with 'phi', 'psi', 'omega' keys mapping to degree lists.
+
         """
         import biotite.structure as struc
 

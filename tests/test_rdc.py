@@ -1,5 +1,4 @@
-"""
-TDD Tests for synth_pdb.rdc shim module.
+"""TDD Tests for synth_pdb.rdc shim module.
 
 These tests are written BEFORE the implementation (test-first / TDD).
 They validate that:
@@ -38,8 +37,7 @@ class TestRDCShimImport:
     """Verify the shim module is importable and exports the correct interface."""
 
     def test_rdc_shim_importable(self):
-        """
-        The synth_pdb.rdc module must exist and expose calculate_rdcs.
+        """The synth_pdb.rdc module must exist and expose calculate_rdcs.
 
         EDUCATIONAL NOTE — Why shims?
         ==============================
@@ -63,8 +61,7 @@ class TestRDCShimImport:
 
 
 class TestRDCPhysics:
-    """
-    Physics-grounded unit tests for the RDC shim.
+    """Physics-grounded unit tests for the RDC shim.
 
     Each test constructs a minimal biotite AtomArray with a precisely placed N-H
     pair, computes the expected RDC analytically from the formula, and checks that
@@ -104,8 +101,7 @@ class TestRDCPhysics:
         return struc.array([n_atom, h_atom])
 
     def test_z_axis_aligned_vector(self, da, R):  # noqa: N803
-        """
-        A vector perfectly aligned with the Z-axis (principal axis) gives RDC = 2·Da.
+        """A vector perfectly aligned with the Z-axis (principal axis) gives RDC = 2·Da.
 
         Derivation (Tjandra & Bax, 1997):
           θ = 0° → cos θ = 1, sin θ = 0
@@ -125,8 +121,7 @@ class TestRDCPhysics:
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_x_axis_aligned_vector(self, da, R):  # noqa: N803
-        """
-        A vector along the X-axis gives RDC = Da·(−1 + 1.5·R).
+        """A vector along the X-axis gives RDC = Da·(−1 + 1.5·R).
 
         Derivation:
           θ = 90°, φ = 0°
@@ -147,8 +142,7 @@ class TestRDCPhysics:
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_y_axis_aligned_vector(self, da, R):  # noqa: N803
-        """
-        A vector along the Y-axis gives RDC = Da·(−1 − 1.5·R).
+        """A vector along the Y-axis gives RDC = Da·(−1 − 1.5·R).
 
         Derivation:
           θ = 90°, φ = 90°
@@ -168,8 +162,7 @@ class TestRDCPhysics:
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_rdc_value_in_physical_range(self, da, R):  # noqa: N803
-        """
-        RDC values must fall within [Da·(−1−1.5R), 2·Da].
+        """RDC values must fall within [Da·(−1−1.5R), 2·Da].
 
         Physical constraint (Prestegard et al., 2000):
           The maximum RDC occurs when θ=0 → 2·Da.
@@ -194,8 +187,7 @@ class TestRDCEdgeCases:
     """Validate graceful handling of biologically special cases."""
 
     def test_proline_skipped(self):
-        """
-        Proline (PRO) has no backbone amide proton due to its cyclic side-chain
+        """Proline (PRO) has no backbone amide proton due to its cyclic side-chain
         linking the nitrogen: the N atom forms a tertiary amine with no H attached.
 
         EDUCATIONAL NOTE — Proline as a secondary amine:
@@ -222,8 +214,7 @@ class TestRDCEdgeCases:
         assert 1 not in rdcs, "Proline should never appear in the RDC output"
 
     def test_missing_amide_h_skipped(self):
-        """
-        A residue with a backbone N but no corresponding H atom is silently skipped.
+        """A residue with a backbone N but no corresponding H atom is silently skipped.
         This handles truncated structures or non-standard residues gracefully.
         """
         from synth_pdb.rdc import calculate_rdcs
@@ -241,8 +232,7 @@ class TestRDCEdgeCases:
         assert 1 not in rdcs
 
     def test_multi_residue_structure(self):
-        """
-        A 3-residue structure (GLY, PRO, ALA) should only produce RDCs for
+        """A 3-residue structure (GLY, PRO, ALA) should only produce RDCs for
         non-Proline residues that have both N and H atoms.
 
         Expected result: res_id {1: float, 3: float}, res 2 (PRO) absent.

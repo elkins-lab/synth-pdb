@@ -3,8 +3,7 @@ from synth_nmr.chemical_shifts import RANDOM_COIL_SHIFTS, predict_empirical_shif
 
 
 def create_mock_phe_system():
-    """
-    Creates a mock system with a PHE residue at the origin and
+    """Creates a mock system with a PHE residue at the origin and
     isolated protons at specific geometric positions to test ring currents.
     """
     # 1. Create a PHE residue (Ring in XY plane, centered at origin)
@@ -57,9 +56,7 @@ def create_mock_phe_system():
 
 
 def test_ring_current_shielding():
-    """
-    Test that a proton placed ABOVE an aromatic ring is SHIELDED (Shift decreases).
-    """
+    """Test that a proton placed ABOVE an aromatic ring is SHIELDED (Shift decreases)."""
     system = create_mock_phe_system()
 
     # Predict shifts
@@ -95,9 +92,7 @@ def test_ring_current_shielding():
 
 
 def test_ring_current_deshielding():
-    """
-    Test that a proton placed IN THE PLANE of an aromatic ring is DESHIELDED (Shift increases).
-    """
+    """Test that a proton placed IN THE PLANE of an aromatic ring is DESHIELDED (Shift increases)."""
     system = create_mock_phe_system()
     import warnings
     from unittest.mock import patch

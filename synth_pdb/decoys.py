@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class DecoyGenerator:
-    """
-    Generates ensembles of protein structures (decoys) with specific properties.
-    """
+    """Generates ensembles of protein structures (decoys) with specific properties."""
 
     def __init__(self) -> None:
         pass
@@ -35,8 +33,7 @@ class DecoyGenerator:
         drift: float = 0.0,
         seed: Optional[int] = None,
     ) -> list[str]:
-        """
-        Generates N unique decoys for a given sequence within a target RMSD range.
+        """Generates N unique decoys for a given sequence within a target RMSD range.
 
         EDUCATIONAL NOTE - RMSD (Root Mean Square Deviation):
         -----------------------------------------------------
@@ -96,6 +93,7 @@ class DecoyGenerator:
             shuffle_sequence: If True, shuffles the final residue labels.
             drift: Torsion angle perturbation in degrees.
             seed: Random seed for reproducibility.
+
         """
         import os
 

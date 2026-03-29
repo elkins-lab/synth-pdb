@@ -12,11 +12,10 @@ except ImportError:
 
 
 def create_triangle_structure():
-    """
-    Creates a simple 3-residue structure forming a right triangle.
+    """Creates a simple 3-residue structure forming a right triangle.
     Res 1: (0,0,0)
     Res 2: (3,0,0) -> Distance 1-2 = 3.0
-    Res 3: (0,4,0) -> Distance 1-3 = 4.0, Distance 2-3 = 5.0 (3-4-5 Triangle)
+    Res 3: (0,4,0) -> Distance 1-3 = 4.0, Distance 2-3 = 5.0 (3-4-5 Triangle).
     """
     atoms = struc.AtomArray(3)
     atoms.res_name = np.array(["ALA", "ALA", "ALA"])

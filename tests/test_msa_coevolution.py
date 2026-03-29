@@ -5,8 +5,7 @@ from synth_pdb.msa import generate_msa
 
 
 def calculate_mutual_information_matrix(msa_array):
-    """
-    Given an MSA of shape (N_sequences, L_residues) containing integer labels,
+    """Given an MSA of shape (N_sequences, L_residues) containing integer labels,
     computes the L x L Mutual Information matrix.
     """
     L = msa_array.shape[1]
@@ -22,8 +21,7 @@ def calculate_mutual_information_matrix(msa_array):
 
 
 def test_msa_mutual_information_recovery():
-    """
-    The ultimate proof of Co-evolution.
+    """The ultimate proof of Co-evolution.
     Generate a deep synthetic MSA constrained by a strict contact map.
     The Mutual Information between contacting pairs in the generated MSA
     must be statistically significantly higher than non-contacting pairs.

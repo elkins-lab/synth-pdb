@@ -1,5 +1,4 @@
-"""
-J-Coupling calculations for synth-pdb.
+"""J-Coupling calculations for synth-pdb.
 
 This module now provides compatibility shims that re-export from the synth-nmr package.
 For direct usage of NMR functionality, consider using synth-nmr directly:

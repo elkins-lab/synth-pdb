@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProteinQualityClassifier:
-    """
-    Random Forest classifier to predict if a protein structure is "High Quality"
+    """Random Forest classifier to predict if a protein structure is "High Quality"
     (biophysically plausible) or "Low Quality" (likely has steric clashes or
     geometry violations).
 
@@ -58,13 +57,13 @@ class ProteinQualityClassifier:
             self.model = None
 
     def predict(self, pdb_content: str) -> Tuple[bool, float, dict]:
-        """
-        Predicts quality of a PDB structure.
+        """Predicts quality of a PDB structure.
 
         Returns:
             is_good (bool): True if probability > 0.5
             probability (float): Confidence score (0.0 - 1.0)
             features (dict): The extracted feature values used for prediction
+
         """
         if self.model is None:
             raise RuntimeError("Classifier model is not loaded.")

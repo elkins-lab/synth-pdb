@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Add missing type annotations to all synth_pdb source files.
+"""Add missing type annotations to all synth_pdb source files.
 Uses exact string replacement on function signatures — no logic changes.
 """
 import ast

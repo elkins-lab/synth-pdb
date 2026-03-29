@@ -1,5 +1,4 @@
-"""
-synth_pdb.plm
+"""synth_pdb.plm.
 ~~~~~~~~~~~~~
 Protein Language Model (PLM) embeddings via ESM-2.
 
@@ -152,8 +151,7 @@ _THREE_TO_ONE = {
 
 
 class ESM2Embedder:
-    """
-    Per-residue protein language model embeddings from ESM-2.
+    """Per-residue protein language model embeddings from ESM-2.
 
     The model is loaded **lazily** on the first call to embed() — not at
     __init__ time.  This means:
@@ -166,6 +164,7 @@ class ESM2Embedder:
             Upgrade to "facebook/esm2_t12_35M_UR50D" for 480-dim embeddings
             with better accuracy; API is identical.
         device: Torch device string ("cpu", "cuda", "mps").  Default: auto-detect.
+
     """
 
     def __init__(
@@ -185,8 +184,7 @@ class ESM2Embedder:
 
     @property
     def embedding_dim(self) -> int:
-        """
-        Embedding dimensionality for this model variant.
+        """Embedding dimensionality for this model variant.
 
         Determined from the model config after the first embed() call.
         Before the first call, returns the known default for common models.
@@ -208,8 +206,7 @@ class ESM2Embedder:
         return self._embedding_dim  # type: ignore[return-value]
 
     def embed(self, sequence: str) -> np.ndarray:
-        """
-        Embed a protein sequence using ESM-2.
+        """Embed a protein sequence using ESM-2.
 
         Each amino acid is represented as a D-dimensional float32 vector
         encoding evolutionary, structural, and chemical context learned from
@@ -232,13 +229,13 @@ class ESM2Embedder:
             >>> emb = embedder.embed("ACDEFGHIKLMNPQRSTVWY")
             >>> emb.shape
             (20, 320)
+
         """
         self._load_model()
         return self._run_model(sequence)
 
     def embed_structure(self, structure: Any) -> np.ndarray:
-        """
-        Embed a protein given its biotite AtomArray.
+        """Embed a protein given its biotite AtomArray.
 
         Extracts the amino acid sequence from the structure (using residue
         names in the AtomArray), then delegates to embed().
@@ -259,14 +256,14 @@ class ESM2Embedder:
             >>> emb = embedder.embed_structure(structure)
             >>> emb.shape
             (20, 320)
+
         """
         sequence = _extract_sequence(structure)
         logger.debug("Extracted sequence (%d residues) from AtomArray", len(sequence))
         return self.embed(sequence)
 
     def mean_embed(self, sequence: str) -> np.ndarray:
-        """
-        Return the mean-pooled sequence-level embedding.
+        """Return the mean-pooled sequence-level embedding.
 
         Mean pooling averages the per-residue vectors:
             mean_embed(seq) = (1/L) Σ embed(seq)[i]    for i in 0..L-1
@@ -276,12 +273,12 @@ class ESM2Embedder:
 
         Returns:
             np.ndarray of shape (D,), float32.
+
         """
         return cast(np.ndarray, self.embed(sequence).mean(axis=0))
 
     def sequence_similarity(self, seq_a: str, seq_b: str) -> float:
-        """
-        Cosine similarity between the mean embeddings of two sequences.
+        """Cosine similarity between the mean embeddings of two sequences.
 
         Returns a value in [-1, 1]:
           •  1.0  — identical embeddings (same sequence)
@@ -307,6 +304,7 @@ class ESM2Embedder:
             0.832...   # high — both are simple repetitive peptides
             >>> embedder.sequence_similarity("ACDEFGHIK", "WQMPLRNTS")
             0.71...    # lower — very different character
+
         """
         ea = self.mean_embed(seq_a)
         eb = self.mean_embed(seq_b)
@@ -321,8 +319,7 @@ class ESM2Embedder:
     # ──────────────────────────────────────────────────────────────────────
 
     def _load_model(self) -> None:
-        """
-        Lazily import torch + transformers and load the ESM-2 model.
+        """Lazily import torch + transformers and load the ESM-2 model.
 
         Called automatically on the first embed() call.  Subsequent calls
         are no-ops because self._model is already set.
@@ -393,8 +390,7 @@ class ESM2Embedder:
         )
 
     def _run_model(self, sequence: str) -> np.ndarray:
-        """
-        Tokenize the sequence, run the transformer, return per-residue embeddings.
+        """Tokenize the sequence, run the transformer, return per-residue embeddings.
 
         Tokenization adds [CLS] at position 0 and [EOS] at position L+1.
         We slice these off so the output aligns 1-to-1 with the input residues:
@@ -432,8 +428,7 @@ class ESM2Embedder:
 
 
 def _extract_sequence(structure: Any) -> str:
-    """
-    Extract the one-letter amino acid sequence from a biotite AtomArray.
+    """Extract the one-letter amino acid sequence from a biotite AtomArray.
 
     Iterates residues in chain/res_id order, maps three-letter codes to
     one-letter codes using _THREE_TO_ONE.  Unknown residues (HETATM, ligands,
@@ -444,6 +439,7 @@ def _extract_sequence(structure: Any) -> str:
 
     Returns:
         str — single-letter sequence, e.g. "MQIFVKTLTG".
+
     """
     import biotite.structure as struc
 

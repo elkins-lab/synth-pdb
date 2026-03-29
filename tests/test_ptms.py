@@ -4,8 +4,7 @@ from synth_pdb.generator import generate_pdb_content
 
 
 class TestPTMs:
-    """
-    TDD Test Suite for Post-Translational Modifications (Phosphorylation).
+    """TDD Test Suite for Post-Translational Modifications (Phosphorylation).
 
     Biological Context:
     Phosphorylation replaces the hydroxyl group of Serine (SER), Threonine (THR),

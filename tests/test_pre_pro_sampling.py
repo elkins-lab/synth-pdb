@@ -6,8 +6,7 @@ from synth_pdb.generator import _sample_ramachandran_angles
 
 
 def test_sample_ramachandran_arguments():
-    """
-    TDD: Verify _sample_ramachandran_angles accepts next_res_name argument.
+    """TDD: Verify _sample_ramachandran_angles accepts next_res_name argument.
     Currently this will fail with TypeError.
     """
     try:
@@ -17,8 +16,7 @@ def test_sample_ramachandran_arguments():
 
 
 def test_pre_pro_definitions_exist():
-    """
-    TDD: Verify PRE_PRO definitions exist in data.py.
+    """TDD: Verify PRE_PRO definitions exist in data.py.
     Currently fails because key is missing.
     """
     assert (
@@ -27,11 +25,10 @@ def test_pre_pro_definitions_exist():
 
 
 def test_pre_pro_distribution_bias():
-    """
-    Statistical verification of Pre-Proline bias.
+    """Statistical verification of Pre-Proline bias.
     Pre-Proline residues (residue before PRO) should have:
     - Restricted Alpha region (steric clash)
-    - Enhanced Beta region preference
+    - Enhanced Beta region preference.
     """
     # Sample many points
     phis = []
@@ -71,8 +68,7 @@ def test_pre_pro_distribution_bias():
 
 
 def test_gly_pro_exception():
-    """
-    TDD: GLY and PRO as current residues have their own strong preferences
+    """TDD: GLY and PRO as current residues have their own strong preferences
     that might override Pre-Pro effects or blend with them.
     However, for simplicity in this implementation, if current is GLY/PRO,
     we often keep their specific maps because they are unique.

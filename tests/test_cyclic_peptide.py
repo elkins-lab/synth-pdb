@@ -7,15 +7,13 @@ from synth_pdb.physics import HAS_OPENMM
 
 
 class TestCyclicPeptides:
-    """
-    Test suite for Head-to-Tail Cyclic Peptide verification.
+    """Test suite for Head-to-Tail Cyclic Peptide verification.
     Follows TDD: These tests define the expected behavior before implementation.
     """
 
     @pytest.mark.skipif(not HAS_OPENMM, reason="Cyclization requires OpenMM physics engine")
     def test_cyclic_geometry_closure(self):
-        """
-        Verify that a 5-residue Poly-Glycine ring is actually closed.
+        """Verify that a 5-residue Poly-Glycine ring is actually closed.
 
         Physics Goal:
         The distance between N-terminus (N) and C-terminus (C) should be ~1.33 Angstroms
@@ -54,8 +52,7 @@ class TestCyclicPeptides:
 
     @pytest.mark.skipif(not HAS_OPENMM, reason="Cyclization requires OpenMM physics engine")
     def test_cyclic_removes_termini(self):
-        """
-        Verify that cyclic peptides do NOT have terminal capping groups.
+        """Verify that cyclic peptides do NOT have terminal capping groups.
         A cyclic peptide has no start or end, so:
         - N-terminus should NOT have H1/H2/H3 (only H).
         - C-terminus should NOT have OXT.

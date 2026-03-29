@@ -1,5 +1,4 @@
-"""
-Tests for per-region conformation control.
+"""Tests for per-region conformation control.
 
 Following TDD methodology - RED PHASE.
 These tests should FAIL initially until we implement the per-region conformation feature.

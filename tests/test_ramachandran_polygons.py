@@ -3,8 +3,7 @@ from synth_pdb.validator import PDBValidator
 
 
 class TestRamachandranPolygons:
-    """
-    Unit tests for the High-Resolution Ramachandran Polygons.
+    """Unit tests for the High-Resolution Ramachandran Polygons.
     Tests the geometry logic directly without needing full PDB generation.
     """
 

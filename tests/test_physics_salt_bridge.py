@@ -9,8 +9,7 @@ from synth_pdb.physics import HAS_OPENMM, EnergyMinimizer
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_salt_bridge_restraint_logging(caplog):
-    """
-    Verify that salt bridge restraints are detected and applied.
+    """Verify that salt bridge restraints are detected and applied.
     We use sequence ER in alpha helical conformation.
     """
     logging.getLogger("numba").setLevel(logging.WARNING)

@@ -1,5 +1,4 @@
-"""
-Tests for B-factor (temperature factor) assignment.
+"""Tests for B-factor (temperature factor) assignment.
 
 EDUCATIONAL NOTE - What are B-factors?
 B-factors (temperature factors) represent atomic displacement due to:
@@ -33,8 +32,7 @@ class TestBfactorCalculation:
         assert callable(_calculate_bfactor)
 
     def test_backbone_vs_sidechain_bfactors(self):
-        """
-        Test that backbone atoms have lower B-factors than side chain atoms.
+        """Test that backbone atoms have lower B-factors than side chain atoms.
 
         EDUCATIONAL NOTE:
         Backbone atoms (N, CA, C, O) are constrained by peptide bonds and
@@ -62,8 +60,7 @@ class TestBfactorCalculation:
         assert sidechain_avg > backbone_avg
 
     def test_terminal_residues_higher_bfactors(self):
-        """
-        Test that terminal residues (Low S2) have higher B-factors than middle residues (High S2).
+        """Test that terminal residues (Low S2) have higher B-factors than middle residues (High S2).
 
         EDUCATIONAL NOTE:
         Terminal residues are more mobile because they have fewer constraints.
@@ -96,8 +93,7 @@ class TestBfactorCalculation:
         assert c_term_avg > middle_avg
 
     def test_glycine_higher_bfactor(self):
-        """
-        Test that glycine has higher B-factors than other residues.
+        """Test that glycine has higher B-factors than other residues.
 
         EDUCATIONAL NOTE:
         Glycine has no side chain (only H as CB), giving it more conformational
@@ -110,8 +106,7 @@ class TestBfactorCalculation:
         assert gly_avg > ala_avg
 
     def test_proline_lower_bfactor(self):
-        """
-        Test that proline has lower B-factors than other residues.
+        """Test that proline has lower B-factors than other residues.
 
         EDUCATIONAL NOTE:
         Proline's cyclic structure (side chain connects back to backbone N)
@@ -124,8 +119,7 @@ class TestBfactorCalculation:
         assert pro_avg < ala_avg
 
     def test_bfactor_realistic_range(self):
-        """
-        Test that B-factors are in realistic range (5-100 Ų).
+        """Test that B-factors are in realistic range (5-100 Ų).
 
         EDUCATIONAL NOTE:
         Typical B-factors in crystal structures:
@@ -154,8 +148,7 @@ class TestBfactorCalculation:
             ), f"B-factor {bfactor} out of range for {res_name} {atom_name}"
 
     def test_bfactor_in_generated_pdb(self):
-        """
-        Test that generated PDB files contain realistic B-factors.
+        """Test that generated PDB files contain realistic B-factors.
 
         EDUCATIONAL NOTE:
         B-factors appear in columns 61-66 of ATOM records in PDB format.
@@ -191,8 +184,7 @@ class TestBfactorCalculation:
         assert len(set(bfactors)) > 1, "All B-factors are identical (should vary)"
 
     def test_bfactor_variation_along_chain(self):
-        """
-        Test that B-factors vary along the peptide chain.
+        """Test that B-factors vary along the peptide chain.
 
         EDUCATIONAL NOTE:
         In real structures, B-factors typically show gradients:

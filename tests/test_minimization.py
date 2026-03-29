@@ -8,9 +8,7 @@ from synth_pdb.physics import EnergyMinimizer
 
 
 def test_energy_minimization_reduction():
-    """
-    Verify that energy minimization reduces the potential energy of a generated structure.
-    """
+    """Verify that energy minimization reduces the potential energy of a generated structure."""
     # 1. Generate a raw structure (strained)
     # Use poly-alanine to ensure standard templates match easily
     pdb_content = generate_pdb_content(

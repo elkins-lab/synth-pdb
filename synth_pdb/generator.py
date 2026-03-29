@@ -80,8 +80,7 @@ PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_
 def _calculate_bfactor(
     atom_name: str, residue_number: int, total_residues: int, residue_name: str, s2: float = 0.85
 ) -> float:
-    """
-    Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
+    r"""Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
 
     EDUCATIONAL NOTE - B-factors (Temperature Factors):
     ===================================================
@@ -133,6 +132,7 @@ def _calculate_bfactor(
 
     Returns:
         B-factor value in Ų, rounded to 2 decimal places
+
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
     backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
@@ -227,8 +227,7 @@ def create_atom_line(
     temp_factor: float = 0.00,  # B-factor (temperature factor) in Ų
     occupancy: float = 1.00,  # Occupancy (fraction of molecules)
 ) -> str:
-    """
-    Create a PDB ATOM line.
+    """Create a PDB ATOM line.
 
     EDUCATIONAL NOTE - PDB ATOM Record Format:
     - temp_factor (columns 61-66): Atomic mobility/flexibility
@@ -251,8 +250,7 @@ def _place_atom_with_dihedral(
     bond_angle: float,
     dihedral: float,
 ) -> np.ndarray:
-    """
-    Place a new atom using bond length, angle, and dihedral.
+    """Place a new atom using bond length, angle, and dihedral.
 
     Wrapper around position_atom_3d_from_internal_coords with clearer naming.
     """
@@ -269,10 +267,17 @@ def _place_atom_with_dihedral(
 def _generate_random_amino_acid_sequence(
     length: int, use_plausible_frequencies: bool = False
 ) -> List[str]:
-    """
-    Generates a random amino acid sequence of a given length.
+    """Generate a random amino acid sequence of a given length.
+
     If `use_plausible_frequencies` is True, uses frequencies from AMINO_ACID_FREQUENCIES.
     Otherwise, uses a uniform random distribution.
+
+    Args:
+        length: Number of residues to generate.
+        use_plausible_frequencies: If True, uses biological distribution.
+
+    Returns:
+        List of 3-letter amino acid codes.
     """
     if length is None or length <= 0:
         return []
@@ -286,8 +291,7 @@ def _generate_random_amino_acid_sequence(
 
 
 def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
-    """
-    Detect potential disulfide bonds between cysteine residues.
+    """Detect potential disulfide bonds between cysteine residues.
 
     EDUCATIONAL NOTE - Disulfide Bond Detection:
     ============================================
@@ -321,8 +325,8 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
         >>> disulfides = _detect_disulfide_bonds(structure)
         >>> print(disulfides)
         [(3, 8), (12, 20)]  # CYS 3-8 and CYS 12-20 are bonded
-    """
 
+    """
     disulfides: List[Tuple[int, int]] = []
 
     # Find all CYS/CYX residues
@@ -358,8 +362,7 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 
 
 def _generate_ssbond_records(disulfides: list, chain_id: str = "A") -> str:
-    """
-    Generate SSBOND records for PDB header.
+    """Generate SSBOND records for PDB header.
 
     EDUCATIONAL NOTE - PDB SSBOND Format:
     ====================================
@@ -396,6 +399,7 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = "A") -> str:
         >>> print(records)
         SSBOND   1 CYS A    3    CYS A    8
         SSBOND   2 CYS A   12    CYS A   20
+
     """
     if not disulfides:
         return ""
@@ -415,9 +419,15 @@ def _resolve_sequence(
     user_sequence_str: Optional[str] = None,
     use_plausible_frequencies: bool = False,
 ) -> List[str]:
-    """
-    Resolves the amino acid sequence, either by parsing a user-provided sequence
-    or generating a random one.
+    """Resolve the amino acid sequence from user input or random generation.
+
+    Args:
+        length: Target length for random generation.
+        user_sequence_str: Optional user-provided sequence (1-letter or 3-letter).
+        use_plausible_frequencies: If True, uses biological frequencies for random.
+
+    Returns:
+        List of 3-letter amino acid codes.
     """
     if user_sequence_str:
         user_sequence_str_upper = user_sequence_str.upper()
@@ -476,8 +486,7 @@ def _resolve_sequence(
 def _sample_ramachandran_angles(
     res_name: str, next_res_name: Optional[str] = None
 ) -> Tuple[float, float]:
-    """
-    Sample phi/psi angles from Ramachandran probability distribution.
+    """Sample phi/psi angles from Ramachandran probability distribution.
 
     Uses residue-specific distributions for GLY and PRO, general distribution
     for all other amino acids. Samples from favored regions using weighted
@@ -496,6 +505,7 @@ def _sample_ramachandran_angles(
 
     Reference:
         Lovell et al. (2003) Proteins: Structure, Function, and Bioinformatics
+
     """
     # Get residue-specific or general distribution
     if res_name in RAMACHANDRAN_REGIONS:
@@ -528,8 +538,7 @@ def _sample_ramachandran_angles(
 
 
 def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[int, str]:
-    """
-    Parse structure region specification into per-residue conformations.
+    """Parse structure region specification into per-residue conformations.
 
     This function enables users to specify different secondary structure conformations
     for different regions of their peptide. This is crucial for creating realistic
@@ -573,6 +582,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
     1. We allow gaps in coverage - unspecified residues will use the default conformation
     2. We strictly forbid overlaps - each residue can only have one conformation
     3. We validate all inputs before processing to give clear error messages
+
     """
     # Handle empty input - return empty dictionary (all residues will use default)
     if not structure_str:
@@ -709,6 +719,7 @@ def _resolve_conformation_map(
 
     Returns:
         Dict mapping 0-based residue index to conformation name.
+
     """
     sequence_length = len(sequence)
     # EDUCATIONAL NOTE - Input Validation:
@@ -781,6 +792,7 @@ def _build_peptide_chain(
 
     Returns:
         Complete :class:`biotite.structure.AtomArray` with chain_id ``"A"``.
+
     """
     sequence_length = len(sequence)
     peptide = struc.AtomArray(0)
@@ -1193,6 +1205,7 @@ def _apply_biophysical_mods(
 
     Returns:
         Modified AtomArray (may be the same object or a new one with ions).
+
     """
     # EDUCATIONAL NOTE - Biophysical Realism (Phase 2):
     # We apply chemical modifications after geometric construction/packing but BEFORE
@@ -1260,6 +1273,7 @@ def _do_energy_minimization(
         ``(atomic_and_ter_content, updated_peptide)`` where *atomic_and_ter_content*
         is the raw PDB string from OpenMM (or ``None`` on failure) and
         *updated_peptide* is the (possibly updated) AtomArray.
+
     """
     # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
     # OpenMM requires a file-based interaction for easy topology handling from PDB.
@@ -1396,6 +1410,7 @@ def _assemble_pdb_output(
 
     Returns:
         Complete PDB file as a string.
+
     """
     if atomic_and_ter_content is None:
         peptide.atom_id = np.arange(1, peptide.array_length() + 1)
@@ -1529,8 +1544,7 @@ def generate_pdb_content(
     psi_list: Optional[List[float]] = None,  # Explicit Psi angles
     omega_list: Optional[List[float]] = None,  # Explicit Omega angles
 ) -> str:
-    """
-    Generates PDB content for a linear or cyclic peptide chain.
+    r"""Generates PDB content for a linear or cyclic peptide chain.
 
     EDUCATIONAL NOTE - New Feature: Cyclic Peptides
     Cyclic peptides have their N-terminus bonded to their C-terminus.
@@ -1599,8 +1613,8 @@ def generate_pdb_content(
     2. **Threading (`phi_list`, `psi_list`, `omega_list`)**: Allows constructing
        one sequence using the backbone torsion angles of another. This maps a
        "wrong" sequence to a "right" fold, a key test for discriminative models.
-    """
 
+    """
     if seed is not None:
         logger.info(f"Setting random seed to {seed} for reproducibility.")
         random.seed(seed)
@@ -1690,8 +1704,7 @@ def generate_pdb_content(
 
 
 class PeptideGenerator:
-    """
-    Object-oriented wrapper for protein structure generation.
+    """Object-oriented wrapper for protein structure generation.
     Provides a cleaner API for interactive notebooks and complex workflows.
     """
 
@@ -1714,8 +1727,7 @@ class PeptideGenerator:
 
 
 class PeptideResult:
-    """
-    Container for generation outputs, providing easy access to
+    """Container for generation outputs, providing easy access to
     PDB strings, Biotite structures, and metadata.
     """
 

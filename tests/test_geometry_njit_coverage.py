@@ -1,10 +1,9 @@
-"""
-Tests targeting geometry.py coverage gaps:
-  - njit fallback decorator (lines 9-17)
-  - calculate_angle (lines 257-278)
-  - calculate_dihedral_angle (lines 281-326)
-  - batched_angle / batched_dihedral
-  - reconstruct_sidechain rotation path (rotate_points inner fn + superimpose)
+"""Tests targeting geometry.py coverage gaps:
+- njit fallback decorator (lines 9-17)
+- calculate_angle (lines 257-278)
+- calculate_dihedral_angle (lines 281-326)
+- batched_angle / batched_dihedral
+- reconstruct_sidechain rotation path (rotate_points inner fn + superimpose).
 """
 
 import math
@@ -27,8 +26,7 @@ def _assert_close(a: float, b: float, abs_tol: float = 0.5) -> None:
 
 
 class TestNjitFallback:
-    """
-    Confirm that the no-op njit fallback defined when numba is absent
+    """Confirm that the no-op njit fallback defined when numba is absent
     passes functions through unchanged.
     """
 
@@ -234,8 +232,7 @@ class TestBatchedGeometry:
 
 
 class TestReconstructSidechainRotation:
-    """
-    Specifically target the sidechain-rotation branch inside reconstruct_sidechain
+    """Specifically target the sidechain-rotation branch inside reconstruct_sidechain
     (lines 525-605 in geometry.py).  We use residues with gamma atoms so the
     sidechain-rotation code path is exercised.
     """
@@ -299,8 +296,7 @@ class TestReconstructSidechainRotation:
         reconstruct_sidechain(peptide, 2, {"chi1": [60.0]})
 
     def test_reconstruct_with_scalar_rotamer_entry(self):
-        """
-        RotamerEntry values may be Union[float, List[float]].
+        """RotamerEntry values may be Union[float, List[float]].
         Passing a plain float for chi1 should be handled gracefully.
         """
         import io

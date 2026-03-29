@@ -1,5 +1,4 @@
-"""
-Synthetic Multiple Sequence Alignment (MSA) Generation with Co-Evolutionary Constraints.
+"""Synthetic Multiple Sequence Alignment (MSA) Generation with Co-Evolutionary Constraints.
 
 This module implements a physical sequence-level evolutionary simulator.
 Based on Direct Coupling Analysis (DCA) theory, it models sequence probability using a
@@ -50,8 +49,7 @@ RESIDUE_VOLUMES = {
 
 
 class CoevolutionModel:
-    """
-    Defines the statistical Potts Model energy landscape for a given Protein Fold.
+    """Defines the statistical Potts Model energy landscape for a given Protein Fold.
 
     The energy function is defined as:
         E(S) = sum_i(h_i(S_i)) + sum_{i<j}(J_ij(S_i, S_j))
@@ -61,12 +59,12 @@ class CoevolutionModel:
     """
 
     def __init__(self, base_sequence: str, contact_map: np.ndarray):
-        """
-        Initialize the Coevolution Model.
+        """Initialize the Coevolution Model.
 
         Args:
             base_sequence (str): The native, starting sequence.
             contact_map (np.ndarray): N x N boolean matrix where True indicates physical contact.
+
         """
         self.length = len(base_sequence)
         self.contact_map = contact_map
@@ -80,8 +78,7 @@ class CoevolutionModel:
         self._build_physical_couplings(base_sequence)
 
     def _build_physical_couplings(self, base_sequence: str) -> None:
-        """
-        Constructs the J_ij coupling matrix based on simplified sterics.
+        """Constructs the J_ij coupling matrix based on simplified sterics.
         If residues closely pack in 3D space, massive-massive combinations are penalized (steric clash).
         To lower the energy back down, one residue must mutate to a Tiny volume (compensatory mutation).
         """
@@ -112,8 +109,7 @@ class CoevolutionModel:
                             self.couplings[j, i, aa2_idx, aa1_idx] = penalty
 
     def calculate_energy(self, sequence: str) -> float:
-        """
-        Calculate the pseudo-energy of a given sequence on this fold's energetic landscape.
+        """Calculate the pseudo-energy of a given sequence on this fold's energetic landscape.
         Lower energy indicates a more stable, evolutionarily favored protein.
         """
         energy = 0.0
@@ -135,8 +131,7 @@ class CoevolutionModel:
 
 
 class MetropolisHastingsSampler:
-    """
-    Simulates the evolutionary drift of a sequence using Markov Chain Monte Carlo.
+    """Simulates the evolutionary drift of a sequence using Markov Chain Monte Carlo.
     A mutation is proposed:
         - If Energy decreases: It is always accepted (favorable).
         - If Energy increases: It is accepted with probability P = exp(-DeltaE / T).
@@ -155,8 +150,7 @@ class MetropolisHastingsSampler:
         self.current_energy = self.model.calculate_energy(base_sequence)
 
     def step(self) -> bool:
-        """
-        Propose exactly ONE amino acid point mutation and probabilistically accept or reject it.
+        """Propose exactly ONE amino acid point mutation and probabilistically accept or reject it.
         Returns True if the mutation was accepted.
         """
         if not self.current_sequence:
@@ -208,8 +202,7 @@ def generate_msa(
     temperature: float = 1.0,
     steps_between_samples: int = 20,
 ) -> list[str]:
-    """
-    Generates a Synthetic Multiple Sequence Alignment (MSA) imbued with Co-Evolutionary constraints.
+    """Generates a Synthetic Multiple Sequence Alignment (MSA) imbued with Co-Evolutionary constraints.
 
     Args:
         base_sequence: Starting 'wild type' amino acid sequence string.
@@ -220,6 +213,7 @@ def generate_msa(
 
     Returns:
         List of strings representing the aligned MSA.
+
     """
     # 1. Initialize Physics Engine
     model = CoevolutionModel(base_sequence, contact_map)

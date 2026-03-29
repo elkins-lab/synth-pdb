@@ -236,8 +236,7 @@ def test_cyclic_annealing_log(caplog):
 
 @pytest.mark.skipif(not HAS_OPENMM, reason="OpenMM not installed")
 def test_ptm_restoration_validation(caplog):
-    """
-    Verify that PTMs (like SEP) have their names restored correctly
+    """Verify that PTMs (like SEP) have their names restored correctly
     after being translated/stripped for OpenMM compliance.
     """
     sequence = "ALA-SEP-ALA"

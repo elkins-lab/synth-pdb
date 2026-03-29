@@ -17,7 +17,8 @@ def test_sampler_initialization():
 
 def test_sampler_acceptance_high_temp():
     """At extremely high temperatures, almost all mutations should be accepted,
-    even energetically unfavorable ones (modeling random genetic drift)."""
+    even energetically unfavorable ones (modeling random genetic drift).
+    """
     seq = "AAAAA"
     cmap = np.zeros((5, 5), dtype=bool)
     model = CoevolutionModel(seq, cmap)
@@ -41,7 +42,8 @@ def test_sampler_acceptance_high_temp():
 
 def test_sampler_rejection_low_temp():
     """At extremely low temperatures (near absolute zero), the sampler should
-    rapidly minimize energy and reject ANY mutation that increases it (greedy algorithm)."""
+    rapidly minimize energy and reject ANY mutation that increases it (greedy algorithm).
+    """
     seq = "WGTTW"  # Two massive Tryptophans
 
     # Force them to be in severe steric contact

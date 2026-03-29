@@ -1,5 +1,4 @@
-"""
-TDD tests for synth_pdb/quality/gnn/graph.py (PDB → PyG Data conversion).
+"""TDD tests for synth_pdb/quality/gnn/graph.py (PDB → PyG Data conversion).
 
 Written BEFORE the implementation exists — all tests should fail initially.
 """
@@ -8,10 +7,10 @@ import unittest
 
 import pytest
 
-torch = pytest.importorskip("torch", reason="PyTorch not installed")
-pyg = pytest.importorskip("torch_geometric", reason="torch_geometric not installed")
+torch = pytest.importorskip("torch", reason="PyTorch not installed")  # noqa: E402
+pyg = pytest.importorskip("torch_geometric", reason="torch_geometric not installed")  # noqa: E402
 
-from synth_pdb.generator import generate_pdb_content
+from synth_pdb.generator import generate_pdb_content  # noqa: E402
 
 
 def _make_helix_pdb(length: int = 20) -> str:

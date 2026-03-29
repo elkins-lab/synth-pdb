@@ -7,9 +7,7 @@ from synth_pdb.generator import generate_pdb_content
 
 
 class TestBetaTurns:
-    """
-    TDD Test Suite for Beta-Turn Geometries.
-    """
+    """TDD Test Suite for Beta-Turn Geometries."""
 
     def _get_backbone_angles(self, pdb_content):
         import io
@@ -20,8 +18,7 @@ class TestBetaTurns:
         return np.degrees(phi), np.degrees(psi)
 
     def test_type_ii_turn_dihedrals(self):
-        """
-        Request a Type II turn at residues 2-5 (indices 1-4).
+        """Request a Type II turn at residues 2-5 (indices 1-4).
         Turn residues: i, i+1, i+2, i+3.
         Defined angles for i+1 (Res 3) and i+2 (Res 4).
         """

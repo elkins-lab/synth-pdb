@@ -22,9 +22,7 @@ BMRB_FILE = "bmr6457.json"
 
 @pytest.fixture(scope="module")
 def experimental_data():
-    """
-    Downloads the PDB and BMRB files if they don't exist locally.
-    """
+    """Downloads the PDB and BMRB files if they don't exist locally."""
     files = [
         (PDB_FILE, PDB_URL),
         (BMRB_FILE, BMRB_URL),
@@ -50,8 +48,7 @@ def _strip_hetatm(pdb_path, out_path):
 
 @pytest.mark.slow
 def test_ubiquitin_j_coupling_correlation(experimental_data, tmp_path):
-    """
-    Tests that energy minimization of the 1UBQ crystal structure preserves
+    """Tests that energy minimization of the 1UBQ crystal structure preserves
     backbone phi-angle geometry, as measured by the correlation of Karplus-
     predicted 3J(HN,HA) couplings between the crystal structure and the
     minimized structure.
@@ -128,9 +125,7 @@ def test_ubiquitin_j_coupling_correlation(experimental_data, tmp_path):
 
 
 def parse_bmrb_chemical_shifts(bmrb_file):
-    """
-    Parses a BMRB JSON file to extract chemical shifts.
-    """
+    """Parses a BMRB JSON file to extract chemical shifts."""
     with open(bmrb_file) as f:
         entry_data = json.load(f)
 
@@ -164,9 +159,7 @@ def parse_bmrb_chemical_shifts(bmrb_file):
 
 @pytest.mark.slow
 def test_ubiquitin_chemical_shift_correlation(experimental_data, tmp_path):
-    """
-    Tests the correlation between simulated and experimental chemical shifts for ubiquitin.
-    """
+    """Tests the correlation between simulated and experimental chemical shifts for ubiquitin."""
     pdb_file, bmrb_file = experimental_data
 
     # 1. Parse experimental data

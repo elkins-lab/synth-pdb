@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Refactor EnergyMinimizer._run_simulation() in physics.py.
+"""Refactor EnergyMinimizer._run_simulation() in physics.py.
 
 Extracts 4 private methods with identical logic, reducing _run_simulation
 to a ~70-line orchestrator.  No logic is changed — only scoping.

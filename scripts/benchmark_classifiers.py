@@ -1,5 +1,4 @@
-"""
-Benchmark: GNN Quality Scorer vs. Random Forest Quality Classifier.
+"""Benchmark: GNN Quality Scorer vs. Random Forest Quality Classifier.
 
 Both models are trained on identical data from the same RNG seed and evaluated
 on the same held-out test set, giving a fair apples-to-apples comparison.
@@ -36,8 +35,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_shared_dataset(n_samples: int = 100, random_state: int = 42):
-    """
-    Generate PDB strings + labels for both classifiers.
+    """Generate PDB strings + labels for both classifiers.
     Returns (pdb_list, y) — the GNN builds graph features directly,
     the RF builds tabular features via extract_quality_features.
     """

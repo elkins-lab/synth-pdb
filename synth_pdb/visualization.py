@@ -1,5 +1,4 @@
-"""
-Visualization module for synth-pdb.
+"""Visualization module for synth-pdb.
 Generates scripts for external molecular viewers (PyMOL, ChimeraX).
 """
 
@@ -10,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 
 def generate_pymol_script(pdb_file: str, restraints: List[Dict], output_pml: str) -> None:
-    """
-    Generate a PyMOL script (.pml) to visualize NEF restraints on a PDB structure.
+    """Generate a PyMOL script (.pml) to visualize NEF restraints on a PDB structure.
 
     Args:
         pdb_file: Path to the PDB structure file (relative to where script runs).
         restraints: List of restraint dictionaries (from nmr.calculate_synthetic_noes or read_nef_restraints).
         output_pml: Output path for the PyMOL script.
+
     """
     logger.info(f"Generating PyMOL script: {output_pml}")
 

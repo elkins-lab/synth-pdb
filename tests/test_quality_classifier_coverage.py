@@ -1,9 +1,8 @@
-"""
-Tests for synth_pdb/quality/classifier.py — targeting all uncovered lines:
-  - Line 37:  __init__ without model file (warning logged)
-  - Lines 43-46: load_model when joblib is missing (ImportError)
-  - Lines 51-53: load_model when joblib.load raises an exception
-  - Line 65:  predict() when self.model is None (raises RuntimeError)
+"""Tests for synth_pdb/quality/classifier.py — targeting all uncovered lines:
+- Line 37:  __init__ without model file (warning logged)
+- Lines 43-46: load_model when joblib is missing (ImportError)
+- Lines 51-53: load_model when joblib.load raises an exception
+- Line 65:  predict() when self.model is None (raises RuntimeError).
 """
 
 import logging
@@ -20,8 +19,7 @@ class TestClassifierInit:
 
     @patch("synth_pdb.quality.classifier.os.path.exists", return_value=False)
     def test_no_model_file_logs_warning(self, mock_exists, tmp_path, caplog):
-        """
-        When no default model exists, __init__ should log a warning and leave
+        """When no default model exists, __init__ should log a warning and leave
         self.model as None.
         """
         from synth_pdb.quality.classifier import ProteinQualityClassifier
@@ -38,8 +36,7 @@ class TestClassifierInit:
             ), "Expected a 'No model found' warning when no model file exists"
 
     def test_explicit_model_path_triggers_load(self, tmp_path):
-        """
-        Passing an explicit model_path should call load_model.
+        """Passing an explicit model_path should call load_model.
         We use a path that doesn't exist; load_model should catch the exception.
         """
         from synth_pdb.quality.classifier import ProteinQualityClassifier
@@ -60,8 +57,7 @@ class TestClassifierInit:
 class TestLoadModelImportError:
 
     def test_load_model_when_joblib_missing(self, tmp_path, caplog):
-        """
-        If joblib is not installed, load_model should log an error, set
+        """If joblib is not installed, load_model should log an error, set
         self.model = None, and return early (no raise).
         """
         from synth_pdb.quality.classifier import ProteinQualityClassifier
@@ -83,8 +79,7 @@ class TestLoadModelImportError:
         ), "Expected an error log mentioning 'joblib' when the import fails"
 
     def test_load_model_exception_sets_model_none(self, tmp_path, caplog):
-        """
-        When joblib is available but joblib.load raises, model should be set
+        """When joblib is available but joblib.load raises, model should be set
         to None and an error should be logged (lines 51-53).
         """
         from synth_pdb.quality.classifier import ProteinQualityClassifier
@@ -140,9 +135,7 @@ class TestPredictNoModel:
 class TestPredictHappyPath:
 
     def test_predict_returns_correct_types(self, tmp_path):
-        """
-        With a mocked sklearn model, predict() should return (bool, float, dict).
-        """
+        """With a mocked sklearn model, predict() should return (bool, float, dict)."""
         import numpy as np
 
         from synth_pdb.generator import generate_pdb_content
@@ -195,9 +188,7 @@ class TestPredictHappyPath:
         assert pytest.approx(prob) == 0.2
 
     def test_load_model_success(self, tmp_path):
-        """
-        When joblib.load succeeds, model should be set and an info log emitted.
-        """
+        """When joblib.load succeeds, model should be set and an info log emitted."""
         from synth_pdb.quality.classifier import ProteinQualityClassifier
 
         clf = ProteinQualityClassifier.__new__(ProteinQualityClassifier)

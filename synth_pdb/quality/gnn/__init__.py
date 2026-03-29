@@ -1,5 +1,4 @@
-"""
-synth_pdb.quality.gnn
+"""synth_pdb.quality.gnn.
 ~~~~~~~~~~~~~~~~~~~~~
 PyTorch Geometric-based protein quality GNN scorer.
 

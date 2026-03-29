@@ -1,5 +1,4 @@
-"""
-Tests for conformational diversity feature.
+"""Tests for conformational diversity feature.
 Following TDD methodology - these tests should fail initially.
 """
 

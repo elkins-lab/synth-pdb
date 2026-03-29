@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]]:
-    """
-    Calculate backbone torsion angles (phi, psi, omega) for a given structure.
+    """Calculate backbone torsion angles (phi, psi, omega) for a given structure.
 
     Args:
         atom_array: Biotite AtomArray containing the protein structure.
@@ -23,6 +22,7 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
         - phi: Phi angle in degrees (or None)
         - psi: Psi angle in degrees (or None)
         - omega: Omega angle in degrees (or None)
+
     """
     logger.info("Calculating backbone torsion angles...")
 
@@ -71,13 +71,13 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
 
 
 def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str = "csv") -> None:
-    """
-    Export calculated torsion angles to a file.
+    """Export calculated torsion angles to a file.
 
     Args:
         data: List of angle dictionaries (from calculate_torsion_angles).
         output_file: Path to output file.
         fmt: Format 'csv' or 'json'.
+
     """
     logger.info(f"Exporting torsion angles to {output_file} ({fmt})...")
 

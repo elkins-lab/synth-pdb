@@ -8,9 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class DockingPrep:
-    """
-    Utilities for preparing PDB structures for molecular docking.
-    """
+    """Utilities for preparing PDB structures for molecular docking."""
 
     def __init__(self, forcefield_name: str = "amber14-all.xml") -> None:
         self.forcefield_name = forcefield_name
@@ -21,8 +19,7 @@ class DockingPrep:
             raise
 
     def write_pqr(self, input_pdb: str, output_pqr: str) -> bool:
-        """
-        Converts a PDB file to PQR format (adding partial charges and radii).
+        """Converts a PDB file to PQR format (adding partial charges and radii).
 
         Uses OpenMM to assign charges based on the selected forcefield.
         Radii are derived from Lennard-Jones sigma (sigma / 2).
@@ -33,6 +30,7 @@ class DockingPrep:
 
         Returns:
             bool: True if successful.
+
         """
         try:
             import os

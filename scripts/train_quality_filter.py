@@ -28,6 +28,7 @@ def generate_dataset(n_samples=200, random_state=42):
     Raises:
         RuntimeError: If fewer than 50% of requested samples were successfully generated,
             indicating a systemic generation or feature-extraction failure.
+
     """
     logger.info("Generating training data (%d samples)...", n_samples)
 

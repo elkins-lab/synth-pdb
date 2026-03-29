@@ -1,5 +1,4 @@
-"""
-synth_pdb.quality.gnn.model
+"""synth_pdb.quality.gnn.model.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Graph Attention Network (GAT) for protein structure quality classification.
 
@@ -129,8 +128,7 @@ def _check_pyg() -> None:
 
 
 class ProteinGNN:
-    """
-    Graph Attention Network classifier for protein structure quality.
+    """Graph Attention Network classifier for protein structure quality.
 
     ── Design note on the __new__ pattern ─────────────────────────────
     We want ``ProteinGNN`` to be importable without triggering PyTorch
@@ -165,8 +163,7 @@ class ProteinGNN:
         from torch_geometric.nn import GATConv, global_mean_pool
 
         class _ProteinGNNModule(nn.Module):
-            """
-            The actual torch.nn.Module returned by ProteinGNN().
+            """The actual torch.nn.Module returned by ProteinGNN().
 
             Parameters
             ----------
@@ -180,6 +177,7 @@ class ProteinGNN:
                 Width of all GATConv and MLP hidden layers.
             num_classes : int
                 Output classes. 2 for binary (Bad / Good) classification.
+
             """
 
             def __init__(self) -> None:
@@ -250,8 +248,7 @@ class ProteinGNN:
                 self.num_classes = num_classes
 
             def forward(self, x: Any, edge_index: Any, edge_attr: Any, batch: Any) -> Any:
-                """
-                Forward pass.
+                """Forward pass.
 
                 Parameters
                 ----------
@@ -272,8 +269,8 @@ class ProteinGNN:
                 Tensor [batch_size, num_classes]
                     Log-probabilities for each class per protein.
                     Use .exp() to get probabilities.  argmax(-1) for label.
-                """
 
+                """
                 # ── Layer 1: local geometry ────────────────────────────────
                 # After layer 1, each node has aggregated information from its
                 # direct neighbours — the first "shell" of contacts.

@@ -1,21 +1,20 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # # 🔬 Validating Synthetic J-Couplings against Experimental NMR Data
 # ### Using Ubiquitin (PDB: 1D3Z) and Published Scalar Couplings
-# 
+#
 # ---
-# 
+#
 # ## 🎯 Academic Context & The Karplus Equation
 # Scalar J-couplings ($^3J$) are mediated exclusively through chemical bonds. The $^3J_{H^N,H^\alpha}$ coupling constant is heavily dependent on the backbone $\phi$ dihedral angle (the angle between the N and C$\alpha$ atoms).
-# 
+#
 # The physical relationship is famously described by the **Karplus equation**:
-# 
+#
 # $$ ^3J_{H^N,H^\alpha} = A \cos^2(\phi - \theta) + B \cos(\phi - \theta) + C $$
-# 
+#
 # - Typical Alpha helices ($\phi \sim -60^\circ$) show small couplings ($\sim 4$ Hz).
 # - Typical Beta sheets ($\phi \sim -120^\circ$) show large couplings ($\sim 8$-$10$ Hz).
-# 
+#
 # In this notebook, we evaluate whether our generated 3D atomic coordinates produce physically accurate scalar couplings by computing the theoretical J-couplings and comparing them against the empirical measurements published in the classic 1D3Z NMR restraint set.
 
 # In[ ]:
@@ -39,13 +38,14 @@ print('✅ Environment configured!')
 
 
 # ## 1. Downloading the Experimental Data
-# 
+#
 # We need the 3D coordinates for Ubiquitin (1D3Z) and the experimental NMR restraints file, which contains the Vuister & Bax J-coupling assignments.
 
 # In[ ]:
 
 
 import subprocess
+
 import biotite.structure.io.pdb as bpdb
 
 pdb_file = '1D3Z.pdb'
@@ -65,18 +65,20 @@ print("✅ Structural and experimental data ready.")
 
 
 # ## 2. Parsing Experimenal J-Couplings from XPLOR Constraints
-# 
+#
 # The experimental J-couplings are embedded in `1d3z_mr.str` under the `hnha, phi coupling` section. We'll parse the measured scalar values (in Hz) assigned to each residue's backbone.
 
 # In[ ]:
 
 
 import re
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 
 def extract_hnha_jcouplings(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
 
     extracted_data = []
@@ -120,7 +122,7 @@ print(df_j.head())
 
 
 # ## 3. Calculating Synthetic J-Couplings via `synth-pdb`
-# 
+#
 # We calculate the theoretical scalar interactions exclusively from the 3D atomic coordinates. Internally, `synth-pdb` extracts the backbone $\phi$ angles mathematically via vector cross products and projects them against the Vuister & Bax parameters.
 
 # In[ ]:
@@ -156,7 +158,7 @@ print(f"Compiled {len(df_clean)} validated couplings for statistical analysis.")
 
 
 # ## 4. Visualizing Performance & Accuracy (RMSD)
-# 
+#
 # We plot the correlations and determine if the Root-Mean-Square Deviation lies under the accepted scientific noise thresholds (typically ~0.7-1.1 Hz) given the high uncertainties inherent to NMR lineshape fitting.
 
 # In[ ]:
@@ -184,7 +186,7 @@ plt.xlabel("Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 
 bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
-plt.text(min_val + 0.5, max_val - 1.5, f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}", 
+plt.text(min_val + 0.5, max_val - 1.5, f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}",
          fontsize=12, bbox=bbox_props, family='monospace')
 
 plt.grid(alpha=0.3)

@@ -27,8 +27,7 @@ def get_feature_names() -> List[str]:
 
 
 def extract_quality_features(pdb_content: str) -> np.ndarray:
-    """
-    Extracts a feature vector for the Protein Structure Quality Classifier.
+    """Extracts a feature vector for the Protein Structure Quality Classifier.
 
     Features:
     0. Ramachandran Favored %
@@ -42,6 +41,7 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
 
     Returns:
         np.ndarray: A 1D array of floats (shape: 8,)
+
     """
     try:
         # Use PDBValidator for geometric violations; intercept counts, not strings.

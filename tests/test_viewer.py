@@ -1,6 +1,4 @@
-"""
-Tests for 3D molecular viewer functionality.
-"""
+"""Tests for 3D molecular viewer functionality."""
 
 import pytest
 

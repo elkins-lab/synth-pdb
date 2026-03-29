@@ -26,8 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
-    """
-    Helper function to generate a single sample.
+    """Helper function to generate a single sample.
     Arguments are passed as a tuple to be compatible with map/submit if needed,
     but we'll use unpacking for clarity.
     """
@@ -93,8 +92,7 @@ def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
 
 
 class DatasetGenerator:
-    """
-    Orchestrates the generation of large-scale synthetic protein datasets for AI model training.
+    """Orchestrates the generation of large-scale synthetic protein datasets for AI model training.
 
     EDUCATIONAL NOTE - The Balanced Dataset Problem:
     -----------------------------------------------
@@ -269,8 +267,7 @@ class DatasetGenerator:
 
 
 def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
-    """
-    Generate a single sample in NPZ format (AI-Ready).
+    """Generate a single sample in NPZ format (AI-Ready).
     Does NOT write intermediate PDB files.
     """
     sample_id, length, conf_type, split, output_dir, fmt = args

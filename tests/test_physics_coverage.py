@@ -10,9 +10,7 @@ import synth_pdb.physics
 class TestPhysicsCoverage:
 
     def test_missing_openmm_dependency(self):
-        """
-        Test that methods return gracefully when OpenMM is not installed.
-        """
+        """Test that methods return gracefully when OpenMM is not installed."""
         # Mock HAS_OPENMM = False
         with patch("synth_pdb.physics.HAS_OPENMM", False):
             minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -58,9 +56,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_forcefield_loading_error(self, mock_app):
-        """
-        Test that init handles ForceField loading errors.
-        """
+        """Test that init handles ForceField loading errors."""
         # ForceField constructor raises Exception
         mock_app.ForceField.side_effect = Exception("XML file missing")
         mock_app.OBC2 = "OBC2"  # Needed for defaults
@@ -71,9 +67,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_simulation_failure(self, mock_app):
-        """
-        Test general simulation failure (e.g., bad topology).
-        """
+        """Test general simulation failure (e.g., bad topology)."""
         # Set up a working minimizer mock
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
@@ -86,8 +80,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_hetatm_restoration_logic(self, mock_app, caplog):
-        """
-        Test the specific logic for preserving ZN ions during hydrogen checking.
+        """Test the specific logic for preserving ZN ions during hydrogen checking.
         The "AI Trinity" logic: identifying non-protein atoms, storing them,
         and restoring them after addHydrogens.
         """
@@ -233,9 +226,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_minimize_calls_run_simulation(self, mock_app):
-        """
-        Test that minimize() correctly calls _run_simulation with add_hydrogens=False.
-        """
+        """Test that minimize() correctly calls _run_simulation with add_hydrogens=False."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
         # Mock the internal _run_simulation method
@@ -257,9 +248,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_zero_atoms_in_topology(self, mock_app, caplog):
-        """
-        Test that _run_simulation returns False if topology has 0 atoms.
-        """
+        """Test that _run_simulation returns False if topology has 0 atoms."""
         import logging
 
         caplog.set_level(logging.ERROR)
@@ -288,9 +277,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_empty_positions_from_openmm(self, mock_app, caplog):
-        """
-        Test that we catch empty positions returned by OpenMM state.
-        """
+        """Test that we catch empty positions returned by OpenMM state."""
         import logging
 
         caplog.set_level(logging.ERROR)
@@ -337,9 +324,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.app")
     @patch("synth_pdb.physics.mm")
     def test_salt_bridge_force_application(self, mock_mm, mock_app, caplog):
-        """
-        Test that salt bridge forces are applied when bridges are detected.
-        """
+        """Test that salt bridge forces are applied when bridges are detected."""
         import logging
 
         caplog.set_level(logging.DEBUG)
@@ -417,9 +402,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_wrapper_methods(self, mock_app):
-        """
-        Test utility wrappers add_hydrogens_and_minimize and equilibrate steps.
-        """
+        """Test utility wrappers add_hydrogens_and_minimize and equilibrate steps."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
         # Test add_hydrogens_and_minimize
@@ -455,8 +438,7 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     def test_create_system_exception_fallback(self, mock_app, caplog):
-        """
-        Test that createSystem() succeeds on the first call now that the implicit
+        """Test that createSystem() succeeds on the first call now that the implicit
         solvent is configured exclusively via the XML file loaded at construction
         time (not as a redundant kwarg to createSystem).  The old retry-and-warn
         loop should no longer be exercised under normal operation.

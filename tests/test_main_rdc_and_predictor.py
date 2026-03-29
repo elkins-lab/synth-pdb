@@ -1,5 +1,4 @@
-"""
-TDD Tests for new CLI flags: --output-rdcs and --shift-predictor.
+"""TDD Tests for new CLI flags: --output-rdcs and --shift-predictor.
 
 These tests are written BEFORE main.py is modified (Red phase of TDD).
 They will FAIL initially because the CLI arguments do not exist yet.
@@ -37,6 +36,7 @@ References:
   Tjandra, N. & Bax, A. (1997). Direct measurement of distances and angles in
   biomolecules by NMR in a dilute liquid crystalline medium. Science, 278,
   1111–1114. DOI: 10.1126/science.278.5340.1111
+
 """
 
 import logging
@@ -83,8 +83,7 @@ class TestOutputRDCsFlag:
     """Verify that the --output-rdcs flag triggers RDC calculation and CSV export."""
 
     def test_output_rdcs_calls_calculate_rdcs(self, mocker, tmp_path, caplog):
-        """
-        When --output-rdcs is provided, calculate_rdcs() must be called.
+        """When --output-rdcs is provided, calculate_rdcs() must be called.
 
         This test initially FAILS because the CLI argument does not exist yet
         (the Red phase of Red-Green-Refactor TDD).
@@ -259,8 +258,7 @@ class TestOutputRDCsFlag:
         mock_calc.assert_not_called()
 
     def test_rdc_da_and_r_flags_passed_through(self, mocker, tmp_path):
-        """
-        Custom --rdc-da and --rdc-r values must be forwarded to calculate_rdcs.
+        """Custom --rdc-da and --rdc-r values must be forwarded to calculate_rdcs.
 
         Physical note: Da and R together define the alignment tensor.
         Typical experimental values for dilute liquid crystal media:
@@ -305,8 +303,7 @@ class TestOutputRDCsFlag:
 
 
 class TestShiftPredictorFlag:
-    """
-    Verify that --shift-predictor correctly selects the chemical shift predictor.
+    """Verify that --shift-predictor correctly selects the chemical shift predictor.
 
     EDUCATIONAL NOTE — Chemical Shift Prediction Methods:
     =====================================================
@@ -357,9 +354,7 @@ class TestShiftPredictorFlag:
         main.main()
 
     def test_shift_predictor_shiftx2_passes_use_shiftx2_true(self, mocker, tmp_path):
-        """
-        --shift-predictor shiftx2 must call predict_chemical_shifts with use_shiftx2=True.
-        """
+        """--shift-predictor shiftx2 must call predict_chemical_shifts with use_shiftx2=True."""
         mock_predict = mocker.patch(
             "synth_pdb.chemical_shifts.predict_chemical_shifts",
             return_value={},
@@ -373,9 +368,7 @@ class TestShiftPredictorFlag:
         ), "--shift-predictor shiftx2 must pass use_shiftx2=True"
 
     def test_shift_predictor_empirical_passes_use_shiftx2_false(self, mocker, tmp_path):
-        """
-        --shift-predictor empirical must call predict_chemical_shifts with use_shiftx2=False.
-        """
+        """--shift-predictor empirical must call predict_chemical_shifts with use_shiftx2=False."""
         mock_predict = mocker.patch(
             "synth_pdb.chemical_shifts.predict_chemical_shifts",
             return_value={},
@@ -389,8 +382,7 @@ class TestShiftPredictorFlag:
         ), "--shift-predictor empirical must pass use_shiftx2=False"
 
     def test_shift_predictor_default_is_shiftx2(self, mocker, tmp_path):
-        """
-        When --gen-shifts is used without --shift-predictor, the default must be
+        """When --gen-shifts is used without --shift-predictor, the default must be
         use_shiftx2=True (consistent with synth-nmr's own default behaviour).
         """
         output_pdb = tmp_path / "default_pred.pdb"
@@ -433,8 +425,7 @@ class TestShiftPredictorFlag:
         ), "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
 
     def test_shift_predictor_appears_in_command_string(self, mocker, tmp_path):
-        """
-        The --shift-predictor flag must appear in the command string recorded
+        """The --shift-predictor flag must appear in the command string recorded
         in the PDB REMARK header so the generation is fully reproducible.
 
         EDUCATIONAL NOTE — Provenance in PDB Headers:

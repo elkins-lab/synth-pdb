@@ -1,5 +1,4 @@
-"""
-Biophysical Realism Module.
+"""Biophysical Realism Module.
 
 Enhances synthetic structures with realistic physical chemistry properties.
 Includes:
@@ -34,8 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.AtomArray:
-    """
-    Apply global pH settings to titratable residues (mainly Histidine).
+    """Apply global pH settings to titratable residues (mainly Histidine).
 
     Args:
         structure: The atom array.
@@ -43,6 +41,7 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
 
     Returns:
         Modified atom array with updated residue names (HIS -> HIE/HID/HIP).
+
     """
     logger.info(f"Applying pH Titration (pH={ph})...")
 
@@ -92,8 +91,7 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
 
 
 def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
-    """
-    Add terminal capping groups (ACE/NME) to the peptide.
+    """Add terminal capping groups (ACE/NME) to the peptide.
 
     EDUCATIONAL NOTE - Terminal Capping:
     ====================================
@@ -116,6 +114,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
 
     Returns:
         Structure with ACE and NME residues added.
+
     """
     logger.info("Adding terminal caps (ACE/NME)...")
 
@@ -314,8 +313,7 @@ BASIC_ATOMS = ["NZ", "NH1", "NH2", "ND1", "NE2"]
 
 
 def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]:
-    """
-    Automatically detects potential salt bridges in a protein structure.
+    """Automatically detects potential salt bridges in a protein structure.
 
     A salt bridge is defined here as a pair of acidic and basic residues
     where any of their side-chain charged atoms are within the specified cutoff.
@@ -331,6 +329,7 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
             - atom_a: Name of the coordinating atom in res_ia
             - atom_b: Name of the coordinating atom in res_ib
             - distance: The measured distance
+
     """
     # Filter for Acidic and Basic atoms only to speed up search
     acid_mask = np.isin(structure.res_name, ACIDIC_RESIDUES) & np.isin(

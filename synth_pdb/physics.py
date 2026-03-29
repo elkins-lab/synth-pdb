@@ -26,8 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class EnergyMinimizer:
-    """
-    Performs energy minimization on molecular structures using OpenMM.
+    """Performs energy minimization on molecular structures using OpenMM.
 
     ### Educational Note: What is Energy Minimization?
     --------------------------------------------------
@@ -64,8 +63,7 @@ class EnergyMinimizer:
         solvent_model: str = "app.OBC2",
         box_size: float = 1.0,
     ) -> None:
-        """
-        Initialize the Minimizer with a Forcefield and Solvent Model.
+        """Initialize the Minimizer with a Forcefield and Solvent Model.
 
         Args:
             forcefield_name: The "rulebook" for how atoms interact.
@@ -96,6 +94,7 @@ class EnergyMinimizer:
            it is. Surface atoms feel the full ε=80, while core atoms are shielded.
            The **OBC2 (Onufriev-Bashford-Case)** model is a refined version that
            parameterizes these radii to match explicit solvent behavior closely.
+
         """
         if not HAS_OPENMM:
             return
@@ -178,8 +177,7 @@ class EnergyMinimizer:
         disulfides: Optional[List] = None,
         coordination: Optional[List] = None,
     ) -> bool:
-        """
-        Run energy minimization to regularize geometry and resolve clashes.
+        """Run energy minimization to regularize geometry and resolve clashes.
 
         Uses OpenMM with implicit solvent (OBC2) and the AMBER forcefield.
         This provides a "physically valid" structure by moving atoms into their
@@ -232,6 +230,7 @@ class EnergyMinimizer:
 
         Returns:
             True if successful.
+
         """
         if not HAS_OPENMM:
             logger.error("Cannot minimize: OpenMM not found.")
@@ -257,8 +256,7 @@ class EnergyMinimizer:
         disulfides: Optional[List] = None,
         coordination: Optional[List] = None,
     ) -> bool:
-        """
-        Run Thermal Equilibration (MD) at 300K.
+        """Run Thermal Equilibration (MD) at 300K.
 
         Args:
             pdb_file_path: Input PDB/File path.
@@ -284,6 +282,7 @@ class EnergyMinimizer:
 
         Returns:
             True if successful.
+
         """
         if not HAS_OPENMM:
             logger.error("Cannot equilibrate: OpenMM not found.")
@@ -309,8 +308,7 @@ class EnergyMinimizer:
         disulfides: Optional[List] = None,
         coordination: Optional[List] = None,
     ) -> bool:
-        """
-        Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
+        """Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
 
         ### Why Add Hydrogens?
         X-ray crystallography often doesn't resolve hydrogen atoms because they have very few electrons.
@@ -334,6 +332,7 @@ class EnergyMinimizer:
 
         Returns:
             True if successful.
+
         """
         if not HAS_OPENMM:
             logger.error("Cannot add hydrogens: OpenMM not found.")
@@ -353,8 +352,7 @@ class EnergyMinimizer:
     def calculate_energy(
         self, input_data: Union[str, Any], cyclic: bool = False
     ) -> Optional[float]:
-        """
-        Calculates the potential energy of a structure.
+        """Calculates the potential energy of a structure.
 
         Args:
             input_data: Can be a PDB file path, a PDB string, or a PeptideResult object.
@@ -362,6 +360,7 @@ class EnergyMinimizer:
 
         Returns:
             float: Potential energy in kJ/mol.
+
         """
         if not HAS_OPENMM:
             return 0.0
@@ -369,6 +368,8 @@ class EnergyMinimizer:
         # Handle different input types
         pdb_path = None
         temp_file = None
+
+        import tempfile
 
         try:
             if (
@@ -380,8 +381,6 @@ class EnergyMinimizer:
             else:
                 # Treat as PDB content or object with .pdb property
                 content = input_data.pdb if hasattr(input_data, "pdb") else str(input_data)
-                import tempfile
-
                 temp_file = tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False)
                 temp_file.write(content)
                 temp_file.close()
@@ -410,8 +409,7 @@ class EnergyMinimizer:
     def _create_system_robust(
         self, topology: Any, constraints: Any, modeller: Optional[Any] = None
     ) -> Tuple[Any, Any, Any]:
-        """
-        Creates an OpenMM system, with robust fallbacks for template mismatches
+        """Creates an OpenMM system, with robust fallbacks for template mismatches
         and incompatible forcefield arguments. Returns (system, topology, positions).
         """
         if not hasattr(self, "_suppressed_args"):
@@ -502,6 +500,7 @@ class EnergyMinimizer:
         Raises:
             Exception: Any failure in file I/O or OpenMM loading is re-raised
                 so that the caller's try/except can log and return ``None``.
+
         """
         import os
         import tempfile
@@ -722,6 +721,7 @@ class EnergyMinimizer:
         Returns:
             ``(modeller, added_bonds, salt_bridge_restraints,
               coordination_restraints, atom_list)``
+
         """
         import io as _io
 
@@ -1003,6 +1003,7 @@ class EnergyMinimizer:
             ``(simulation, system, n_idx, c_idx, topology, positions)``
             where *n_idx*/*c_idx* are the N/C-terminus atom indices used for
             the cyclic pull force (``-1`` for non-cyclic structures).
+
         """
         topology, positions = modeller.topology, modeller.positions
 
@@ -1347,6 +1348,7 @@ class EnergyMinimizer:
             original_metadata: ``{(res_id, chain_id): {"name": ..., "id": ...}}``
                 used to restore renamed residues.
             atom_list: Atom list at system-creation time (for CONECT mapping).
+
         """
         import io as _io
 
@@ -1762,8 +1764,7 @@ def simulate_trajectory(
     steps: int = 1000,
     report_interval: int = 20,
 ) -> List[str]:
-    """
-    Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
+    """Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
 
     Args:
         pdb_content: Complete string representation of the starting PDB.
@@ -1773,6 +1774,7 @@ def simulate_trajectory(
 
     Returns:
         A list of PDB formatted strings, one for each recorded frame.
+
     """
     import io
     import os

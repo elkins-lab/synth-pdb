@@ -1,5 +1,4 @@
-"""
-Utility functions for PDB file formatting and manipulation.
+"""Utility functions for PDB file formatting and manipulation.
 
 This module centralizes PDB header/footer generation and content manipulation
 to avoid code duplication across the codebase.
@@ -10,11 +9,11 @@ from typing import Optional
 
 
 def get_current_date_pdb_format() -> str:
-    """
-    Returns the current date formatted for PDB HEADER record (DD-MON-YY).
+    """Returns the current date formatted for PDB HEADER record (DD-MON-YY).
 
     Returns:
         str: Date string in PDB format (e.g., "21-JAN-26")
+
     """
     now = datetime.now()
     month_abbr = now.strftime("%b").upper()
@@ -22,14 +21,14 @@ def get_current_date_pdb_format() -> str:
 
 
 def extract_atomic_content(full_pdb_content: str) -> str:
-    """
-    Extracts only ATOM, HETATM, and TER lines from a full PDB content string.
+    """Extracts only ATOM, HETATM, and TER lines from a full PDB content string.
 
     Args:
         full_pdb_content: Complete PDB file content including headers
 
     Returns:
         str: PDB content containing only atomic coordinate lines
+
     """
     atomic_lines = []
     for line in full_pdb_content.splitlines():
@@ -43,8 +42,7 @@ def create_pdb_header(
     date: Optional[str] = None,
     command_args: Optional[str] = None,
 ) -> str:
-    """
-    Creates standardized PDB header records.
+    """Creates standardized PDB header records.
 
     Args:
         sequence_length: Number of residues in the peptide
@@ -53,6 +51,7 @@ def create_pdb_header(
 
     Returns:
         str: PDB header records (HEADER through MODEL)
+
     """
     if date is None:
         date = get_current_date_pdb_format()
@@ -98,11 +97,11 @@ def create_pdb_header(
 
 
 def create_pdb_footer() -> str:
-    """
-    Creates standardized PDB footer records.
+    """Creates standardized PDB footer records.
 
     Returns:
         str: PDB footer records (ENDMDL and END)
+
     """
     footer_lines = [
         "ENDMDL",
@@ -112,8 +111,7 @@ def create_pdb_footer() -> str:
 
 
 def extract_header_records(full_pdb_content: str, record_type: str = "SSBOND") -> str:
-    """
-    Extracts specific header records (e.g. SSBOND) from a full PDB content string.
+    """Extracts specific header records (e.g. SSBOND) from a full PDB content string.
 
     Args:
         full_pdb_content: Complete PDB file content
@@ -121,6 +119,7 @@ def extract_header_records(full_pdb_content: str, record_type: str = "SSBOND") -
 
     Returns:
         str: Extracted records joined by newlines
+
     """
     records = []
     for line in full_pdb_content.splitlines():
@@ -137,8 +136,7 @@ def assemble_pdb_content(
     extra_records: Optional[str] = None,
     conect_records: Optional[str] = None,
 ) -> str:
-    """
-    Assembles complete PDB file content from atomic coordinates and metadata.
+    """Assembles complete PDB file content from atomic coordinates and metadata.
 
     Args:
         atomic_content: PDB content containing only ATOM/HETATM/TER lines
@@ -150,6 +148,7 @@ def assemble_pdb_content(
 
     Returns:
         str: Complete PDB file content with headers and footers
+
     """
     header = create_pdb_header(sequence_length, date, command_args)
     footer = create_pdb_footer()

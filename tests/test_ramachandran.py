@@ -1,5 +1,4 @@
-"""
-Tests for residue-specific Ramachandran distributions.
+"""Tests for residue-specific Ramachandran distributions.
 
 EDUCATIONAL NOTE - The Ramachandran Plot
 ========================================
@@ -77,8 +76,7 @@ class TestRamachandranDistributions:
     """Test suite for residue-specific Ramachandran distributions."""
 
     def test_ramachandran_data_has_residue_specific_entries(self):
-        """
-        Test that Ramachandran data includes GLY and PRO specific distributions.
+        """Test that Ramachandran data includes GLY and PRO specific distributions.
 
         EDUCATIONAL NOTE:
         We need separate distributions for:
@@ -95,8 +93,7 @@ class TestRamachandranDistributions:
         ), "Should have PRO-specific Ramachandran data"
 
     def test_glycine_can_access_left_handed_alpha(self):
-        """
-        Test that glycine structures can have positive phi angles.
+        """Test that glycine structures can have positive phi angles.
 
         EDUCATIONAL NOTE - Left-Handed Alpha Region:
         This region (φ ≈ +60°, ψ ≈ +45°) is FORBIDDEN for most residues
@@ -156,8 +153,7 @@ class TestRamachandranDistributions:
         reason="WIP: Geometric construction method produces different angles than input. Being refactored."
     )
     def test_proline_has_restricted_phi(self):
-        """
-        Test that proline has restricted phi angles around -60°.
+        """Test that proline has restricted phi angles around -60°.
 
         SKIPPED (WIP):
         Geometric construction method limitations cause Proline angles to deviate
@@ -213,8 +209,7 @@ class TestRamachandranDistributions:
         reason="WIP: Geometric construction method produces different angles than input. Being refactored."
     )
     def test_general_residues_avoid_left_handed_alpha(self):
-        """
-        Test that non-GLY residues avoid left-handed alpha region.
+        """Test that non-GLY residues avoid left-handed alpha region.
 
         SKIPPED (WIP):
         Currently the geometric construction method produces angles that differ
@@ -257,8 +252,7 @@ class TestRamachandranDistributions:
         reason="WIP: Geometric construction method produces different angles than input. Being refactored."
     )
     def test_alpha_helix_conformation_uses_correct_angles(self):
-        """
-        Test that alpha helix conformation uses correct phi/psi angles.
+        """Test that alpha helix conformation uses correct phi/psi angles.
 
         SKIPPED (WIP):
         The code correctly selects psi=-57, phi=-47 from presets, however
@@ -300,8 +294,7 @@ class TestRamachandranDistributions:
         reason="WIP: Geometric construction method produces different angles than input. Being refactored."
     )
     def test_beta_sheet_conformation_uses_correct_angles(self):
-        """
-        Test that beta sheet conformation uses correct phi/psi angles.
+        """Test that beta sheet conformation uses correct phi/psi angles.
 
         SKIPPED (WIP):
         Same issue as alpha helix test - geometric construction limitation.

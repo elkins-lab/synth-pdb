@@ -1,5 +1,4 @@
-"""
-Distogram (Distance Matrix) Export Module.
+"""Distogram (Distance Matrix) Export Module.
 
 THE "AI TRINITY" PART 3: Spatial Relationships.
 
@@ -24,8 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.ndarray:
-    """
-    Calculate the pairwise distance matrix for the given structure.
+    """Calculate the pairwise distance matrix for the given structure.
 
     Args:
         structure: Biotite AtomArray.
@@ -33,6 +31,7 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
 
     Returns:
         np.ndarray: NxN matrix where M[i,j] is the distance in Angstroms between residue i and j.
+
     """
     logger.info(f"Calculating {method.upper()} Distance Matrix (Distogram)...")
 
@@ -72,13 +71,13 @@ def calculate_distogram(structure: struc.AtomArray, method: str = "ca") -> np.nd
 
 
 def export_distogram(matrix: np.ndarray, output_file: str, fmt: str = "json") -> None:
-    """
-    Export the distance matrix to a file.
+    """Export the distance matrix to a file.
 
     Args:
         matrix: NxN numpy array.
         output_file: Output filename.
         fmt: Format 'json', 'csv', 'npz'.
+
     """
     logger.info(f"Exporting Distogram to {output_file} ({fmt})...")
 

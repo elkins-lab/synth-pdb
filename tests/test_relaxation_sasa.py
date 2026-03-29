@@ -4,8 +4,7 @@ from synth_pdb.relaxation import predict_order_parameters
 
 
 def create_buried_exposed_system():
-    """
-    Creates a simple system with a 'buried' residue and an 'exposed' residue.
+    """Creates a simple system with a 'buried' residue and an 'exposed' residue.
 
     Structure:
     - Residue 1 (Buried): Surrounded by other atoms.
@@ -46,8 +45,7 @@ def create_buried_exposed_system():
 
 
 def test_sasa_modulation_of_s2():
-    """
-    Test that a buried residue has a higher S2 (more rigid) than an exposed residue
+    """Test that a buried residue has a higher S2 (more rigid) than an exposed residue
     when both have the same secondary structure (coil).
     """
     structure = create_buried_exposed_system()
@@ -79,9 +77,7 @@ def test_sasa_modulation_of_s2():
 
 
 def test_sasa_integration_runs():
-    """
-    Test that the function runs on a somewhat normal peptide without crashing.
-    """
+    """Test that the function runs on a somewhat normal peptide without crashing."""
     # Create simple peptide
     # We need a small backbone to avoid secondary structure crashes if any
     atom1 = struc.Atom([0, 0, 0], atom_name="CA", res_name="GLY", res_id=1, element="C")

@@ -50,8 +50,7 @@ class TestGenerator(unittest.TestCase):
             self.assertEqual(len(sequence), length)
 
     def test_generate_pdb_content_full_atom_backbone_geometry(self):
-        """
-        Test if the N, CA, C, O backbone atom coordinates for a single residue
+        """Test if the N, CA, C, O backbone atom coordinates for a single residue
         adhere to the defined bond lengths and angles from data.py.
         """
         # Test with a single Alanine residue
@@ -225,8 +224,7 @@ class TestGenerator(unittest.TestCase):
             _resolve_sequence(length=0, user_sequence_str=sequence_str)
 
     def test_get_sequence_plausible_frequencies(self):
-        """
-        Test if random sequence generation with plausible frequencies
+        """Test if random sequence generation with plausible frequencies
         adheres to the expected distribution within a tolerance.
         """
         from synth_pdb.data import AMINO_ACID_FREQUENCIES
@@ -378,8 +376,7 @@ class TestGenerator(unittest.TestCase):
         self.assertIn("O", atom_names)  # Check for unpadded name
 
     def test_linear_full_atom_peptide_is_ramachandran_valid(self):
-        """
-        Test that a generated full-atom peptide, using the Ramachandran-guided geometry,
+        """Test that a generated full-atom peptide, using the Ramachandran-guided geometry,
         exhibits NO Ramachandran violations.
         """
         # Generate a short peptide, full atom mode
@@ -542,8 +539,7 @@ class TestGenerator(unittest.TestCase):
             generate_pdb_content(sequence_str=invalid_sequence_str)
 
     def test_generate_pdb_content_pdb_atom_format_compliance(self):
-        """
-        Test if the generated ATOM lines comply with PDB format specifications
+        """Test if the generated ATOM lines comply with PDB format specifications
         regarding field widths, justifications, and data types.
         """
         test_cases = [
@@ -686,8 +682,7 @@ class TestGenerator(unittest.TestCase):
                     self.assertIn(atom_data["charge"], ["", "1+", "1-"])
 
     def test_generate_pdb_content_long_peptide_numbering_and_chain_id(self):
-        """
-        Test if atom and residue numbering, and chain ID are correct for longer peptides
+        """Test if atom and residue numbering, and chain ID are correct for longer peptides
         in full-atom mode.
         """
         peptide_length = 10

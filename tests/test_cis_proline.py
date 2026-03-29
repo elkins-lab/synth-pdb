@@ -6,8 +6,7 @@ from synth_pdb.generator import generate_pdb_content
 
 
 class TestCisProline:
-    """
-    TDD Test Suite for Cis-Proline Isomerization.
+    """TDD Test Suite for Cis-Proline Isomerization.
 
     EDUCATIONAL NOTE - Peptide Bond Isomerism (Cis vs Trans)
     --------------------------------------------------------
@@ -70,9 +69,7 @@ class TestCisProline:
         assert np.all(is_trans), f"Default generation produced non-trans bonds: {omegas}"
 
     def test_force_cis_proline(self):
-        """
-        Test that we can force Cis-Proline generation.
-        """
+        """Test that we can force Cis-Proline generation."""
         seq = "APA"  # ALA-PRO-ALA. The A-P bond should be cis.
 
         content = generate_pdb_content(

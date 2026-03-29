@@ -1,5 +1,4 @@
-"""
-Cofactor and Metal Ion Coordination Module.
+"""Cofactor and Metal Ion Coordination Module.
 
 THE "AI TRINITY" PHASE 15: Inorganic Coordination.
 
@@ -29,8 +28,7 @@ logger = logging.getLogger(__name__)
 def find_metal_binding_sites(
     structure: struc.AtomArray, distance_threshold: float = 10.0
 ) -> List[Dict]:
-    """
-    Scans the structure for clusters of residues that could coordinate a metal ion.
+    """Scans the structure for clusters of residues that could coordinate a metal ion.
 
     Args:
         structure: Biotite AtomArray.
@@ -38,6 +36,7 @@ def find_metal_binding_sites(
 
     Returns:
         List[Dict]: A list of detected sites, each with 'type' and 'ligand_indices'.
+
     """
     logger.info("Scanning for metal binding motifs (Zinc Fingers)...")
 
@@ -88,8 +87,7 @@ def find_metal_binding_sites(
 
 
 def add_metal_ion(structure: struc.AtomArray, site: Dict) -> struc.AtomArray:
-    """
-    Adds a metal ion (HETATM) to the structure at the centroid of its ligands.
+    """Adds a metal ion (HETATM) to the structure at the centroid of its ligands.
 
     Args:
         structure: Original AtomArray.
@@ -97,6 +95,7 @@ def add_metal_ion(structure: struc.AtomArray, site: Dict) -> struc.AtomArray:
 
     Returns:
         struc.AtomArray: New AtomArray with the ion appended.
+
     """
     ion_type = site["type"]
     ligand_indices = site["ligand_indices"]

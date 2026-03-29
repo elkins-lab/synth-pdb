@@ -1,5 +1,4 @@
-"""
-ML Integration Example: PyTorch Handover
+"""ML Integration Example: PyTorch Handover.
 ----------------------------------------
 This script demonstrates how to generate a batch of thousands of protein structures
 using synth_pdb and feed them directly into a PyTorch model for training or inference.

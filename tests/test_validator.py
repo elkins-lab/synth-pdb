@@ -3,10 +3,6 @@ import logging
 import numpy as np
 import pytest
 
-from synth_pdb.validator import PDBValidator
-
-logger = logging.getLogger(__name__)
-# logging.getLogger().setLevel(logging.DEBUG) # Optional: Configure externally
 from synth_pdb.data import (
     ANGLE_C_N_CA,
     ANGLE_CA_C_N,
@@ -22,13 +18,15 @@ from synth_pdb.generator import (  # Import create_atom_line
     _position_atom_3d_from_internal_coords,
     create_atom_line,
 )
+from synth_pdb.validator import PDBValidator
 
+logger = logging.getLogger(__name__)
+# logging.getLogger().setLevel(logging.DEBUG) # Optional: Configure externally
 logging.getLogger().setLevel(logging.DEBUG)
 
 
 def is_valid_pdb_file(file_path: str) -> bool:
-    """
-    Helper function to determine if a PDB file is valid based on whether
+    """Helper function to determine if a PDB file is valid based on whether
     the PDBValidator can parse it and find at least one atom.
     """
     try:
@@ -329,8 +327,7 @@ class TestPDBValidator:
         assert not validator.get_violations()
 
     def test_validate_ramachandran_violation_phi(self):
-        """
-        Test that a General residue (Alanine) is FLAGGED as a violation when placed
+        """Test that a General residue (Alanine) is FLAGGED as a violation when placed
         in the "Left-Handed Alpha Helix" region (Phi approx +60).
 
         Biological Context:
@@ -397,8 +394,7 @@ class TestPDBValidator:
         assert "Outlier" in violations[0]
 
     def test_validate_ramachandran_glycine_allowed(self):
-        """
-        Test that Glycine is ALLOWED in the "Left-Handed Alpha Helix" region.
+        """Test that Glycine is ALLOWED in the "Left-Handed Alpha Helix" region.
 
         Biological Context:
         -------------------
@@ -450,8 +446,7 @@ class TestPDBValidator:
         assert len(violations) == 0
 
     def test_validate_ramachandran_violation_proline(self):
-        """
-        Test that Proline is FLAGGED as a violation in the standard Beta region.
+        """Test that Proline is FLAGGED as a violation in the standard Beta region.
 
         Biological Context:
         -------------------
@@ -1077,8 +1072,7 @@ class TestPDBValidator:
 
     # --- Rotamer Validation Tests ---
     def test_validate_rotamers_violation(self):
-        """
-        Test that a side-chain rotamer violation is detected.
+        """Test that a side-chain rotamer violation is detected.
 
         Scenario: Valine (VAL) with Chi1 = 0.0 degrees (completely eclipsed).
         Allowed Chi1 for VAL: {-60, 180, 60}.
@@ -1144,8 +1138,7 @@ class TestPDBValidator:
         assert "0.0" in violations[0]  # Should mention the measured angle
 
     def test_validate_bond_angles_missing_ca_regression(self):
-        """
-        Regression test for a 'NoneType' object is not subscriptable error
+        """Regression test for a 'NoneType' object is not subscriptable error
         that occurred when next_res_atoms.get("CA") returned None.
         This often happens with terminal caps (like ACE/NME) or incomplete models.
         """

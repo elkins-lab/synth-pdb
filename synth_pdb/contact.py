@@ -6,11 +6,10 @@ import numpy as np
 def compute_contact_map(
     structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None
 ) -> np.ndarray:
-    """
-    Computes a residue-residue contact map.
+    """Computes a residue-residue contact map.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     structure : AtomArray
         The protein structure.
     method : str
@@ -23,10 +22,11 @@ def compute_contact_map(
         If 6, returns 1/r^6 (NOE Intensity proxy).
         If 0, returns binary contact map (1 if r < threshold, else 0).
 
-    Returns:
-    --------
+    Returns
+    -------
     matrix : np.ndarray (N_res x N_res)
         The contact matrix.
+
     """
     # Filter for the relevant atoms
     if method == "ca":

@@ -8,8 +8,7 @@ Also see test_comment_density.py for tests of the comment density.
 
 
 class TestDocumentationIntegrity(unittest.TestCase):
-    """
-    Safeguard to ensure educational notes are not accidentally removed.
+    """Safeguard to ensure educational notes are not accidentally removed.
 
     These tests scan the source code for specific educational content that
     must be preserved to maintain the pedagogical value of the project.

@@ -16,12 +16,11 @@ logger = logging.getLogger(__name__)
 class TestRotamerDistribution(unittest.TestCase):
 
     def test_valine_rotamer_distribution(self):
-        """
-        Verify that Valine rotamers follow approximately the expected distribution.
+        """Verify that Valine rotamers follow approximately the expected distribution.
         Expected weights from data.py for VAL:
           -60 deg (g-): 0.70
           180 deg (t):  0.20
-          60 deg (g+):  0.10
+          60 deg (g+):  0.10.
         """
         n_samples = 100
         rotamer_counts = Counter()

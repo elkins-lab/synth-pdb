@@ -2,9 +2,7 @@ import unittest
 
 
 class TestNumbaFallback(unittest.TestCase):
-    """
-    Verifies that the codebase degrades gracefully when Numba is not installed.
-    """
+    """Verifies that the codebase degrades gracefully when Numba is not installed."""
 
     def test_njit_fallback_mechanics(self):
         """Verify that the njit fallback behaves like an identity decorator."""

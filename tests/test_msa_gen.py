@@ -10,7 +10,7 @@ except ImportError:
 
 
 def create_mock_structure():
-    """Creates a simple structure (Alpha Helix like)"""
+    """Creates a simple structure (Alpha Helix like)."""
     # We create a dummy atom array with coords.
     # 3 residues: ALA, ALA, ALA
     # For SASA, we need coords.
