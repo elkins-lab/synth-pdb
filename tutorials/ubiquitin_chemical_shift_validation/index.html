@@ -4366,8 +4366,8 @@ print('✅ Environment configured!')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pynmrstar</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpdb</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpdb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pynmrstar</span>
 
 <span class="c1"># Download 1D3Z structure if not present</span>
 <span class="n">pdb_file</span> <span class="o">=</span> <span class="s1">'1D3Z.pdb'</span>
@@ -4380,8 +4380,8 @@ print('✅ Environment configured!')</div>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Structural data downloaded and atom array parsed."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import pynmrstar
-import biotite.structure.io.pdb as bpdb
+<div class="clipboard-copy-txt" id="cell-2">import biotite.structure.io.pdb as bpdb
+import pynmrstar
 
 # Download 1D3Z structure if not present
 pdb_file = '1D3Z.pdb'
@@ -4445,9 +4445,9 @@ print("✅ Structural data downloaded and atom array parsed.")</div>
     <span class="n">res_index</span><span class="p">,</span> <span class="n">res_name</span><span class="p">,</span> <span class="n">atom_name</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">row</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># The BMRB labels backbone amide protons as 'H' or 'HN' interchangeably; standardize to 'H'</span>
-        <span class="k">if</span> <span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'HN'</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'HN'</span><span class="p">:</span>
             <span class="n">atom_name</span> <span class="o">=</span> <span class="s1">'H'</span>
-            
+
         <span class="n">experimental_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
             <span class="s1">'res_index'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_index</span><span class="p">),</span>
             <span class="s1">'atom'</span><span class="p">:</span> <span class="n">atom_name</span><span class="p">,</span>
@@ -4481,9 +4481,9 @@ for row in cs_loop.get_tag(['Comp_index_ID', 'Comp_ID', 'Atom_ID', 'Val']):
     res_index, res_name, atom_name, val = row
     try:
         # The BMRB labels backbone amide protons as 'H' or 'HN' interchangeably; standardize to 'H'
-        if atom_name == 'HN': 
+        if atom_name == 'HN':
             atom_name = 'H'
-            
+
         experimental_data.append({
             'res_index': int(res_index),
             'atom': atom_name,
@@ -4549,11 +4549,11 @@ print(df_exp.head())</div>
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_exp</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
     <span class="n">res_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]</span>
     <span class="n">atom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'atom'</span><span class="p">]</span>
-    
+
     <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">if</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">calc_shifts</span> <span class="ow">and</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">calc_shifts</span><span class="p">[</span><span class="n">res_id</span><span class="p">]:</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">calc_shifts</span><span class="p">[</span><span class="n">res_id</span><span class="p">][</span><span class="n">atom</span><span class="p">]</span>
-        
+
     <span class="n">calc_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 <span class="n">df_exp</span><span class="p">[</span><span class="s1">'calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_values</span>
@@ -4575,11 +4575,11 @@ calc_values = []
 for idx, row in df_exp.iterrows():
     res_id = row['res_index']
     atom = row['atom']
-    
+
     val = np.nan
     if res_id in calc_shifts and atom in calc_shifts[res_id]:
         val = calc_shifts[res_id][atom]
-        
+
     calc_values.append(val)
 
 df_exp['calc'] = calc_values
@@ -4634,30 +4634,30 @@ print(f"Matched {len(df_clean)} aligned theoretical/experimental pairs.")</div>
     <span class="n">df_nuc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">df_clean</span><span class="p">[</span><span class="s1">'atom'</span><span class="p">]</span> <span class="o">==</span> <span class="n">nuc</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">df_nuc</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="k">continue</span>
-        
+
     <span class="n">exp</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s1">'exp'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">calc</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s1">'calc'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    
+
     <span class="c1"># Calculate Error Metrics</span>
     <span class="n">rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">exp</span> <span class="o">-</span> <span class="n">calc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
     <span class="n">r_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">calc</span><span class="p">)</span>
     <span class="n">rmsds</span><span class="p">[</span><span class="n">nuc</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsd</span>
-    
+
     <span class="c1"># Scatter Plot</span>
     <span class="n">color</span> <span class="o">=</span> <span class="s1">'tab:blue'</span> <span class="k">if</span> <span class="s1">'C'</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="p">(</span><span class="s1">'tab:green'</span> <span class="k">if</span> <span class="s1">'N'</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="s1">'tab:orange'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-    
+
     <span class="c1"># Regression line parity</span>
     <span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">calc</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">calc</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s1">'k--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-    
+
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nucleus: </span><span class="si">{</span><span class="n">nuc</span><span class="si">}</span><span class="s2"> | RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ppm"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Experimental (ppm)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"synth-pdb Calculated (ppm)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
-    
+
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
@@ -4666,7 +4666,7 @@ print(f"Matched {len(df_clean)} aligned theoretical/experimental pairs.")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Our synthetic empirical predictor demonstrates highly accurate alignment with real physics:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">nuc</span><span class="p">,</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">rmsds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">" - </span><span class="si">{</span><span class="n">nuc</span><span class="si">:</span><span class="s2">2s</span><span class="si">}</span><span class="s2"> RMSD: </span><span class="si">{</span><span class="n">err</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ppm"</span><span class="p">)</span>
-    
+
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">These RMSD metrics align with the theoretical performance limits for sequence+structure "</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"based empirical prediction published in the SPARTA and SHIFTX literatures."</span><span class="p">)</span>
 </pre></div>
@@ -4684,30 +4684,30 @@ for i, nuc in enumerate(nuclei):
     df_nuc = df_clean[df_clean['atom'] == nuc]
     if df_nuc.empty:
         continue
-        
+
     exp = df_nuc['exp'].values
     calc = df_nuc['calc'].values
-    
+
     # Calculate Error Metrics
     rmsd = np.sqrt(np.mean((exp - calc) ** 2))
     r_val, _ = pearsonr(exp, calc)
     rmsds[nuc] = rmsd
-    
+
     # Scatter Plot
     color = 'tab:blue' if 'C' in nuc else ('tab:green' if 'N' in nuc else 'tab:orange')
     ax.scatter(exp, calc, color=color, alpha=0.7, edgecolor='white', s=60)
-    
+
     # Regression line parity
     min_val = min(exp.min(), calc.min()) - 1
     max_val = max(exp.max(), calc.max()) + 1
     ax.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5)
-    
+
     ax.set_title(f"Nucleus: {nuc} | RMSD: {rmsd:.3f} ppm", fontsize=12, fontweight='bold')
     ax.set_xlabel("Experimental (ppm)")
     ax.set_ylabel("synth-pdb Calculated (ppm)")
     ax.grid(alpha=0.3)
     ax.set_aspect('equal')
-    
+
 plt.tight_layout()
 plt.show()
 
@@ -4716,7 +4716,7 @@ print("=" * 60)
 print("Our synthetic empirical predictor demonstrates highly accurate alignment with real physics:")
 for nuc, err in rmsds.items():
     print(f" - {nuc:2s} RMSD: {err:.3f} ppm")
-    
+
 print("\nThese RMSD metrics align with the theoretical performance limits for sequence+structure ")
 print("based empirical prediction published in the SPARTA and SHIFTX literatures.")</div>
 </div>

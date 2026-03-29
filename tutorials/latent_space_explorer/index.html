@@ -4649,6 +4649,7 @@ print('✅ Latent Space Explorer Ready!')</div>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_CombinedBatch</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Thin wrapper that concatenates two BatchedPeptide objects along the batch axis."""</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">coords</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">=</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
@@ -4694,6 +4695,7 @@ batch_extended = bg_ext.generate_batch(conformation='extended', drift=20.0, seed
 
 class _CombinedBatch:
     """Thin wrapper that concatenates two BatchedPeptide objects along the batch axis."""
+
     def __init__(self, a, b):
         self.coords = np.concatenate([a.coords, b.coords], axis=0)
         self._a, self._b = a, b

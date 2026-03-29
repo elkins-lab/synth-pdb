@@ -4398,28 +4398,30 @@ print("✅ Experimental data downloaded.")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_nh_rdcs_from_xplor</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Extract N-H RDCs from the 1D3Z XPLOR/CNS restraint file."""</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    
+
     <span class="c1"># Extract the block containing N-H RDCs in bicelles</span>
     <span class="n">start_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">'!!! DipolarCouplings.HN-N.tbl</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="n">end_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">'!!! DipolarCouplings.HN-CO.tbl</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">start_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Could not find HN-N RDC table in file"</span><span class="p">)</span>
-        
+
     <span class="n">rdc_block</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span> <span class="k">if</span> <span class="n">end_idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)]</span>
-    
+
     <span class="n">rdc_data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">rdc_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-    
+
     <span class="n">current_res</span> <span class="o">=</span> <span class="kc">None</span>
-    
+
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">'HN'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'and name'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">')'</span><span class="p">)</span>
@@ -4434,7 +4436,7 @@ print("✅ Experimental data downloaded.")</div>
                         <span class="n">rdc_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'res_index'</span><span class="p">:</span> <span class="n">current_res</span><span class="p">,</span> <span class="s1">'D_exp'</span><span class="p">:</span> <span class="n">val</span><span class="p">})</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="k">pass</span>
-                        
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rdc_data</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'res_index'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -4443,28 +4445,30 @@ print("✅ Experimental data downloaded.")</div>
 <span class="n">df_rdc</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import re
+
 import numpy as np
 import pandas as pd
 
+
 def extract_nh_rdcs_from_xplor(filepath):
     """Extract N-H RDCs from the 1D3Z XPLOR/CNS restraint file."""
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
-    
+
     # Extract the block containing N-H RDCs in bicelles
     start_idx = content.find('!!! DipolarCouplings.HN-N.tbl\n')
     end_idx = content.find('!!! DipolarCouplings.HN-CO.tbl\n', start_idx)
-    
+
     if start_idx == -1:
         raise ValueError("Could not find HN-N RDC table in file")
-        
+
     rdc_block = content[start_idx:end_idx if end_idx != -1 else len(content)]
-    
+
     rdc_data = []
     lines = rdc_block.split('\n')
-    
+
     current_res = None
-    
+
     for line in lines:
         if 'HN' in line and 'and name' in line:
             parts = line.split(')')
@@ -4479,7 +4483,7 @@ def extract_nh_rdcs_from_xplor(filepath):
                         rdc_data.append({'res_index': current_res, 'D_exp': val})
                     except ValueError:
                         pass
-                        
+
     df = pd.DataFrame(rdc_data).drop_duplicates(subset=['res_index'])
     return df.sort_values('res_index').reset_index(drop=True)
 
@@ -4522,7 +4526,6 @@ df_rdc.head()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpdb</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Load the PDB file into a Biotite AtomArray</span>
 <span class="n">pdb_struct</span> <span class="o">=</span> <span class="n">bpdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -4554,12 +4557,12 @@ df_rdc.head()</div>
     <span class="k">if</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">nh_vectors</span><span class="p">:</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">nh_vectors</span><span class="p">[</span><span class="n">res_id</span><span class="p">]</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        
+
         <span class="c1"># Coefficients for the 5 independent elements: Sxx, Syy, Sxy, Sxz, Syz</span>
         <span class="c1"># Using the relation D = D_max * sum_i sum_j v_i S_ij v_j</span>
         <span class="n">row_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="p">]</span>
         <span class="n">B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_B</span><span class="p">)</span>
-        
+
         <span class="c1"># D_max for N-H is approx -21700 Hz (assuming rigid bond length 1.04 A)</span>
         <span class="c1"># But we fit a scaled relative tensor directly to the experimental Hz</span>
         <span class="n">D</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'D_exp'</span><span class="p">])</span>
@@ -4591,14 +4594,14 @@ df_rdc.head()</div>
 <span class="n">Da</span> <span class="o">=</span> <span class="n">Szz</span> <span class="o">/</span> <span class="mf">2.0</span>
 <span class="n">R</span> <span class="o">=</span> <span class="p">(</span><span class="n">Sxx</span> <span class="o">-</span> <span class="n">Syy</span><span class="p">)</span> <span class="o">/</span> <span class="n">Szz</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SVD Tensor Fitting Complete!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"SVD Tensor Fitting Complete!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fitted Axial Component (Da): </span><span class="si">{</span><span class="n">Da</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Hz"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fitted Rhombicity (R): </span><span class="si">{</span><span class="n">R</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Now calculate the theoretical RDCs using this exact fitted tensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_nmr.rdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rdcs</span>
 
-<span class="c1"># Note: The 'calculate_rdcs' function expects the PDB to be oriented such that </span>
+<span class="c1"># Note: The 'calculate_rdcs' function expects the PDB to be oriented such that</span>
 <span class="c1"># its coordinates align with the principal axes of the tensor.</span>
 <span class="c1"># Since we just found the principal axes (eigenvectors), we must rotate the structure!</span>
 
@@ -4618,7 +4621,6 @@ df_rdc.head()</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Compiled </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_clean</span><span class="p">)</span><span class="si">}</span><span class="s2"> aligned overlapping RDCs for validation."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">import biotite.structure.io.pdb as bpdb
-import numpy as np
 
 # Load the PDB file into a Biotite AtomArray
 pdb_struct = bpdb.PDBFile.read(pdb_file).get_structure(model=1)
@@ -4650,12 +4652,12 @@ for idx, row in df_rdc.iterrows():
     if res_id in nh_vectors:
         v = nh_vectors[res_id]
         x, y, z = v[0], v[1], v[2]
-        
+
         # Coefficients for the 5 independent elements: Sxx, Syy, Sxy, Sxz, Syz
         # Using the relation D = D_max * sum_i sum_j v_i S_ij v_j
         row_B = [x**2 - z**2, y**2 - z**2, 2*x*y, 2*x*z, 2*y*z]
         B.append(row_B)
-        
+
         # D_max for N-H is approx -21700 Hz (assuming rigid bond length 1.04 A)
         # But we fit a scaled relative tensor directly to the experimental Hz
         D.append(row['D_exp'])
@@ -4687,14 +4689,14 @@ Sxx, Syy, Szz = eigenvalues[idx_sort]
 Da = Szz / 2.0
 R = (Sxx - Syy) / Szz
 
-print(f"SVD Tensor Fitting Complete!")
+print("SVD Tensor Fitting Complete!")
 print(f"Fitted Axial Component (Da): {Da:.2f} Hz")
 print(f"Fitted Rhombicity (R): {R:.3f}")
 
 # Now calculate the theoretical RDCs using this exact fitted tensor
 from synth_nmr.rdc import calculate_rdcs
 
-# Note: The 'calculate_rdcs' function expects the PDB to be oriented such that 
+# Note: The 'calculate_rdcs' function expects the PDB to be oriented such that
 # its coordinates align with the principal axes of the tensor.
 # Since we just found the principal axes (eigenvectors), we must rotate the structure!
 
@@ -4778,7 +4780,7 @@ print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
 
 <span class="c1"># Annotate stats</span>
 <span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Cornilescu Q-Factor: </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Cornilescu Q-Factor: </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
          <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">'monospace'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
@@ -4824,7 +4826,7 @@ plt.ylabel("synth-pdb Calculated RDC $D_{HN}$ (Hz)", fontsize=12)
 
 # Annotate stats
 bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
-plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}", 
+plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
          fontsize=12, bbox=bbox_props, family='monospace')
 
 plt.grid(alpha=0.2)

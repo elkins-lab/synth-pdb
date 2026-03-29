@@ -4554,8 +4554,7 @@ $$D(\theta, \phi) = D_a \left[ (3\cos^2\theta - 1) + \tfrac{3}{2}R\,\sin^2\theta
 <span class="p">})</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">rdc_formula</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">,</span> <span class="n">phi_deg</span><span class="p">,</span> <span class="n">Da</span><span class="p">,</span> <span class="n">R</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]</span>
+<span class="w">    </span><span class="sd">"""Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)].</span>
 
 <span class="sd">    Tjandra &amp; Bax (1997), Science 278:1111.</span>
 
@@ -4565,6 +4564,7 @@ $$D(\theta, \phi) = D_a \left[ (3\cos^2\theta - 1) + \tfrac{3}{2}R\,\sin^2\theta
 <span class="sd">    phi_deg   : float or ndarray  — azimuthal angle in degrees</span>
 <span class="sd">    Da        : float             — axial component (Hz)</span>
 <span class="sd">    R         : float             — rhombicity (0 ≤ R ≤ 2/3)</span>
+
 <span class="sd">    """</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">theta_deg</span><span class="p">)</span>
     <span class="n">phi</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span>
@@ -4595,8 +4595,7 @@ plt.rcParams.update({
 })
 
 def rdc_formula(theta_deg, phi_deg, Da, R):
-    """
-    Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
+    """Compute D(θ, φ) = Da * [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)].
 
     Tjandra &amp; Bax (1997), Science 278:1111.
 
@@ -4606,6 +4605,7 @@ def rdc_formula(theta_deg, phi_deg, Da, R):
     phi_deg   : float or ndarray  — azimuthal angle in degrees
     Da        : float             — axial component (Hz)
     R         : float             — rhombicity (0 ≤ R ≤ 2/3)
+
     """
     theta = np.deg2rad(theta_deg)
     phi   = np.deg2rad(phi_deg)

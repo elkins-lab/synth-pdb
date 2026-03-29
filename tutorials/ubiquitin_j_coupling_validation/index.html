@@ -4324,6 +4324,7 @@ print('✅ Environment configured!')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpdb</span>
 
 <span class="n">pdb_file</span> <span class="o">=</span> <span class="s1">'1D3Z.pdb'</span>
@@ -4342,6 +4343,7 @@ print('✅ Environment configured!')</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Structural and experimental data ready."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import subprocess
+
 import biotite.structure.io.pdb as bpdb
 
 pdb_file = '1D3Z.pdb'
@@ -4394,33 +4396,35 @@ print("✅ Structural and experimental data ready.")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_hnha_jcouplings</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        
+
     <span class="n">extracted_data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
     <span class="n">current_target_res</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">in_target_section</span> <span class="o">=</span> <span class="kc">False</span>
-    
+
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">'!remark hnha, phi coupling'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">in_target_section</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">continue</span>
-            
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">in_target_section</span><span class="p">:</span>
             <span class="k">continue</span>
-            
+
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'!remark'</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">'coupling'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'hnha'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="k">break</span>
-            
+
         <span class="n">res_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'resid\s+(\d+)\s+and\s+name\s+ca\b'</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res_match</span><span class="p">:</span>
             <span class="n">current_target_res</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-            
+
         <span class="k">if</span> <span class="n">current_target_res</span> <span class="ow">and</span> <span class="s1">')'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'assign'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">')'</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -4432,7 +4436,7 @@ print("✅ Structural and experimental data ready.")</div>
                         <span class="n">current_target_res</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="k">pass</span>
-                        
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'res_index'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -4441,33 +4445,35 @@ print("✅ Structural and experimental data ready.")</div>
 <span class="nb">print</span><span class="p">(</span><span class="n">df_j</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import re
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 
 def extract_hnha_jcouplings(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
-        
+
     extracted_data = []
     lines = content.split('\n')
     current_target_res = None
     in_target_section = False
-    
+
     for line in lines:
         if '!remark hnha, phi coupling' in line:
             in_target_section = True
             continue
-            
+
         if not in_target_section:
             continue
-            
+
         if line.startswith('!remark') and 'coupling' in line and 'hnha' not in line:
             break
-            
+
         res_match = re.search(r'resid\s+(\d+)\s+and\s+name\s+ca\b', line)
         if res_match:
             current_target_res = int(res_match.group(1))
-            
+
         if current_target_res and ')' in line and 'assign' not in line:
             parts = line.split(')')
             if len(parts) &gt; 1:
@@ -4479,7 +4485,7 @@ def extract_hnha_jcouplings(filepath):
                         current_target_res = None
                     except ValueError:
                         pass
-                        
+
     df = pd.DataFrame(extracted_data).drop_duplicates()
     return df.sort_values('res_index').reset_index(drop=True)
 
@@ -4633,7 +4639,7 @@ print(f"Compiled {len(df_clean)} validated couplings for statistical analysis.")
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"synth-pdb Calculated $^3J_{H^N,H^</span><span class="se">\a</span><span class="s2">lpha}$ (Hz)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
 <span class="n">bbox_props</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
          <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">'monospace'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
@@ -4672,7 +4678,7 @@ plt.xlabel("Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 
 bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
-plt.text(min_val + 0.5, max_val - 1.5, f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}", 
+plt.text(min_val + 0.5, max_val - 1.5, f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}",
          fontsize=12, bbox=bbox_props, family='monospace')
 
 plt.grid(alpha=0.3)

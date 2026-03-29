@@ -5119,8 +5119,7 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">estimate_binding_score</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">target_profile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Simplified binding score estimation.</span>
+<span class="w">    </span><span class="sd">"""Simplified binding score estimation.</span>
 <span class="sd">    Lower score = better binding (like docking scores).</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">target_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -5173,8 +5172,7 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (score: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def estimate_binding_score(sequence, target_profile=None):
-    """
-    Simplified binding score estimation.
+    """Simplified binding score estimation.
     Lower score = better binding (like docking scores).
     """
     if target_profile is None:
