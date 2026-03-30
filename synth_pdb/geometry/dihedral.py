@@ -25,8 +25,8 @@ from synth_pdb.geometry._numba import njit
 @njit
 def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
     """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
-    vec1 = coord1 - coord2
-    vec2 = coord3 - coord2
+    vec1 = coord1.astype(np.float64) - coord2.astype(np.float64)
+    vec2 = coord3.astype(np.float64) - coord2.astype(np.float64)
 
     norm_vec1 = np.sqrt(np.sum(vec1**2))
     norm_vec2 = np.sqrt(np.sum(vec2**2))
@@ -47,45 +47,30 @@ def calculate_dihedral(
     p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray
 ) -> float:
     """Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
-    Uses the robust vector-based normal approach (IUPAC convention).
+    Uses the robust Praxeolitic formula for numerical stability and IUPAC convention.
     """
-    v1 = p2 - p1
-    v2 = p3 - p2
-    v3 = p4 - p3
+    b0 = -1.0 * (p2.astype(np.float64) - p1.astype(np.float64))
+    b1 = p3.astype(np.float64) - p2.astype(np.float64)
+    b2 = p4.astype(np.float64) - p3.astype(np.float64)
 
-    # Normals to the two planes
-    n1 = np.cross(v1, v2)
-    n2 = np.cross(v2, v3)
+    # Normalize b1
+    b1_norm = np.sqrt(np.sum(b1**2))
+    if b1_norm > 0:
+        b1 = b1 / b1_norm
 
-    # Normalize normals
-    n1_norm = np.sqrt(np.sum(n1**2))
-    n2_norm = np.sqrt(np.sum(n2**2))
+    # v = orthogonal component of b0 with respect to b1
+    # v = b0 - proj_b1(b0)
+    v = b0 - np.sum(b0 * b1) * b1
+    # w = orthogonal component of b2 with respect to b1
+    # w = b2 - proj_b1(b2)
+    w = b2 - np.sum(b2 * b1) * b1
 
-    # Safe normalization
-    if n1_norm > 0:
-        n1 = n1.astype(np.float64) / n1_norm
-    else:
-        n1 = n1.astype(np.float64) * 0.0
+    # x = dot product of v and w
+    x = np.sum(v * w)
+    # y = dot product of cross(b1, v) and w
+    y = np.sum(np.cross(b1, v) * w)
 
-    if n2_norm > 0:
-        n2 = n2.astype(np.float64) / n2_norm
-    else:
-        n2 = n2.astype(np.float64) * 0.0
-
-    # Unit vector along the second bond
-    v2_norm = np.sqrt(np.sum(v2**2))
-    if v2_norm > 0:
-        u2 = v2.astype(np.float64) / v2_norm
-    else:
-        u2 = v2.astype(np.float64) * 0.0
-
-    # Orthonormal basis in the plane perpendicular to b2
-    m1 = np.cross(n1, u2)
-
-    x = np.sum(n1 * n2)
-    y = np.sum(m1 * n2)
-
-    return float(-np.degrees(np.arctan2(y, x)))
+    return float(np.degrees(np.arctan2(y, x)))
 
 # Alias for backward compatibility
 calculate_dihedral_angle = calculate_dihedral
