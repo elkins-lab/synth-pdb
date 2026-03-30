@@ -13,6 +13,23 @@ logger = logging.getLogger(__name__)
 def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> float:
     """
     Calculate Root Mean Square Deviation between two sets of coordinates.
+
+    The RMSD is calculated as:
+        RMSD = sqrt(mean(sum((P - Q)^2, axis=1)))
+
+    Args:
+        P: Nx3 array of coordinates (first structure)
+        Q: Nx3 array of coordinates (second structure)
+
+    Returns:
+        RMSD value in Angstroms
+
+    Examples:
+        >>> import numpy as np
+        >>> coords1 = np.array([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]])
+        >>> coords2 = np.array([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]])
+        >>> calculate_rmsd(coords1, coords2)
+        0.0
     """
     if P.shape != Q.shape:
         logger.error(f"Shape mismatch: P.shape={P.shape}, Q.shape={Q.shape}")
@@ -46,6 +63,25 @@ def calculate_pairwise_rmsd(
 ) -> npt.NDArray[np.float64]:
     """
     Calculate pairwise RMSD matrix for multiple structures.
+
+    Args:
+        coords_list: List of Nx3 coordinate arrays
+        superimpose: If True, perform optimal superposition before RMSD calculation
+
+    Returns:
+        MxM symmetric matrix of pairwise RMSD values,
+        where M is the number of structures
+
+    Examples:
+        >>> import numpy as np
+        >>> c1 = np.array([[0., 0., 0.], [1., 0., 0.]])
+        >>> c2 = np.array([[0., 0., 0.], [1., 0., 0.]])
+        >>> c3 = np.array([[1., 0., 0.], [2., 0., 0.]])
+        >>> rmsd_matrix = calculate_pairwise_rmsd([c1, c2, c3])
+        >>> rmsd_matrix.shape
+        (3, 3)
+        >>> float(rmsd_matrix[0, 1])  # c1 vs c2
+        0.0
     """
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -70,6 +106,21 @@ def calculate_average_coords(
 ) -> npt.NDArray[np.float64]:
     """
     Calculate average (centroid) coordinates from ensemble.
+
+    Args:
+        coords_list: List of Nx3 coordinate arrays from ensemble
+
+    Returns:
+        Nx3 array of average coordinates
+
+    Examples:
+        >>> import numpy as np
+        >>> c1 = np.array([[0., 0., 0.], [1., 0., 0.]])
+        >>> c2 = np.array([[2., 0., 0.], [3., 0., 0.]])
+        >>> avg = calculate_average_coords([c1, c2])
+        >>> avg
+        array([[1., 0., 0.],
+               [2., 0., 0.]])
     """
     if not coords_list:
         return np.array([]).reshape(0, 3)
@@ -88,6 +139,24 @@ def calculate_rmsd_to_average(
 ) -> tuple[float, npt.NDArray[np.float64]]:
     """
     Calculate RMSD of each structure to the average structure.
+
+    This is commonly reported for NMR ensembles.
+
+    Args:
+        coords_list: List of Nx3 coordinate arrays
+
+    Returns:
+        Tuple of (average_rmsd, average_coords)
+        - average_rmsd: Mean RMSD across all structures
+        - average_coords: Nx3 array of average coordinates
+
+    Examples:
+        >>> import numpy as np
+        >>> c1 = np.array([[0., 0., 0.], [1., 0., 0.]])
+        >>> c2 = np.array([[0., 0., 0.], [1., 0., 0.]])
+        >>> avg_rmsd, avg_coords = calculate_rmsd_to_average([c1, c2])
+        >>> float(avg_rmsd)
+        0.0
     """
     avg_coords = calculate_average_coords(coords_list)
     if avg_coords.size == 0 or not coords_list:
