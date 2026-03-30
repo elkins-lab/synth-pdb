@@ -41,16 +41,13 @@ def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> fl
         logger.error(f"Invalid shape: {P.shape}")
         raise ValueError(f"Coordinates must be Nx3 arrays. Got shape: {P.shape}")
 
-    if P.size == 0 or Q.size == 0:
-        logger.warning("calculate_rmsd: Empty input arrays.")
+    if P.shape[0] == 0:
+        logger.warning("calculate_rmsd: Zero points provided.")
         return 0.0
 
     # Calculate squared differences
     diff = P - Q
     squared_diff = np.sum(diff**2, axis=1)
-    if squared_diff.size == 0:
-        logger.warning("calculate_rmsd: squared_diff is empty. Returning np.nan.")
-        return float("nan")
     rmsd = float(np.sqrt(np.mean(squared_diff)))
     return rmsd
 
