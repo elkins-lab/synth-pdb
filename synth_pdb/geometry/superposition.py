@@ -1,0 +1,112 @@
+"""
+Optimal superposition of structures using the Kabsch algorithm.
+"""
+
+import logging
+from typing import List
+
+import numpy as np
+import numpy.typing as npt
+
+logger = logging.getLogger(__name__)
+
+def kabsch_superposition(
+    P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+    """
+    Calculate optimal rotation and translation to superimpose P onto Q.
+    Uses the Kabsch algorithm.
+    """
+    # Validate input
+    if P.shape != Q.shape:
+        logger.error(f"Shape mismatch: P.shape={P.shape}, Q.shape={Q.shape}")
+        raise ValueError(
+            f"Coordinate arrays must have same shape. Got P: {P.shape}, Q: {Q.shape}"
+        )
+
+    if len(P.shape) != 2 or P.shape[1] != 3:
+        logger.error(f"Invalid shape: {P.shape}")
+        raise ValueError(f"Coordinates must be Nx3 arrays. Got shape: {P.shape}")
+
+    # Step 1: Center both structures
+    if P.size == 0 or Q.size == 0:
+        logger.warning("kabsch_superposition: Empty input arrays.")
+        return np.array([]), np.array([])
+    P_center = P.mean(axis=0)
+    Q_center = Q.mean(axis=0)
+
+    P_centered = P - P_center
+    Q_centered = Q - Q_center
+
+    # Step 2: Compute covariance matrix
+    H = P_centered.T @ Q_centered
+
+    # Check for numerical issues in H
+    if not np.all(np.isfinite(H)):
+        logger.warning("kabsch_superposition: H contains non-finite values.")
+        return np.eye(3), np.zeros(3)
+
+    # Step 3: SVD decomposition
+    try:
+        U, S, Vt = np.linalg.svd(H)
+    except np.linalg.LinAlgError as e:
+        logger.error(f"kabsch_superposition: SVD failed to converge: {e}")
+        return np.eye(3), np.zeros(3)
+
+    # Step 4: Compute rotation matrix
+    try:
+        d = np.linalg.det(Vt.T @ U.T)
+    except np.linalg.LinAlgError:
+        d = 1.0
+
+    if abs(d) < 1e-12:
+        d_corr = 1.0 if d >= 0 else -1.0
+    else:
+        d_corr = 1.0 if d > 0 else -1.0
+
+    diag = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, d_corr]])
+
+    R = Vt.T @ diag @ U.T
+
+    # Final check on R
+    if not np.all(np.isfinite(R)):
+        logger.warning("kabsch_superposition: Input matrices contain non-finite values.")
+        return np.eye(3), np.zeros(3)
+
+    # Step 5: Compute translation
+    t = Q_center - R @ P_center
+
+    return R, t
+
+
+def apply_transformation(
+    coords: npt.NDArray[np.float64],
+    rotation: npt.NDArray[np.float64],
+    translation: npt.NDArray[np.float64],
+) -> npt.NDArray[np.float64]:
+    """
+    Apply rotation and translation to coordinates.
+    """
+    return (rotation @ coords.T).T + translation
+
+
+def superimpose_structures(
+    mobile: npt.NDArray[np.float64], reference: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
+    """
+    Superimpose mobile structure onto reference structure.
+    """
+    R, t = kabsch_superposition(mobile, reference)
+    return apply_transformation(mobile, R, t)
+
+
+def find_medoid(
+    coords_list: List[npt.NDArray[np.float64]], superimpose: bool = True
+) -> int:
+    """
+    Find medoid structure (most representative) from ensemble.
+    """
+    from synth_pdb.geometry.rmsd import calculate_pairwise_rmsd
+    rmsd_matrix = calculate_pairwise_rmsd(coords_list, superimpose=superimpose)
+    sum_rmsds = rmsd_matrix.sum(axis=1)
+    return int(np.argmin(sum_rmsds))
