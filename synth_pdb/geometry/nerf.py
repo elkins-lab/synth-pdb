@@ -61,10 +61,14 @@ def position_atom_3d_from_internal_coords(
     c_norm = np.sqrt(np.sum(c**2))
     d_norm = np.sqrt(np.sum(d**2))
 
-    if a_norm > 0: a /= a_norm
-    if b_norm > 0: b /= b_norm
-    if c_norm > 0: c /= c_norm
-    if d_norm > 0: d /= d_norm
+    if a_norm > 0:
+        a /= a_norm
+    if b_norm > 0:
+        b /= b_norm
+    if c_norm > 0:
+        c /= c_norm
+    if d_norm > 0:
+        d /= d_norm
 
     p4 = p3 + bond_length * (
         -b * np.cos(bond_angle_rad)

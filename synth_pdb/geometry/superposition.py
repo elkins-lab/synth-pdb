@@ -3,7 +3,7 @@ Optimal superposition of structures using the Kabsch algorithm.
 """
 
 import logging
-from typing import List
+from typing import List, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -11,7 +11,7 @@ import numpy.typing as npt
 logger = logging.getLogger(__name__)
 
 def kabsch_superposition(
-    P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]
+    P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]  # noqa: N803
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
     Calculate optimal rotation and translation to superimpose P onto Q.
@@ -49,14 +49,14 @@ def kabsch_superposition(
     if P.size == 0 or Q.size == 0:
         logger.warning("kabsch_superposition: Empty input arrays.")
         return np.array([]), np.array([])
-    P_center = P.mean(axis=0)
-    Q_center = Q.mean(axis=0)
+    P_center = P.mean(axis=0)  # noqa: N806
+    Q_center = Q.mean(axis=0)  # noqa: N806
 
-    P_centered = P - P_center
-    Q_centered = Q - Q_center
+    P_centered = P - P_center  # noqa: N806
+    Q_centered = Q - Q_center  # noqa: N806
 
     # Step 2: Compute covariance matrix
-    H = P_centered.T @ Q_centered
+    H = P_centered.T @ Q_centered  # noqa: N806
 
     # Check for numerical issues in H
     if not np.all(np.isfinite(H)):
@@ -65,7 +65,7 @@ def kabsch_superposition(
 
     # Step 3: SVD decomposition
     try:
-        U, S, Vt = np.linalg.svd(H)
+        U, S, Vt = np.linalg.svd(H)  # noqa: N806
     except np.linalg.LinAlgError as e:
         logger.error(f"kabsch_superposition: SVD failed to converge: {e}")
         return np.eye(3), np.zeros(3)
@@ -83,7 +83,7 @@ def kabsch_superposition(
 
     diag = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, d_corr]])
 
-    R = Vt.T @ diag @ U.T
+    R = Vt.T @ diag @ U.T  # noqa: N806
 
     # Final check on R
     if not np.all(np.isfinite(R)):
@@ -91,7 +91,7 @@ def kabsch_superposition(
         return np.eye(3), np.zeros(3)
 
     # Step 5: Compute translation
-    t = Q_center - R @ P_center
+    t = Q_center - R @ P_center  # noqa: N806
 
     return R, t
 
@@ -121,7 +121,7 @@ def apply_transformation(
         >>> np.allclose(transformed, coords + t)
         True
     """
-    return (rotation @ coords.T).T + translation
+    return cast(npt.NDArray[np.float64], (rotation @ coords.T).T + translation)
 
 
 def superimpose_structures(
@@ -145,8 +145,9 @@ def superimpose_structures(
         >>> reference = np.array([[5., 3., -2.], [6., 3., -2.]])
         >>> aligned = superimpose_structures(mobile, reference)
     """
-    R, t = kabsch_superposition(mobile, reference)
+    R, t = kabsch_superposition(mobile, reference)  # noqa: N806
     return apply_transformation(mobile, R, t)
+
 
 
 def find_medoid(

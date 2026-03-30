@@ -87,10 +87,8 @@ def reconstruct_sidechain(
     if "chi1" not in rotamer:
         return
 
-    _chi1_val = rotamer["chi1"]
-    chi1_target = _chi1_val[0] if isinstance(_chi1_val, list) else float(_chi1_val)
-
     # Basic rigid body alignment of the whole template to the backbone
+
     mob_n = ref_res_template[ref_res_template.atom_name == "N"]
     mob_ca = ref_res_template[ref_res_template.atom_name == "CA"]
     mob_c = ref_res_template[ref_res_template.atom_name == "C"]

@@ -10,7 +10,7 @@ import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
-def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> float:
+def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> float:  # noqa: N803
     """
     Calculate Root Mean Square Deviation between two sets of coordinates.
 
@@ -91,8 +91,8 @@ def calculate_pairwise_rmsd(
     for i in range(n_structures):
         for j in range(i + 1, n_structures):
             if superimpose:
-                R, t = kabsch_superposition(coords_list[i], coords_list[j])
-                aligned_i = (R @ coords_list[i].T).T + t
+                R, t = kabsch_superposition(coords_list[i], coords_list[j])  # noqa: N806
+                aligned_i = cast(npt.NDArray[np.float64], (R @ coords_list[i].T).T + t)
                 rmsd = calculate_rmsd(aligned_i, coords_list[j])
             else:
                 rmsd = calculate_rmsd(coords_list[i], coords_list[j])
