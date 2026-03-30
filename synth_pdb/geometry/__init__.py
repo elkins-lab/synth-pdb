@@ -2,6 +2,7 @@
 Geometry utilities for protein structure generation and analysis.
 """
 
+from synth_pdb.geometry._numba import njit
 from synth_pdb.geometry.dihedral import (
     calculate_angle,
     calculate_dihedral,
@@ -54,4 +55,6 @@ __all__ = [
     "batched_dihedral",
     "position_atoms_batch",
     "superimpose_batch",
+    "njit",
 ]
+
