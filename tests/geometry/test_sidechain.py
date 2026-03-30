@@ -82,3 +82,30 @@ def test_reconstruct_sidechain_missing_backbone():
     # Should log warning and return None
     result = reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})
     assert result is None
+
+
+def test_reconstruct_sidechain_unknown_residue():
+    """Test handling of unknown residue type (hitting Miss 83-85)."""
+    pdb_content = generate_pdb_content(sequence_str="A", conformation="alpha")
+    pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
+    peptide = pdb_file.get_structure(model=1)
+
+    # Change residue name to something unknown
+    peptide.res_name[0] = "XYZ"
+
+    # Should log warning and return
+    reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})
+
+
+def test_reconstruct_sidechain_missing_template_atoms(mocker):
+    """Test handling of templates missing essential backbone atoms (hitting Miss 96-97)."""
+    # Use VAL for mock to avoid affecting ALA setup in generate_pdb_content
+    bad_template = struc.AtomArray(1)
+    bad_template[0] = struc.Atom(res_id=1, res_name="VAL", atom_name="N", coord=[0,0,0])
+
+    pdb_content = generate_pdb_content(sequence_str="V", conformation="alpha")
+    pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
+    peptide = pdb_file.get_structure(model=1)
+
+    mocker.patch("biotite.structure.info.residue", return_value=bad_template)
+    assert reconstruct_sidechain(peptide, 1, {"chi1": [60.0]}) is None

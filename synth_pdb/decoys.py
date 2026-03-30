@@ -7,6 +7,7 @@ import biotite.structure.io.pdb as pdb
 import numpy as np
 
 from .generator import generate_pdb_content
+from .geometry import calculate_rmsd, kabsch_superposition
 
 logger = logging.getLogger(__name__)
 
@@ -172,9 +173,13 @@ class DecoyGenerator:
                 else:
                     # Calculate RMSD against reference
                     # Superimpose first to minimize RMSD
-                    # Returns (fitted, transform)
-                    fitted_ca, _ = struc.superimpose(reference_ca, current_ca)
-                    rmsd = struc.rmsd(reference_ca, fitted_ca)
+                    # Returns (rotation, translation)
+                    r_ref = reference_ca.coord
+                    r_curr = current_ca.coord
+
+                    rot, trans = kabsch_superposition(r_curr, r_ref)
+                    fitted_coords = (rot @ r_curr.T).T + trans
+                    rmsd = calculate_rmsd(fitted_coords, r_ref)
 
                     if rmsd_min <= rmsd <= rmsd_max:
                         idx = len(generated_decoys)

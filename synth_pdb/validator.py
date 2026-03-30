@@ -22,6 +22,10 @@ from .data import (
     RAMACHANDRAN_POLYGONS,
     VAN_DER_WAALS_RADII,
 )
+from .geometry import (
+    calculate_angle,
+    calculate_dihedral,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -230,21 +234,7 @@ class PDBValidator:
     @staticmethod
     def _calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
         """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
-        vec1 = coord1 - coord2
-        vec2 = coord3 - coord2
-
-        # Avoid division by zero for zero-length vectors
-        norm_vec1 = np.linalg.norm(vec1)
-        norm_vec2 = np.linalg.norm(vec2)
-
-        if norm_vec1 == 0 or norm_vec2 == 0:
-            return 0.0  # Or raise an error, depending on desired behavior for degenerate cases
-
-        cosine_angle = np.dot(vec1, vec2) / (norm_vec1 * norm_vec2)
-        # Ensure cosine_angle is within [-1, 1] to avoid issues with arccos due to floating point inaccuracies
-        cosine_angle = np.clip(cosine_angle, -1.0, 1.0)
-        angle_rad = np.arccos(cosine_angle)
-        return float(np.degrees(angle_rad))
+        return calculate_angle(coord1, coord2, coord3)
 
     @staticmethod
     def _calculate_dihedral_angle(
@@ -252,46 +242,11 @@ class PDBValidator:
     ) -> float:
         """Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
 
-        IMPORTANT NOTE - Dihedral Conventions:
-        It was discovered that simple projection math can accidentally swap
-        Cis and Trans conventions.  Instead, the robust vector-based normal
-        approach used in professional structural biology (IUPAC) is used.
-
-        Standard IUPAC convention:
-        - Cis-Peptide (eclipsed): ~0 degrees
-        - Trans-Peptide (anti-planar): ~180 degrees
+        EDUCATIONAL NOTE:
+        This internal wrapper uses the centralized geometry module to ensure
+        IUPAC convention for protein dihedrals is maintained across the project.
         """
-        v1 = p2 - p1
-        v2 = p3 - p2
-        v3 = p4 - p3
-
-        # Normals to the two planes
-        n1 = np.cross(v1, v2).astype(float)
-        n2 = np.cross(v2, v3).astype(float)
-
-        # Normalize normals
-        n1_norm = np.linalg.norm(n1)
-        n2_norm = np.linalg.norm(n2)
-
-        if n1_norm == 0 or n2_norm == 0:
-            return 0.0
-
-        n1 /= n1_norm
-        n2 /= n2_norm
-
-        # Unit vector along the second bond
-        u2 = v2.astype(float) / np.linalg.norm(v2)
-
-        # Orthonormal basis in the plane perpendicular to b2
-        m1 = np.cross(n1, u2)
-
-        x = np.dot(n1, n2)
-        y = np.dot(m1, n2)
-
-        # EDUCATIONAL NOTE:
-        # Standard atan2 returns values in (-180, 180].
-        # This matches the IUPAC convention for protein dihedrals.
-        return float(-np.degrees(np.arctan2(y, x)))
+        return calculate_dihedral(p1, p2, p3, p4)
 
     def get_violations(self) -> List[str]:
         """Returns a list of detected violations."""

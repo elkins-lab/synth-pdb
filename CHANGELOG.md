@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **New Geometry Module** (`synth_pdb.geometry`): Modernized core protein geometry logic based upon `pdbstat-python`, including symmetry-aware RMSD calculation and rigid-body superposition.
 - **Improved J-Coupling Prediction**: Updated `tests/test_coupling.py` to support `NaN` key exclusions in the latest `synth-nmr` predictor.
+- **Extensive Geometry Testing**: Added edge-case kernels tests for RMSD, dihedral angles and Kabsch superposition.
+
+### Fixed
+- **Geometric Strain Formula**: Corrected calculation of omega dihedral deviation from 180° for consistent residue strain reporting.
+- **Generator Robustness**: Resolved systemic `TypeError` regressions caused by `pytest-cov` environment interference with `numpy._NoValueType`.
 
 ### Changed
 - **Dependency Update**: Bumped `synth-nmr` dependency to `>=0.9.0` for improved physical validation and J-coupling support.

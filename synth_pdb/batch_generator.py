@@ -1,5 +1,5 @@
 import random
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import biotite.structure as struc
 import numpy as np
@@ -14,7 +14,12 @@ from .data import (
     ONE_TO_THREE_LETTER_CODE,
     RAMACHANDRAN_PRESETS,
 )
-from .geometry import position_atoms_batch, superimpose_batch
+from .geometry import (
+    calculate_rmsd_to_average,
+    find_medoid,
+    position_atoms_batch,
+    superimpose_batch,
+)
 
 # EDUCATIONAL OVERVIEW - Batched Generation (GPU-First):
 # ----------------------------------------------------
@@ -156,6 +161,36 @@ class BatchedPeptide:
         return compute_6d_orientations(
             self.coords, self.atom_names, self.residue_indices, self.n_residues
         )
+
+    def analyze_ensemble(
+        self, superimpose: bool = True
+    ) -> Dict[str, Any]:
+        """Performs NMR-style ensemble analysis on the batch.
+
+        Calculates the average structure, the average RMSD to that structure
+        (measuring batch precision), and identifies the medoid structure.
+
+        Args:
+            superimpose: If True, aligns all structures before analysis.
+
+        Returns:
+            A dictionary containing:
+                - 'avg_rmsd': The mean RMSD of all structures to the average.
+                - 'medoid_index': The index of the most representative structure.
+                - 'avg_coords': (N_atoms, 3) array of the centroid structure.
+        """
+        # Convert List[np.ndarray] for the geometry API
+        # self.coords is (B, N, 3)
+        coords_list = [self.coords[i] for i in range(self.n_structures)]
+
+        avg_rmsd, avg_coords = calculate_rmsd_to_average(coords_list)
+        medoid_idx = find_medoid(coords_list, superimpose=superimpose)
+
+        return {
+            "avg_rmsd": avg_rmsd,
+            "medoid_index": medoid_idx,
+            "avg_coords": avg_coords,
+        }
 
 
 class BatchedGenerator:

@@ -279,7 +279,17 @@ def _generate_random_amino_acid_sequence(
     Returns:
         List of 3-letter amino acid codes.
     """
-    if length is None or length <= 0:
+    # Handle potential non-standard types like numpy._NoValue
+    if length is None or str(length) == "<no value>":
+        return []
+
+    try:
+        length_int = int(length)
+    except (TypeError, ValueError):
+        logger.warning(f"Invalid sequence length: {length}. Returning empty list.")
+        return []
+
+    if length_int <= 0:
         return []
 
     if use_plausible_frequencies:
@@ -1615,13 +1625,15 @@ def generate_pdb_content(
        "wrong" sequence to a "right" fold, a key test for discriminative models.
 
     """
-    if seed is not None:
+    if seed is not None and str(seed) != "<no value>":
         logger.info(f"Setting random seed to {seed} for reproducibility.")
         random.seed(seed)
         np.random.seed(seed)
 
     # Use localized random generator for better control and thread-safety
-    rng = random.Random(seed)
+    # Ensure seed is None if it's <no value> for random.Random initialization
+    actual_seed = seed if str(seed) != "<no value>" else None
+    rng = random.Random(actual_seed)
 
     sequence = _resolve_sequence(
         length=length,

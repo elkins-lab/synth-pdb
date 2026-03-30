@@ -58,10 +58,8 @@ custom_peptide_*.fasta
 test_*.pdb
 out.pdb
 fix_*.py
-1UBQ.pdb
 decoys/
 bmr6457.json
-1D3Z.pdb
 1d3z_mr.str
 
 # Translations
