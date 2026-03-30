@@ -25,7 +25,6 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.physics_path = os.path.join(self.base_dir, "synth_pdb", "physics.py")
         self.validator_path = os.path.join(self.base_dir, "synth_pdb", "validator.py")
         self.cofactors_path = os.path.join(self.base_dir, "synth_pdb", "cofactors.py")
-        self.geometry_path = os.path.join(self.base_dir, "synth_pdb", "geometry.py")
         self.packing_path = os.path.join(self.base_dir, "synth_pdb", "packing.py")
         self.scoring_path = os.path.join(self.base_dir, "synth_pdb", "scoring.py")
         self.dataset_path = os.path.join(self.base_dir, "synth_pdb", "dataset.py")
@@ -38,6 +37,11 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.rdc_path = os.path.join(self.base_dir, "synth_pdb", "rdc.py")
         self.docking_path = os.path.join(self.base_dir, "synth_pdb", "docking.py")
         self.main_path = os.path.join(self.base_dir, "synth_pdb", "main.py")
+
+        # Modular Geometry Paths
+        self.geometry_nerf_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "nerf.py")
+        self.geometry_dihedral_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "dihedral.py")
+        self.geometry_vectorized_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "vectorized.py")
 
     def _check_file_contains(self, filepath, substrings):
         """Helper to assert file contains list of substrings."""
@@ -148,24 +152,31 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self._check_file_contains(self.cofactors_path, required_notes)
 
     def test_geometry_educational_notes(self):
-        """Ensure geometry.py retains Z-Matrix and NeRF notes."""
-        required_notes = [
+        """Ensure geometry modules retain Z-Matrix, NeRF, and performance notes."""
+        nerf_notes = [
             "EDUCATIONAL NOTE - Z-Matrix Construction",
             "Bond Length",
             "Bond Angle",
             "Torsion/Dihedral Angle",
             "EDUCATIONAL NOTE - NeRF Geometry",
             "Natural Extension Reference Frame",
-            "EDUCATIONAL NOTE - SIMD & Parallel Geometry:",
-            "EDUCATIONAL NOTE - Vectorized Kabsch Algorithm:",
-            "Root Mean Square Deviation (RMSD)",
-            "EDUCATIONAL NOTE - GPU-First Operations:",
-            "Memory bandwidth",
-            "EDUCATIONAL NOTE - Circular Statistics (The 180/-180 Problem):",
-            "Boundary Artifact",
             "mathematical precision",
         ]
-        self._check_file_contains(self.geometry_path, required_notes)
+        self._check_file_contains(self.geometry_nerf_path, nerf_notes)
+
+        dihedral_notes = [
+            "EDUCATIONAL NOTE - Circular Statistics (The 180/-180 Problem):",
+            "Boundary Artifact",
+        ]
+        self._check_file_contains(self.geometry_dihedral_path, dihedral_notes)
+
+        vectorized_notes = [
+            "EDUCATIONAL NOTE - SIMD & Parallel Geometry:",
+            "EDUCATIONAL NOTE - Vectorized Kabsch Algorithm:",
+            "EDUCATIONAL NOTE - GPU-First Operations:",
+            "Memory bandwidth",
+        ]
+        self._check_file_contains(self.geometry_vectorized_path, vectorized_notes)
 
     def test_batch_generator_educational_notes(self):
         """Ensure batch_generator.py retains performance notes."""

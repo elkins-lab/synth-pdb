@@ -140,3 +140,10 @@ Traditional biology code uses "Serial Geometry" ($O(B \times L)$). To place atom
 
 On modern hardware (Apple M4 AMX, NVIDIA Tensor Cores), serial loops are extremely inefficient. By vectorizing the math into large matrix operations, memory bandwidth is maximized via contiguous array access and hardware acceleration (Accelerate/MPS/Metal) can be leveraged automatically.
 
+## References
+
+1. Parsons, J., et al. (2005). "Practical conversion from torsion space to Cartesian space for in silico protein synthesis." *Journal of Computational Chemistry*, 26(10), 1063-1068.
+2. Coutsias, E. A., et al. (2004). "Using quaternions to calculate RMSD." *Journal of Computational Chemistry*, 25(15), 1849-1857.
+3. Kabsch, W. (1976). "A solution for the best rotation to relate two sets of vectors." *Acta Crystallographica Section A*, 32(6), 922-923.
+4. Kabsch, W. (1978). "A discussion of the solution for the best rotation to relate two sets of vectors." *Acta Crystallographica Section A*, 34(5), 827-828.
+
