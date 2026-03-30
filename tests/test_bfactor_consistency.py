@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-import pytest
 
 from synth_pdb.generator import generate_pdb_content
 
@@ -45,16 +44,8 @@ def test_bfactor_reflects_dynamics():
         assert 5.0 <= bf <= 100.0, f"B-factor {bf} for residue {rid} out of realistic range"
 
 
-@pytest.mark.skip(
-    reason="WIP: Geometry generator needs refactoring to produce reliable secondary structure for S2 prediction."
-)
 def test_bfactor_loop_vs_helix():
-    """Verify that loop regions have higher B-factors than helical regions.
-
-    SKIPPED (WIP):
-    Currently, generated helices often deviate from ideal Phi/Psi angles, causing
-    S2 prediction to classify them as 'coil', inverting the expected B-factor trend.
-    """
+    """Verify that loop regions have higher B-factors than helical regions."""
     # Generate a structure with explicit regions: helix-loop-helix
     pdb_content = generate_pdb_content(
         sequence_str="A" * 20, structure="1-7:alpha,8-13:random,14-20:alpha", seed=42

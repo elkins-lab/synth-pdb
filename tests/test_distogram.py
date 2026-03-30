@@ -4,11 +4,7 @@ import biotite.structure as struc
 import numpy as np
 import pytest
 
-# Try to import the module (will fail initially)
-try:
-    from synth_pdb import distogram
-except ImportError:
-    distogram = None
+from synth_pdb import distogram
 
 
 def create_triangle_structure():
@@ -27,15 +23,8 @@ def create_triangle_structure():
 
 class TestDistogramExport:
 
-    def test_module_exists(self):
-        if distogram is None:
-            pytest.fail("synth_pdb.distogram module not found")
-
     def test_distogram_calculation(self):
         """Test calculation of NxN distance matrix."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
 
         # Calculate matrix
@@ -58,9 +47,6 @@ class TestDistogramExport:
 
     def test_export_json_format(self, tmp_path):
         """Test export to JSON."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
         matrix = distogram.calculate_distogram(atoms)
         outfile = tmp_path / "dist.json"
@@ -75,9 +61,6 @@ class TestDistogramExport:
 
     def test_export_csv_format(self, tmp_path):
         """Test export to CSV."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
         matrix = distogram.calculate_distogram(atoms)
         outfile = tmp_path / "dist.csv"
@@ -86,18 +69,11 @@ class TestDistogramExport:
 
         assert outfile.exists()
         content = outfile.read_text()
-        # Should be a matrix CSV or flattened? Usually matrix.
-        # Check headers if any, or just numbers.
-        # Implementation decision: No headers for matrix CSV usually, or simple residue index.
-        # Let's verify it contains the numbers.
         assert "3.0" in content
         assert "5.0" in content
 
     def test_export_numpy_format(self, tmp_path):
         """Test export to .npz or .npy."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
         matrix = distogram.calculate_distogram(atoms)
         outfile = tmp_path / "dist.npz"
@@ -107,20 +83,12 @@ class TestDistogramExport:
         assert outfile.exists()
         # Verify load
         loaded = np.load(str(outfile))
-        # Typically npz stores files inside. We might save as 'distogram'.
         assert "distogram" in loaded
         assert np.allclose(loaded["distogram"], matrix)
 
     def test_distogram_calculation_cb(self):
         """Test calculation using CB atoms (and fallback)."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
-        # Mock CB atoms by renaming CA to CB for test simplicity
-        # Or add CB atoms.
-        # Let's add CB atoms to the atom array.
-        # Actually simpler: atoms.atom_name[:] = "CB"
         atoms.atom_name[:] = "CB"
 
         matrix = distogram.calculate_distogram(atoms, method="cb")
@@ -129,9 +97,6 @@ class TestDistogramExport:
 
     def test_export_invalid_format(self, tmp_path):
         """Test error on unknown format."""
-        if distogram is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_triangle_structure()
         matrix = distogram.calculate_distogram(atoms)
         outfile = tmp_path / "dist.txt"

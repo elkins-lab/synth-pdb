@@ -1,14 +1,8 @@
 import biotite.structure as struc
 import numpy as np
-import pytest
 
+from synth_pdb import biophysics
 from synth_pdb.biophysics import find_salt_bridges
-
-# Try to import the module (will fail initially)
-try:
-    from synth_pdb import biophysics
-except ImportError:
-    biophysics = None
 
 
 def create_his_peptide():
@@ -19,20 +13,14 @@ def create_his_peptide():
     atoms.res_id = np.array([1, 2, 3])
     atoms.chain_id = np.array(["A", "A", "A"])
     atoms.atom_name = np.array(["CA", "CA", "CA"])
+    atoms.coord = np.zeros((3, 3))
     return atoms
 
 
 class TestBiophysics:
 
-    def test_module_exists(self):
-        if biophysics is None:
-            pytest.fail("synth_pdb.biophysics module not found")
-
     def test_ph_titration_low_ph(self):
         """Test HIS -> HIP conversion at low pH."""
-        if biophysics is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_his_peptide()
 
         # Apply pH 5.0 (Acidic)
@@ -45,29 +33,18 @@ class TestBiophysics:
 
     def test_ph_titration_high_ph(self):
         """Test HIS -> HIE/HID conversion at physiological pH."""
-        if biophysics is None:
-            pytest.skip("Module not implemented")
-
         atoms = create_his_peptide()
 
         # Apply pH 7.4
         titrated = biophysics.apply_ph_titration(atoms, ph=7.4)
 
         # Should be HIE or HID, or remain HIS if standard.
-        # Ideally we want explicit states.
-        # Let's assert it's NOT HIP.
         assert titrated.res_name[1] in ["HIE", "HID", "HIS"]
         assert titrated.res_name[1] != "HIP"
 
     def test_cap_termini_functionality(self):
         """Test ACE and NME addition."""
-        if biophysics is None:
-            pytest.skip("Module not implemented")
-
         # Create 2-residue peptide with backbone atoms
-        # ALA-ALA
-        # We need N, CA, C coords to avoid IndexError in biophysics.py
-        # Using dummy coords
         n1 = struc.Atom([0, 0, 0], atom_name="N", res_id=1, res_name="ALA", element="N")
         ca1 = struc.Atom([1.4, 0, 0], atom_name="CA", res_id=1, res_name="ALA", element="C")
         c1 = struc.Atom([2.0, 1.2, 0], atom_name="C", res_id=1, res_name="ALA", element="C")
@@ -85,8 +62,6 @@ class TestBiophysics:
         assert "ACE" in capped.res_name
         ace_atoms = capped[capped.res_name == "ACE"]
         assert len(ace_atoms) == 3  # C, O, CH3
-        # Check ACE geometry exists (not 0,0,0 unless inputs were)
-        # Inputs were close to 0 but distinct.
 
         # Check for NME
         assert "NME" in capped.res_name
@@ -100,9 +75,6 @@ class TestBiophysics:
 
 def test_find_salt_bridges_simple():
     """Test detection of a simple salt bridge between ASP and LYS."""
-    # Create simple structure: ASP 1 and LYS 2
-    # ASP OD1 - LYS NZ distance ~3.5 A
-
     atoms = []
     # ASP 1
     atoms.append(struc.Atom([0, 0, 0], res_id=1, res_name="ASP", atom_name="OD1", element="O"))
@@ -110,12 +82,10 @@ def test_find_salt_bridges_simple():
     atoms.append(struc.Atom([0, 1, 0], res_id=1, res_name="ASP", atom_name="CG", element="C"))
 
     # LYS 2
-    # NZ within 3.5 of OD1
     atoms.append(struc.Atom([3.5, 0, 0], res_id=2, res_name="LYS", atom_name="NZ", element="N"))
     atoms.append(struc.Atom([4.5, 0, 0], res_id=2, res_name="LYS", atom_name="CE", element="C"))
 
     structure = struc.array(atoms)
-
     bridges = find_salt_bridges(structure, cutoff=4.0)
 
     assert len(bridges) == 1
@@ -123,7 +93,6 @@ def test_find_salt_bridges_simple():
     assert bridge["res_ia"] == 1
     assert bridge["res_ib"] == 2
     assert "NZ" in [bridge["atom_a"], bridge["atom_b"]]
-    # It might pick OD1 or OD2 depending on which is closer (TDD logic chooses closest)
     assert any(x in [bridge["atom_a"], bridge["atom_b"]] for x in ["OD1", "OD2"])
 
 
@@ -159,7 +128,6 @@ def test_find_salt_bridges_arg_glu():
 def test_find_salt_bridges_ignore_same_residue():
     """Ensure we don't detect fake bridges within the same residue."""
     atoms = []
-    # HIS 1 (if we misconfigure, it might think ND1 and NE2 are a bridge)
     atoms.append(struc.Atom([0, 0, 0], res_id=1, res_name="HIS", atom_name="ND1", element="N"))
     atoms.append(struc.Atom([1, 0, 0], res_id=1, res_name="HIS", atom_name="NE2", element="N"))
 
@@ -170,8 +138,6 @@ def test_find_salt_bridges_ignore_same_residue():
 
 def test_apply_ph_titration():
     """Test Histidine protonation states at different pH."""
-    from synth_pdb.biophysics import apply_ph_titration
-
     atoms = [
         struc.Atom([0, 0, 0], res_id=1, res_name="HIS", atom_name="CA", element="C"),
         struc.Atom([0, 0, 0], res_id=2, res_name="HIS", atom_name="CA", element="C"),
@@ -179,12 +145,12 @@ def test_apply_ph_titration():
     structure = struc.array(atoms)
 
     # pH 5.0 -> HIP
-    structure = apply_ph_titration(structure, ph=5.0)
+    structure = biophysics.apply_ph_titration(structure, ph=5.0)
     assert np.all(structure.res_name == "HIP")
 
     # pH 8.0 -> HIE or HID
     structure.res_name[:] = "HIS"
-    structure = apply_ph_titration(structure, ph=8.0)
+    structure = biophysics.apply_ph_titration(structure, ph=8.0)
     assert np.all(np.isin(structure.res_name, ["HIE", "HID"]))
 
 
@@ -194,7 +160,6 @@ def test_cap_termini():
 
     import biotite.structure.io.pdb as pdb
 
-    from synth_pdb.biophysics import cap_termini
     from synth_pdb.generator import generate_pdb_content
 
     # Generate simple peptide
@@ -202,11 +167,8 @@ def test_cap_termini():
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
     structure = pdb_file.get_structure(model=1)
 
-    # Original length
-    sorted(set(structure.res_id))
-
     # Cap it
-    capped = cap_termini(structure)
+    capped = biophysics.cap_termini(structure)
     capped_res_names = list(set(capped.res_name))
 
     assert "ACE" in capped_res_names

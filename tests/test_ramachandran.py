@@ -66,7 +66,6 @@ import tempfile
 
 import biotite.structure.io as strucio
 import numpy as np
-import pytest
 
 from synth_pdb.data import RAMACHANDRAN_PRESETS
 from synth_pdb.generator import generate_pdb_content
@@ -149,9 +148,6 @@ class TestRamachandranDistributions:
             f"but only {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had positive phi"
         )
 
-    @pytest.mark.skip(
-        reason="WIP: Geometric construction method produces different angles than input. Being refactored."
-    )
     def test_proline_has_restricted_phi(self):
         """Test that proline has restricted phi angles around -60°.
 
@@ -205,9 +201,6 @@ class TestRamachandranDistributions:
         # might vary slightly due to geometric construction issues
         assert std_phi < 60, f"PRO phi should be restricted (low std), but std is {std_phi:.1f}°"
 
-    @pytest.mark.skip(
-        reason="WIP: Geometric construction method produces different angles than input. Being refactored."
-    )
     def test_general_residues_avoid_left_handed_alpha(self):
         """Test that non-GLY residues avoid left-handed alpha region.
 
@@ -248,9 +241,6 @@ class TestRamachandranDistributions:
             f"but {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had phi > 30°"
         )
 
-    @pytest.mark.skip(
-        reason="WIP: Geometric construction method produces different angles than input. Being refactored."
-    )
     def test_alpha_helix_conformation_uses_correct_angles(self):
         """Test that alpha helix conformation uses correct phi/psi angles.
 
@@ -290,9 +280,6 @@ class TestRamachandranDistributions:
         finally:
             os.remove(temp_path)
 
-    @pytest.mark.skip(
-        reason="WIP: Geometric construction method produces different angles than input. Being refactored."
-    )
     def test_beta_sheet_conformation_uses_correct_angles(self):
         """Test that beta sheet conformation uses correct phi/psi angles.
 

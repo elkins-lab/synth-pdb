@@ -4,11 +4,7 @@ import biotite.structure.io.pdb as pdb
 import numpy as np
 import pytest
 
-# Try to import the module to be tested (will fail initially)
-try:
-    from synth_pdb import torsion
-except ImportError:
-    torsion = None
+from synth_pdb import torsion
 
 
 class TestTorsionExport:
@@ -16,18 +12,6 @@ class TestTorsionExport:
     @pytest.fixture
     def alpha_helix_pdb(self):
         """Returns a string wrapper for a simple 3-residue alpha helix PDB content."""
-        # Ideally using Biotite to build it properly or a raw string.
-        # For torsion calculation, we need valid geometry.
-        # I'll use a mocked PDB string that approximates an alpha helix
-        # Helix: (-60, -45).
-        # But constructing coordinates by hand is hard.
-        # I will rely on biotite to build a structure if possible,
-        # or use a pre-calculated small PDB string.
-
-        # Let's use a very simple linear chain (extended) which is easier to coordinate manually
-        # Res 1 at (0,0,0), Res 2 at (3.8, 0, 0)...
-        # This gives 180 degree angles approximately.
-
         return """HEADER    EXTENDED
 ATOM      1  N   ALA A   1      -1.458   0.000   0.000  1.00  0.00           N
 ATOM      2  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C
@@ -44,16 +28,8 @@ ATOM     12  O   ALA A   3       8.600   2.500   0.000  1.00  0.00           O
 END
 """
 
-    def test_module_exists(self):
-        """Check if synth_pdb.torsion module exists."""
-        if torsion is None:
-            pytest.fail("synth_pdb.torsion module not found/implemented")
-
     def test_calculate_torsion_angles_structure(self, alpha_helix_pdb):
         """Test calculation of angles from structure."""
-        if torsion is None:
-            pytest.skip("Module not implemented")
-
         pdb_file = pdb.PDBFile.read(io.StringIO(alpha_helix_pdb))
         atom_array = pdb_file.get_structure(model=1)
 
@@ -77,9 +53,6 @@ END
 
     def test_export_csv(self, tmp_path):
         """Test export to CSV format."""
-        if torsion is None:
-            pytest.skip("Module not implemented")
-
         data = [
             {"residue": "ALA", "res_id": 1, "phi": np.nan, "psi": -57.0, "omega": 180.0},
             {"residue": "GLY", "res_id": 2, "phi": -60.0, "psi": -45.0, "omega": 180.0},
@@ -95,9 +68,6 @@ END
 
     def test_export_json(self, tmp_path):
         """Test export to JSON format."""
-        if torsion is None:
-            pytest.skip("Module not implemented")
-
         data = [
             {"residue": "ALA", "res_id": 1, "phi": None, "psi": -57.0},
         ]

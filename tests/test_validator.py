@@ -628,16 +628,15 @@ class TestPDBValidator:
         # Optionally, check that total violations are not drastically increased (for a simple tweak)
         # For simplicity, we just check reduction of steric clashes for now.
 
-    # --- Peptide Plane Tests ---
-    @pytest.mark.skip(reason="Fails due to random coordinate variation in new implementation")
     def test_validate_peptide_plane_no_violation(self):
         # Use generator to create a simple peptide, should be planar
         from synth_pdb.generator import generate_pdb_content
 
-        pdb_content = generate_pdb_content(length=2, sequence_str="AA")
+        # Force omega to 180.0 to ensure planarity for the test
+        pdb_content = generate_pdb_content(length=2, sequence_str="AA", omega_list=[180.0])
         validator = PDBValidator(pdb_content)
-        validator.validate_peptide_plane(tolerance_deg=10.0)  # Tight tolerance
-        # assert not validator.get_violations()
+        validator.validate_peptide_plane(tolerance_deg=1.0)  # Tight tolerance
+        assert not [v for v in validator.get_violations() if "Peptide plane" in v]
 
     def test_validate_peptide_plane_violation(self):
         # Manually craft atoms to create a non-planar peptide bond

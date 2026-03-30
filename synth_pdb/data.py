@@ -207,9 +207,8 @@ RAMACHANDRAN_PRESETS: Dict[str, Dict[str, float]] = {
 RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
     "general": {
         "favored": [
-            {"name": "alpha", "phi": -60.0, "psi": -45.0, "std": 10.0, "weight": 0.60},
+            {"name": "alpha", "phi": -60.0, "psi": -45.0, "std": 10.0, "weight": 0.70},
             {"name": "beta", "phi": -135.0, "psi": 135.0, "std": 10.0, "weight": 0.30},
-            {"name": "left", "phi": 60.0, "psi": 45.0, "std": 10.0, "weight": 0.10},
         ],
     },
     "GLY": {
@@ -237,7 +236,7 @@ RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
                 "phi": -135.0,
                 "psi": 135.0,
                 "std": 10.0,
-                "weight": 0.75,
+                "weight": 0.80,
             },  # Majority Beta
             {
                 "name": "alpha",
@@ -246,13 +245,6 @@ RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
                 "std": 10.0,
                 "weight": 0.20,
             },  # Minor Alpha
-            {
-                "name": "left",
-                "phi": 60.0,
-                "psi": 45.0,
-                "std": 10.0,
-                "weight": 0.05,
-            },  # Very minor Left
         ],
     },
 }
