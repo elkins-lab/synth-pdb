@@ -234,7 +234,7 @@ class PDBValidator:
     @staticmethod
     def _calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
         """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
-        return calculate_angle(coord1, coord2, coord3)
+        return float(calculate_angle(coord1, coord2, coord3))
 
     @staticmethod
     def _calculate_dihedral_angle(
@@ -246,7 +246,7 @@ class PDBValidator:
         This internal wrapper uses the centralized geometry module to ensure
         IUPAC convention for protein dihedrals is maintained across the project.
         """
-        return calculate_dihedral(p1, p2, p3, p4)
+        return float(calculate_dihedral(p1, p2, p3, p4))
 
     def get_violations(self) -> List[str]:
         """Returns a list of detected violations."""
