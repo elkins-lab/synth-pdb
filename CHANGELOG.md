@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.27.0] - 2026-03-30
+
+### Added
+- **New Geometry Module** (`synth_pdb.geometry`): Modernized core protein geometry logic based upon `pdbstat-python`, including symmetry-aware RMSD calculation and rigid-body superposition.
+- **Improved J-Coupling Prediction**: Updated `tests/test_coupling.py` to support `NaN` key exclusions in the latest `synth-nmr` predictor.
+
+### Changed
+- **Dependency Update**: Bumped `synth-nmr` dependency to `>=0.9.0` for improved physical validation and J-coupling support.
+- **CI/CD Stabilization**: Hard-pinned documentation dependencies (`mkdocstrings`, `mkdocstrings-python`, and `pygments`) to ensure build site reproducibility and resolve `NoneType` errors in the MkDocs pipeline.
+
+---
+
 ## [1.26.0] - 2026-03-29
 
 ### Added
