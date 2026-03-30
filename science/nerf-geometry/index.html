@@ -3020,6 +3020,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#advanced-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Topics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Topics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#z-matrix-construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-Matrix Construction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#circular-statistics-the-180-180-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Circular Statistics (The 180/-180 Problem)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simd-parallel-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SIMD &amp; Parallel Geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3664,6 +3714,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#advanced-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Topics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Topics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#z-matrix-construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-Matrix Construction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#circular-statistics-the-180-180-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Circular Statistics (The 180/-180 Problem)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simd-parallel-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SIMD &amp; Parallel Geometry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3799,10 +3899,34 @@
 <li><a href="../rotamers/">Rotamer Libraries</a> - Side-chain conformations</li>
 <li><a href="../../api/geometry/">geometry Module</a> - Implementation details</li>
 </ul>
+<h2 id="advanced-topics">Advanced Topics</h2>
+<h3 id="z-matrix-construction">Z-Matrix Construction</h3>
+<p>Proteins are defined by their "Internal Coordinates" (Z-Matrix):
+1. <strong>Bond Length</strong>: distance between two atoms.
+2. <strong>Bond Angle</strong>: angle between three atoms.
+3. <strong>Torsion/Dihedral Angle</strong>: twist between four atoms.</p>
+<p>Our generator builds structures by transitioning from this 1D/2D internal representation into 3D Cartesian space. This algorithm is the engine of our protein builder, allowing us to "walk down" the chain atom-by-atom with mathematical precision.</p>
+<h3 id="circular-statistics-the-180-180-problem">Circular Statistics (The 180/-180 Problem)</h3>
+<p>In protein geometry, torsion angles (Phi, Psi, Omega, Chi) are periodic. This introduces a challenge for both math and AI modeling:</p>
+<ol>
+<li><strong>The Boundary Artifact</strong>: An angle of -179 deg is physically very close to +179 deg, but their arithmetic difference is 358 deg.</li>
+<li><strong>Correct Distance</strong>: To find the "real" difference between two angles, we must use: <code>diff = (a - b + 180) % 360 - 180</code>.</li>
+<li><strong>AI Loss Functions</strong>: Naive Mean Squared Error (MSE) fails on angles because it doesn't understand this wrapping. High-performance models (like AlphaFold) often predict the (Sine, Cosine) of the angle instead, ensuring a smooth, continuous coordinate space.</li>
+<li><strong>Phase Wrapping</strong>: In structure generation, "Drift" must be applied carefully to avoid discontinuities at the -180/180 boundary.</li>
+</ol>
+<h3 id="simd-parallel-geometry">SIMD &amp; Parallel Geometry</h3>
+<p>Traditional biology code uses "Serial Geometry" (<span class="arithmatex">\(O(B \times L)\)</span>). To place atoms for <span class="arithmatex">\(B\)</span> structures of length <span class="arithmatex">\(L\)</span>, it loops <span class="arithmatex">\(B\)</span> times.</p>
+<p><code>synth-pdb</code> uses <strong>Single Instruction, Multiple Data (SIMD)</strong> logic:
+1. <strong>Broad Geometry</strong>: We treat the coordinates as a massive block of numbers rather than individual XYZ points.
+2. <strong>Vector Units</strong>: Hardware like the M4's AMX or a GPU's CUDA cores can execute one operation (e.g., a cross product) across thousands of data points at once.
+3. <strong>Efficiency</strong>: By avoiding the Python interpreter loop for each structure, we reach throughput levels required for "Foundation Model" training in proteomics.</p>
+<p>On modern hardware (Apple M4 AMX, NVIDIA Tensor Cores), serial loops are extremely inefficient. By vectorizing the math into large matrix operations, memory bandwidth is maximized via contiguous array access and hardware acceleration (Accelerate/MPS/Metal) can be leveraged automatically.</p>
 <h2 id="references">References</h2>
 <ol>
 <li>Parsons, J., et al. (2005). "Practical conversion from torsion space to Cartesian space for in silico protein synthesis." <em>Journal of Computational Chemistry</em>, 26(10), 1063-1068.</li>
 <li>Coutsias, E. A., et al. (2004). "Using quaternions to calculate RMSD." <em>Journal of Computational Chemistry</em>, 25(15), 1849-1857.</li>
+<li>Kabsch, W. (1976). "A solution for the best rotation to relate two sets of vectors." <em>Acta Crystallographica Section A</em>, 32(6), 922-923.</li>
+<li>Kabsch, W. (1978). "A discussion of the solution for the best rotation to relate two sets of vectors." <em>Acta Crystallographica Section A</em>, 34(5), 827-828.</li>
 </ol>
 
 

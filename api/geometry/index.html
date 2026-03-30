@@ -2282,6 +2282,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    geometry
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -2298,6 +2316,91 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dihedral-and-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dihedral and Angle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rmsd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RMSD
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#superposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Superposition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nerf-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NeRF Geometry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidechain-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sidechain Reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vectorized-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vectorized Operations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3352,6 +3455,80 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dihedral-and-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dihedral and Angle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rmsd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RMSD
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#superposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Superposition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nerf-geometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NeRF Geometry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidechain-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sidechain Reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vectorized-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vectorized Operations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3371,7 +3548,48 @@
 
 
 <h1 id="geometry">geometry</h1>
-<p>Documentation coming soon.</p>
+<p>The <code>geometry</code> module provides a comprehensive suite of utilities for 3D coordinate manipulation, structural comparison, and protein reconstruction.</p>
+<h2 id="dihedral-and-angle">Dihedral and Angle</h2>
+<p>Calculations for bond angles and torsion angles.</p>
+<ul>
+<li><code>calculate_angle(coord1, coord2, coord3)</code>: Calculates the angle (in degrees) formed by three coordinates.</li>
+<li><code>calculate_dihedral(p1, p2, p3, p4)</code>: Calculates the dihedral angle (in degrees) defined by four points.</li>
+</ul>
+<h2 id="rmsd">RMSD</h2>
+<p>Root Mean Square Deviation calculations for structural comparison.</p>
+<ul>
+<li><code>calculate_rmsd(P, Q)</code>: Calculate RMSD between two sets of coordinates.</li>
+<li><code>calculate_pairwise_rmsd(coords_list, superimpose=False)</code>: Calculate pairwise RMSD matrix for multiple structures.</li>
+<li><code>calculate_average_coords(coords_list)</code>: Calculate average (centroid) coordinates from an ensemble.</li>
+<li><code>calculate_rmsd_to_average(coords_list)</code>: Calculate RMSD of each structure to the average structure.</li>
+</ul>
+<h2 id="superposition">Superposition</h2>
+<p>Optimal alignment of structures using the Kabsch algorithm.</p>
+<ul>
+<li><code>kabsch_superposition(P, Q)</code>: Calculate optimal rotation and translation to superimpose P onto Q.</li>
+<li><code>apply_transformation(coords, rotation, translation)</code>: Apply rotation and translation to coordinates.</li>
+<li><code>superimpose_structures(mobile, reference)</code>: Superimpose mobile structure onto reference structure.</li>
+<li><code>find_medoid(coords_list, superimpose=True)</code>: Find the most representative structure (medoid) from an ensemble.</li>
+</ul>
+<h2 id="nerf-geometry">NeRF Geometry</h2>
+<p>Natural Extension Reference Frame (NeRF) for building 3D structures from internal coordinates.</p>
+<ul>
+<li><code>position_atom_3d_from_internal_coords(p1, p2, p3, bond_length, bond_angle, dihedral)</code>: Place a new atom in 3D space.</li>
+</ul>
+<h2 id="sidechain-reconstruction">Sidechain Reconstruction</h2>
+<p>Tools for rebuilding and rotating sidechain conformations.</p>
+<ul>
+<li><code>reconstruct_sidechain(peptide, res_id, rotamer)</code>: Updates sidechain coordinates in place using rotamer angles.</li>
+</ul>
+<h2 id="vectorized-operations">Vectorized Operations</h2>
+<p>High-performance batch processing for large ensembles.</p>
+<ul>
+<li><code>superimpose_batch(sources, targets)</code>: Batched Kabsch algorithm.</li>
+<li><code>position_atoms_batch(p1, p2, p3, lengths, angles, dihedrals)</code>: Batched NeRF algorithm.</li>
+<li><code>batched_angle(p1, p2, p3)</code>: Vectorized angle calculations.</li>
+<li><code>batched_dihedral(p1, p2, p3, p4)</code>: Vectorized dihedral calculations.</li>
+</ul>
+<p>For scientific details and mathematical background, see the <a href="../../science/nerf-geometry/">NeRF Geometry Background</a> page.</p>
 
 
 

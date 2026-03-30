@@ -112,7 +112,38 @@ new_position = place_atom(
 - [Rotamer Libraries](rotamers.md) - Side-chain conformations
 - [geometry Module](../api/geometry.md) - Implementation details
 
+## Advanced Topics
+
+### Z-Matrix Construction
+Proteins are defined by their "Internal Coordinates" (Z-Matrix):
+1. **Bond Length**: distance between two atoms.
+2. **Bond Angle**: angle between three atoms.
+3. **Torsion/Dihedral Angle**: twist between four atoms.
+
+Our generator builds structures by transitioning from this 1D/2D internal representation into 3D Cartesian space. This algorithm is the engine of our protein builder, allowing us to "walk down" the chain atom-by-atom with mathematical precision.
+
+### Circular Statistics (The 180/-180 Problem)
+In protein geometry, torsion angles (Phi, Psi, Omega, Chi) are periodic. This introduces a challenge for both math and AI modeling:
+
+1. **The Boundary Artifact**: An angle of -179 deg is physically very close to +179 deg, but their arithmetic difference is 358 deg.
+2. **Correct Distance**: To find the "real" difference between two angles, we must use: `diff = (a - b + 180) % 360 - 180`.
+3. **AI Loss Functions**: Naive Mean Squared Error (MSE) fails on angles because it doesn't understand this wrapping. High-performance models (like AlphaFold) often predict the (Sine, Cosine) of the angle instead, ensuring a smooth, continuous coordinate space.
+4. **Phase Wrapping**: In structure generation, "Drift" must be applied carefully to avoid discontinuities at the -180/180 boundary.
+
+### SIMD & Parallel Geometry
+Traditional biology code uses "Serial Geometry" ($O(B \times L)$). To place atoms for $B$ structures of length $L$, it loops $B$ times.
+
+`synth-pdb` uses **Single Instruction, Multiple Data (SIMD)** logic:
+1. **Broad Geometry**: We treat the coordinates as a massive block of numbers rather than individual XYZ points.
+2. **Vector Units**: Hardware like the M4's AMX or a GPU's CUDA cores can execute one operation (e.g., a cross product) across thousands of data points at once.
+3. **Efficiency**: By avoiding the Python interpreter loop for each structure, we reach throughput levels required for "Foundation Model" training in proteomics.
+
+On modern hardware (Apple M4 AMX, NVIDIA Tensor Cores), serial loops are extremely inefficient. By vectorizing the math into large matrix operations, memory bandwidth is maximized via contiguous array access and hardware acceleration (Accelerate/MPS/Metal) can be leveraged automatically.
+
 ## References
 
 1. Parsons, J., et al. (2005). "Practical conversion from torsion space to Cartesian space for in silico protein synthesis." *Journal of Computational Chemistry*, 26(10), 1063-1068.
 2. Coutsias, E. A., et al. (2004). "Using quaternions to calculate RMSD." *Journal of Computational Chemistry*, 25(15), 1849-1857.
+3. Kabsch, W. (1976). "A solution for the best rotation to relate two sets of vectors." *Acta Crystallographica Section A*, 32(6), 922-923.
+4. Kabsch, W. (1978). "A discussion of the solution for the best rotation to relate two sets of vectors." *Acta Crystallographica Section A*, 34(5), 827-828.
+
