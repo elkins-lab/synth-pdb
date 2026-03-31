@@ -12,13 +12,13 @@
         <meta name="author" content="George Elkins">
       
       
-        <link rel="canonical" href="https://elkins.github.io/synth-pdb/tutorials/executed_msa/">
+        <link rel="canonical" href="https://elkins.github.io/synth-pdb/tutorials/geometry_tools_reference/">
       
       
-        <link rel="prev" href="../coevolution_msa_factory/">
+        <link rel="prev" href="../nerf_geometry_lab/">
       
       
-        <link rel="next" href="../ml_handover_demo/">
+        <link rel="next" href="../rdc_alignment_explorer/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA) - synth-pdb</title>
+        <title>📐 Geometry Tools Reference - synth-pdb</title>
       
     
     
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-co-evolution-msa-factory-direct-coupling-analysis-dca" class="md-skip">
+        <a href="#geometry-tools-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA)
+              📐 Geometry Tools Reference
             
           </span>
         </div>
@@ -1236,10 +1236,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../geometry_tools_reference/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📐 Geometry Tools Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1255,6 +1282,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mastering-protein-structure-manipulation-with-synth-pdbgeometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mastering Protein Structure Manipulation with synth-pdb.geometry
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎯 Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-optimal-superposition-kabsch-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Optimal Superposition (Kabsch Algorithm)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-dihedral-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Dihedral Analysis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-low-level-point-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Low-Level Point Rotation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-nerf-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. NeRF Reconstruction
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1376,37 +1489,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../executed_msa/" class="md-nav__link">
         
   
   
@@ -1422,87 +1508,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#literature-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Literature Context
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1-creating-the-biological-ground-truth-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Creating the Biological 'Ground Truth' Structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-markov-chain-monte-carlo-sequence-evolution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Markov Chain Monte Carlo Sequence Evolution
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-the-evidence-mutual-information-matrix" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. The Evidence: Mutual Information Matrix
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. The Evidence: Mutual Information Matrix">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -3487,10 +3492,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#literature-context" class="md-nav__link">
+  <a href="#mastering-protein-structure-manipulation-with-synth-pdbgeometry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Literature Context
+        Mastering Protein Structure Manipulation with synth-pdb.geometry
       
     </span>
   </a>
@@ -3498,10 +3503,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#1-creating-the-biological-ground-truth-structure" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Creating the Biological 'Ground Truth' Structure
+        🎯 Overview
       
     </span>
   </a>
@@ -3509,10 +3514,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-markov-chain-monte-carlo-sequence-evolution" class="md-nav__link">
+  <a href="#1-optimal-superposition-kabsch-algorithm" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Markov Chain Monte Carlo Sequence Evolution
+        1. Optimal Superposition (Kabsch Algorithm)
       
     </span>
   </a>
@@ -3520,30 +3525,35 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-the-evidence-mutual-information-matrix" class="md-nav__link">
+  <a href="#2-dihedral-analysis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. The Evidence: Mutual Information Matrix
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. The Evidence: Mutual Information Matrix">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Conclusion
+        2. Dihedral Analysis
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#3-low-level-point-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Low-Level Point Rotation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-nerf-reconstruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. NeRF Reconstruction
+      
+    </span>
+  </a>
   
 </li>
       
@@ -4288,32 +4298,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=intro">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5f4815f8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="the-co-evolution-msa-factory-direct-coupling-analysis-dca">The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA)<a class="anchor-link" href="#the-co-evolution-msa-factory-direct-coupling-analysis-dca">¶</a></h1><p>In Structural Bioinformatics, <strong>Multiple Sequence Alignments (MSAs)</strong> are the 'fossil record' of protein evolution. When an essential 3D structural contact (like a salt bridge or hydrophobic core packing) exists, the two amino acids forming that contact cannot evolve independently. If one mutates to become much larger (causing a steric clash), the other <em>must</em> mutate to become smaller to rescue the fold (a compensatory mutation).</p>
-<p>This phenomenon leaves a statistical fingerprint in the MSA known as <strong>Mutual Information (MI)</strong>.</p>
-<p>In this tutorial, we will use <code>synth-pdb</code> to:</p>
-<ol>
-<li><strong>Generate a random 3D protein structure.</strong></li>
-<li><strong>Simulate Sequence Evolution (using a Potts Model &amp; MCMC)</strong> to generate a synthetic MSA.</li>
-<li><strong>Compute the Mutual Information Matrix</strong> of the MSA to mathematically prove that sequence correlation strictly mirrors 3D physical proximity.</li>
-</ol>
-<h3 id="literature-context">Literature Context<a class="anchor-link" href="#literature-context">¶</a></h3><p>Direct-coupling analysis (DCA) of residue coevolution revolutionized the protein folding problem (long before AlphaFold), allowing researchers to predict 3D contact maps purely from sequence alignments.
-<em>(Morcos, F., et al. (2011). PNAS, 108(49), E1293-E1301)</em></p>
+<h1 id="geometry-tools-reference">📐 Geometry Tools Reference<a class="anchor-link" href="#geometry-tools-reference">¶</a></h1><h3 id="mastering-protein-structure-manipulation-with-synth-pdbgeometry">Mastering Protein Structure Manipulation with <code>synth-pdb.geometry</code><a class="anchor-link" href="#mastering-protein-structure-manipulation-with-synth-pdbgeometry">¶</a></h3><hr/>
+<h2 id="overview">🎯 Overview<a class="anchor-link" href="#overview">¶</a></h2><p>The <code>synth_pdb.geometry</code> module provides a high-performance, domain-agnostic suite of tools for structural biology calculations. Optimized for both speed (via Numba) and mathematical robustness (Praxeolitic dihedrals), these utilities are the core of our structural engines.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=imports">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dc2a3983">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy for="cell-1">
@@ -4326,69 +4328,74 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Suppress verbose logging from synth_pdb for the notebook</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🔧 Environment Setup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mutual_info_score</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_contact_map</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.msa</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_msa</span>
+<span class="c1"># Ensure synth_pdb is in path (local dev environment)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
 
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'synth_pdb'</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries loaded. Ready to simulate evolution."</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">superimpose_structures</span><span class="p">,</span> 
+    <span class="n">calculate_rmsd</span><span class="p">,</span>
+    <span class="n">calculate_pairwise_rmsd</span><span class="p">,</span>
+    <span class="n">calculate_dihedral</span><span class="p">,</span>
+    <span class="n">position_atom_3d_from_internal_coords</span><span class="p">,</span>
+    <span class="n">rotate_points</span><span class="p">,</span>
+    <span class="n">superimpose_batch</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Geometry module loaded successfully!'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># Suppress verbose logging from synth_pdb for the notebook
-import logging
-
-import matplotlib.pyplot as plt
+<div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Setup
+import os
+import sys
 import numpy as np
-from sklearn.metrics import mutual_info_score
+import matplotlib.pyplot as plt
+import biotite.structure as struc
+import biotite.structure.io.pdb as pdb
 
-from synth_pdb.contact import compute_contact_map
-from synth_pdb.generator import generate_pdb_content
-from synth_pdb.msa import generate_msa
+# Ensure synth_pdb is in path (local dev environment)
+sys.path.append(os.path.abspath('../../'))
 
-logging.getLogger('synth_pdb').setLevel(logging.WARNING)
-print("Libraries loaded. Ready to simulate evolution.")</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Libraries loaded. Ready to simulate evolution.
-</pre>
+from synth_pdb.geometry import (
+    superimpose_structures, 
+    calculate_rmsd,
+    calculate_pairwise_rmsd,
+    calculate_dihedral,
+    position_atom_3d_from_internal_coords,
+    rotate_points,
+    superimpose_batch
+)
+
+print('✅ Geometry module loaded successfully!')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=step1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ad17bf54">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="1-creating-the-biological-ground-truth-structure">1. Creating the Biological 'Ground Truth' Structure<a class="anchor-link" href="#1-creating-the-biological-ground-truth-structure">¶</a></h2><p>First, we synthesize a random backbone conformation. This represents our ancestral Protein Fold. We will extract its <strong>Contact Map</strong>—the matrix of which amino acids physically touch in 3D space.</p>
+<h2 id="1-optimal-superposition-kabsch-algorithm">1. Optimal Superposition (Kabsch Algorithm)<a class="anchor-link" href="#1-optimal-superposition-kabsch-algorithm">¶</a></h2><p>To compare structures, we must first align them. The <strong>Kabsch algorithm</strong> finds the optimal rotation and translation to minimize the Root Mean Square Deviation (RMSD).</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=generate_gt">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a60da366">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy for="cell-2">
@@ -4401,94 +4408,78 @@ print("Libraries loaded. Ready to simulate evolution.")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate a 20-residue sequence as a 'beta-hairpin' generic fold</span>
-<span class="n">base_sequence_str</span> <span class="o">=</span> <span class="s2">"GATAAAAKGATAAAAKGYTG"</span>
-<span class="n">pdb_string</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">base_sequence_str</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"beta"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Load Ubiquitin (1UBQ) as a reference</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Use the example PDB file provided with the repository</span>
+    <span class="n">ubq_file</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">'../../examples/1UBQ.pdb'</span><span class="p">)</span>
+    <span class="n">ubq_ref</span> <span class="o">=</span> <span class="n">ubq_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ca_ref</span> <span class="o">=</span> <span class="n">ubq_ref</span><span class="p">[</span><span class="n">ubq_ref</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'CA'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+    <span class="c1"># Create a 'mobile' structure with 45-degree rotation and 10,20,30 translation</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">R_rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="p">])</span>
+    <span class="n">ca_mobile</span> <span class="o">=</span> <span class="p">(</span><span class="n">R_rand</span> <span class="o">@</span> <span class="n">ca_ref</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">])</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb_io</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Initial distance between centroids: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ca_mobile</span><span class="p">,</span><span class="w"> </span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ca_ref</span><span class="p">,</span><span class="w"> </span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
 
-<span class="n">pdb_file</span> <span class="o">=</span> <span class="n">pdb_io</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_string</span><span class="p">))</span>
-<span class="n">structure</span> <span class="o">=</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Superimpose mobile onto reference</span>
+    <span class="n">ca_aligned</span> <span class="o">=</span> <span class="n">superimpose_structures</span><span class="p">(</span><span class="n">mobile</span><span class="o">=</span><span class="n">ca_mobile</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="n">ca_ref</span><span class="p">)</span>
 
-<span class="c1"># Compute distance map and convert to boolean true/false contacts (8 Angstrom threshold)</span>
-<span class="n">distogram</span> <span class="o">=</span> <span class="n">compute_contact_map</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"ca"</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)</span>
-<span class="n">contact_map</span> <span class="o">=</span> <span class="p">(</span><span class="n">distogram</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">distogram</span> <span class="o">&lt;=</span> <span class="mf">8.0</span><span class="p">)</span>
-
-<span class="c1"># Vizualize Ground Truth Fold</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"3D Contact Map (Ground Truth Constraints)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Contact Present (True/False)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Residue j"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Post-alignment RMSD: </span><span class="si">{</span><span class="n">calculate_rmsd</span><span class="p">(</span><span class="n">ca_aligned</span><span class="p">,</span><span class="w"> </span><span class="n">ca_ref</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'⚠️ Skipping live PDB load: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># Generate a 20-residue sequence as a 'beta-hairpin' generic fold
-base_sequence_str = "GATAAAAKGATAAAAKGYTG"
-pdb_string = generate_pdb_content(sequence_str=base_sequence_str, conformation="beta")
+<div class="clipboard-copy-txt" id="cell-2"># Load Ubiquitin (1UBQ) as a reference
+try:
+    # Use the example PDB file provided with the repository
+    ubq_file = pdb.PDBFile.read('../../examples/1UBQ.pdb')
+    ubq_ref = ubq_file.get_structure(model=1)
+    ca_ref = ubq_ref[ubq_ref.atom_name == 'CA'].coord
 
-import io
+    # Create a 'mobile' structure with 45-degree rotation and 10,20,30 translation
+    theta = np.radians(45)
+    R_rand = np.array([
+        [np.cos(theta), -np.sin(theta), 0],
+        [np.sin(theta),  np.cos(theta), 0],
+        [0, 0, 1]
+    ])
+    ca_mobile = (R_rand @ ca_ref.T).T + np.array([10, 20, 30])
 
-import biotite.structure.io.pdb as pdb_io
+    print(f'Initial distance between centroids: {np.linalg.norm(np.mean(ca_mobile, axis=0) - np.mean(ca_ref, axis=0)):.2f} Å')
 
-pdb_file = pdb_io.PDBFile.read(io.StringIO(pdb_string))
-structure = pdb_file.get_structure(model=1)
+    # Superimpose mobile onto reference
+    ca_aligned = superimpose_structures(mobile=ca_mobile, reference=ca_ref)
 
-# Compute distance map and convert to boolean true/false contacts (8 Angstrom threshold)
-distogram = compute_contact_map(structure, method="ca", threshold=8.0)
-contact_map = (distogram &gt; 0) &amp; (distogram &lt;= 8.0)
-
-# Vizualize Ground Truth Fold
-plt.figure(figsize=(6, 5))
-plt.imshow(contact_map, cmap='Blues')
-plt.title("3D Contact Map (Ground Truth Constraints)")
-plt.colorbar(label="Contact Present (True/False)")
-plt.xlabel("Residue i")
-plt.ylabel("Residue j")
-plt.show()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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tArymuvWrZPHH3/c5XYHDhzQJno0+2bIkCHB/eKY0LyJtA/SKIUKFZJ58+Zp0/Ply5elZ8+eDtvPnj1brl27Ji+99JI2qY4aNUr7nSBdhDQR1v/999/afP7FF1/Eub8JEybIE088oSmF27dvy5w5c7SZFekG+8c0bNgwbQ5H0zTSSkidbNq0SfPmTZo0kfHjx8urr76qzcfoywG5cuVK1LlEGgqPC83quP3du3f1Mffp00dTMc5wHdJo3bt31/zy5s2b5eOPP5aTJ0/qdc5Nzo8++qg89NBDem6WLl2qTfu4DzyO+Kxfv15TTM7pNpybokWLaprGE7jPpk2bysMPPywffvih9iHBdw3OP5q1u3Tpoumfn3/+Wfr16yenTp2ScePGibeQLsTrB+nE7du3y6effqr9kD744IPYbZCbR0oRzwGeWzyf7l7L3sLrCWlI9G/wJCWINMykSZP0eX7yySf1dQ326R08vzineC5wTpcvXy5jxoyRIkWK6O3cwXv2n3/+kV69eul7OSFIPeH84HX32muv6evus88+0+cOqQkcn733339f03N9+/bVzxi89vAew3sG8F7Dcd+6dUvfN0gD4fnGawvv80yZMun7Fc9P9erVY9PEeFwJnVu81/H+79y5s+4X/eCmTp2q/27cuDHB1As+e5ACwuuxY8eOMmPGDP38qVKlipQpU0b70OEcOKff8O+5c+f08wDP3YABAyRz5szab8RVvzfsD69vHBfeZxSEAh0FBbOXXnopNoJHOgC/cP75559Et4TAd999p7dH07s7ixYt0m3GjRuXqOMaP368bv/ll1/GrsMvcbRW4Jeq0Zpi/ErErw374zbuzz69E186xrn1APeFZlL8cjPgFxzO0ZNPPmm7d++ew/b2v2K8Scfg2HD8aAFASwssXrzYFhERYTt69KjLlhDnY4aRI0fqbY4dOxanFejVV191OF780sP9JZTiQcsE0kH2rly5EptGcnbp0iXdp7HYH6dxLAMGDHC4DdJQWI9fzfbwesTjQcuJty0haE2zh+cPrxfDzp07dTu0Otl79tlnTW0JwS91Z4lpCUlMOgbXvfPOOw7rK1WqZKtSpUq8x4v3LG6L93BioLUI26OFwHDt2jVtJcAvfeN9YbSEIFV369atOPe3a9cuvbxjxw697K7VMaF0THzn1tX74+uvv9bt0YqYUEuI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fBLv42Q6hogMbAkhsqDdu3fL+vXrpUCBArHrEIB8+eWXMnnyZA0w1qxZI88995wGHfXq1ZNBgwbJn3/+KT/99JNkz55dDh48KP/++6/L/Z84cUKeeuop6dGjh7z44ouydetWef311z0+zq+++koGDx4s0dHRUqlSJdmxY4d069ZN0qVLpy05RETxYRBCZBE//vijpE+fXu7evSu3bt2SyMhI/XIHXB4xYoQsX75catasqesKFy4s69atkylTpmgQcvz4cQ0Eqlatqtc7t1jYmzRpkhQpUkTGjBmjl0uUKCG7du3yOPUzZMgQ3QcCGkArDQIhHBODECJKCIMQIotASgTBQUxMjIwbN06SJ08urVq10uvQqnHjxg1p3Lixw21u376tgQd0795dt9++fbs0adJEUzq1atVyeV979+6VGjVqOKwzgpvEwnEeOnRIunTpoq0fBgRRmTJl8mhfRBSeGIQQWQRSGEWLFtW/Z8yYoX0+pk+frl/y169f1/WLFy+WfPnyxelLAs2aNZNjx45pXw/0JWnYsKGmWz788EOvjgctMTabzWEdOs0ajGOaNm1anIAGHWGJiBLCIITIghAAvPnmm9KnTx959tlnpXTp0hpsIOWC1Is76B+CNAiWOnXqSL9+/VwGIehI+v333zus27hxY5x9nTlzRgMRdGoF+46tuXLlkrx588rhw4e1QywRkac4OobIolq3bq0tChMnTpQMGTJI3759pXfv3vLZZ59pGgRpl48//lgvAzqILlq0SFM3e/bs0T4mCDZcefnll+XAgQMapOzfv19mz54ts2bNijOK5fz58zJq1Ci9PxwHOr3aGzZsmHaY/eijj+Svv/7SfiUYkTN27Fg/nhkiChUMQogsCn1CoqKiNAhA/wsU+MIIGHzpI7hAXRGkZ9AZFFKmTCkDBw6U8uXLS926dTWAmTNnjst9P/jgg/Ltt9/KwoULNe2DETfo+GoP94Hhtgg+sM3mzZs1ELLXtWtXHaKLwKNcuXLaSoNgxjgmIqL4RNick75ERERESYAtIURERBQQDEKIiIgoIBiEEBERUUAwCCEiIqKAYBBCREREAcEghIiIiAKCQQgREREFBIMQIiIiCggGIURERBQQDEKIiIgoIBiEEBERkQTC/wHch0b3+WMT/AAAAABJRU5ErkJggg=="/>
+    print(f'Post-alignment RMSD: {calculate_rmsd(ca_aligned, ca_ref):.4f} Å')
+except Exception as e:
+    print(f'⚠️ Skipping live PDB load: {e}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=step2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=67e909ce">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-markov-chain-monte-carlo-sequence-evolution">2. Markov Chain Monte Carlo Sequence Evolution<a class="anchor-link" href="#2-markov-chain-monte-carlo-sequence-evolution">¶</a></h2><p>A <strong>Potts Model</strong> is a physics framework that scores sequence 'Energy'. A sequence has lower energy (is more stable) if contacting residues pack perfectly together in volume.</p>
-<p>We launch a <strong>Metropolis-Hastings MCMC Sampler</strong>. This algorithm proposes random point mutations:</p>
-<ul>
-<li>If standard Steric packing is preserved (Energy stays low) -&gt; the mutation is Accepted.</li>
-<li>If a severe clash occurs (Energy spikes up) -&gt; the mutation is Rejected (with high probability based on <code>evolution_temperature</code>).</li>
-</ul>
-<p>This creates an MSA of homologous sequences that have drifted far from the ancestor, but <em>still respect the contact map</em>.</p>
+<h2 id="2-dihedral-analysis">2. Dihedral Analysis<a class="anchor-link" href="#2-dihedral-analysis">¶</a></h2><p><code>calculate_dihedral</code> uses a robust Praxeolitic formula that avoids numerical instability at 0/180 degrees. This is crucial for protein backbones where trans-peptides are common.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=simulate_msa">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7db33f78">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy for="cell-3">
@@ -4501,87 +4492,44 @@ plt.show()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">n_sequences</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">evolution_temp</span> <span class="o">=</span> <span class="mf">1.5</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">12.4</span><span class="p">,</span> <span class="mf">15.3</span><span class="p">,</span> <span class="mf">20.1</span><span class="p">])</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">13.8</span><span class="p">,</span> <span class="mf">14.2</span><span class="p">,</span> <span class="mf">19.8</span><span class="p">])</span>
+<span class="n">p3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">14.5</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="mf">20.5</span><span class="p">])</span>
+<span class="n">p4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">15.2</span><span class="p">,</span> <span class="mf">12.1</span><span class="p">,</span> <span class="mf">19.9</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generating MSA with </span><span class="si">{</span><span class="n">n_sequences</span><span class="si">}</span><span class="s2"> homologous sequences..."</span><span class="p">)</span>
-<span class="n">msa_list</span> <span class="o">=</span> <span class="n">generate_msa</span><span class="p">(</span>
-    <span class="n">base_sequence</span><span class="o">=</span><span class="n">base_sequence_str</span><span class="p">,</span>
-    <span class="n">contact_map</span><span class="o">=</span><span class="n">contact_map</span><span class="p">,</span>
-    <span class="n">num_sequences</span><span class="o">=</span><span class="n">n_sequences</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">evolution_temp</span><span class="p">,</span>
-    <span class="n">steps_between_samples</span><span class="o">=</span><span class="mi">100</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Sample of evolved sequences:"</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">msa_list</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"   "</span> <span class="o">+</span> <span class="n">seq</span><span class="p">)</span>
+<span class="n">torsion</span> <span class="o">=</span> <span class="n">calculate_dihedral</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Calculated Torsion: </span><span class="si">{</span><span class="n">torsion</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">°'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">n_sequences = 1000
-evolution_temp = 1.5
+<div class="clipboard-copy-txt" id="cell-3">p1 = np.array([12.4, 15.3, 20.1])
+p2 = np.array([13.8, 14.2, 19.8])
+p3 = np.array([14.5, 13.0, 20.5])
+p4 = np.array([15.2, 12.1, 19.9])
 
-print(f"Generating MSA with {n_sequences} homologous sequences...")
-msa_list = generate_msa(
-    base_sequence=base_sequence_str,
-    contact_map=contact_map,
-    num_sequences=n_sequences,
-    temperature=evolution_temp,
-    steps_between_samples=100
-)
-
-print("Sample of evolved sequences:")
-for seq in msa_list[:5]:
-    print("   " + seq)</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Generating MSA with 1000 homologous sequences...
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Sample of evolved sequences:
-   ENNYCNHNIETKLGILKEET
-   DMNNCNVCHEPNCCIPTTDQ
-   TMTNCCLPPNQMLIAKVECI
-   DDVLIKDDYNPNDLPKLPDY
-   KLPNVVTPQDITEDPHVNPQ
-</pre>
+torsion = calculate_dihedral(p1, p2, p3, p4)
+print(f'Calculated Torsion: {torsion:.2f}°')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=step3">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d42922c9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="3-the-evidence-mutual-information-matrix">3. The Evidence: Mutual Information Matrix<a class="anchor-link" href="#3-the-evidence-mutual-information-matrix">¶</a></h2><p>If our physical evolutionary simulator worked, residues that touch in the Contact Map must strongly co-vary in the MSA. 
-We quantify this using <strong>Shannon Mutual Information (MI)</strong>:</p>
-<p>$\text{MI}(i, j) = \sum_{x, y} P_{X,Y}(x, y) \log \frac{P_{X,Y}(x, y)}{P_X(x) P_Y(y)}$</p>
+<h2 id="3-low-level-point-rotation">3. Low-Level Point Rotation<a class="anchor-link" href="#3-low-level-point-rotation">¶</a></h2><p>Use <code>rotate_points</code> to rotate arbitrary coordinates around an axis defined by two points in space. This is the foundation of sidechain reconstruction.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=calc_mi">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=815980a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy for="cell-4">
@@ -4594,91 +4542,83 @@ We quantify this using <strong>Shannon Mutual Information (MI)</strong>:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Convert MSA string list to a numpy char array for column-wise operations</span>
-<span class="n">msa_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">msa_list</span><span class="p">])</span>
-<span class="n">L</span> <span class="o">=</span> <span class="n">msa_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">mi_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Rotate a point around a bond axis (simulating Chi1 rotation)</span>
+<span class="n">bond_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+<span class="n">bond_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">gamma_atom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]])</span> <span class="c1"># Array shape (N, 3)</span>
 
-<span class="c1"># Calculate MI for all pairs of columns (i, j)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
-            <span class="c1"># Compute Shannon Mutual Information between column i and column j</span>
-            <span class="n">mi_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">mutual_info_score</span><span class="p">(</span><span class="n">msa_array</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">msa_array</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Ground Truth 3D Contacts"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Residue j"</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mi_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"MSA Mutual Information (MI)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Bits"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Residue j"</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">rotated_gamma</span> <span class="o">=</span> <span class="n">rotate_points</span><span class="p">(</span><span class="n">gamma_atom</span><span class="p">,</span> <span class="n">bond_start</span><span class="p">,</span> <span class="n">bond_end</span><span class="p">,</span> <span class="mf">90.0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Original Gamma: </span><span class="si">{</span><span class="n">gamma_atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Rotated Gamma (90°): </span><span class="si">{</span><span class="n">rotated_gamma</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Convert MSA string list to a numpy char array for column-wise operations
-msa_array = np.array([list(seq) for seq in msa_list])
-L = msa_array.shape[1]
-mi_matrix = np.zeros((L, L))
+<div class="clipboard-copy-txt" id="cell-4"># Rotate a point around a bond axis (simulating Chi1 rotation)
+bond_start = np.array([0.0, 0.0, 0.0])
+bond_end = np.array([0.0, 0.0, 1.5])
+gamma_atom = np.array([[1.0, 0.0, 1.5]]) # Array shape (N, 3)
 
-# Calculate MI for all pairs of columns (i, j)
-for i in range(L):
-    for j in range(L):
-        if i != j:
-            # Compute Shannon Mutual Information between column i and column j
-            mi_matrix[i, j] = mutual_info_score(msa_array[:, i], msa_array[:, j])
-
-plt.figure(figsize=(12, 5))
-
-plt.subplot(1, 2, 1)
-plt.imshow(contact_map, cmap='Blues')
-plt.title("Ground Truth 3D Contacts")
-plt.xlabel("Residue i")
-plt.ylabel("Residue j")
-
-plt.subplot(1, 2, 2)
-plt.imshow(mi_matrix, cmap='magma')
-plt.title("MSA Mutual Information (MI)")
-plt.colorbar(label="Bits")
-plt.xlabel("Residue i")
-plt.ylabel("Residue j")
-
-plt.tight_layout()
-plt.show()</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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dFidDkez9RktKzoE6pVXXpHly5fLk08+aYZGDho0yLzv0XpOFi5caOpwXX/99UVu59VzAgSizeG9axxtDm+dj/LS3lC0Obx3XmhzIFIqROw7IyK0do3WbDlXzYZevXqZxU8v0m3btpUXX3xRpkyZIpGgf1z6derUyTSk9C7cG2+8Uay761718ssvm2PTO//RdD7KC63xdPPNN5tChvrHfjR+RocOHZr3tRZN1n274IILTG+bvn37SjTSP+y0l8y5il569ZwA5QFtDu+hzeFttDm8iTYHIoWeNSHUrl1bEhISTLe3QPq4fv36QV+j691sX9ZSU1Pl73//u3z00Udy/vnnu3ptYmKiXHTRRbJt2zbxCh2O0qpVq5D75PXzobRg3wcffCC333571J8P5X9v3bzvJflZK+tGk54nLQJdVK+aknxGI0WHA+n7Hmq/vHxO1KeffmoKPrv9ufHyOUH5RpvD+9c42hzeOh+x1t5QtDm8eV5ocyCSSNaEkJSUJF27djXDBvy0G6g+DuzhEEjXB26v9A+8UNuXFe0RoImav/71r/Lhhx9K8+bNXcfQbqNffvmlmR7RK3R8+/bt20Puk1fPR6D58+ebOiJXXXVV1J8PpZ8tvbAGvu9paWlmloZQ73tJftbKstGkNQs0oXbeeedZ/4xGinZl15o1ofbLq+ck8M6w7p/O4hEr5wTlG20O71/jaHN463zEUntD0ebw5nlRtDkQUZGucOxlixcvNlXlFyxY4Hz99dfOHXfc4dSoUcM5cOCAef4Xv/iF89BDD+Vt/69//cupUKGCM23aNOe///2vmUkgMTHR+fLLLyN4FI4zZswYM5PQihUrnP379+ctmZmZedsUPJbJkyc77733nrN9+3Zn/fr1ztChQ52UlBTnq6++itBROM5vfvMbcww7duww73W/fv2c2rVrm9mtoul8BFa6b9KkifPggw8Wes7L5+PkyZPO559/bhb9FTJ9+nTztX+WpCeeeML8nLz99tvOF198YWbsad68uXPq1Km8GDqDzwsvvFDsn7WyPo7s7Gznmmuucc4//3xn48aN+X5usrKyQh7HuT6jkTgWfe6+++5zVq1aZfbrgw8+cC6++GLnwgsvdE6fPh0158TvxIkTTqVKlZzZs2cHjeGVcwK4RZvDG9c4P9ockT8fsdLeONex0OagzQGEQrLmHPQXvP5B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"/>
+rotated_gamma = rotate_points(gamma_atom, bond_start, bond_end, 90.0)
+print(f'Original Gamma: {gamma_atom[0]}')
+print(f'Rotated Gamma (90°): {rotated_gamma[0]}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=step4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a6b5875a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="conclusion">Conclusion<a class="anchor-link" href="#conclusion">¶</a></h3><p>The Mutual Information matrix (right) perfectly shadows the 3D physical Contact Map (left)! The hot spots of high statistical MI correspond exactly to the structural constraints.</p>
-<p>This is the heart of <strong>Direct Coupling Analysis (DCA)</strong>: by measuring $MI$ from natural sequences in UniProt, structural biologists invert this process to predict the 3D fold. <code>synth-pdb</code> gives you the tools to simulate this biophysical phenomenon computationally from scratch.</p>
+<h2 id="4-nerf-reconstruction">4. NeRF Reconstruction<a class="anchor-link" href="#4-nerf-reconstruction">¶</a></h2><p>NeRF converts internal coordinates (bond length, angle, dihedral) into 3D Cartesian coordinates.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1d649eee">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Reconstruct a position from internal coordinates</span>
+<span class="n">node_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">node_ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.45</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">node_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+<span class="n">dist</span> <span class="o">=</span> <span class="mf">1.52</span>
+<span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">111.0</span><span class="p">)</span>
+<span class="n">dihedral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">180.0</span><span class="p">)</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="n">position_atom_3d_from_internal_coords</span><span class="p">(</span><span class="n">node_n</span><span class="p">,</span> <span class="n">node_ca</span><span class="p">,</span> <span class="n">node_c</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">dihedral</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Reconstructed Position: </span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5"># Reconstruct a position from internal coordinates
+node_n = np.array([0, 0, 0])
+node_ca = np.array([1.45, 0, 0])
+node_c = np.array([2.0, 1.2, 0])
+
+dist = 1.52
+angle = np.radians(111.0)
+dihedral = np.radians(180.0)
+
+pos = position_atom_3d_from_internal_coords(node_n, node_ca, node_c, dist, angle, dihedral)
+print(f'Reconstructed Position: {pos}')</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -4727,7 +4667,7 @@ plt.show()</div>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../coevolution_msa_factory/" class="md-footer__link md-footer__link--prev" aria-label="Previous: The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA)">
+          <a href="../nerf_geometry_lab/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 🔬 The NeRF Geometry Lab">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4737,20 +4677,20 @@ plt.show()</div>
                 Previous
               </span>
               <div class="md-ellipsis">
-                The Co-Evolution MSA Factory: Direct Coupling Analysis (DCA)
+                🔬 The NeRF Geometry Lab
               </div>
             </div>
           </a>
         
         
           
-          <a href="../ml_handover_demo/" class="md-footer__link md-footer__link--next" aria-label="Next: ML Integration: Data Factory Flow 🤖">
+          <a href="../rdc_alignment_explorer/" class="md-footer__link md-footer__link--next" aria-label="Next: 🧲 The RDC Alignment Tensor Explorer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                ML Integration: Data Factory Flow 🤖
+                🧲 The RDC Alignment Tensor Explorer
               </div>
             </div>
             <div class="md-footer__button md-icon">
