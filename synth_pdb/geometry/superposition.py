@@ -1,5 +1,11 @@
 """
 Optimal superposition of structures using the Kabsch algorithm.
+
+NOTE ON ATOM SELECTION:
+These functions operate on raw Nx3 coordinate arrays and are atom-agnostic.
+For standard protein 'Backbone Superposition', coordinates should be
+pre-filtered to include only backbone heavy atoms (typically N, CA, C).
+For overall fold alignment, C-alpha (CA) only is often used.
 """
 
 import logging
@@ -19,6 +25,10 @@ def kabsch_superposition(
     Uses the Kabsch algorithm (1976, 1978) with SVD decomposition to find
     the optimal rotation matrix and translation vector that minimizes
     the RMSD between two sets of coordinates.
+
+    Note: This function assumes the input arrays P and Q are already
+    filtered for the desired atoms (e.g., N, CA, C) and are in 1-to-1
+    correspondence.
 
     Args:
         P: Nx3 array of coordinates (mobile structure)

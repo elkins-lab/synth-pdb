@@ -1,5 +1,11 @@
 """
 Root Mean Square Deviation (RMSD) and ensemble average calculations.
+
+NOTE ON ATOM SELECTION:
+These functions operate on raw Nx3 coordinate arrays and are atom-agnostic.
+For standard protein 'Backbone RMSD', coordinates should be pre-filtered to
+include only backbone heavy atoms (typically N, CA, C). For overall fold
+comparison, C-alpha (CA) only is often used.
 """
 
 import logging
@@ -16,6 +22,9 @@ def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> fl
 
     The RMSD is calculated as:
         RMSD = sqrt(mean(sum((P - Q)^2, axis=1)))
+
+    Note: This function assumes the input arrays P and Q are already
+    aligned/superimposed and filtered for the desired atoms (e.g., N, CA, C).
 
     Args:
         P: Nx3 array of coordinates (first structure)
