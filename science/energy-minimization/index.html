@@ -2892,6 +2892,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Energy Minimization
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -2908,6 +2926,114 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-energy-minimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Energy Minimization?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-with-openmm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation with OpenMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation with OpenMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#force-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Force Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solvent-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solvent Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage in synth-pdb
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage in synth-pdb">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-refinement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Refinement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nmr-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NMR Perspective
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3469,103 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-energy-minimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is Energy Minimization?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-with-openmm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation with OpenMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation with OpenMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#force-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Force Fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solvent-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solvent Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage in synth-pdb
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage in synth-pdb">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced-refinement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Refinement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nmr-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NMR Perspective
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3584,50 @@
   
 
 
-<h1 id="energy-minimization">energy minimization</h1>
-<p>Documentation coming soon.</p>
+<h1 id="energy-minimization">Energy Minimization</h1>
+<p>This document explains the physical principles and implementation of energy minimization in <code>synth-pdb</code>.</p>
+<h2 id="what-is-energy-minimization">What is Energy Minimization?</h2>
+<p>Proteins fold into specific 3D shapes to minimize their <strong>Gibbs Free Energy</strong>. A generated structure, especially one built from simple geometry or random sampling, often contains "clashes" (where atoms are too close) or strained bond angles and lengths.</p>
+<p>Energy minimization is a computational process used to "relax" these structures. It treats the protein as a collection of atoms and uses a <strong>Force Field</strong> to calculate the potential energy of the system as a function of atomic coordinates. The algorithm then iteratively moves the atoms to find a local minimum on the energy landscape.</p>
+<h2 id="implementation-with-openmm">Implementation with OpenMM</h2>
+<p><code>synth-pdb</code> leverages <a href="https://openmm.org/">OpenMM</a>, a high-performance toolkit for molecular simulation, to perform energy minimization.</p>
+<h3 id="force-fields">Force Fields</h3>
+<p>A force field is the set of parameters and mathematical functions used to calculate the potential energy. <code>synth-pdb</code> defaults to the <strong>AMBER14</strong> force field (<code>amber14-all.xml</code>), which provides high-quality parameters for proteins, including:
+-   <strong>Bond terms:</strong> Harmonic potentials for bond lengths and angles.
+-   <strong>Torsion terms:</strong> Periodic functions for dihedral angles.
+-   <strong>Non-bonded terms:</strong> Van der Waals (Lennard-Jones) and electrostatic (Coulomb) interactions.</p>
+<h3 id="solvent-models">Solvent Models</h3>
+<p>The environment surrounding the protein significantly affects its energy. <code>synth-pdb</code> supports several solvent models:</p>
+<ol>
+<li>
+<p><strong>Implicit Solvent (Generalized Born / OBC):</strong></p>
+<ul>
+<li>The effect of water is modeled as a continuous medium with a high dielectric constant (ε ≈ 80).</li>
+<li>The <strong>OBC2 (Onufriev-Bashford-Case)</strong> model is the default, offering a good balance between speed and accuracy.</li>
+<li>Ideal for rapid refinement and NMR-style structure regularizations.</li>
+</ul>
+</li>
+<li>
+<p><strong>Explicit Solvent (TIP3P):</strong></p>
+<ul>
+<li>Individual water molecules are explicitly included in a simulation box.</li>
+<li>Captures detailed hydrogen bonding and entropic effects of solvation.</li>
+<li>Requires more computational resources but provides the highest fidelity.</li>
+</ul>
+</li>
+</ol>
+<h2 id="usage-in-synth-pdb">Usage in <code>synth-pdb</code></h2>
+<p>To run energy minimization on a generated structure, use the <code>--minimize</code> flag:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;MEELQK&quot;</span><span class="w"> </span>--minimize<span class="w"> </span>--solvent<span class="w"> </span>obc2
+</span></code></pre></div>
+<h3 id="advanced-refinement">Advanced Refinement</h3>
+<ul>
+<li><strong><code>--refine-clashes</code></strong>: A lightweight, purely geometric alternative that adjusts clashing atoms without a full physics engine. Useful when OpenMM is not available.</li>
+<li><strong><code>--equilibrate</code></strong>: Runs a short Molecular Dynamics (MD) simulation after minimization to allow the structure to sample the local conformational space at a specific temperature (default 300K).</li>
+<li><strong><code>--cyclic</code></strong>: Automatically applies constraints and minimization to ensure the N- and C-termini of a cyclic peptide meet in 3D space.</li>
+</ul>
+<h2 id="nmr-perspective">NMR Perspective</h2>
+<p>In NMR structure calculation (e.g., using CYANA or XPLOR-NIH), energy minimization is a critical final step. It ensures that the structures satisfying experimental restraints (like NOEs and J-couplings) also have excellent covalent geometry and no steric overlaps, satisfying the requirements for "high-quality" structural models.</p>
 
 
 

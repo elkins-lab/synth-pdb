@@ -3093,6 +3093,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -3109,6 +3127,91 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#testing-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Organization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuous-integration-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Integration (CI)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-new-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing New Tests
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3446,80 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#testing-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing Framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Organization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuous-integration-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuous Integration (CI)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-new-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing New Tests
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3538,45 @@
   
 
 
-<h1 id="testing">testing</h1>
-<p>Documentation coming soon.</p>
+<h1 id="testing">Testing</h1>
+<p>This document describes the testing strategy and procedures for <code>synth-pdb</code>.</p>
+<h2 id="testing-framework">Testing Framework</h2>
+<p>We use <a href="https://docs.pytest.org/en/stable/">pytest</a> as our primary testing framework. Our test suite is designed to ensure the reliability and correctness of protein structure generation, biophysical calculations, and NMR predictions.</p>
+<h2 id="test-organization">Test Organization</h2>
+<p>The <code>tests/</code> directory is organized into several subdirectories based on the type of tests:</p>
+<ul>
+<li><code>unit/</code>: Tests for individual functions and classes in isolation.</li>
+<li><code>functional/</code>: Tests for end-to-end functionality of the CLI and core modules.</li>
+<li><code>integration/</code>: Tests that verify the interaction between different modules.</li>
+<li><code>geometry/</code>: Specialized tests for coordinate transformations and NeRF calculations.</li>
+</ul>
+<h2 id="running-tests">Running Tests</h2>
+<p>To run the full test suite, execute the following command from the project root:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pytest
+</span></code></pre></div>
+<p>To run a specific test file:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pytest<span class="w"> </span>tests/test_generator.py
+</span></code></pre></div>
+<p>To run tests with a specific marker (if available):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span>
+</span></code></pre></div>
+<h2 id="coverage">Coverage</h2>
+<p>We use <code>pytest-cov</code> to measure code coverage. Aim for at least 80% coverage on all core modules.</p>
+<p>To run tests with a coverage report:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pytest<span class="w"> </span>--cov<span class="o">=</span>synth_pdb<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+</span></code></pre></div>
+<p>This will generate a summary in the terminal showing the coverage percentage for each file.</p>
+<h2 id="continuous-integration-ci">Continuous Integration (CI)</h2>
+<p>Our CI pipeline is managed through GitHub Actions. Every push and pull request to the <code>main</code> branch triggers a suite of automated tests across different operating systems (Linux, macOS) and Python versions (3.10, 3.11, 3.12).</p>
+<p>The CI workflow (<code>.github/workflows/test.yml</code>) includes:
+-   <strong>Static Analysis:</strong> Linting with <code>ruff</code> and type checking with <code>mypy</code>.
+-   <strong>Test Execution:</strong> Running the full <code>pytest</code> suite.
+-   <strong>Coverage Upload:</strong> Uploading coverage reports to Codecov for tracking.</p>
+<h2 id="writing-new-tests">Writing New Tests</h2>
+<p>When adding new features or fixing bugs, please include corresponding tests:
+1.  <strong>For Bugs:</strong> Create a regression test that fails without the fix and passes with it.
+2.  <strong>For Features:</strong> Add unit tests for the new functionality and integration tests for its usage within the system.</p>
+<p>Please ensure all tests are well-documented and follow the existing naming conventions (<code>test_*.py</code>).</p>
 
 
 

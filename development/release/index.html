@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#release" class="md-skip">
+        <a href="#release-process" class="md-skip">
           Skip to content
         </a>
       
@@ -3121,6 +3121,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release Process
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -3137,6 +3155,75 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#versioning-scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning Scheme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#release-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automated-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automated Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-plugins-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Plugins Used:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3430,64 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#versioning-scheme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versioning Scheme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#release-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Release Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automated-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automated Documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#key-plugins-used" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Plugins Used:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3506,65 @@
   
 
 
-<h1 id="release">release</h1>
-<p>Documentation coming soon.</p>
+<h1 id="release-process">Release Process</h1>
+<p>This document outlines the procedures for releasing new versions of <code>synth-pdb</code>.</p>
+<h2 id="versioning-scheme">Versioning Scheme</h2>
+<p>We follow <a href="https://semver.org/">Semantic Versioning (SemVer)</a>. Version numbers are formatted as <code>MAJOR.MINOR.PATCH</code>:</p>
+<ul>
+<li><strong>MAJOR:</strong> Significant changes, potentially breaking API compatibility.</li>
+<li><strong>MINOR:</strong> New features added in a backwards-compatible manner.</li>
+<li><strong>PATCH:</strong> Backwards-compatible bug fixes and small improvements.</li>
+</ul>
+<p>The version number is centrally defined in <code>pyproject.toml</code>.</p>
+<h2 id="release-workflow">Release Workflow</h2>
+<p>A typical release involves the following steps:</p>
+<ol>
+<li>
+<p><strong>Preparation:</strong></p>
+<ul>
+<li>Ensure all tests are passing.</li>
+<li>Update the <code>CHANGELOG.md</code> with a summary of changes since the last release.</li>
+<li>Increment the version number in <code>pyproject.toml</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Tagging:</strong></p>
+<ul>
+<li>Create a new Git tag for the release:
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>tag<span class="w"> </span>-a<span class="w"> </span>vX.Y.Z<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Release vX.Y.Z&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>vX.Y.Z
+</span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p><strong>Documentation Deployment:</strong></p>
+<ul>
+<li>The <code>Publish Docs</code> GitHub Actions workflow (<code>.github/workflows/deploy_docs.yaml</code>) automatically builds and deploys the documentation to GitHub Pages whenever a change is pushed to the <code>main</code> branch.</li>
+<li>You can manually trigger a deployment using <code>mkdocs gh-deploy</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>PyPI Publication:</strong></p>
+<ul>
+<li>Building and uploading to PyPI (if applicable):
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>build
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>-m<span class="w"> </span>twine<span class="w"> </span>upload<span class="w"> </span>dist/*
+</span></code></pre></div></li>
+</ul>
+</li>
+</ol>
+<h2 id="automated-documentation">Automated Documentation</h2>
+<p>The documentation website (<a href="https://elkins.github.io/synth-pdb">https://elkins.github.io/synth-pdb</a>) is built using <a href="https://www.mkdocs.org/">MkDocs</a> with the <a href="https://squidfunk.github.io/mkdocs-material/">Material for MkDocs</a> theme.</p>
+<h3 id="key-plugins-used">Key Plugins Used:</h3>
+<ul>
+<li><strong>mkdocstrings:</strong> Automatically generates API documentation from Python docstrings.</li>
+<li><strong>mkdocs-jupyter:</strong> Renders Jupyter notebooks within the documentation.</li>
+<li><strong>search:</strong> Provides site-wide search functionality.</li>
+</ul>
+<p>To preview the documentation locally:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mkdocs<span class="w"> </span>serve
+</span></code></pre></div>
+<p>This will start a local server at <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> that automatically reloads when you make changes.</p>
 
 
 

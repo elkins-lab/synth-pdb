@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ramachandran" class="md-skip">
+        <a href="#ramachandran-plots" class="md-skip">
           Skip to content
         </a>
       
@@ -2780,6 +2780,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ramachandran Plots
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -2796,6 +2814,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#backbone-dihedral-angles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backbone Dihedral Angles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#theoretical-basis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Theoretical Basis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Theoretical Basis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allowed-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed Regions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation in synth-pdb
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation in synth-pdb">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Presets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#special-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Special Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3458,92 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#backbone-dihedral-angles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Backbone Dihedral Angles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#theoretical-basis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Theoretical Basis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Theoretical Basis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allowed-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed Regions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation in synth-pdb
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation in synth-pdb">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Presets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#special-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Special Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3562,67 @@
   
 
 
-<h1 id="ramachandran">ramachandran</h1>
-<p>Documentation coming soon.</p>
+<h1 id="ramachandran-plots">Ramachandran Plots</h1>
+<p>The Ramachandran plot is a fundamental tool for understanding and validating protein backbone conformations.</p>
+<h2 id="backbone-dihedral-angles">Backbone Dihedral Angles</h2>
+<p>The protein backbone consists of a repeating sequence of N, Cα, and C atoms. The conformation of each residue is primarily determined by two dihedral (torsion) angles:</p>
+<ol>
+<li><strong>Phi (φ):</strong> Rotation about the N–Cα bond.</li>
+<li><strong>Psi (ψ):</strong> Rotation about the Cα–C bond.</li>
+<li><strong>Omega (ω):</strong> Rotation about the C–N (peptide) bond. This is typically fixed near 180° (trans) or 0° (cis).</li>
+</ol>
+<h2 id="theoretical-basis">Theoretical Basis</h2>
+<p>A Ramachandran plot (φ vs. ψ) displays the energetically allowed regions for backbone dihedral angles. Some combinations of φ and ψ are prohibited due to steric clashes between the carbonyl oxygen (O) and the amide hydrogen (H), or between the side-chain atoms and the backbone.</p>
+<h3 id="allowed-regions">Allowed Regions</h3>
+<ul>
+<li><strong>Alpha-Helix:</strong> φ ≈ -57°, ψ ≈ -47°.</li>
+<li><strong>Beta-Sheet:</strong> φ ≈ -135°, ψ ≈ 135°.</li>
+<li><strong>Polyproline II (PPII):</strong> φ ≈ -75°, ψ ≈ 145°.</li>
+</ul>
+<h2 id="implementation-in-synth-pdb">Implementation in <code>synth-pdb</code></h2>
+<p><code>synth-pdb</code> uses Ramachandran principles in two ways:</p>
+<ol>
+<li><strong>Structure Generation:</strong> When using the <code>--conformation</code> or <code>--structure</code> flags, the tool uses preset φ and ψ angles (defined in <code>synth_pdb/data.py</code>) to build the backbone.</li>
+<li><strong>Validation:</strong> The <code>--validate</code> flag calculates the φ and ψ angles of the generated structure and checks if they fall within the allowed regions.</li>
+</ol>
+<h3 id="presets">Presets</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Conformation</th>
+<th style="text-align: left;">Phi (°)</th>
+<th style="text-align: left;">Psi (°)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>alpha</code></td>
+<td style="text-align: left;">-57.0</td>
+<td style="text-align: left;">-47.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>beta</code></td>
+<td style="text-align: left;">-135.0</td>
+<td style="text-align: left;">135.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ppii</code></td>
+<td style="text-align: left;">-75.0</td>
+<td style="text-align: left;">145.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>extended</code></td>
+<td style="text-align: left;">-120.0</td>
+<td style="text-align: left;">120.0</td>
+</tr>
+</tbody>
+</table>
+<h3 id="special-cases">Special Cases</h3>
+<ul>
+<li><strong>Glycine (GLY):</strong> Lacks a side chain, so it has much more conformational freedom. Its Ramachandran plot is broader and more symmetric.</li>
+<li><strong>Proline (PRO):</strong> Its side chain is cyclized back to the backbone Nitrogen, making it the most restricted residue. It is often a "structure breaker."</li>
+<li><strong>Cis-Proline:</strong> Proline is unique in having a relatively high frequency (~5%) of the <code>cis</code> peptide bond (ω ≈ 0°), which <code>synth-pdb</code> can simulate via the <code>--cis-proline-frequency</code> flag.</li>
+</ul>
 
 
 

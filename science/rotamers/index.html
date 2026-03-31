@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rotamers" class="md-skip">
+        <a href="#rotamer-libraries" class="md-skip">
           Skip to content
         </a>
       
@@ -2808,6 +2808,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rotamer Libraries
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -2824,6 +2842,80 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-rotamer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Rotamer?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#side-chain-dihedral-angles-chi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Side-Chain Dihedral Angles (Chi)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation in synth-pdb
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#placement-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placement Process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scientific-relevance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scientific Relevance
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3435,69 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-rotamer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Rotamer?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#side-chain-dihedral-angles-chi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Side-Chain Dihedral Angles (Chi)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-in-synth-pdb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation in synth-pdb
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#placement-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Placement Process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scientific-relevance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scientific Relevance
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3516,33 @@
   
 
 
-<h1 id="rotamers">rotamers</h1>
-<p>Documentation coming soon.</p>
+<h1 id="rotamer-libraries">Rotamer Libraries</h1>
+<p>This document explains the use of rotamer libraries for side-chain placement in <code>synth-pdb</code>.</p>
+<h2 id="what-is-a-rotamer">What is a Rotamer?</h2>
+<p>A rotamer (short for rotational isomer) is a preferred conformation of a protein side chain. Side chains are relatively flexible, but steric constraints mean they often prefer specific, low-energy dihedral angles (χ1, χ2, etc.).</p>
+<h2 id="side-chain-dihedral-angles-chi">Side-Chain Dihedral Angles (Chi)</h2>
+<p>Side-chain flexibility is defined by the rotation about single bonds, denoted as Chi (χ) angles:
+-   <strong>χ1:</strong> N–Cα–Cβ–Cγ
+-   <strong>χ2:</strong> Cα–Cβ–Cγ–Cδ
+-   -   and so on, depending on the length of the side chain.</p>
+<h2 id="implementation-in-synth-pdb">Implementation in <code>synth-pdb</code></h2>
+<p><code>synth-pdb</code> uses two types of rotamer libraries:</p>
+<ol>
+<li><strong>Backbone-Independent Rotamer Library:</strong> A collection of the most frequent side-chain conformations observed in the Protein Data Bank (PDB), regardless of the backbone's φ and ψ angles.</li>
+<li><strong>Backbone-Dependent Rotamer Library:</strong> A more advanced library that provides the probability of each rotamer based on the specific backbone dihedral angles (φ, ψ). This library is more accurate as the backbone conformation can significantly influence the allowed side-chain orientations.</li>
+</ol>
+<h2 id="placement-process">Placement Process</h2>
+<p>The tool places side-chains in several steps:</p>
+<ol>
+<li><strong>Initial Placement:</strong> For each residue, a rotamer is sampled from the library (either random or the most probable).</li>
+<li><strong>Optimization:</strong> If the <code>--optimize</code> flag is used, the tool performs a Monte Carlo search through the rotamer library to find a combination of side-chain conformations that minimizes steric clashes across the entire protein structure.</li>
+</ol>
+<h2 id="scientific-relevance">Scientific Relevance</h2>
+<p>Accurate side-chain placement is crucial for:
+-   <strong>Clash avoidance:</strong> Preventing atoms from overlapping in 3D space.
+-   <strong>Predicting NMR observables:</strong> Chemical shifts and NOE restraints are highly sensitive to the local environment and distance between side-chain atoms.
+-   <strong>Hydrogen bonding:</strong> Many side chains act as hydrogen bond donors or acceptors.</p>
+<p>For researchers in NMR spectroscopy, the exact orientation of side chains (especially aromatic rings and methyl groups) is essential for interpreting NOE cross-peaks and predicting relaxation parameters.</p>
 
 
 

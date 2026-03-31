@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#visualization" class="md-skip">
+        <a href="#visualization-examples" class="md-skip">
           Skip to content
         </a>
       
@@ -1968,6 +1968,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization Examples
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1984,6 +2002,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-browser-based-3d-viewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Browser-Based 3D Viewer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-pymol-scripting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. PyMOL Scripting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-high-fidelity-solvent-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. High-Fidelity Solvent Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-contact-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Contact Maps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3424,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-browser-based-3d-viewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Browser-Based 3D Viewer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-pymol-scripting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. PyMOL Scripting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-high-fidelity-solvent-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. High-Fidelity Solvent Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-contact-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Contact Maps
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3494,56 @@
   
 
 
-<h1 id="visualization">visualization</h1>
-<p>Documentation coming soon.</p>
+<h1 id="visualization-examples">Visualization Examples</h1>
+<p>This document demonstrates the different visualization options available in <code>synth-pdb</code>.</p>
+<h2 id="1-browser-based-3d-viewer">1. Browser-Based 3D Viewer</h2>
+<p>The easiest way to visualize a generated structure is to use the <code>--visualize</code> flag:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span>--length<span class="w"> </span><span class="m">30</span><span class="w"> </span>--conformation<span class="w"> </span>alpha<span class="w"> </span>--visualize
+</span></code></pre></div>
+<p>This will automatically open your default web browser and display the structure in a 3D viewer powered by <a href="https://3dmol.csb.pitt.edu/">3Dmol.js</a>.</p>
+<p><strong>Features of the 3D Viewer:</strong>
+-   <strong>Interactive:</strong> Rotate, zoom, and pan using your mouse.
+-   <strong>Style Overrides:</strong> Switch between Cartoon, Stick, Sphere, and Line representations.
+-   <strong>Coloring:</strong> Choose from Spectrum, Chain, or Secondary Structure color schemes.
+-   <strong>NMR Restraints:</strong> If generated with NOE restraints (<code>--gen-nef</code>), the viewer can display them as red lines between the atoms.
+-   <strong>Hydrogen Bonds:</strong> Shows backbone hydrogen bonds as dashed lines.
+-   <strong>SSBOND Visualization:</strong> Displays disulfide bonds as thick yellow cylinders.
+-   <strong>PTM Support:</strong> Highlights post-translational modifications (like phosphorylation) with orange markers.</p>
+<h2 id="2-pymol-scripting">2. PyMOL Scripting</h2>
+<p>For professional-quality rendering and detailed analysis, <code>synth-pdb</code> can generate PyMOL scripts (.pml files).</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>--input-pdb<span class="w"> </span>structure.pdb<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--input-nef<span class="w"> </span>data.nef<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>--mode<span class="w"> </span>pymol<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>--output-pml<span class="w"> </span>view_restraints.pml
+</span></code></pre></div>
+<p>Then open the script in PyMOL:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pymol<span class="w"> </span>view_restraints.pml
+</span></code></pre></div></p>
+<p>The script will automatically:
+-   Load your PDB structure and NEF data.
+-   Style the protein as a cartoon and sticks.
+-   Visualize NOE restraints as distance cylinders (colored by violation if applicable).
+-   Set up standard views for analysis.</p>
+<h2 id="3-high-fidelity-solvent-visualization">3. High-Fidelity Solvent Visualization</h2>
+<p>If you run energy minimization with explicit solvent, you can choose to keep the water molecules in the final PDB:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;MEELQK&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--minimize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--solvent<span class="w"> </span>explicit<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>--keep-solvent<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span>--output<span class="w"> </span>structure_with_water.pdb
+</span></code></pre></div>
+<p>This is particularly useful for studying solvation shells and water-mediated hydrogen bonds.</p>
+<h2 id="4-contact-maps">4. Contact Maps</h2>
+<p>You can also export contact maps as an alternative "2D visualization" of structural proximity:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;ALA-GLY-SER-THR-VAL&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--export-constraints<span class="w"> </span>contacts.csv<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--constraint-format<span class="w"> </span>csv<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>--constraint-cutoff<span class="w"> </span><span class="m">8</span>.0
+</span></code></pre></div>
+<p>The CSV file will contain pairs of residues that are within the 8.0 Angstrom cutoff, which can be plotted as a heatmap using libraries like <code>matplotlib</code>.</p>
 
 
 

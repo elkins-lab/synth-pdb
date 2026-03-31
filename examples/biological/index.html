@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#uiological" class="md-skip">
+        <a href="#biologically-inspired-examples" class="md-skip">
           Skip to content
         </a>
       
@@ -1940,6 +1940,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Biologically-Inspired
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1956,6 +1974,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-human-epidermal-growth-factor-egf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Human Epidermal Growth Factor (EGF)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-zinc-finger-motif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Zinc Finger Motif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-cyclic-peptides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cyclic Peptides
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-d-amino-acid-peptides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. D-Amino Acid Peptides
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -3343,6 +3424,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-human-epidermal-growth-factor-egf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Human Epidermal Growth Factor (EGF)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-zinc-finger-motif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Zinc Finger Motif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-cyclic-peptides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Cyclic Peptides
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-d-amino-acid-peptides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. D-Amino Acid Peptides
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -3361,8 +3494,52 @@
   
 
 
-<h1 id="uiological">uiological</h1>
-<p>Documentation coming soon.</p>
+<h1 id="biologically-inspired-examples">Biologically-Inspired Examples</h1>
+<p>This document showcases how to use <code>synth-pdb</code> to generate structures that mimic real biological proteins and motifs.</p>
+<h2 id="1-human-epidermal-growth-factor-egf">1. Human Epidermal Growth Factor (EGF)</h2>
+<p>EGF is a small protein (53 residues) with a complex disulfide-bonded structure. It contains three critical disulfide bonds (C6-C20, C14-C31, C33-C42) that are essential for its biological activity.</p>
+<p>You can generate an EGF-like structure using the following command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;NSDSECPLSHDGYCLHDGVCMYIEALDKYACNCVVGYIGERCQYRDLKWWELR&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>--conformation<span class="w"> </span>random<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>--minimize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span>--cap-termini<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span>--gen-shifts<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span>--gen-relax<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span>--output<span class="w"> </span>egf_protein.pdb
+</span></code></pre></div>
+<p><strong>Key Features of this Example:</strong>
+-   <strong>Sequence:</strong> Uses the actual human EGF sequence.
+-   <strong>Minimization:</strong> The <code>--minimize</code> flag triggers OpenMM to relax the structure and automatically detect/model the disulfide bonds.
+-   <strong>NMR Data:</strong> Generates synthetic chemical shifts and relaxation data (<code>--gen-shifts</code>, <code>--gen-relax</code>).
+-   <strong>Biophysical Realism:</strong> Adds N- and C-terminal caps (<code>--cap-termini</code>).</p>
+<h2 id="2-zinc-finger-motif">2. Zinc Finger Motif</h2>
+<p>Zinc fingers are common structural motifs in proteins that coordinate one or more zinc ions to help stabilize their fold.</p>
+<p><code>synth-pdb</code> can automatically detect Zinc-binding motifs (like CCHH or CCCC) and insert a Zinc ion:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;PYKCPECGKSFSQKSDLVKHQRTHTG&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--conformation<span class="w"> </span>random<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>--minimize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>--metal-ions<span class="w"> </span>auto<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span>--output<span class="w"> </span>zinc_finger.pdb
+</span></code></pre></div>
+<p>The <code>--metal-ions auto</code> flag scans the sequence for known binding motifs and places the ZN ion in the geometric center of the coordinating residues.</p>
+<h2 id="3-cyclic-peptides">3. Cyclic Peptides</h2>
+<p>Many natural antibiotics and hormones are cyclic peptides. <code>synth-pdb</code> can generate head-to-tail cyclic structures:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;C-G-G-C&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--cyclic<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>--minimize<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>--output<span class="w"> </span>cyclic_peptide.pdb
+</span></code></pre></div>
+<p>The <code>--cyclic</code> flag ensures that the N-terminal Nitrogen and C-terminal Carbon are bonded, and the minimizer relaxes the structure into a stable cyclic conformation.</p>
+<h2 id="4-d-amino-acid-peptides">4. D-Amino Acid Peptides</h2>
+<p>D-amino acids are often found in bacterial cell walls and specialized peptides. They are "mirror images" of the standard L-amino acids and can impart resistance to proteases.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>--sequence<span class="w"> </span><span class="s2">&quot;DAL-GLY-GLY-DPH&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--output<span class="w"> </span>d_peptide.pdb
+</span></code></pre></div>
+<p><code>synth-pdb</code> supports the standard PDB 3-letter codes for D-amino acids (e.g., <code>DAL</code> for D-Alanine, <code>DPH</code> for D-Phenylalanine).</p>
 
 
 
