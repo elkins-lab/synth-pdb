@@ -4328,7 +4328,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🔧 Environment Setup</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 🛠️ SETUP: Environment and Dependencies</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -4336,7 +4336,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
 
-<span class="c1"># Ensure synth_pdb is in path (local dev environment)</span>
+<span class="c1"># Check if we are running in Google Colab</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab - Installing public dependencies..."</span><span class="p">)</span>
+    <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">biotite</span> <span class="n">py3Dmol</span> <span class="n">ipywidgets</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running locally"</span><span class="p">)</span>
+
+<span class="c1"># Ensure synth_pdb is in the python path</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -4349,9 +4358,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">superimpose_batch</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Geometry module loaded successfully!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Setup complete and imports successful!"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Setup
+<div class="clipboard-copy-txt" id="cell-1"># 🛠️ SETUP: Environment and Dependencies
 import os
 import sys
 import numpy as np
@@ -4359,7 +4368,16 @@ import matplotlib.pyplot as plt
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 
-# Ensure synth_pdb is in path (local dev environment)
+# Check if we are running in Google Colab
+IN_COLAB = 'google.colab' in sys.modules
+
+if IN_COLAB:
+    print("🌐 Running in Google Colab - Installing public dependencies...")
+    %pip install -q biotite py3Dmol ipywidgets
+else:
+    print("💻 Running locally")
+
+# Ensure synth_pdb is in the python path
 sys.path.append(os.path.abspath('../../'))
 
 from synth_pdb.geometry import (
@@ -4372,7 +4390,7 @@ from synth_pdb.geometry import (
     superimpose_batch
 )
 
-print('✅ Geometry module loaded successfully!')</div>
+print("✅ Setup complete and imports successful!")</div>
 </div>
 </div>
 </div>
