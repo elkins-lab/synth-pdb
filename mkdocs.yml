@@ -63,6 +63,7 @@ nav:
       - Folding Landscape: tutorials/folding_landscape.ipynb
       - Latent Space Explorer: tutorials/latent_space_explorer.ipynb
       - NeRF Geometry Lab: tutorials/nerf_geometry_lab.ipynb
+      - Geometry Tools Reference: tutorials/geometry_tools_reference.ipynb
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
       - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
       - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
