@@ -3557,6 +3557,9 @@
 </ul>
 <h2 id="rmsd">RMSD</h2>
 <p>Root Mean Square Deviation calculations for structural comparison.</p>
+<blockquote>
+<p><strong>Note on Atom Selection</strong>: These functions are atom-agnostic and operate on raw Nx3 coordinate arrays. For standard protein "Backbone RMSD", coordinates should be pre-filtered to include only backbone heavy atoms (N, CA, C). For overall fold comparison, C-alpha (CA) only is often used.</p>
+</blockquote>
 <ul>
 <li><code>calculate_rmsd(P, Q)</code>: Calculate RMSD between two sets of coordinates.</li>
 <li><code>calculate_pairwise_rmsd(coords_list, superimpose=False)</code>: Calculate pairwise RMSD matrix for multiple structures.</li>
@@ -3565,6 +3568,9 @@
 </ul>
 <h2 id="superposition">Superposition</h2>
 <p>Optimal alignment of structures using the Kabsch algorithm.</p>
+<blockquote>
+<p><strong>Note on Atom Selection</strong>: For optimal structural alignment, it is recommended to use the same set of backbone heavy atoms (N, CA, C) or C-alpha (CA) only. The input arrays must have the same shape and be in 1-to-1 correspondence.</p>
+</blockquote>
 <ul>
 <li><code>kabsch_superposition(P, Q)</code>: Calculate optimal rotation and translation to superimpose P onto Q.</li>
 <li><code>apply_transformation(coords, rotation, translation)</code>: Apply rotation and translation to coordinates.</li>
