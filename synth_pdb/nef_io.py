@@ -9,12 +9,12 @@ See: https://github.com/elkins/synth-nmr
 """
 
 # Re-export from synth-nmr for backward compatibility
-from synth_nmr.nef_io import (
-    read_nef_restraints,
-    write_nef_chemical_shifts,
-    write_nef_file,
-    write_nef_relaxation,
-)
+import synth_nmr.nef_io as _nef
+
+read_nef_restraints = _nef.read_nef_restraints
+write_nef_chemical_shifts = _nef.write_nef_chemical_shifts
+write_nef_file = _nef.write_nef_file
+write_nef_relaxation = _nef.write_nef_relaxation
 
 __all__ = [
     "read_nef_restraints",

@@ -83,12 +83,37 @@ References:
      of biomolecular structure. Curr Opin Struct Biol, 15, 563–570.
      DOI: 10.1016/j.sbi.2005.08.006
 
+WHY MEASURE MULTIPLE ALIGNMENT MEDIA?
+A single set of RDCs from one alignment medium provides enough information
+to orient a bond vector relative to the tensor, but it leaves "cones" of
+uncertainty — several possible orientations can satisfy the same RDC value.
+By measuring RDCs in two or more alignment media (e.g., phage and bicelles)
+that align the protein in different ways, these cones intersect at a unique
+point, allowing for much more precise structural determination.
+
+RDC DATA TYPES IN SYNTH-PDB:
+While backbone N-H RDCs are the most commonly measured due to the ease of
+obtaining 15N-labelled samples, synth-pdb's underlying engine can also
+simulate 13Ca-13C', 13Ca-1Ha, and side-chain RDCs. These additional
+restraints are particularly powerful for determining the relative
+orientation of domains or rigid secondary structure elements.
+
+EXPERIMENTAL CAUTIONS:
+Users of synthetic RDC data should be aware that real experimental RDCs are
+subject to vibrational averaging. The "static" bond length usually assumed in
+calculations (e.g., 1.041 Å for N-H) is an effective distance that absorbs
+some of these dynamical effects. synth-pdb uses these standard effective
+distances to ensure compatibility with structural refinement software like
+XPLOR-NIH or CNS.
+
 """
 
 # Re-export from synth-nmr for backward compatibility.
 # This shim preserves a stable synth_pdb.rdc public API even if the
 # underlying synth-nmr implementation evolves.
-from synth_nmr.rdc import calculate_rdcs
+import synth_nmr.rdc as _rdc
+
+calculate_rdcs = _rdc.calculate_rdcs
 
 __all__ = [
     "calculate_rdcs",

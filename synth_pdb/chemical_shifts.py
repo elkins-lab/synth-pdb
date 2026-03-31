@@ -9,16 +9,16 @@ See: https://github.com/elkins/synth-nmr
 """
 
 # Re-export from synth-nmr for backward compatibility
-from synth_nmr.chemical_shifts import (
-    RANDOM_COIL_SHIFTS,
-    SECONDARY_SHIFTS,
-    # Private functions used in tests
-    _calculate_ring_current_shift,
-    _get_aromatic_rings,
-    calculate_csi,
-    get_secondary_structure,
-    predict_chemical_shifts,
-)
+import synth_nmr.chemical_shifts as _cs
+
+RANDOM_COIL_SHIFTS = _cs.RANDOM_COIL_SHIFTS
+SECONDARY_SHIFTS = _cs.SECONDARY_SHIFTS
+# Private functions used in tests
+_calculate_ring_current_shift = _cs._calculate_ring_current_shift
+_get_aromatic_rings = _cs._get_aromatic_rings
+calculate_csi = _cs.calculate_csi
+get_secondary_structure = _cs.get_secondary_structure
+predict_chemical_shifts = _cs.predict_chemical_shifts
 
 __all__ = [
     "predict_chemical_shifts",

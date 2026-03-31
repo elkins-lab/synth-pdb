@@ -14,12 +14,10 @@ See: https://github.com/elkins/synth-nmr
 """
 
 # Re-export from synth-nmr for backward compatibility
-from synth_nmr.j_coupling import (
-    calculate_hn_ha_coupling_from_phi as calculate_hn_ha_coupling,
-)
-from synth_nmr.j_coupling import (
-    predict_couplings_from_phi_map as predict_couplings_from_structure,
-)
+import synth_nmr.j_coupling as _j
+
+calculate_hn_ha_coupling = _j.calculate_hn_ha_coupling_from_phi
+predict_couplings_from_structure = _j.predict_couplings_from_phi_map
 
 __all__ = [
     "calculate_hn_ha_coupling",

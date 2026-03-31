@@ -6,14 +6,37 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
     from synth_nmr import calculate_relaxation_rates, predict_order_parameters
 
 See: https://github.com/elkins/synth-nmr
+
+EDUCATIONAL NOTE — NMR Relaxation and the Lipari-Szabo Model
+============================================================
+NMR relaxation rate measurements (T1, T2, NOE) provide information about the
+timescales and amplitudes of protein motion. These motions range from fast
+bond vibrations (picoseconds) to slow loop rearrangements (microseconds).
+
+THE MODEL-FREE FORMALISM:
+Lipari and Szabo (1982) introduced a "model-free" approach to describe
+protein dynamics using only two key parameters:
+1. S² (Order Parameter): Measures the spatial amplitude of internal motion.
+   S²=1 means rigid, S²=0 means fully isotropic.
+2. τe (Effective Correlation Time): Measures the speed of the internal motion.
+
+APPLICATION:
+For a globular protein, the overall tumbling (τm) usually dominates the
+relaxation rate. By measuring relaxation at multiple magnetic field strengths,
+researchers can de-convolve the global and local motions. synth-pdb uses
+S² parameters predicted from sequence and structure to generate synthetic
+T1/T2 rates that reflect the protein's dynamic landscape.
+
 """
 
 # Re-export from synth-nmr for backward compatibility
-from synth_nmr import (
-    calculate_relaxation_rates,
-    predict_order_parameters,
-)
-from synth_nmr.relaxation import njit, spectral_density
+import synth_nmr as _nmr
+import synth_nmr.relaxation as _rel
+
+calculate_relaxation_rates = _nmr.calculate_relaxation_rates
+predict_order_parameters = _nmr.predict_order_parameters
+njit = _rel.njit
+spectral_density = _rel.spectral_density
 
 __all__ = [
     "calculate_relaxation_rates",
