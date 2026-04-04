@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.28.0] - 2026-04-04
+
+### Added
+- **New Ensemble Module** (`synth_pdb.ensemble`): A new subpackage housing
+  NMR ensemble analysis algorithms, extracted from `pdbstat-python` and
+  elevated to a general-purpose, scientifically validated library.
+- **`DAOPCalculator`** (`synth_pdb.ensemble.daop`): Implements the circular
+  order-parameter formula from Hyberts et al. (1992) *Protein Science* 1:736
+  for quantifying dihedral angle consistency across an NMR ensemble.
+  Includes `calculate_order_parameter`, `find_well_defined_residues`
+  (PDBStat S(φ)+S(ψ) ≥ 1.8 convention), and `calculate_backbone_daop`.
+- **`EnsembleStatistics`** (`synth_pdb.ensemble.statistics`): Typed dataclass
+  replacing plain `Dict[str, float]` for ensemble quality metrics (pairwise
+  RMSD, RMSF, medoid, well-defined residues) with `precision` and
+  `overall_quality` computed properties and `to_dict`/`from_dict` round-trips.
+  Quality thresholds from Tejero et al. (2013) *J Biomol NMR* 56:337.
+- **`QualityAssessment`** (`synth_pdb.ensemble.statistics`): Lightweight typed
+  dataclass for the precision/overall-quality assessment pair.
+
+---
+
 ## [1.27.0] - 2026-03-30
 
 ### Added
