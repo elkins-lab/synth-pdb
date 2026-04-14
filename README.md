@@ -1263,6 +1263,8 @@ For students and researchers interested in the physics behind the code, here are
 
 *   **NMR Structure Validation & Chirality:**
     *   Montelione, G. T., et al. (2013). Recommendations of the wwPDB NMR Validation Task Force. *Structure*, 21(9), 1563-1570. (Defines standards for geometric validation).
+    *   Huang, Y. J., Powers, R., & Montelione, G. T. (2005). "Protein NMR recall, precision, and F-measure scores (RPF scores): structure quality assessment measures based on information retrieval statistics." *Journal of the American Chemical Society*, 127(6), 1665-1674.
+    *   Raman, S., et al. (2010). "NMR Structure Determination for Larger Proteins Using Backbone-Only Data." *Science*, 327(5968), 1014-1018. (Using chemical shifts and RDCs for structure prediction).
     *   Bhattacharya, A., & Montelione, G. T. (2011). PDBStat: a server for validation of protein NMR structures.
 
 *   **Nuclear Overhauser Effect (NOE) & $r^{-6}$:**
