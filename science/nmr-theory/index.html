@@ -3048,6 +3048,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#nmr-structure-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NMR Structure Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NMR Structure Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpf-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RPF Scores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-quality-scores-z-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Quality Scores (Z-scores)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#key-references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3636,6 +3675,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#nmr-structure-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NMR Structure Validation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NMR Structure Validation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpf-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RPF Scores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-quality-scores-z-scores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Quality Scores (Z-scores)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#key-references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3825,44 +3903,57 @@ making N a secondary (tertiary) amine. Consequently:</p>
 <li><code>calculate_rdcs</code> automatically excludes PRO residues</li>
 </ul>
 <hr />
+<h2 id="nmr-structure-validation">NMR Structure Validation</h2>
+<p>Validating NMR structures requires assessing both the physical quality of the model and its consistency with experimental data. <code>synth-pdb</code> adopts standards recommended by the <strong>wwPDB NMR Validation Task Force (VTF)</strong>.</p>
+<h3 id="rpf-scores">RPF Scores</h3>
+<p>The <strong>RPF scores</strong> (Recall, Precision, and F-measure) assess how well a structural model accounts for the observed NOESY cross-peaks.
+- <strong>Recall</strong>: Proportion of experimental peaks explained by the model.
+- <strong>Precision</strong>: Proportion of back-calculated peaks that match experimental data.
+- <strong>F-measure</strong>: Harmonic mean of Recall and Precision.</p>
+<blockquote>
+<p><em>"RPF scores provide a sensitive measure of structural quality, independent of the software used for structure calculation."</em>
+— Huang et al. (2005), <em>J Am Chem Soc</em> 127:1665.</p>
+</blockquote>
+<h3 id="global-quality-scores-z-scores">Global Quality Scores (Z-scores)</h3>
+<p>Structure quality is often benchmarked against high-resolution X-ray structures using tools like <strong>PSVS</strong> (Protein Structure Validation Suite).
+- <strong>Procheck G-factor</strong>: Overall stereochemical quality.
+- <strong>Verify3D</strong>: Compatibility of the 3D model with its sequence.
+- <strong>Prosall</strong>: Energy-based fold validation.</p>
+<hr />
 <h2 id="key-references">Key References</h2>
 <ol>
 <li>
-<p><strong>Tjandra, N. &amp; Bax, A.</strong> (1997). Direct measurement of distances and angles in
-   biomolecules by NMR in a dilute liquid crystalline medium. <em>Science</em>, 278, 1111–1114.
-   DOI: <a href="https://doi.org/10.1126/science.278.5340.1111">10.1126/science.278.5340.1111</a></p>
+<p><strong>Montelione, G. T., et al.</strong> (2013). Recommendations of the wwPDB NMR Validation Task Force. <em>Structure</em>, 21, 1563–1570. DOI: <a href="https://doi.org/10.1016/j.str.2013.07.021">10.1016/j.str.2013.07.021</a></p>
 </li>
 <li>
-<p><strong>Prestegard, J.H., Al-Hashimi, H.M. &amp; Tolman, J.R.</strong> (2000). NMR structures of
-   biomolecules using field oriented media and residual dipolar couplings.
-   <em>Q Rev Biophys</em>, 33, 371–424.
-   DOI: <a href="https://doi.org/10.1017/S0033583500003656">10.1017/S0033583500003656</a></p>
+<p><strong>Huang, Y. J., Powers, R. &amp; Montelione, G. T.</strong> (2005). Protein NMR recall, precision, and F-measure scores (RPF scores): structure quality assessment measures based on information retrieval statistics. <em>J Am Chem Soc</em>, 127, 1665–1674. DOI: <a href="https://doi.org/10.1021/ja045714y">10.1021/ja045714y</a></p>
 </li>
 <li>
-<p><strong>Bax, A. &amp; Grishaev, A.</strong> (2005). Weak alignment NMR: a hawk-eyed view of
-   biomolecular structure. <em>Curr Opin Struct Biol</em>, 15, 563–570.
-   DOI: <a href="https://doi.org/10.1016/j.sbi.2005.08.006">10.1016/j.sbi.2005.08.006</a></p>
+<p><strong>Bhattacharya, A., Tejero, R. &amp; Montelione, G. T.</strong> (2007). Evaluating protein structures determined by structural genomics consortia. <em>Proteins</em>, 66, 778–795. DOI: <a href="https://doi.org/10.1002/prot.21165">10.1002/prot.21165</a></p>
 </li>
 <li>
-<p><strong>Han, B. et al.</strong> (2011). SHIFTX2: significantly improved protein chemical shift
-   prediction. <em>J Biomol NMR</em>, 50, 43–57.
-   DOI: <a href="https://doi.org/10.1007/s10858-011-9478-4">10.1007/s10858-011-9478-4</a></p>
+<p><strong>Raman, S. et al.</strong> (2010). NMR structure determination for larger proteins using backbone-only data. <em>Science</em>, 327, 1014–1018. DOI: <a href="https://doi.org/10.1126/science.1183649">10.1126/science.1183649</a></p>
 </li>
 <li>
-<p><strong>Shen, Y. &amp; Bax, A.</strong> (2010). SPARTA+: a modest improvement in empirical NMR
-   chemical shift prediction by means of an artificial neural network. <em>J Biomol NMR</em>,
-   48, 13–22. DOI: <a href="https://doi.org/10.1007/s10858-010-9433-9">10.1007/s10858-010-9433-9</a></p>
+<p><strong>Tjandra, N. &amp; Bax, A.</strong> (1997). Direct measurement of distances and angles in biomolecules by NMR in a dilute liquid crystalline medium. <em>Science</em>, 278, 1111–1114. DOI: <a href="https://doi.org/10.1126/science.278.5340.1111">10.1126/science.278.5340.1111</a></p>
 </li>
 <li>
-<p><strong>Bewley, C.A. &amp; Clore, G.M.</strong> (2000). Determination of the relative orientation of
-   the two halves of the domain-swapped dimer of HIV-1 protease using residual dipolar
-   couplings. <em>J Am Chem Soc</em>, 122, 6009.
-   DOI: <a href="https://doi.org/10.1021/ja000635g">10.1021/ja000635g</a></p>
+<p><strong>Prestegard, J.H., Al-Hashimi, H.M. &amp; Tolman, J.R.</strong> (2000). NMR structures of biomolecules using field oriented media and residual dipolar couplings. <em>Q Rev Biophys</em>, 33, 371–424. DOI: <a href="https://doi.org/10.1017/S0033583500003656">10.1017/S0033583500003656</a></p>
 </li>
 <li>
-<p><strong>Karplus, M.</strong> (1963). Vicinal proton coupling in nuclear magnetic resonance.
-   <em>J Am Chem Soc</em>, 85, 2870–2871.
-   DOI: <a href="https://doi.org/10.1021/ja00901a059">10.1021/ja00901a059</a></p>
+<p><strong>Bax, A. &amp; Grishaev, A.</strong> (2005). Weak alignment NMR: a hawk-eyed view of biomolecular structure. <em>Curr Opin Struct Biol</em>, 15, 563–570. DOI: <a href="https://doi.org/10.1016/j.sbi.2005.08.006">10.1016/j.sbi.2005.08.006</a></p>
+</li>
+<li>
+<p><strong>Han, B. et al.</strong> (2011). SHIFTX2: significantly improved protein chemical shift prediction. <em>J Biomol NMR</em>, 50, 43–57. DOI: <a href="https://doi.org/10.1007/s10858-011-9478-4">10.1007/s10858-011-9478-4</a></p>
+</li>
+<li>
+<p><strong>Shen, Y. &amp; Bax, A.</strong> (2010). SPARTA+: a modest improvement in empirical NMR chemical shift prediction. <em>J Biomol NMR</em>, 48, 13–22. DOI: <a href="https://doi.org/10.1007/s10858-010-9433-9">10.1007/s10858-010-9433-9</a></p>
+</li>
+<li>
+<p><strong>Bewley, C.A. &amp; Clore, G.M.</strong> (2000). Determination of the relative orientation of the two halves of the domain-swapped dimer of HIV-1 protease using residual dipolar couplings. <em>J Am Chem Soc</em>, 122, 6009. DOI: <a href="https://doi.org/10.1021/ja000635g">10.1021/ja000635g</a></p>
+</li>
+<li>
+<p><strong>Karplus, M.</strong> (1963). Vicinal proton coupling in nuclear magnetic resonance. <em>J Am Chem Soc</em>, 85, 2870–2871. DOI: <a href="https://doi.org/10.1021/ja00901a059">10.1021/ja00901a059</a></p>
 </li>
 </ol>
 
