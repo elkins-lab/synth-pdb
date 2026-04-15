@@ -185,6 +185,11 @@ def main() -> None:
         help="Per-region conformation specification. Format: 'start-end:conformation,...'. Supports secondary structures (alpha, beta) and Turn types (typeI, typeII, typeVIII). Example: '1-10:alpha,11-14:typeII,15-20:beta'.",
     )
     parser.add_argument(
+        "--restraints",
+        type=str,
+        help="Optional: Path to an NMR NOE restraint file (.nef or .restraints) for RPF validation.",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="Open generated structure in browser-based 3D viewer (uses 3Dmol.js). Interactive visualization with rotation, zoom, and style controls.",
@@ -1130,6 +1135,7 @@ def main() -> None:
 
                 if (
                     args.gen_nef
+                    or args.restraints
                     or args.gen_relax
                     or args.gen_shifts
                     or args.gen_couplings
@@ -1161,7 +1167,11 @@ def main() -> None:
                             write_nef_file,
                             write_nef_relaxation,
                         )
-                        from .nmr import calculate_synthetic_noes
+                        from .nmr import (
+                            calculate_rpf_score,
+                            calculate_synthetic_noes,
+                            read_restraint_file,
+                        )
                         from .relaxation import calculate_relaxation_rates
                         from .torsion import calculate_torsion_angles, export_torsion_angles
 
@@ -1170,6 +1180,25 @@ def main() -> None:
                         # We need the generated structure as an AtomArray
                         pdb_file = pdb_io.PDBFile.read(io.StringIO(final_full_pdb_content_to_write))
                         structure = pdb_file.get_structure(model=1)
+
+                        # RPF Validation if restraints provided
+                        if args.restraints:
+                            logger.info(f"Performing RPF Validation against {args.restraints}...")
+                            try:
+                                target_restraints = read_restraint_file(args.restraints)
+                                rpf_scores = calculate_rpf_score(structure, target_restraints)
+
+                                # Print RPF Report
+                                print("\n" + "=" * 40)
+                                print("--- NMR RPF Validation Report ---")
+                                print(f"File: {args.restraints}")
+                                print(f"Recall:    {rpf_scores['recall']:.4f}")
+                                print(f"Precision: {rpf_scores['precision']:.4f}")
+                                print(f"F-measure: {rpf_scores['f_measure']:.4f}")
+                                print("=" * 40 + "\n")
+
+                            except Exception as e:
+                                logger.error(f"RPF Validation failed: {e}")
 
                         # Sequence inference
                         res_names = [
