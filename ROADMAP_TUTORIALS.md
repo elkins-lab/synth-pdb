@@ -77,3 +77,16 @@ Fills the biggest educational gap. Covers:
 | 2 | Extend `virtual_nmr_spectrometer.ipynb` | ~2 hrs | High |
 | 3 | Shift predictor comparison | ~1 hr | Medium |
 | 4 | Q-factor in `protein_quality_assessment.ipynb` | ~2 hrs | Medium |
+
+---
+
+## Priority 5 — Measuring Structural Truth: The RPF Score ✅ IN PROGRESS
+
+**File**: `docs/tutorials/nmr_validation_rpf.ipynb`
+
+This tutorial teaches users how to validate structural models using RPF (Recall, Precision, F-measure) scores:
+1. **The Concept of Truth**: Introduction to how structural models relate to experimental NOE restraints.
+2. **Recall**: Visualizing how well a model captures "expected" contacts.
+3. **Precision**: Identifying "over-folded" structures with unsupported short distances.
+4. **F-measure**: Using the harmonic mean as a single objective metric for model quality.
+5. **Practical Exercise**: Comparing a raw generator output with an energy-minimized structure to see the score improvements.

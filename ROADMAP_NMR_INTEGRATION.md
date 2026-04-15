@@ -121,3 +121,23 @@ utility.
 | Neural shift predictor shim | Niche, ML-focused | Low | ⭐ Low |
 | BMRB dataset integration | Research-facing | Medium | ⭐ Low |
 | Shared `_lazy_torch_import` | Code cleanliness | Low | ⭐ Low |
+
+---
+
+## 4. Future RPF and Validation Enhancements (Proposed)
+
+### A. CLI Integration for RPF Scores
+**Opportunity:** Automatically report RPF scores in `main.py` when a user provides a restraint file (e.g., `.nbl` or `.tbl`). This would provide immediate feedback on structural agreement with experimental data.
+**Effort:** Small — add a `--restraints` flag and call `calculate_rpf_score`.
+
+### B. Structural Validator Integration
+**Opportunity:** Add a `validate_nmr_restraints(restraints)` method to the `PDBValidator` class in `synth_pdb/validator.py`.
+**Value:** Allows "Restraint Satisfaction" to be a pass/fail criterion in automated decoy-generation and structural biology pipelines.
+
+### C. Quality Classifier Features
+**Opportunity:** Include the **F-measure** as a feature in `extract_quality_features` (in `synth_pdb/quality/features.py`).
+**Value:** A model that satisfies its NMR restraints is statistically much more likely to be a "correct" fold, improving the quality filter's accuracy.
+
+### D. Ensemble-Average RPF
+**Opportunity:** Extend `GeometryAnalyzer` in `synth_pdb/analysis.py` to calculate an **Ensemble-RPF**, reporting mean and variance of the F-measure across NMR ensembles.
+**Value:** Identifies which members of an ensemble are most representative of the data.
