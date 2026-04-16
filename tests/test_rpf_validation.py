@@ -67,3 +67,20 @@ def test_rpf_empty_restraints():
     structure = struc.array([h1])
     scores = calculate_rpf_score(structure, [])
     assert scores == {"recall": 0.0, "precision": 0.0, "f_measure": 0.0}
+
+def test_rpf_sparse_protons():
+    """If the structure has fewer than 2 protons, precision should be 1.0 (no false positives possible).
+
+    SCIENTIFIC BASIS:
+    Precision in RPF measures the fraction of model contacts supported by restraints.
+    If there are no model contacts (fewer than 2 atoms), the model is not
+    making any "extra" predictions, thus precision is 1.0.
+    """
+    h1 = struc.Atom([0, 0, 0], atom_name="H", element="H", res_id=1, res_name="ALA", chain_id="A")
+    structure = struc.array([h1])
+    # Need at least one restraint to bypass the 'if not restraints' check
+    restraints = [{"res_i": 1, "atom_i": "H", "res_j": 2, "atom_j": "H", "upper_bound": 5.0}]
+    scores = calculate_rpf_score(structure, restraints)
+
+    assert scores["precision"] == 1.0
+    assert scores["recall"] == 0.0 # Atom 2 is missing

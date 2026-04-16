@@ -555,6 +555,101 @@ class TestMainCLI:
 
         sys.exit.assert_not_called()
 
+    def test_run_dataset_generation(self, mocker, caplog):
+        """Test --mode dataset calls DatasetGenerator.
+
+        SCIENTIFIC BASIS:
+        Bulk dataset generation is critical for training machine learning models
+        (like GNNs or PLMs) to recognize protein structural quality.
+        """
+        caplog.set_level(logging.INFO)
+        mock_ds_cls = mocker.patch("synth_pdb.dataset.DatasetGenerator")
+        mock_ds_instance = mock_ds_cls.return_value
+
+        test_args = [
+            "synth_pdb",
+            "--mode", "dataset",
+            "--num-samples", "10",
+            "--output", "my_dataset",
+            "--train-ratio", "0.8"
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        mock_ds_cls.assert_called_once()
+        kwargs = mock_ds_cls.call_args.kwargs
+        assert kwargs["num_samples"] == 10
+        assert kwargs["output_dir"] == "my_dataset"
+        assert kwargs["train_ratio"] == 0.8
+        mock_ds_instance.generate.assert_called_once()
+        assert "Dataset generation complete" in caplog.text
+
+    def test_run_ai_interpolate(self, mocker, caplog):
+        """Test --mode ai --ai-op interpolate.
+
+        SCIENTIFIC BASIS:
+        Structural interpolation (morphing) is used to visualize and study
+        transitions between different protein conformational states, such as
+        folding pathways or ligand-induced changes.
+        """
+        caplog.set_level(logging.INFO)
+        mock_interp = mocker.patch("synth_pdb.quality.interpolate.interpolate_structures")
+
+        test_args = [
+            "synth_pdb",
+            "--mode", "ai",
+            "--ai-op", "interpolate",
+            "--start-pdb", "start.pdb",
+            "--end-pdb", "end.pdb",
+            "--steps", "20",
+            "--output", "my_morph"
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        mock_interp.assert_called_once_with("start.pdb", "end.pdb", 20, "my_morph")
+        assert "Interpolation complete" in caplog.text
+
+    def test_run_ai_missing_args(self, mocker, caplog):
+        """Test error handling for missing AI arguments."""
+        caplog.set_level(logging.ERROR)
+        test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "interpolate"] # missing PDBS
+        mocker.patch("sys.argv", test_args)
+        mock_exit = mocker.patch("sys.exit")
+
+        main.main()
+
+        assert "Interpolation requires --start-pdb and --end-pdb" in caplog.text
+        mock_exit.assert_called_with(1)
+
+    def test_run_ai_invalid_op(self, mocker, caplog):
+        """Test error handling for invalid AI operation."""
+        caplog.set_level(logging.ERROR)
+        test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "invalid"]
+        mocker.patch("sys.argv", test_args)
+        mock_exit = mocker.patch("sys.exit")
+
+        main.main()
+
+        assert "AI mode requires --ai-op {interpolate, cluster}" in caplog.text
+        mock_exit.assert_called_with(1)
+
+    def test_run_ai_cluster_not_implemented(self, mocker, caplog):
+        """Test cluster op reports not implemented."""
+        caplog.set_level(logging.ERROR)
+        test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "cluster"]
+        mocker.patch("sys.argv", test_args)
+        mock_exit = mocker.patch("sys.exit")
+
+        main.main()
+
+        assert "Clustering not yet implemented" in caplog.text
+        mock_exit.assert_called_with(1)
+
     # --- Additional tests for error conditions and edge cases ---
 
     def test_invalid_length_without_sequence(self, tmp_path):
