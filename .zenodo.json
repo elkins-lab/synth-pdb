@@ -7,6 +7,14 @@
             "affiliation": "Independent Researcher"
         }
     ],
+    "related_identifiers": [
+        {
+            "identifier": "10.5281/zenodo.18855128",
+            "relation": "isRequiredBy",
+            "scheme": "doi",
+            "resource_type": "software"
+        }
+    ],
     "access_right": "open",
     "license": "MIT",
     "keywords": [
