@@ -145,7 +145,7 @@ BIBLIOGRAPHY AND FURTHER READING:
 
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 import biotite.structure as struc
 import numpy as np
@@ -518,7 +518,7 @@ def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
         # Lazy import of NEF logic to minimize startup time for non-NMR tasks.
         # This reduces the overhead for basic generator users.
         from .nef_io import read_nef_restraints
-        return read_nef_restraints(file_path)
+        return cast(List[Dict[str, Any]], read_nef_restraints(file_path))
 
     # ── SIMPLE WHITESPACE PARSER ─────────────────────────────────────────────
     # For non-standard or simplified files, we use a robust line-by-line parser.
