@@ -566,7 +566,7 @@ def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
         # This provides a clearer stack trace for the end user and helps
         # identify syntax errors in their restraint files.
         # Descriptive errors are a hallmark of high-quality scientific software.
-        raise ValueError(f"Failed to parse restraint file {file_path}: {e}")
+        raise ValueError(f"Failed to parse restraint file {file_path}: {e}") from e
 
 # ── MODULE EXPORTS ───────────────────────────────────────────────────────────
 # We define __all__ to explicitly control the public API of this module.
