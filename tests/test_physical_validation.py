@@ -23,7 +23,6 @@ def test_physical_energy_validation_tdd(tmp_path):
     # 2. Generate a "Bad" structure (manually create a clash in PDB string)
     # We take the first two ATOM lines and make their coordinates identical
     lines = pdb_good.splitlines()
-    l1 = lines[0] # Might be HEADER
     atom_lines = [l for l in lines if l.startswith("ATOM")]
 
     # "ATOM      1  N   ALA A   1      -0.001   0.005   0.000  1.00  0.00           N"

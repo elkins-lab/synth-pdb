@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 import requests
 
@@ -25,7 +25,7 @@ class BMRBAPI:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        return data.get(bmrb_id, {})
+        return cast(Dict[str, Any], data.get(bmrb_id, {}))
 
     @staticmethod
     def search_entries_with_restraints(search_term: str = "ubiquitin") -> List[str]:
@@ -108,7 +108,7 @@ class PDBValidationAPI:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return response.json().get(pdb_id.lower(), {})
+            return cast(Dict[str, Any], response.json().get(pdb_id.lower(), {}))
         except Exception as e:
             logger.error(f"Failed to fetch PDBe summary for {pdb_id}: {e}")
             return {}
@@ -120,7 +120,7 @@ class PDBValidationAPI:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return response.json().get(pdb_id.lower(), {})
+            return cast(Dict[str, Any], response.json().get(pdb_id.lower(), {}))
         except Exception as e:
             logger.error(f"Failed to fetch PDBe outliers for {pdb_id}: {e}")
             return {}

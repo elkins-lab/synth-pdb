@@ -223,8 +223,6 @@ class PDBValidator:
         favored_count = 0
         allowed_count = 0
 
-        from matplotlib.path import Path
-
         for res_id, (phi, psi) in phi_psi.items():
             # Determine residue type for specific polygons
             res_name = self.grouped_atoms[next(iter(self.grouped_atoms))][res_id]["CA"]["residue_name"]
@@ -240,7 +238,7 @@ class PDBValidator:
             # Check Favored
             is_favored = False
             for poly in RAMACHANDRAN_POLYGONS[cat]["Favored"]:
-                if Path(poly).contains_point((phi, psi)):
+                if self._is_point_in_polygon((phi, psi), poly):
                     is_favored = True
                     break
 
@@ -252,13 +250,12 @@ class PDBValidator:
             # Check Allowed
             is_allowed = False
             for poly in RAMACHANDRAN_POLYGONS[cat]["Allowed"]:
-                if Path(poly).contains_point((phi, psi)):
+                if self._is_point_in_polygon((phi, psi), poly):
                     is_allowed = True
                     break
 
             if is_allowed:
                 allowed_count += 1
-
         return {
             "favored_pct": (favored_count / total) * 100.0,
             "allowed_pct": (allowed_count / total) * 100.0,
@@ -296,6 +293,8 @@ class PDBValidator:
         try:
             engine = EnergyMinimizer()
             energy = engine.calculate_energy(self.pdb_content)
+            if energy is None:
+                return float("inf")
             return float(energy)
         except Exception as e:
             logger.error(f"Energy calculation failed: {e}")
@@ -566,7 +565,7 @@ class PDBValidator:
             Dict[int, Tuple[float, float]]: Mapping of residue number to (phi, psi) tuple.
         """
         phi_psi = {}
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for _chain_id, residues_in_chain in self.grouped_atoms.items():
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]

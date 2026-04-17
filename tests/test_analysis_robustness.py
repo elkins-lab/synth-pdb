@@ -59,7 +59,7 @@ def test_calculate_residue_strain():
 
         # We'll "strain" it by generating with high drift or manual edit?
         # Let's generate a normal one first.
-        content = generate_pdb_content(sequence_str="AAAAA", conformation="alpha", seed=42)
+        generate_pdb_content(sequence_str="AAAAA", conformation="alpha", seed=42)
 
         # Manual edit to make a "cis" peptide bond (strain)
         # Omega is 180 (trans) usually. Let's make it 0.

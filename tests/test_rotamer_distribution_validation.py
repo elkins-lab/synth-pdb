@@ -23,8 +23,8 @@ def test_valine_chi1_distribution():
     validator = PDBValidator(pdb_content)
 
     chi_angles = []
-    for chain_id, residues in validator.grouped_atoms.items():
-        for res_num, atoms in residues.items():
+    for _chain_id, residues in validator.grouped_atoms.items():
+        for _res_num, atoms in residues.items():
             if atoms.get("CA") and atoms["CA"]["residue_name"] == "VAL":
                 # Calculate Chi1: N, CA, CB, CG1
                 if all(k in atoms for k in ["N", "CA", "CB", "CG1"]):

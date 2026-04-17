@@ -14,9 +14,9 @@ def test_simulate_trajectory_smoke_mocked():
 
     # Mock OpenMM components
     with patch("openmm.app.PDBFile") as mock_pdb_file, \
-         patch("openmm.app.ForceField") as mock_ff, \
+         patch("openmm.app.ForceField"), \
          patch("openmm.app.Simulation") as mock_sim_cls, \
-         patch("openmm.LangevinMiddleIntegrator") as mock_int:
+         patch("openmm.LangevinMiddleIntegrator"):
 
         # Setup mock simulation instance
         mock_sim = mock_sim_cls.return_value
