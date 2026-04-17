@@ -206,6 +206,137 @@ class PDBValidator:
             grouped_atoms[chain_id][residue_number][atom_name] = atom
         return grouped_atoms
 
+    def get_ramachandran_statistics(self) -> Dict[str, float]:
+        """Calculates the percentage of residues in Favored and Allowed regions.
+
+        SCIENTIFIC BASIS:
+        According to the Top8000 peer-reviewed dataset (Lovell et al. 2003),
+        high-quality protein structures should have:
+        - Favored: > 98.0%
+        - Allowed: > 99.8%
+        """
+        phi_psi = self.calculate_all_phi_psi()
+        total = len(phi_psi)
+        if total == 0:
+            return {"favored_pct": 0.0, "allowed_pct": 0.0, "outlier_pct": 0.0}
+
+        favored_count = 0
+        allowed_count = 0
+
+        from matplotlib.path import Path
+
+        for res_id, (phi, psi) in phi_psi.items():
+            # Determine residue type for specific polygons
+            res_name = self.grouped_atoms[next(iter(self.grouped_atoms))][res_id]["CA"]["residue_name"]
+
+            cat = "General"
+            if res_name == "GLY":
+                cat = "GLY"
+            elif res_name == "PRO":
+                cat = "PRO"
+            elif res_name == "PREPRO":
+                cat = "Pre-Pro"
+
+            # Check Favored
+            is_favored = False
+            for poly in RAMACHANDRAN_POLYGONS[cat]["Favored"]:
+                if Path(poly).contains_point((phi, psi)):
+                    is_favored = True
+                    break
+
+            if is_favored:
+                favored_count += 1
+                allowed_count += 1
+                continue
+
+            # Check Allowed
+            is_allowed = False
+            for poly in RAMACHANDRAN_POLYGONS[cat]["Allowed"]:
+                if Path(poly).contains_point((phi, psi)):
+                    is_allowed = True
+                    break
+
+            if is_allowed:
+                allowed_count += 1
+
+        return {
+            "favored_pct": (favored_count / total) * 100.0,
+            "allowed_pct": (allowed_count / total) * 100.0,
+            "outlier_pct": ((total - allowed_count) / total) * 100.0
+        }
+
+    def refresh_content(self) -> None:
+        """Updates the internal pdb_content string from the current atom list.
+
+        This must be called if atoms or their coordinates are modified externally
+        before calling methods that rely on the raw PDB string (like energy).
+        """
+        self.pdb_content = self.atoms_to_pdb_content(self.atoms)
+        # Also refresh grouped atoms to ensure consistency
+        self.grouped_atoms = self._group_atoms_by_residue()
+
+    def calculate_potential_energy(self) -> float:
+        """Calculates the potential energy of the structure using the Amber forcefield.
+
+        EDUCATIONAL NOTE - Energy as a Clash Detector:
+        ----------------------------------------------
+        While geometric checks (bond lengths, angles) catch obvious errors,
+        Potential Energy is the "ultimate clash detector". It uses the
+        Lennard-Jones potential to penalize atom-atom overlaps.
+
+        Even if all bond lengths are perfect, two residues from different
+        parts of the chain could be occupying the same space. Geometric
+        validators often miss this, but the Energy will spike to
+        astronomical levels (e.g., > 10^10 kJ/mol).
+
+        Returns:
+            The potential energy in kJ/mol. Returns float('inf') on failure.
+        """
+        from .physics import EnergyMinimizer
+        try:
+            engine = EnergyMinimizer()
+            energy = engine.calculate_energy(self.pdb_content)
+            return float(energy)
+        except Exception as e:
+            logger.error(f"Energy calculation failed: {e}")
+            return float("inf")
+
+    def get_quality_report(self) -> Dict[str, Any]:
+        """Generates a comprehensive, evidence-based quality assessment.
+
+        SCIENTIFIC BASIS:
+        A scientifically defensible model must satisfy three criteria:
+        1. Local Geometry: Bonds/Angles within Engh & Huber (1991) limits.
+        2. Backbone Conformation: Phi/Psi in Richardson Top8000/2018 favored regions.
+        3. Global Physics: Low potential energy (no steric overlaps).
+
+        Returns:
+            A dictionary containing metrics and a plausibility flag.
+        """
+        ramachandran = self.get_ramachandran_statistics()
+        energy = self.calculate_potential_energy()
+
+        # Check for bond/angle violations (assuming tolerance has been run)
+        # For a clean report, we run them now if violations list is empty
+        if not self.violations:
+            self.validate_bond_lengths()
+            self.validate_bond_angles()
+            self.validate_ramachandran()
+
+        is_plausible = (
+            len(self.violations) == 0 and
+            ramachandran["outlier_pct"] < 5.0 and
+            energy < 1e5 # Threshold for "physically reasonable"
+        )
+
+        return {
+            "potential_energy_kj_mol": energy,
+            "ramachandran_stats": ramachandran,
+            "violation_count": len(self.violations),
+            "is_physically_plausible": is_plausible,
+            "detailed_violations": self.violations[:10] # Top 10 for brevity
+        }
+
     def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
         """Extracts the amino acid sequences (list of 3-letter codes) for each chain."""
         sequences = {}
@@ -427,6 +558,51 @@ class PDBValidator:
                             inside = not inside
             p1x, p1y = p2x, p2y
         return inside
+
+    def calculate_all_phi_psi(self) -> Dict[int, Tuple[float, float]]:
+        """Calculates (Phi, Psi) pairs for all residues where both are defined.
+
+        Returns:
+            Dict[int, Tuple[float, float]]: Mapping of residue number to (phi, psi) tuple.
+        """
+        phi_psi = {}
+        for chain_id, residues_in_chain in self.grouped_atoms.items():
+            sorted_res_numbers = sorted(residues_in_chain.keys())
+            for i, res_num in enumerate(sorted_res_numbers):
+                current_res_atoms = residues_in_chain[res_num]
+
+                # Check for required backbone atoms
+                if not all(name in current_res_atoms for name in ["N", "CA", "C"]):
+                    continue
+
+                phi = None
+                psi = None
+
+                # Calculate Phi (Φ): C(i-1) - N(i) - CA(i) - C(i)
+                if i > 0:
+                    prev_res_num = sorted_res_numbers[i - 1]
+                    prev_res_atoms = residues_in_chain.get(prev_res_num)
+                    if prev_res_atoms and "C" in prev_res_atoms:
+                        p1 = prev_res_atoms["C"]["coords"]
+                        p2 = current_res_atoms["N"]["coords"]
+                        p3 = current_res_atoms["CA"]["coords"]
+                        p4 = current_res_atoms["C"]["coords"]
+                        phi = self._calculate_dihedral_angle(p1, p2, p3, p4)
+
+                # Calculate Psi (Ψ): N(i) - CA(i) - C(i) - N(i+1)
+                if i < len(sorted_res_numbers) - 1:
+                    next_res_num = sorted_res_numbers[i + 1]
+                    next_res_atoms = residues_in_chain.get(next_res_num)
+                    if next_res_atoms and "N" in next_res_atoms:
+                        p1 = current_res_atoms["N"]["coords"]
+                        p2 = current_res_atoms["CA"]["coords"]
+                        p3 = current_res_atoms["C"]["coords"]
+                        p4 = next_res_atoms["N"]["coords"]
+                        psi = self._calculate_dihedral_angle(p1, p2, p3, p4)
+
+                if phi is not None and psi is not None:
+                    phi_psi[res_num] = (phi, psi)
+        return phi_psi
 
     def validate_ramachandran(self) -> None:
         """Validates Ramachandran angles (Phi, Psi) against MolProbity-defined polygonal regions.

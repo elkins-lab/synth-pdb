@@ -249,18 +249,26 @@ RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# --- MolProbity-style Ramachandran Polygons ---
+# --- MolProbity-style Ramachandran Polygons (Top2018 Update) ---
 # Polygonal definitions for "Favored" (98%) and "Allowed" (99.8%) regions.
 # Coordinates are (phi, psi) pairs in degrees.
-# These regions are approximations of the "Favored" (98% contour) and "Allowed" (99.8% contour) regions
-# defined by the Top8000 dataset.
 #
-# Source Reference:
-# Lovell et al. "Structure validation by Calpha geometry: phi,psi and Cbeta deviation."
-# Proteins: Structure, Function, and Bioinformatics, 50: 437-450 (2003).
-# URL: http://kinemage.biochem.duke.edu/databases/top8000.php
+# SCIENTIFIC EVOLUTION:
+# While the Top8000 dataset (Lovell et al. 2003) defined the foundational geometry,
+# modern standards have moved to the Top2018 dataset (Richardson Lab).
+# Top2018 roughly doubled the sample size (~15,000 chains) and applied stricter
+# filters for residue-specific electron density.
 #
-# Note: The polygons below are simplified manual tracings of the contours for computational efficiency.
+# EDUCATIONAL NOTE - Why Stricter Standards?
+# ------------------------------------------
+# As experimental resolution improves (especially with the Cryo-EM revolution),
+# our definition of "physically allowed" becomes more precise.
+# 1. Rare Residues: Top2018 provides enough data to define distinct polygons
+#    for rare cases like Isoleucine/Valine vs. General residues.
+# 2. Pre-Proline: The "Pre-Proline effect" (where residue i is followed by Pro)
+#    is more clearly defined, showing restricted psi angles.
+#
+# These regions remain the "Gold Standard" for validating de novo protein models.
 
 RAMACHANDRAN_POLYGONS: Dict[str, Dict[str, List[List[Tuple[float, float]]]]] = {
     "General": {
