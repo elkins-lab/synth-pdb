@@ -11,7 +11,7 @@ def test_zinc_finger_generation():
 
     # Generate with mental ions auto (default) and minimization
     pdb_content = generate_pdb_content(
-        sequence_str=sequence, minimize_energy=True, metal_ions="auto"
+        sequence_str=sequence, minimize_energy=True, metal_ions="auto", seed=42
     )
 
     # 1. Verify ZN is in the PDB
@@ -41,7 +41,9 @@ def test_zinc_coordination_restraints_detection():
     # Generate but only verify it doesn't crash
     # (The internal logs would show "Applying harmonic coordination constraints")
     try:
-        generate_pdb_content(sequence_str=sequence, minimize_energy=True, metal_ions="auto")
+        generate_pdb_content(
+            sequence_str=sequence, minimize_energy=True, metal_ions="auto", seed=42
+        )
     except Exception as e:
         pytest.fail(f"Zinc finger generation crashed: {e}")
 
@@ -50,7 +52,7 @@ def test_no_metal_ions_flag():
     """Test that --metal-ions none actually prevents ion injection."""
     sequence = "CPYCKKRFHSH"
     pdb_content = generate_pdb_content(
-        sequence_str=sequence, minimize_energy=True, metal_ions="none"
+        sequence_str=sequence, minimize_energy=True, metal_ions="none", seed=42
     )
 
     assert "ZN" not in pdb_content

@@ -16,7 +16,7 @@ Biological function depends on pH. The most sensitive residue near physiological
 
 import logging
 import random
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import biotite.structure as struc
 import numpy as np
@@ -32,7 +32,9 @@ from .geometry import position_atom_3d_from_internal_coords
 logger = logging.getLogger(__name__)
 
 
-def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.AtomArray:
+def apply_ph_titration(
+    structure: struc.AtomArray, ph: float = 7.4, rng: Optional[random.Random] = None
+) -> struc.AtomArray:
     """Apply global pH settings to titratable residues (mainly Histidine).
 
     Args:
@@ -76,7 +78,8 @@ def apply_ph_titration(structure: struc.AtomArray, ph: float = 7.4) -> struc.Ato
             # Note: Standard PDB often uses just "HIS" implying neural.
             # But explicit modelling requires choosing one.
             # If we want to be explicit:
-            new_name = "HIE" if random.random() < 0.8 else "HID"
+            _rng = rng if rng is not None else random
+            new_name = "HIE" if _rng.random() < 0.8 else "HID"
 
             # Update this residue
             res_mask = (structure.res_id == res_id) & (structure.res_name == "HIS")
@@ -119,12 +122,15 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     logger.info("Adding terminal caps (ACE/NME)...")
 
     # 1. Identify Termini
-    res_ids = sorted(set(structure.res_id))
-    if not res_ids:
+    # Filter for non-hetero atoms to ensure we cap the protein chain,
+    # not an injected metal ion or other cofactor.
+    protein_indices = np.where(~structure.hetero)[0]
+    if len(protein_indices) == 0:
         return structure
 
-    n_term_id = res_ids[0]
-    c_term_id = res_ids[-1]
+    protein_res_ids = sorted(set(structure.res_id[protein_indices]))
+    n_term_id = protein_res_ids[0]
+    c_term_id = protein_res_ids[-1]
 
     # --- ACE (Acetyl) at N-terminus ---
     # Attaches to N of first residue.

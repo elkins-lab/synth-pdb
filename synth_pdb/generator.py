@@ -78,7 +78,12 @@ PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_
 
 
 def _calculate_bfactor(
-    atom_name: str, residue_number: int, total_residues: int, residue_name: str, s2: float = 0.85
+    atom_name: str,
+    residue_number: int,
+    total_residues: int,
+    residue_name: str,
+    s2: float = 0.85,
+    rng: Optional[random.Random] = None,
 ) -> float:
     r"""Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
 
@@ -162,7 +167,8 @@ def _calculate_bfactor(
         base_bfactor -= 3.0
 
     # Add small random variation
-    random_variation = np.random.uniform(-2.0, 2.0)
+    _rng = rng if rng is not None else random
+    random_variation = _rng.uniform(-2.0, 2.0)
 
     # Calculate final B-factor
     bfactor = base_bfactor + random_variation
@@ -174,7 +180,12 @@ def _calculate_bfactor(
 
 
 def _calculate_occupancy(
-    atom_name: str, residue_number: int, total_residues: int, residue_name: str, bfactor: float
+    atom_name: str,
+    residue_number: int,
+    total_residues: int,
+    residue_name: str,
+    bfactor: float,
+    rng: Optional[random.Random] = None,
 ) -> float:
     """Calculate realistic occupancy for an atom (0.85-1.00)."""
     backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
@@ -200,7 +211,8 @@ def _calculate_occupancy(
     bfactor_correlation = -0.08 * normalized_bfactor
 
     # Random variation
-    random_variation = np.random.uniform(-0.01, 0.01)
+    _rng = rng if rng is not None else random
+    random_variation = _rng.uniform(-0.01, 0.01)
 
     # Calculate and clamp
     occupancy = (
@@ -265,7 +277,7 @@ def _place_atom_with_dihedral(
 
 
 def _generate_random_amino_acid_sequence(
-    length: int, use_plausible_frequencies: bool = False
+    length: int, use_plausible_frequencies: bool = False, rng: Optional[random.Random] = None
 ) -> List[str]:
     """Generate a random amino acid sequence of a given length.
 
@@ -275,10 +287,14 @@ def _generate_random_amino_acid_sequence(
     Args:
         length: Number of residues to generate.
         use_plausible_frequencies: If True, uses biological distribution.
+        rng: Optional local random generator.
 
     Returns:
         List of 3-letter amino acid codes.
     """
+    # Use global random if no local rng provided (for backward compatibility)
+    _rng = rng if rng is not None else random
+
     # Handle potential non-standard types like numpy._NoValue
     if length is None or str(length) == "<no value>":
         return []
@@ -295,9 +311,9 @@ def _generate_random_amino_acid_sequence(
     if use_plausible_frequencies:
         amino_acids = list(AMINO_ACID_FREQUENCIES.keys())
         weights = list(AMINO_ACID_FREQUENCIES.values())
-        return random.choices(amino_acids, weights=weights, k=length)
+        return _rng.choices(amino_acids, weights=weights, k=length)
     else:
-        return [random.choice(STANDARD_AMINO_ACIDS) for _ in range(length)]
+        return [_rng.choice(STANDARD_AMINO_ACIDS) for _ in range(length)]
 
 
 def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
@@ -428,6 +444,7 @@ def _resolve_sequence(
     length: Optional[int],
     user_sequence_str: Optional[str] = None,
     use_plausible_frequencies: bool = False,
+    rng: Optional[random.Random] = None,
 ) -> List[str]:
     """Resolve the amino acid sequence from user input or random generation.
 
@@ -489,12 +506,12 @@ def _resolve_sequence(
     else:
         actual_length = length if length is not None else 20
         return _generate_random_amino_acid_sequence(
-            actual_length, use_plausible_frequencies=use_plausible_frequencies
+            actual_length, use_plausible_frequencies=use_plausible_frequencies, rng=rng
         )
 
 
 def _sample_ramachandran_angles(
-    res_name: str, next_res_name: Optional[str] = None
+    res_name: str, next_res_name: Optional[str] = None, rng: Optional[random.Random] = None
 ) -> Tuple[float, float]:
     """Sample phi/psi angles from Ramachandran probability distribution.
 
@@ -509,6 +526,7 @@ def _sample_ramachandran_angles(
     Args:
         res_name: Three-letter amino acid code
         next_res_name: (Optional) Code of the next residue
+        rng: Optional local random generator.
 
     Returns:
         Tuple of (phi, psi) angles in degrees
@@ -517,6 +535,8 @@ def _sample_ramachandran_angles(
         Lovell et al. (2003) Proteins: Structure, Function, and Bioinformatics
 
     """
+    _rng = rng if rng is not None else random
+
     # Get residue-specific or general distribution
     if res_name in RAMACHANDRAN_REGIONS:
         # GLY or PRO specific maps take precedence
@@ -533,12 +553,11 @@ def _sample_ramachandran_angles(
     weights = [r["weight"] for r in favored_regions]
 
     # Choose region based on weights
-    region_idx = np.random.choice(len(favored_regions), p=weights)
-    chosen_region = favored_regions[region_idx]
+    chosen_region = _rng.choices(favored_regions, weights=weights, k=1)[0]
 
     # Sample angles from Gaussian around region center
-    phi = np.random.normal(chosen_region["phi"], chosen_region["std"])
-    psi = np.random.normal(chosen_region["psi"], chosen_region["std"])
+    phi = _rng.normalvariate(chosen_region["phi"], chosen_region["std"])
+    psi = _rng.normalvariate(chosen_region["psi"], chosen_region["std"])
 
     # Wrap to [-180, 180]
     phi = ((phi + 180) % 360) - 180
@@ -841,7 +860,7 @@ def _build_peptide_chain(
                 current_psi = RAMACHANDRAN_PRESETS[res_conformation]["psi"]
             elif res_conformation == "random":
                 next_res_name = sequence[i + 1] if i + 1 < sequence_length else None
-                _, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
+                _, current_psi = _sample_ramachandran_angles(res_name, next_res_name, rng=rng)
             elif res_conformation in BETA_TURN_TYPES:
                 current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
             else:
@@ -899,7 +918,7 @@ def _build_peptide_chain(
                     if prev_full_res_name.startswith("D-")
                     else prev_full_res_name
                 )
-                _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name)
+                _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name, rng=rng)
             else:
                 prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
@@ -910,13 +929,13 @@ def _build_peptide_chain(
 
             # Place CA(i) — sample omega (including cis-proline)
             omega_mean = OMEGA_TRANS
-            if res_name == "PRO" and random.random() < cis_proline_frequency:
+            if res_name == "PRO" and rng.random() < cis_proline_frequency:
                 omega_mean = 0.0
 
             if omega_list is not None and i > 0 and (i - 1) < len(omega_list):
                 omega = omega_list[i - 1]
             else:
-                omega = np.random.normal(omega_mean, OMEGA_VARIATION)
+                omega = rng.normalvariate(omega_mean, OMEGA_VARIATION)
 
             ca_coord = _place_atom_with_dihedral(
                 prev_ca_coord, prev_c_coord, n_coord, BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
@@ -958,7 +977,7 @@ def _build_peptide_chain(
                     current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
             elif res_conformation == "random":
-                current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name)
+                current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name, rng=rng)
             else:
                 current_phi = RAMACHANDRAN_PRESETS["alpha"]["phi"]
                 current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
@@ -1036,7 +1055,7 @@ def _build_peptide_chain(
 
         if rotamers:
             weights = [float(r.get("prob", 0.0)) for r in rotamers]  # type: ignore[arg-type]
-            selected_rotamer = random.choices(rotamers, weights=weights, k=1)[0]
+            selected_rotamer = rng.choices(rotamers, weights=weights, k=1)[0]
 
             if "chi1" in selected_rotamer:
                 _chi1_val = selected_rotamer["chi1"]
@@ -1196,6 +1215,7 @@ def _apply_biophysical_mods(
     cyclic: bool,
     ph: float,
     metal_ions: str,
+    rng: Optional[random.Random] = None,
 ) -> struc.AtomArray:
     """Apply post-construction biophysical modifications in-place on a copy.
 
@@ -1234,7 +1254,7 @@ def _apply_biophysical_mods(
         peptide = biophysics.cap_termini(peptide)
 
     # 2. pH Titration (Protonation States)
-    peptide = biophysics.apply_ph_titration(peptide, ph=ph)
+    peptide = biophysics.apply_ph_titration(peptide, ph=ph, rng=rng)
 
     # EDUCATIONAL NOTE - Metal Ion Coordination (Phase 15):
     # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
@@ -1403,6 +1423,7 @@ def _assemble_pdb_output(
     atomic_and_ter_content: Optional[str],
     sequence_length: int,
     cyclic: bool,
+    rng: Optional[random.Random] = None,
 ) -> str:
     """Assemble the final PDB string with realistic B-factors, occupancy, and records.
 
@@ -1468,9 +1489,11 @@ def _assemble_pdb_output(
 
             current_s2 = s2_map.get(res_num, 0.85)
             bfactor = _calculate_bfactor(
-                atom_name, res_num, total_residues, res_name, s2=current_s2
+                atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
             )
-            occupancy = _calculate_occupancy(atom_name, res_num, total_residues, res_name, bfactor)
+            occupancy = _calculate_occupancy(
+                atom_name, res_num, total_residues, res_name, bfactor, rng=rng
+            )
             line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
 
         processed_lines.append(line)
@@ -1639,6 +1662,7 @@ def generate_pdb_content(
         length=length,
         user_sequence_str=sequence_str,
         use_plausible_frequencies=use_plausible_frequencies,
+        rng=rng,
     )
 
     # EDUCATIONAL NOTE - Post-Translational Modifications (PTMs):
@@ -1646,11 +1670,11 @@ def generate_pdb_content(
     if phosphorylation_rate > 0:
         modified_sequence = []
         for aa in sequence:
-            if aa == "SER" and random.random() < phosphorylation_rate:
+            if aa == "SER" and rng.random() < phosphorylation_rate:
                 modified_sequence.append("SEP")
-            elif aa == "THR" and random.random() < phosphorylation_rate:
+            elif aa == "THR" and rng.random() < phosphorylation_rate:
                 modified_sequence.append("TPO")
-            elif aa == "TYR" and random.random() < phosphorylation_rate:
+            elif aa == "TYR" and rng.random() < phosphorylation_rate:
                 modified_sequence.append("PTR")
             else:
                 modified_sequence.append(aa)
@@ -1692,6 +1716,7 @@ def generate_pdb_content(
         cyclic,
         ph,
         metal_ions,
+        rng=rng,
     )
 
     # Optional energy minimization / MD equilibration via OpenMM
@@ -1712,7 +1737,7 @@ def generate_pdb_content(
         )
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records
-    return _assemble_pdb_output(peptide, atomic_and_ter_content, sequence_length, cyclic)
+    return _assemble_pdb_output(peptide, atomic_and_ter_content, sequence_length, cyclic, rng=rng)
 
 
 class PeptideGenerator:
