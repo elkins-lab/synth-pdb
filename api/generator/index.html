@@ -4077,47 +4077,47 @@ Provides a cleaner API for interactive notebooks and complex workflows.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1718">1718</a></span>
-<span class="normal"><a href="#__codelineno-0-1719">1719</a></span>
-<span class="normal"><a href="#__codelineno-0-1720">1720</a></span>
-<span class="normal"><a href="#__codelineno-0-1721">1721</a></span>
-<span class="normal"><a href="#__codelineno-0-1722">1722</a></span>
-<span class="normal"><a href="#__codelineno-0-1723">1723</a></span>
-<span class="normal"><a href="#__codelineno-0-1724">1724</a></span>
-<span class="normal"><a href="#__codelineno-0-1725">1725</a></span>
-<span class="normal"><a href="#__codelineno-0-1726">1726</a></span>
-<span class="normal"><a href="#__codelineno-0-1727">1727</a></span>
-<span class="normal"><a href="#__codelineno-0-1728">1728</a></span>
-<span class="normal"><a href="#__codelineno-0-1729">1729</a></span>
-<span class="normal"><a href="#__codelineno-0-1730">1730</a></span>
-<span class="normal"><a href="#__codelineno-0-1731">1731</a></span>
-<span class="normal"><a href="#__codelineno-0-1732">1732</a></span>
-<span class="normal"><a href="#__codelineno-0-1733">1733</a></span>
-<span class="normal"><a href="#__codelineno-0-1734">1734</a></span>
-<span class="normal"><a href="#__codelineno-0-1735">1735</a></span>
-<span class="normal"><a href="#__codelineno-0-1736">1736</a></span>
-<span class="normal"><a href="#__codelineno-0-1737">1737</a></span>
-<span class="normal"><a href="#__codelineno-0-1738">1738</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1718"><a id="__codelineno-0-1718" name="__codelineno-0-1718"></a><span class="k">class</span><span class="w"> </span><span class="nc">PeptideGenerator</span><span class="p">:</span>
-</span><span id="__span-0-1719"><a id="__codelineno-0-1719" name="__codelineno-0-1719"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Object-oriented wrapper for protein structure generation.</span>
-</span><span id="__span-0-1720"><a id="__codelineno-0-1720" name="__codelineno-0-1720"></a><span class="sd">    Provides a cleaner API for interactive notebooks and complex workflows.</span>
-</span><span id="__span-0-1721"><a id="__codelineno-0-1721" name="__codelineno-0-1721"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-1722"><a id="__codelineno-0-1722" name="__codelineno-0-1722"></a>
-</span><span id="__span-0-1723"><a id="__codelineno-0-1723" name="__codelineno-0-1723"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-1724"><a id="__codelineno-0-1724" name="__codelineno-0-1724"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-</span><span id="__span-0-1725"><a id="__codelineno-0-1725" name="__codelineno-0-1725"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
-</span><span id="__span-0-1726"><a id="__codelineno-0-1726" name="__codelineno-0-1726"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PeptideResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-0-1727"><a id="__codelineno-0-1727" name="__codelineno-0-1727"></a>
-</span><span id="__span-0-1728"><a id="__codelineno-0-1728" name="__codelineno-0-1728"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
-</span><span id="__span-0-1729"><a id="__codelineno-0-1729" name="__codelineno-0-1729"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.&quot;&quot;&quot;</span>
-</span><span id="__span-0-1730"><a id="__codelineno-0-1730" name="__codelineno-0-1730"></a>        <span class="c1"># Merge init config with call-time overrides</span>
-</span><span id="__span-0-1731"><a id="__codelineno-0-1731" name="__codelineno-0-1731"></a>        <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
-</span><span id="__span-0-1732"><a id="__codelineno-0-1732" name="__codelineno-0-1732"></a>
-</span><span id="__span-0-1733"><a id="__codelineno-0-1733" name="__codelineno-0-1733"></a>        <span class="c1"># Call the functional generator</span>
-</span><span id="__span-0-1734"><a id="__codelineno-0-1734" name="__codelineno-0-1734"></a>        <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
-</span><span id="__span-0-1735"><a id="__codelineno-0-1735" name="__codelineno-0-1735"></a>
-</span><span id="__span-0-1736"><a id="__codelineno-0-1736" name="__codelineno-0-1736"></a>        <span class="c1"># Package into a Result object for easy access</span>
-</span><span id="__span-0-1737"><a id="__codelineno-0-1737" name="__codelineno-0-1737"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
-</span><span id="__span-0-1738"><a id="__codelineno-0-1738" name="__codelineno-0-1738"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
+                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1743">1743</a></span>
+<span class="normal"><a href="#__codelineno-0-1744">1744</a></span>
+<span class="normal"><a href="#__codelineno-0-1745">1745</a></span>
+<span class="normal"><a href="#__codelineno-0-1746">1746</a></span>
+<span class="normal"><a href="#__codelineno-0-1747">1747</a></span>
+<span class="normal"><a href="#__codelineno-0-1748">1748</a></span>
+<span class="normal"><a href="#__codelineno-0-1749">1749</a></span>
+<span class="normal"><a href="#__codelineno-0-1750">1750</a></span>
+<span class="normal"><a href="#__codelineno-0-1751">1751</a></span>
+<span class="normal"><a href="#__codelineno-0-1752">1752</a></span>
+<span class="normal"><a href="#__codelineno-0-1753">1753</a></span>
+<span class="normal"><a href="#__codelineno-0-1754">1754</a></span>
+<span class="normal"><a href="#__codelineno-0-1755">1755</a></span>
+<span class="normal"><a href="#__codelineno-0-1756">1756</a></span>
+<span class="normal"><a href="#__codelineno-0-1757">1757</a></span>
+<span class="normal"><a href="#__codelineno-0-1758">1758</a></span>
+<span class="normal"><a href="#__codelineno-0-1759">1759</a></span>
+<span class="normal"><a href="#__codelineno-0-1760">1760</a></span>
+<span class="normal"><a href="#__codelineno-0-1761">1761</a></span>
+<span class="normal"><a href="#__codelineno-0-1762">1762</a></span>
+<span class="normal"><a href="#__codelineno-0-1763">1763</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1743"><a id="__codelineno-0-1743" name="__codelineno-0-1743"></a><span class="k">class</span><span class="w"> </span><span class="nc">PeptideGenerator</span><span class="p">:</span>
+</span><span id="__span-0-1744"><a id="__codelineno-0-1744" name="__codelineno-0-1744"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Object-oriented wrapper for protein structure generation.</span>
+</span><span id="__span-0-1745"><a id="__codelineno-0-1745" name="__codelineno-0-1745"></a><span class="sd">    Provides a cleaner API for interactive notebooks and complex workflows.</span>
+</span><span id="__span-0-1746"><a id="__codelineno-0-1746" name="__codelineno-0-1746"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-1747"><a id="__codelineno-0-1747" name="__codelineno-0-1747"></a>
+</span><span id="__span-0-1748"><a id="__codelineno-0-1748" name="__codelineno-0-1748"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-1749"><a id="__codelineno-0-1749" name="__codelineno-0-1749"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+</span><span id="__span-0-1750"><a id="__codelineno-0-1750" name="__codelineno-0-1750"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+</span><span id="__span-0-1751"><a id="__codelineno-0-1751" name="__codelineno-0-1751"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PeptideResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-1752"><a id="__codelineno-0-1752" name="__codelineno-0-1752"></a>
+</span><span id="__span-0-1753"><a id="__codelineno-0-1753" name="__codelineno-0-1753"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
+</span><span id="__span-0-1754"><a id="__codelineno-0-1754" name="__codelineno-0-1754"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.&quot;&quot;&quot;</span>
+</span><span id="__span-0-1755"><a id="__codelineno-0-1755" name="__codelineno-0-1755"></a>        <span class="c1"># Merge init config with call-time overrides</span>
+</span><span id="__span-0-1756"><a id="__codelineno-0-1756" name="__codelineno-0-1756"></a>        <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+</span><span id="__span-0-1757"><a id="__codelineno-0-1757" name="__codelineno-0-1757"></a>
+</span><span id="__span-0-1758"><a id="__codelineno-0-1758" name="__codelineno-0-1758"></a>        <span class="c1"># Call the functional generator</span>
+</span><span id="__span-0-1759"><a id="__codelineno-0-1759" name="__codelineno-0-1759"></a>        <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
+</span><span id="__span-0-1760"><a id="__codelineno-0-1760" name="__codelineno-0-1760"></a>
+</span><span id="__span-0-1761"><a id="__codelineno-0-1761" name="__codelineno-0-1761"></a>        <span class="c1"># Package into a Result object for easy access</span>
+</span><span id="__span-0-1762"><a id="__codelineno-0-1762" name="__codelineno-0-1762"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
+</span><span id="__span-0-1763"><a id="__codelineno-0-1763" name="__codelineno-0-1763"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
 </span></code></pre></div></td></tr></table></div>
               </details>
 
@@ -4148,13 +4148,13 @@ Provides a cleaner API for interactive notebooks and complex workflows.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1723">1723</a></span>
-<span class="normal"><a href="#__codelineno-0-1724">1724</a></span>
-<span class="normal"><a href="#__codelineno-0-1725">1725</a></span>
-<span class="normal"><a href="#__codelineno-0-1726">1726</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1723"><a id="__codelineno-0-1723" name="__codelineno-0-1723"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-1724"><a id="__codelineno-0-1724" name="__codelineno-0-1724"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-</span><span id="__span-0-1725"><a id="__codelineno-0-1725" name="__codelineno-0-1725"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
-</span><span id="__span-0-1726"><a id="__codelineno-0-1726" name="__codelineno-0-1726"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PeptideResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1748">1748</a></span>
+<span class="normal"><a href="#__codelineno-0-1749">1749</a></span>
+<span class="normal"><a href="#__codelineno-0-1750">1750</a></span>
+<span class="normal"><a href="#__codelineno-0-1751">1751</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1748"><a id="__codelineno-0-1748" name="__codelineno-0-1748"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-1749"><a id="__codelineno-0-1749" name="__codelineno-0-1749"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+</span><span id="__span-0-1750"><a id="__codelineno-0-1750" name="__codelineno-0-1750"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+</span><span id="__span-0-1751"><a id="__codelineno-0-1751" name="__codelineno-0-1751"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PeptideResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4177,27 +4177,27 @@ Provides a cleaner API for interactive notebooks and complex workflows.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1728">1728</a></span>
-<span class="normal"><a href="#__codelineno-0-1729">1729</a></span>
-<span class="normal"><a href="#__codelineno-0-1730">1730</a></span>
-<span class="normal"><a href="#__codelineno-0-1731">1731</a></span>
-<span class="normal"><a href="#__codelineno-0-1732">1732</a></span>
-<span class="normal"><a href="#__codelineno-0-1733">1733</a></span>
-<span class="normal"><a href="#__codelineno-0-1734">1734</a></span>
-<span class="normal"><a href="#__codelineno-0-1735">1735</a></span>
-<span class="normal"><a href="#__codelineno-0-1736">1736</a></span>
-<span class="normal"><a href="#__codelineno-0-1737">1737</a></span>
-<span class="normal"><a href="#__codelineno-0-1738">1738</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1728"><a id="__codelineno-0-1728" name="__codelineno-0-1728"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
-</span><span id="__span-0-1729"><a id="__codelineno-0-1729" name="__codelineno-0-1729"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.&quot;&quot;&quot;</span>
-</span><span id="__span-0-1730"><a id="__codelineno-0-1730" name="__codelineno-0-1730"></a>    <span class="c1"># Merge init config with call-time overrides</span>
-</span><span id="__span-0-1731"><a id="__codelineno-0-1731" name="__codelineno-0-1731"></a>    <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
-</span><span id="__span-0-1732"><a id="__codelineno-0-1732" name="__codelineno-0-1732"></a>
-</span><span id="__span-0-1733"><a id="__codelineno-0-1733" name="__codelineno-0-1733"></a>    <span class="c1"># Call the functional generator</span>
-</span><span id="__span-0-1734"><a id="__codelineno-0-1734" name="__codelineno-0-1734"></a>    <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
-</span><span id="__span-0-1735"><a id="__codelineno-0-1735" name="__codelineno-0-1735"></a>
-</span><span id="__span-0-1736"><a id="__codelineno-0-1736" name="__codelineno-0-1736"></a>    <span class="c1"># Package into a Result object for easy access</span>
-</span><span id="__span-0-1737"><a id="__codelineno-0-1737" name="__codelineno-0-1737"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
-</span><span id="__span-0-1738"><a id="__codelineno-0-1738" name="__codelineno-0-1738"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1753">1753</a></span>
+<span class="normal"><a href="#__codelineno-0-1754">1754</a></span>
+<span class="normal"><a href="#__codelineno-0-1755">1755</a></span>
+<span class="normal"><a href="#__codelineno-0-1756">1756</a></span>
+<span class="normal"><a href="#__codelineno-0-1757">1757</a></span>
+<span class="normal"><a href="#__codelineno-0-1758">1758</a></span>
+<span class="normal"><a href="#__codelineno-0-1759">1759</a></span>
+<span class="normal"><a href="#__codelineno-0-1760">1760</a></span>
+<span class="normal"><a href="#__codelineno-0-1761">1761</a></span>
+<span class="normal"><a href="#__codelineno-0-1762">1762</a></span>
+<span class="normal"><a href="#__codelineno-0-1763">1763</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1753"><a id="__codelineno-0-1753" name="__codelineno-0-1753"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
+</span><span id="__span-0-1754"><a id="__codelineno-0-1754" name="__codelineno-0-1754"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.&quot;&quot;&quot;</span>
+</span><span id="__span-0-1755"><a id="__codelineno-0-1755" name="__codelineno-0-1755"></a>    <span class="c1"># Merge init config with call-time overrides</span>
+</span><span id="__span-0-1756"><a id="__codelineno-0-1756" name="__codelineno-0-1756"></a>    <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+</span><span id="__span-0-1757"><a id="__codelineno-0-1757" name="__codelineno-0-1757"></a>
+</span><span id="__span-0-1758"><a id="__codelineno-0-1758" name="__codelineno-0-1758"></a>    <span class="c1"># Call the functional generator</span>
+</span><span id="__span-0-1759"><a id="__codelineno-0-1759" name="__codelineno-0-1759"></a>    <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
+</span><span id="__span-0-1760"><a id="__codelineno-0-1760" name="__codelineno-0-1760"></a>
+</span><span id="__span-0-1761"><a id="__codelineno-0-1761" name="__codelineno-0-1761"></a>    <span class="c1"># Package into a Result object for easy access</span>
+</span><span id="__span-0-1762"><a id="__codelineno-0-1762" name="__codelineno-0-1762"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
+</span><span id="__span-0-1763"><a id="__codelineno-0-1763" name="__codelineno-0-1763"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4693,7 +4693,7 @@ are covalently linked. This has profound biological implications:
 
 
 <h2 id="synth_pdb.generator._resolve_sequence" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">_resolve_sequence</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">user_sequence_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_plausible_frequencies</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">_resolve_sequence</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">user_sequence_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_plausible_frequencies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -4797,7 +4797,7 @@ are covalently linked. This has profound biological implications:
 
 
 <h2 id="synth_pdb.generator._sample_ramachandran_angles" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">_sample_ramachandran_angles</span><span class="p">(</span><span class="n">res_name</span><span class="p">,</span> <span class="n">next_res_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">_sample_ramachandran_angles</span><span class="p">(</span><span class="n">res_name</span><span class="p">,</span> <span class="n">next_res_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -4850,6 +4850,22 @@ uses a specific 'PRE_PRO' distribution (favors beta/extended).</p>
             <td>
               <div class="doc-md-description">
                 <p>(Optional) Code of the next residue</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>rng</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="random.Random">Random</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional local random generator.</p>
               </div>
             </td>
             <td>
