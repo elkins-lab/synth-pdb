@@ -47,8 +47,9 @@ def test_bfactor_reflects_dynamics():
 def test_bfactor_loop_vs_helix():
     """Verify that loop regions have higher B-factors than helical regions."""
     # Generate a structure with explicit regions: helix-loop-helix
+    # Use a longer sequence to get more stable averages
     pdb_content = generate_pdb_content(
-        sequence_str="A" * 20, structure="1-7:alpha,8-13:random,14-20:alpha", seed=42
+        sequence_str="A" * 40, structure="1-15:alpha,16-25:random,26-40:alpha", seed=42
     )
 
     # Manually parse B-factors
@@ -59,13 +60,16 @@ def test_bfactor_loop_vs_helix():
             bf = float(line[60:66].strip())
             bfactors[res_id] = bf
 
-    # Helix regions: 3-6, 15-18 (avoiding termini effects)
-    # Loop region: 10-11
-    helix_bfactor = np.mean([bfactors[i] for i in [4, 5, 16, 17] if i in bfactors])
-    loop_bfactor = np.mean([bfactors[i] for i in [10, 11] if i in bfactors])
+    # Helix regions: 5-10, 30-35 (avoiding termini effects and transition regions)
+    helix_res = list(range(5, 11)) + list(range(30, 36))
+    loop_res = list(range(18, 23))
+
+    helix_bfactor = np.mean([bfactors[i] for i in helix_res if i in bfactors])
+    loop_bfactor = np.mean([bfactors[i] for i in loop_res if i in bfactors])
 
     logger.info(f"Helix avg B-factor: {helix_bfactor:.2f}")
     logger.info(f"Loop avg B-factor: {loop_bfactor:.2f}")
 
     # Loop should be more flexible (higher B-factor)
-    assert loop_bfactor > helix_bfactor, "Loop regions should have higher B-factors than helices"
+    # We use a small delta to ensure it's meaningfully higher, or just > if we use enough residues
+    assert loop_bfactor > helix_bfactor, f"Loop regions ({loop_bfactor:.2f}) should have higher B-factors than helices ({helix_bfactor:.2f})"
