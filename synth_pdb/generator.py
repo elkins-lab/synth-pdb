@@ -66,7 +66,7 @@ PHI_ALPHA_HELIX = -57.0
 PSI_ALPHA_HELIX = -47.0
 # Ideal Omega for trans peptide bond
 OMEGA_TRANS = 180.0
-OMEGA_VARIATION = 5.0  # degrees - adds thermal fluctuation to peptide bond
+OMEGA_VARIATION = 4.0  # degrees - adds thermal fluctuation to peptide bond
 
 logger = logging.getLogger(__name__)
 
@@ -838,8 +838,7 @@ def _build_peptide_chain(
         # Determine conformation for this residue
         res_conformation = residue_conformations.get(i, conformation)
         if res_conformation == "alpha" and not structure:
-            cys_count = sum(1 for aa in sequence if "CYS" in aa.upper() or "DCY" in aa.upper())
-            if cyclic or cys_count >= 2:
+            if cyclic:
                 res_conformation = "curved"
 
         # Compatibility alias for rotamer selection logic downstream

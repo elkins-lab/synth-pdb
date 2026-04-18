@@ -14,11 +14,11 @@ from synth_pdb.geometry.dihedral import calculate_angle, calculate_dihedral
 from synth_pdb.geometry.nerf import position_atom_3d_from_internal_coords
 
 
-def get_peptide_structure(sequence="ACDEFGHIKLMNPQRSTVWY", conformation="alpha", length=None):
+def get_peptide_structure(sequence="ACDEFGHIKLMNPQRSTVWY", conformation="alpha", length=None, seed=42):
     """Helper to generate a standard peptide AtomArray."""
     if length:
         sequence = "A" * length
-    pdb_content = generate_pdb_content(sequence_str=sequence, conformation=conformation)
+    pdb_content = generate_pdb_content(sequence_str=sequence, conformation=conformation, seed=seed)
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
     return pdb_file.get_structure(model=1)
 
