@@ -49,7 +49,9 @@ def test_salt_bridge_detection_in_minimization(caplog):
 def test_hetatm_restoration(caplog):
     """Test that HETATMs (like ZN) are restored if culled by OpenMM."""
     # Zinc finger-like sequence - needs 4 ligands (Cys or His)
-    sequence = "CPYCKCPYCK"  # 4 Cysteines
+    # CPCKCPCK is more compact than CPYCKCPYCK, ensuring cluster detection
+    # at the default 10A threshold in an alpha-helix.
+    sequence = "CPCKCPCK"  # 4 Cysteines
 
     with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False) as tmp_in:
         # Generate with Zinc
