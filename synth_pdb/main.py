@@ -190,6 +190,11 @@ def main() -> None:
         help="Optional: Path to an NMR NOE restraint file (.nef or .restraints) for RPF validation.",
     )
     parser.add_argument(
+        "--rdc-restraints",
+        type=str,
+        help="Optional: Path to an NMR RDC restraint file for Q-factor validation.",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="Open generated structure in browser-based 3D viewer (uses 3Dmol.js). Interactive visualization with rotation, zoom, and style controls.",
@@ -946,9 +951,9 @@ def main() -> None:
             parts = args.structure.split(",")
             for part in parts:
                 if ":" in part:
-                    rng, s_type = part.split(":")
-                    if "-" in rng:
-                        start_s, end_s = rng.split("-")
+                    res_range, s_type = part.split(":")
+                    if "-" in res_range:
+                        start_s, end_s = res_range.split("-")
                         start, end = int(start_s), int(end_s)
 
                         # Only highlight specific turns or interesting features
@@ -1136,6 +1141,7 @@ def main() -> None:
                 if (
                     args.gen_nef
                     or args.restraints
+                    or args.rdc_restraints
                     or args.gen_relax
                     or args.gen_shifts
                     or args.gen_couplings
@@ -1172,6 +1178,7 @@ def main() -> None:
                             calculate_synthetic_noes,
                             read_restraint_file,
                         )
+                        from .rdc import calculate_rdc_q_factor, calculate_rdcs, read_rdc_file
                         from .relaxation import calculate_relaxation_rates
                         from .torsion import calculate_torsion_angles, export_torsion_angles
 
@@ -1199,6 +1206,58 @@ def main() -> None:
 
                             except Exception as e:
                                 logger.error(f"RPF Validation failed: {e}")
+
+                        # RDC Q-factor Validation
+                        if args.rdc_restraints:
+                            logger.info(
+                                f"Performing RDC Validation against {args.rdc_restraints}..."
+                            )
+                            try:
+                                target_rdcs = read_rdc_file(args.rdc_restraints)
+                                # Back-calculate RDCs from model
+                                # We use the same Da/R as provided or defaults
+                                calc_rdcs_dict = calculate_rdcs(
+                                    structure, Da=args.rdc_da, R=args.rdc_r
+                                )
+
+                                # Align obs and calc
+                                obs_vals = []
+                                calc_vals = []
+                                for target in target_rdcs:
+                                    # Try matching by residue index (common for NH RDCs)
+                                    res_key = target["res_1"]
+                                    # Try matching by full atom tuple
+                                    tuple_key = (
+                                        target["res_1"],
+                                        target["atom_1"],
+                                        target["res_2"],
+                                        target["atom_2"],
+                                    )
+
+                                    if tuple_key in calc_rdcs_dict:
+                                        obs_vals.append(target["value"])
+                                        calc_vals.append(calc_rdcs_dict[tuple_key])
+                                    elif res_key in calc_rdcs_dict:
+                                        obs_vals.append(target["value"])
+                                        calc_vals.append(calc_rdcs_dict[res_key])
+
+                                if obs_vals:
+                                    q_factor = calculate_rdc_q_factor(
+                                        np.array(obs_vals), np.array(calc_vals)
+                                    )
+
+                                    # Print RDC Report
+                                    print("\n" + "=" * 40)
+                                    print("--- NMR RDC Validation Report ---")
+                                    print(f"File: {args.rdc_restraints}")
+                                    print(f"Q-factor: {q_factor:.4f}")
+                                    print(f"Entries:  {len(obs_vals)}")
+                                    print("=" * 40 + "\n")
+                                else:
+                                    logger.warning("No matching RDC entries found for validation.")
+
+                            except Exception as e:
+                                logger.error(f"RDC Validation failed: {e}")
 
                         # Sequence inference
                         res_names = [

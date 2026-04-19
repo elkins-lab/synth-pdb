@@ -1227,8 +1227,8 @@ pytest --cov=synth_pdb --cov-report=term-missing
 pytest tests/test_generator.py -v
 ```
 
-**Test Coverage**: 95% overall
-- 800 tests covering generation, validation, CLI, and edge cases
+**Test Coverage**: 87% overall
+- 832 tests covering generation, validation, CLI, and edge cases
 
 ### Project Structure
 
