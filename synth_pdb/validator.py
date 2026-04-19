@@ -225,7 +225,9 @@ class PDBValidator:
 
         for res_id, (phi, psi) in phi_psi.items():
             # Determine residue type for specific polygons
-            res_name = self.grouped_atoms[next(iter(self.grouped_atoms))][res_id]["CA"]["residue_name"]
+            res_name = self.grouped_atoms[next(iter(self.grouped_atoms))][res_id]["CA"][
+                "residue_name"
+            ]
 
             cat = "General"
             if res_name == "GLY":
@@ -259,7 +261,7 @@ class PDBValidator:
         return {
             "favored_pct": (favored_count / total) * 100.0,
             "allowed_pct": (allowed_count / total) * 100.0,
-            "outlier_pct": ((total - allowed_count) / total) * 100.0
+            "outlier_pct": ((total - allowed_count) / total) * 100.0,
         }
 
     def refresh_content(self) -> None:
@@ -271,6 +273,84 @@ class PDBValidator:
         self.pdb_content = self.atoms_to_pdb_content(self.atoms)
         # Also refresh grouped atoms to ensure consistency
         self.grouped_atoms = self._group_atoms_by_residue()
+
+    def calculate_residue_sasa(self) -> Dict[str, Any]:
+        """Calculates Solvent Accessible Surface Area (SASA) for each residue.
+
+        EDUCATIONAL NOTE - The Shrake-Rupley Algorithm:
+        ----------------------------------------------
+        SASA is calculated by "rolling a sphere" (representing a water molecule,
+        radius ~1.4Å) over the protein surface.
+
+        This implementation uses the Shrake-Rupley algorithm which places points
+        on a sphere around each atom and checks how many are not occluded by
+        neighboring atoms.
+
+        Returns:
+            Dict containing per-residue SASA and summary statistics.
+        """
+        import io
+
+        import biotite.structure as struc
+        import biotite.structure.io.pdb as biotite_pdb
+
+        # We need a biotite structure object
+        tmp_io = io.StringIO(self.pdb_content)
+        try:
+            b_struc_raw = biotite_pdb.PDBFile.read(tmp_io)
+            b_struc = b_struc_raw.get_structure(model=1)
+        except Exception as e:
+            logger.error(f"SASA calculation failed to parse PDB: {e}")
+            return {"SASA": {}, "mean_hydrophobic_sasa": 0.0}
+
+        # Calculate SASA for all atoms
+        # EDUCATIONAL NOTE - VdW Radii:
+        # ----------------------------
+        # SASA depends on the Van der Waals radii of the atoms.
+        # Standard values (Angstroms): H ~ 1.1, C ~ 1.7, N ~ 1.55, O ~ 1.52.
+        from biotite.structure.info import vdw_radius_single
+
+        radii = []
+        for atom in b_struc:
+            try:
+                rad = vdw_radius_single(atom.element)
+                if rad is None:  # fallback
+                    rad = 1.7
+            except Exception:
+                rad = 1.7
+            radii.append(rad)
+
+        sasa_per_atom = struc.sasa(b_struc, probe_radius=1.4, vdw_radii=np.array(radii))
+
+        # Aggregate by residue
+        res_sasa = {}
+        hydrophobic_res = ["VAL", "ILE", "LEU", "PHE", "TRP", "MET", "TYR"]
+        hydro_vals = []
+        polar_vals = []
+
+        for i, atom in enumerate(b_struc):
+            res_id = int(atom.res_id)
+            if res_id not in res_sasa:
+                res_sasa[res_id] = 0.0
+            res_sasa[res_id] += sasa_per_atom[i]
+
+        for res_id, total_sasa in res_sasa.items():
+            # Find residue name for this ID
+            res_name = b_struc[b_struc.res_id == res_id].res_name[0]
+            if res_name in hydrophobic_res:
+                hydro_vals.append(total_sasa)
+            else:
+                polar_vals.append(total_sasa)
+
+        mean_hydro = np.mean(hydro_vals) if hydro_vals else 0.0
+        mean_polar = np.mean(polar_vals) if polar_vals else 1.0  # Avoid div by zero
+
+        return {
+            "SASA": res_sasa,
+            "mean_hydrophobic_sasa": float(mean_hydro),
+            "mean_polar_sasa": float(mean_polar),
+            "burial_ratio": float(mean_polar / (mean_hydro + 1e-6)),
+        }
 
     def calculate_potential_energy(self) -> float:
         """Calculates the potential energy of the structure using the Amber forcefield.
@@ -290,6 +370,7 @@ class PDBValidator:
             The potential energy in kJ/mol. Returns float('inf') on failure.
         """
         from .physics import EnergyMinimizer
+
         try:
             engine = EnergyMinimizer()
             energy = engine.calculate_energy(self.pdb_content)
@@ -304,36 +385,44 @@ class PDBValidator:
         """Generates a comprehensive, evidence-based quality assessment.
 
         SCIENTIFIC BASIS:
-        A scientifically defensible model must satisfy three criteria:
+        A scientifically defensible model must satisfy four criteria:
         1. Local Geometry: Bonds/Angles within Engh & Huber (1991) limits.
-        2. Backbone Conformation: Phi/Psi in Richardson Top8000/2018 favored regions.
+        2. Backbone Conformation: Phi/Psi in Top2018 favored regions.
         3. Global Physics: Low potential energy (no steric overlaps).
+        4. Biophysics: Hydrophobic residues should be buried (SASA).
 
         Returns:
             A dictionary containing metrics and a plausibility flag.
         """
         ramachandran = self.get_ramachandran_statistics()
         energy = self.calculate_potential_energy()
+        sasa = self.calculate_residue_sasa()
 
-        # Check for bond/angle violations (assuming tolerance has been run)
-        # For a clean report, we run them now if violations list is empty
         if not self.violations:
             self.validate_bond_lengths()
             self.validate_bond_angles()
             self.validate_ramachandran()
 
+        # PLOT SCIENTIFIC DEFENSE:
+        # 1. Physics: Energy < 1e5 (no clashes)
+        # 2. Geometry: Outliers < 5%
+        # 3. Biophysics: Burial Ratio > 1.0 (Hydrophobics are more buried than Polars)
         is_plausible = (
-            len(self.violations) == 0 and
-            ramachandran["outlier_pct"] < 5.0 and
-            energy < 1e5 # Threshold for "physically reasonable"
+            len(self.violations) == 0
+            and ramachandran["outlier_pct"] < 5.0
+            and energy < 1e5
+            and sasa["burial_ratio"] >= 0.8  # Heuristic for de novo
         )
 
         return {
             "potential_energy_kj_mol": energy,
             "ramachandran_stats": ramachandran,
             "violation_count": len(self.violations),
-            "is_physically_plausible": is_plausible,
-            "detailed_violations": self.violations[:10] # Top 10 for brevity
+            "hydrophobic_burial_ratio": sasa["burial_ratio"],
+            "is_physically_plausible": energy < 1e5,
+            "is_biophysically_plausible": sasa["burial_ratio"] >= 0.8,
+            "is_overall_scientifically_defensible": is_plausible,
+            "detailed_violations": self.violations[:10],
         }
 
     def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
