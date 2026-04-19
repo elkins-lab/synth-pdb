@@ -300,7 +300,7 @@ class TestGenerator(unittest.TestCase):
     def test_generate_pdb_content_atom_residue_numbers(self):
         """Test if atom and residue numbers are sequential for full-atom."""
         length = 3
-        content = generate_pdb_content(length=length)
+        content = generate_pdb_content(length=length, metal_ions="none")
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as temp_pdb_file:
             temp_pdb_file.write(content)
@@ -687,7 +687,7 @@ class TestGenerator(unittest.TestCase):
         """
         peptide_length = 10
         # Now generate_pdb_content always produces full-atom
-        content = generate_pdb_content(length=peptide_length)
+        content = generate_pdb_content(length=peptide_length, metal_ions="none")
 
         # Save to a temporary file and load with biotite to get AtomArray
         with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as temp_pdb_file:
