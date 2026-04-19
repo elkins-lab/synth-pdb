@@ -21,7 +21,6 @@ logging.getLogger().setLevel(logging.CRITICAL)
 
 
 class TestGenerator(unittest.TestCase):
-
     def _parse_atom_line(self, line: str) -> dict:
         """Parses an ATOM PDB line and returns a dictionary of atom properties."""
         return {
@@ -337,7 +336,7 @@ class TestGenerator(unittest.TestCase):
     def test_generate_pdb_content_residue_names(self):
         """Test if residue names are valid for full-atom."""
         length = 5
-        content = generate_pdb_content(length=length)
+        content = generate_pdb_content(length=length, metal_ions="none")
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as temp_pdb_file:
             temp_pdb_file.write(content)
