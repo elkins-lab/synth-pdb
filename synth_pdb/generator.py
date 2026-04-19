@@ -991,12 +991,6 @@ def _build_peptide_chain(
                 current_phi = ((current_phi + 180) % 360) - 180
                 current_psi = ((current_psi + 180) % 360) - 180
 
-            # Place C(i)
-            # D-amino acids invert the chirality by negating phi/psi before placement
-            if is_d:
-                current_phi *= -1.0
-                current_psi *= -1.0
-
             c_coord = _place_atom_with_dihedral(
                 prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
             )
@@ -1120,46 +1114,45 @@ def _build_peptide_chain(
         template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
         template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
         template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
-        template_backbone_o = ref_res_template[ref_res_template.atom_name == "O"]
         mobile_backbone_from_template = (
-            template_backbone_n + template_backbone_ca + template_backbone_c + template_backbone_o
+            template_backbone_n + template_backbone_ca + template_backbone_c
         )
 
-        if len(mobile_backbone_from_template) != 4:
-            # Fallback to 3 atoms if O is somehow missing (shouldn't happen for standard AAs)
-            mobile_backbone_from_template = (
-                template_backbone_n + template_backbone_ca + template_backbone_c
+        if len(mobile_backbone_from_template) != 3:
+            raise ValueError(
+                f"Reference residue template for {res_name} is missing required "
+                f"backbone atoms (N, CA, C) for superimposition. "
+                f"Found atoms: {list(mobile_backbone_from_template.atom_name)}"
             )
 
-        target_atoms = [
-            struc.Atom(
-                n_coord, atom_name="N", res_id=res_id, res_name=res_name, element="N", hetero=False
-            ),
-            struc.Atom(
-                ca_coord,
-                atom_name="CA",
-                res_id=res_id,
-                res_name=res_name,
-                element="C",
-                hetero=False,
-            ),
-            struc.Atom(
-                c_coord, atom_name="C", res_id=res_id, res_name=res_name, element="C", hetero=False
-            ),
-        ]
-        if len(mobile_backbone_from_template) == 4:
-            target_atoms.append(
+        target_backbone_constructed = struc.array(
+            [
                 struc.Atom(
-                    o_coord,
-                    atom_name="O",
+                    n_coord,
+                    atom_name="N",
                     res_id=res_id,
                     res_name=res_name,
-                    element="O",
+                    element="N",
                     hetero=False,
-                )
-            )
-
-        target_backbone_constructed = struc.array(target_atoms)
+                ),
+                struc.Atom(
+                    ca_coord,
+                    atom_name="CA",
+                    res_id=res_id,
+                    res_name=res_name,
+                    element="C",
+                    hetero=False,
+                ),
+                struc.Atom(
+                    c_coord,
+                    atom_name="C",
+                    res_id=res_id,
+                    res_name=res_name,
+                    element="C",
+                    hetero=False,
+                ),
+            ]
+        )
 
         # AHA MOMENT - Superimposition Direction:
         # In the "AI Trinity" debugging phase, we found that residues were disconnected
