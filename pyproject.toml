@@ -66,6 +66,7 @@ dev = [
     "pre-commit>=3.0.0",
     "scikit-learn>=1.0.0",  # for test_train_quality_filter dynamic script load
     "joblib>=1.1.0",        # for test_train_quality_filter dynamic script load
+    "types-requests",
 ]
 test = [
     "pynmrstar",
@@ -177,13 +178,7 @@ module = [
     "numpy.*",
     "openmm.*",
     "torch.*",
-    "jax.*",
     "numba.*",
-    "py3Dmol.*",
-    "sklearn.*",
-    "umap.*",
-    "plotly.*",
-    "ipywidgets.*",
     "synth_nmr.*",
     "torch_geometric.*",
     "transformers.*",
