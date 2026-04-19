@@ -137,8 +137,9 @@ SVD FITTING VS BACK-CALCULATION:
 There are two primary ways to compare model RDCs to experimental RDCs:
 
 A. BACK-CALCULATION (Used here):
-   Given a model and a KNOWN alignment tensor (Da, R, and orientation),
-   calculate the predicted RDC values. This is useful when the alignment
+   Given a structure and an alignment tensor (Da, R), we predict the RDCs.
+   This is useful for cross-validating a known structure against new data.
+
    parameters are already established.
 
 B. SVD FITTING (Singular Value Decomposition):

@@ -158,6 +158,12 @@ addopts = [
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "benchmark: marks tests as benchmarks",
+    "network: marks tests that require network access (BMRB API, etc.)",
+]
+filterwarnings = [
+    "ignore:.*Passing None into shape arguments.*:DeprecationWarning",
+    "ignore:.*invalid value encountered in divide.*:RuntimeWarning",
+    "ignore:.*Input structure has no associated 'BondList'.*:UserWarning",
 ]
 
 [tool.mypy]
