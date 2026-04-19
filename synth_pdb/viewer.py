@@ -9,7 +9,7 @@ import logging
 import tempfile
 import traceback
 import webbrowser
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import biotite.structure.hbond as hbond
 import biotite.structure.io.pdb as pdb
@@ -808,11 +808,19 @@ def _find_hbonds(pdb_content: str) -> list:
         triplets = []
         if has_hydrogens:
             try:
-                triplets = hbond(structure, selection1="atom_name N", selection2="atom_name O")
+                # Use boolean masks for selections
+                mask_n = structure.atom_name == "N"
+                mask_o = structure.atom_name == "O"
+                # Call hbond function (imported as hbond module/func)
+                # In some Biotite versions hbond is both a module and a function
+                if hasattr(hbond, "hbond"):
+                    triplets = hbond.hbond(structure, selection1=mask_n, selection2=mask_o)
+                else:
+                    triplets = hbond(structure, selection1=mask_n, selection2=mask_o)
             except Exception:
                 pass  # Fallback
 
-        hbonds = []
+        hbonds: List[Dict[str, Any]] = []
 
         if len(triplets) > 0:
             # Strict mode worked
@@ -821,15 +829,15 @@ def _find_hbonds(pdb_content: str) -> list:
                 acceptor = structure[acceptor_idx]
                 hbonds.append(
                     {
-                        "start_resi": acceptor.res_id,
-                        "start_atom": acceptor.atom_name,  # O
-                        "end_resi": donor.res_id,
-                        "end_atom": donor.atom_name,  # N
+                        "start_resi": int(acceptor.res_id),
+                        "start_atom": str(acceptor.atom_name),  # O
+                        "end_resi": int(donor.res_id),
+                        "end_atom": str(donor.atom_name),  # N
                     }
                 )
         else:
-            # Fallback: Geometric distance check (O...N < 3.5 A)
-            # This is "good enough" for visualization
+            # Fallback: Geometric distance check (O...N < 4.5 A)
+            # This is "good enough" for visualization and handles synthetic drift
             ns = structure[structure.atom_name == "N"]
             os_atoms = structure[structure.atom_name == "O"]
 
@@ -838,32 +846,29 @@ def _find_hbonds(pdb_content: str) -> list:
                 o_coords = os_atoms.coord
 
                 # Brute force distance matrix (N_n x N_o)
-                # n_coords[:, None, :] is (N_n, 1, 3)
-                # o_coords[None, :, :] is (1, N_o, 3)
-                # Broadcasting gives (N_n, N_o, 3) displacement vectors
                 diff = n_coords[:, np.newaxis, :] - o_coords[np.newaxis, :, :]
                 dists = np.linalg.norm(diff, axis=2)
 
-                # Find pairs < 4.0 Angstrom (relaxed for visualization)
-                # Returns tuple of arrays (row_indices, col_indices)
-                n_indices, o_indices = np.where(dists < 4.0)
+                # Find pairs < 4.5 Angstrom (relaxed for visualization)
+                n_indices, o_indices = np.where(dists < 4.5)
 
                 for i, j in zip(n_indices, o_indices):
                     n_atom = ns[i]
                     o_atom = os_atoms[j]
 
-                    # Check sequence separation
-                    seq_sep = abs(n_atom.res_id - o_atom.res_id)
-                    if seq_sep >= 3:
+                    # Check sequence separation (k >= 3)
+                    if abs(n_atom.res_id - o_atom.res_id) >= 3:
                         hbonds.append(
                             {
-                                "start_resi": o_atom.res_id,
-                                "start_atom": o_atom.atom_name,
-                                "end_resi": n_atom.res_id,
-                                "end_atom": n_atom.atom_name,
+                                "start_resi": int(o_atom.res_id),
+                                "start_atom": str(o_atom.atom_name),
+                                "end_resi": int(n_atom.res_id),
+                                "end_atom": str(n_atom.atom_name),
                             }
                         )
 
+        # Sort by start residue for consistent visualization and testing
+        hbonds.sort(key=lambda x: int(x["start_resi"]))
         return hbonds
 
     except Exception as e:
