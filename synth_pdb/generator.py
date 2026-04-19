@@ -32,6 +32,7 @@ from .data import (
     BACKBONE_DEPENDENT_ROTAMER_LIBRARY,
     BETA_TURN_TYPES,
     BOND_LENGTH_C_N,
+    BOND_LENGTH_C_O,
     BOND_LENGTH_CA_C,
     BOND_LENGTH_N_CA,
     L_TO_D_MAPPING,
@@ -976,7 +977,9 @@ def _build_peptide_chain(
                     current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
             elif res_conformation == "random":
-                current_phi, current_psi = _sample_ramachandran_angles(res_name, next_res_name, rng=rng)
+                current_phi, current_psi = _sample_ramachandran_angles(
+                    res_name, next_res_name, rng=rng
+                )
             else:
                 current_phi = RAMACHANDRAN_PRESETS["alpha"]["phi"]
                 current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
@@ -998,11 +1001,25 @@ def _build_peptide_chain(
                 prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
             )
 
+        # ── Place Oxygen (O) explicitly ──
+        # EDUCATIONAL NOTE - Oxygen Orientation:
+        # In the peptide bond, the Carbonyl Oxygen (O) must be placed correctly
+        # relative to the next residue's Nitrogen to form H-bonds.
+        # It rotates around the CA-C bond with the Psi angle.
+        # Since O is roughly trans to the next N relative to the CA-C line,
+        # its dihedral angle is Psi + 180.
+        # For the C-terminal residue, Psi is undefined (None); we use 180.0 as default.
+        o_dihedral = (current_psi if current_psi is not None else 0.0) + 180.0
+        o_coord = _place_atom_with_dihedral(
+            n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
+        )
+
         # ── Store coordinates for next iteration ────────────────────────────
         residue_coordinates[i] = {
             "N": n_coord,
             "CA": ca_coord,
             "C": c_coord,
+            "O": o_coord,
         }
 
         # Store Psi for next iteration (kept for readability; recomputed in loop)
@@ -1099,48 +1116,50 @@ def _build_peptide_chain(
                             ref_res_template.coord[atom_idx] = rotated_p + ca_atom.coord
 
         # ── Superimpose template onto constructed backbone frame ─────────────
+
         template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
         template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
         template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
+        template_backbone_o = ref_res_template[ref_res_template.atom_name == "O"]
         mobile_backbone_from_template = (
-            template_backbone_n + template_backbone_ca + template_backbone_c
+            template_backbone_n + template_backbone_ca + template_backbone_c + template_backbone_o
         )
 
-        if len(mobile_backbone_from_template) != 3:
-            raise ValueError(
-                f"Reference residue template for {res_name} is missing required "
-                f"backbone atoms (N, CA, C) for superimposition. "
-                f"Found atoms: {list(mobile_backbone_from_template.atom_name)}"
+        if len(mobile_backbone_from_template) != 4:
+            # Fallback to 3 atoms if O is somehow missing (shouldn't happen for standard AAs)
+            mobile_backbone_from_template = (
+                template_backbone_n + template_backbone_ca + template_backbone_c
             )
 
-        target_backbone_constructed = struc.array(
-            [
+        target_atoms = [
+            struc.Atom(
+                n_coord, atom_name="N", res_id=res_id, res_name=res_name, element="N", hetero=False
+            ),
+            struc.Atom(
+                ca_coord,
+                atom_name="CA",
+                res_id=res_id,
+                res_name=res_name,
+                element="C",
+                hetero=False,
+            ),
+            struc.Atom(
+                c_coord, atom_name="C", res_id=res_id, res_name=res_name, element="C", hetero=False
+            ),
+        ]
+        if len(mobile_backbone_from_template) == 4:
+            target_atoms.append(
                 struc.Atom(
-                    n_coord,
-                    atom_name="N",
+                    o_coord,
+                    atom_name="O",
                     res_id=res_id,
                     res_name=res_name,
-                    element="N",
+                    element="O",
                     hetero=False,
-                ),
-                struc.Atom(
-                    ca_coord,
-                    atom_name="CA",
-                    res_id=res_id,
-                    res_name=res_name,
-                    element="C",
-                    hetero=False,
-                ),
-                struc.Atom(
-                    c_coord,
-                    atom_name="C",
-                    res_id=res_id,
-                    res_name=res_name,
-                    element="C",
-                    hetero=False,
-                ),
-            ]
-        )
+                )
+            )
+
+        target_backbone_constructed = struc.array(target_atoms)
 
         # AHA MOMENT - Superimposition Direction:
         # In the "AI Trinity" debugging phase, we found that residues were disconnected

@@ -104,6 +104,34 @@ vector within the Alignment Tensor's Principal Axis System (PAS).
    Once V_pas is known, the coupling is calculated based on the axial (Da)
    and rhombic (R) components.
 
+THE SAUPE ALIGNMENT TENSOR:
+---------------------------
+The alignment of the protein molecule is mathematically described by the
+Saupe alignment tensor S, which is a traceless, symmetric 3x3 matrix. This
+tensor represents the time-averaged orientation of the molecule's axes
+relative to the external magnetic field (B0).
+
+Historically, Saupe (1964) developed this formalism to describe the order
+of liquid crystals. In protein NMR, we use it to define the degree and
+direction of steric or electrostatic occlusion by the alignment medium.
+
+BIOPHYSICAL CHOICE OF ALIGNMENT MEDIA:
+--------------------------------------
+The choice of "liquid crystal" (medium) is critical for experimental success:
+
+1. PHAGE PARTICLES: Filamentous Pf1 phage (Hansen et al., 2000) provides
+   electrostatic alignment. Since phage are negatively charged, they are
+   excellent for proteins with high pI, but can cause aggregation if the
+   protein is also positively charged.
+
+2. BICELLES: Lipid mixtures (e.g., DMPC/DHPC) form disk-like structures
+   that align sterically. These are temperature-sensitive and often mimic
+   the membrane environment (Tjandra & Bax, 1997).
+
+3. POLYACRYLAMIDE GELS: Strained gels (Tycko et al., 2000) allow for
+   alignment via mechanical compression. This is the only medium that
+   works at any pH or salt concentration, as it is chemically inert.
+
 SVD FITTING VS BACK-CALCULATION:
 ================================
 There are two primary ways to compare model RDCs to experimental RDCs:
@@ -207,12 +235,16 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
     # 1. Calculate the squared differences (the residuals)
     # This captures the magnitude of error for each restraint point.
     # Residual = (D_measured - D_predicted)
+    # We use NumPy broadcasting here; assuming both arrays are 1D vectors
+    # of equal shape. The subtraction is performed element-wise.
     diff_sq = (observed - calculated) ** 2
 
     # 2. Calculate the sum of squares of the observed values (normalization)
     # This scales the final score by the magnitude of the measured values.
     # Normalization ensures that Q is comparable across different alignment
     # media with different Da values.
+    # Without this normalization, a tensor with Da=20Hz would always have
+    # higher absolute residuals than a tensor with Da=5Hz.
     obs_sq = observed**2
 
     # 3. Handle the edge case where all observed values are zero
@@ -287,6 +319,7 @@ def read_rdc_file(file_path: str) -> List[Dict[str, Any]]:
 
                 # Split line into fields. We expect 5 columns for a valid pair.
                 # parts = [Res1, Atom1, Res2, Atom2, Value]
+                # Column index map: 0=Res1, 1=Atom1, 2=Res2, 3=Atom2, 4=Value
                 parts = line.split()
                 if len(parts) >= 5:
                     # We store the residue indices and atom names to allow
@@ -294,6 +327,12 @@ def read_rdc_file(file_path: str) -> List[Dict[str, Any]]:
                     # index_1 and atom_1 define the first nucleus (e.g. 15N).
                     # index_2 and atom_2 define the second nucleus (e.g. 1H).
                     # 'value' is the coupling in Hz.
+                    #
+                    # DATA VALIDATION NOTE:
+                    # ---------------------
+                    # Here we assume the file uses biotite-standard atom names.
+                    # If your file uses different naming (e.g. HN instead of H),
+                    # you may need a mapping function before back-calculation.
                     rdcs.append(
                         {
                             "res_1": int(parts[0]),
