@@ -195,6 +195,11 @@ def main() -> None:
         help="Optional: Path to an NMR RDC restraint file for Q-factor validation.",
     )
     parser.add_argument(
+        "--shift-restraints",
+        type=str,
+        help="Optional: Path to a chemical shift restraint file for validation.",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="Open generated structure in browser-based 3D viewer (uses 3Dmol.js). Interactive visualization with rotation, zoom, and style controls.",
@@ -1142,6 +1147,7 @@ def main() -> None:
                     args.gen_nef
                     or args.restraints
                     or args.rdc_restraints
+                    or args.shift_restraints
                     or args.gen_relax
                     or args.gen_shifts
                     or args.gen_couplings
@@ -1161,7 +1167,11 @@ def main() -> None:
                         import biotite.structure.io.pdb as pdb_io
                         import numpy as np
 
-                        from .chemical_shifts import predict_chemical_shifts
+                        from .chemical_shifts import (
+                            calculate_shift_metrics,
+                            predict_chemical_shifts,
+                            read_shift_file,
+                        )
 
                         # NEW IMPORTS for Export
                         from .contact import compute_contact_map
@@ -1259,6 +1269,61 @@ def main() -> None:
                             except Exception as e:
                                 logger.error(f"RDC Validation failed: {e}")
 
+                        # Chemical Shift Validation
+                        if args.shift_restraints:
+                            logger.info(
+                                f"Performing Chemical Shift Validation against {args.shift_restraints}..."
+                            )
+                            try:
+                                target_shifts = read_shift_file(args.shift_restraints)
+                                # Back-calculate shifts from model
+                                use_shiftx2 = (
+                                    getattr(args, "shift_predictor", "shiftx2") == "shiftx2"
+                                )
+                                calc_shifts = predict_chemical_shifts(
+                                    structure, use_shiftx2=use_shiftx2
+                                )
+
+                                # Align obs and calc
+                                obs_vals = []
+                                calc_vals = []
+                                for target in target_shifts:
+                                    res_id = target["res_id"]
+                                    atom_name = target["atom_name"]
+
+                                    # Prediction output is nested by chain: {chain: {res: {atom: val}}}
+                                    for chain_id in calc_shifts:
+                                        if (
+                                            res_id in calc_shifts[chain_id]
+                                            and atom_name in calc_shifts[chain_id][res_id]
+                                        ):
+                                            obs_vals.append(target["value"])
+                                            calc_vals.append(
+                                                calc_shifts[chain_id][res_id][atom_name]
+                                            )
+                                            break
+
+                                if obs_vals:
+                                    shift_metrics = calculate_shift_metrics(
+                                        np.array(obs_vals), np.array(calc_vals)
+                                    )
+
+                                    # Print Shift Report
+                                    print("\n" + "=" * 40)
+                                    print("--- NMR Chemical Shift Validation Report ---")
+                                    print(f"File: {args.shift_restraints}")
+                                    print(f"RMSD:        {shift_metrics['rmsd']:.4f} ppm")
+                                    print(f"Correlation: {shift_metrics['correlation']:.4f}")
+                                    print(f"Entries:     {len(obs_vals)}")
+                                    print("=" * 40 + "\n")
+                                else:
+                                    logger.warning(
+                                        "No matching chemical shift entries found for validation."
+                                    )
+
+                            except Exception as e:
+                                logger.error(f"Chemical Shift Validation failed: {e}")
+
                         # Sequence inference
                         res_names = [
                             structure[structure.res_id == i][0].res_name
@@ -1328,7 +1393,9 @@ def main() -> None:
                                 #     (Shen & Bax, 2010, J Biomol NMR 48:13). Always available
                                 #     (pure Python, no external binary). RMSD ~0.05 ppm (1H),
                                 #     ~0.55 ppm (13C). Recommended for CI/CD pipelines.
-                                use_shiftx2 = args.shift_predictor == "shiftx2"
+                                use_shiftx2 = (
+                                    getattr(args, "shift_predictor", "shiftx2") == "shiftx2"
+                                )
                                 shifts = predict_chemical_shifts(structure, use_shiftx2=use_shiftx2)
                                 shift_filename = (
                                     args.shift_output
