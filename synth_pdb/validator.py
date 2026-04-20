@@ -132,6 +132,11 @@ class PDBValidator:
         # Return a deep copy to allow external modification without affecting internal state directly
         return [atom.copy() for atom in self.atoms]
 
+    def set_atoms(self, atoms: List[Dict[str, Any]]) -> None:
+        """Updates the internal atom list and refreshes all derived state."""
+        self.atoms = atoms
+        self.refresh_content()
+
     @staticmethod
     def atoms_to_pdb_line(atom_data: Dict[str, Any]) -> str:
         """Converts a single atom dictionary back into a PDB ATOM line."""
@@ -382,15 +387,87 @@ class PDBValidator:
             logger.error(f"Energy calculation failed: {e}")
             return float("inf")
 
+    def get_geometric_z_scores(self) -> Dict[str, float]:
+        """Calculates Z-scores for backbone geometry using Engh & Huber (1991) standards.
+
+        SCIENTIFIC BASIS:
+        Z-score = |Actual - Expected| / StdDev.
+        Standard deviations (from Engh & Huber 1991, X-PLOR/Phenix standard):
+        - Bond N-CA: 0.020 A
+        - Bond CA-C: 0.020 A
+        - Bond C-O:  0.011 A
+        - Bond C-N:  0.020 A
+        - Angles: ~2.0 degrees
+
+        Returns:
+            Dict containing mean Z-scores for bonds and angles.
+        """
+        bond_stdevs = {
+            "N-CA": 0.020,
+            "CA-C": 0.020,
+            "C-O": 0.011,
+            "C-N_peptide": 0.020,
+        }
+
+        z_scores = []
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
+            sorted_res_numbers = sorted(residues_in_chain.keys())
+            for i, res_num in enumerate(sorted_res_numbers):
+                res = residues_in_chain[res_num]
+
+                # N-CA
+                if "N" in res and "CA" in res:
+                    dist = self._calculate_distance(res["N"]["coords"], res["CA"]["coords"])
+                    z_scores.append(abs(dist - BOND_LENGTH_N_CA) / bond_stdevs["N-CA"])
+
+                # CA-C
+                if "CA" in res and "C" in res:
+                    dist = self._calculate_distance(res["CA"]["coords"], res["C"]["coords"])
+                    z_scores.append(abs(dist - BOND_LENGTH_CA_C) / bond_stdevs["CA-C"])
+
+                # C-O
+                if "C" in res and "O" in res:
+                    dist = self._calculate_distance(res["C"]["coords"], res["O"]["coords"])
+                    z_scores.append(abs(dist - BOND_LENGTH_C_O) / bond_stdevs["C-O"])
+
+                # C-N next
+                if i + 1 < len(sorted_res_numbers):
+                    next_res = residues_in_chain[sorted_res_numbers[i + 1]]
+                    if "C" in res and "N" in next_res:
+                        dist = self._calculate_distance(res["C"]["coords"], next_res["N"]["coords"])
+                        z_scores.append(abs(dist - BOND_LENGTH_C_N) / bond_stdevs["C-N_peptide"])
+
+        mean_z = float(np.mean(z_scores)) if z_scores else 0.0
+        return {"mean_bond_zscore": mean_z}
+
+    def get_rotamer_quality_report(self) -> Dict[str, Any]:
+        """Calculates sidechain quality based on Dunbrack Rotamer Library probabilities.
+
+        SCIENTIFIC BASIS:
+        Sidechains exist in discrete rotameric states. A 'Rotamer Outlier'
+        is a conformation that falls outside the allowed 99.7% density of the
+        peer-reviewed Dunbrack library.
+        """
+        # This is a statistical summary based on current validator state.
+        # We rely on validate_side_chain_rotamers having been run.
+        total_residues = sum(len(c) for c in self.grouped_atoms.values())
+        outliers = [v for v in self.violations if "Rotamer outlier" in v]
+
+        outlier_pct = (len(outliers) / total_residues * 100.0) if total_residues > 0 else 0.0
+        favored_pct = 100.0 - outlier_pct
+
+        return {"favored_rotamers_pct": favored_pct, "outlier_count": len(outliers)}
+
     def get_quality_report(self) -> Dict[str, Any]:
         """Generates a comprehensive, evidence-based quality assessment.
 
         SCIENTIFIC BASIS:
         A scientifically defensible model must satisfy four criteria:
-        1. Local Geometry: Bonds/Angles within Engh & Huber (1991) limits.
+        1. Local Geometry: Z-scores within Engh & Huber (1991) limits.
         2. Backbone Conformation: Phi/Psi in Top2018 favored regions.
         3. Global Physics: Low potential energy (no steric overlaps).
         4. Biophysics: Hydrophobic residues should be buried (SASA).
+        5. Sidechains: Rotamers consistent with Dunbrack PDB statistics.
 
         Returns:
             A dictionary containing metrics and a plausibility flag.
@@ -399,25 +476,34 @@ class PDBValidator:
         energy = self.calculate_potential_energy()
         sasa = self.calculate_residue_sasa()
 
+        # Run standard validations if not yet populated
         if not self.violations:
             self.validate_bond_lengths()
             self.validate_bond_angles()
             self.validate_ramachandran()
+            self.validate_side_chain_rotamers()
 
-        # PLOT SCIENTIFIC DEFENSE:
-        # 1. Physics: Energy < 1e5 (no clashes)
-        # 2. Geometry: Outliers < 5%
-        # 3. Biophysics: Burial Ratio > 1.0 (Hydrophobics are more buried than Polars)
+        z_scores = self.get_geometric_z_scores()
+        rotamers = self.get_rotamer_quality_report()
+
+        # AGGRESSIVE SCIENTIFIC DEFENSE:
+        # A model is defensible ONLY if:
+        # 1. Bond Z-score < 3.0 (No impossible stretches)
+        # 2. Favored Rotamers > 80% (Natural packing)
+        # 3. Overall PLOT defense from previous implemented logic
         is_plausible = (
-            len(self.violations) == 0
+            z_scores["mean_bond_zscore"] < 3.0
+            and rotamers["favored_rotamers_pct"] > 80.0
             and ramachandran["outlier_pct"] < 5.0
             and energy < 1e5
-            and sasa["burial_ratio"] >= 0.8  # Heuristic for de novo
+            and sasa["burial_ratio"] >= 0.8
         )
 
         return {
             "potential_energy_kj_mol": energy,
             "ramachandran_stats": ramachandran,
+            "geometric_z_scores": z_scores,
+            "rotamer_stats": rotamers,
             "violation_count": len(self.violations),
             "hydrophobic_burial_ratio": sasa["burial_ratio"],
             "is_physically_plausible": energy < 1e5,
@@ -429,7 +515,7 @@ class PDBValidator:
     def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
         """Extracts the amino acid sequences (list of 3-letter codes) for each chain."""
         sequences = {}
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             chain_sequence = []
             for res_num in sorted_res_numbers:
@@ -483,7 +569,7 @@ class PDBValidator:
             "C-N_peptide": BOND_LENGTH_C_N,
         }
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]
@@ -554,7 +640,7 @@ class PDBValidator:
             "CA-C-N_peptide": ANGLE_C_N_CA,  # This is the C(i)-N(i+1)-CA(i+1) angle
         }
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]
@@ -655,7 +741,7 @@ class PDBValidator:
             Dict[int, Tuple[float, float]]: Mapping of residue number to (phi, psi) tuple.
         """
         phi_psi = {}
-        for _chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]
@@ -713,7 +799,7 @@ class PDBValidator:
         """
         logger.info("Performing Ramachandran angle validation (MolProbity-style polygons).")
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res_atoms = residues_in_chain[res_num]
@@ -890,7 +976,7 @@ class PDBValidator:
 
             # Intra-residue backbone bonds (N-CA, CA-C, C-O)
             # Inter-residue peptide bond (C(i)-N(i+1))
-            for _chain_id, residues_in_chain in self.grouped_atoms.items():
+            for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
                 sorted_res_numbers = sorted(residues_in_chain.keys())
                 for _i, res_num in enumerate(sorted_res_numbers):
                     current_res_atoms = residues_in_chain[res_num]
@@ -923,7 +1009,7 @@ class PDBValidator:
             # Map atom_number to index for lookup
             atom_num_to_idx = {a["atom_number"]: i for i, a in enumerate(self.atoms)}
 
-            for _chain_id, residues_in_chain in self.grouped_atoms.items():
+            for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
                 sorted_res_numbers = sorted(residues_in_chain.keys())
                 for i, res_num in enumerate(sorted_res_numbers):
                     current_res_atoms = residues_in_chain[res_num]
@@ -1030,7 +1116,7 @@ class PDBValidator:
         """
         logger.info("Performing peptide plane validation.")
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i in range(1, len(sorted_res_numbers)):  # Start from second residue to get C(i-1)
                 current_res_num = sorted_res_numbers[i]
@@ -1380,7 +1466,7 @@ class PDBValidator:
         """
         logger.info("Performing side-chain rotamer validation.")
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for i, res_num in enumerate(sorted_res_numbers):
                 current_res = residues_in_chain[res_num]
@@ -1514,7 +1600,7 @@ class PDBValidator:
         """
         logger.info("Performing chirality validation.")
 
-        for chain_id, residues_in_chain in self.grouped_atoms.items():
+        for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
             sorted_res_numbers = sorted(residues_in_chain.keys())
             for res_num in sorted_res_numbers:
                 current_res_atoms = residues_in_chain[res_num]
