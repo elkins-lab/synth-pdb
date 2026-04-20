@@ -475,7 +475,7 @@ class EnergyMinimizer:
             sys = self.forcefield.createSystem(
                 current_topo, nonbondedMethod=app.NoCutoff, constraints=None
             )
-            return cast(Tuple[Any, Any, Any], (sys, current_topo, current_pos))
+            return (sys, current_topo, current_pos)
 
     def _preprocess_pdb_for_simulation(
         self, input_path: str, cyclic: bool, disulfides_param: Optional[List]
@@ -816,7 +816,8 @@ class EnergyMinimizer:
                     d_a = np.sqrt(np.sum((p1 - p2) ** 2))
                     if d_a < SSBOND_CAPTURE_RADIUS:
                         potential_bonds.append((d_a, r1, r2, s1, s2))
-            potential_bonds.sort(key=lambda x: x[0])
+            potential_bonds.sort(key=lambda x: float(x[0]))
+
             bonded_indices: set = set()
             for _d, r1, r2, s1, s2 in potential_bonds:
                 if r1.index in bonded_indices or r2.index in bonded_indices:
@@ -937,7 +938,7 @@ class EnergyMinimizer:
                                 to_delete.append(a)
                         n_hyds = [a for a in res1.atoms() if a.name in ["H1", "H2", "H3", "H"]]
                         if len(n_hyds) > 1:
-                            sorted_hyds = sorted(n_hyds, key=lambda x: x.name)
+                            sorted_hyds = sorted(n_hyds, key=lambda x: str(x.name))
                             to_delete.extend(sorted_hyds[1:])
                         if to_delete:
                             modeller.delete(to_delete)
@@ -1123,9 +1124,11 @@ class EnergyMinimizer:
 
         # Coordination restraints
         if coordination_restraints:
-            f = mm.CustomBondForce("0.5*k*(r-r0)^2")
-            f.addGlobalParameter("k", 50000.0 * unit.kilojoules_per_mole / unit.nanometer**2)
-            f.addPerBondParameter("r0")
+            force_ext = mm.CustomBondForce("0.5*k*(r-r0)^2")
+            force_ext.addGlobalParameter(
+                "k", 50000.0 * unit.kilojoules_per_mole / unit.nanometer**2
+            )
+            force_ext.addPerBondParameter("r0")
             new_ats = list(topology.atoms())
             for i_o, l_o in coordination_restraints:
                 oi, ol = atom_list[i_o], atom_list[l_o]
@@ -1136,12 +1139,12 @@ class EnergyMinimizer:
                     if a.residue.id == ol.residue.id and a.name == ol.name:
                         nl = a.index
                 if ni != -1 and nl != -1:
-                    f.addBond(
+                    force_ext.addBond(
                         ni,
                         nl,
                         [(0.23 if new_ats[nl].name == "SG" else 0.21) * unit.nanometers],
                     )
-            system.addForce(f)
+            system.addForce(force_ext)
 
         # EDUCATIONAL NOTE - Harmonic "Pull" Restraints & Hard Constraints:
         # -----------------------------------------------------------------
@@ -1557,9 +1560,12 @@ class EnergyMinimizer:
 
         # ── Stage 1: PDB preprocessing ──────────────────────────────────────
         try:
-            topology, positions, hetatm_lines, original_metadata = (
-                self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
-            )
+            (
+                topology,
+                positions,
+                hetatm_lines,
+                original_metadata,
+            ) = self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
             atom_list = list(topology.atoms())
         except Exception as e:
             logger.error(f"PDB Pre-processing failed: {e}")
@@ -1568,15 +1574,19 @@ class EnergyMinimizer:
         # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
         try:
             coordination_param = coordination if coordination is not None else []
-            modeller, added_bonds, salt_bridge_restraints, coordination_restraints, atom_list = (
-                self._setup_openmm_modeller(
-                    topology,
-                    positions,
-                    add_hydrogens,
-                    cyclic,
-                    coordination_param,
-                    atom_list,
-                )
+            (
+                modeller,
+                added_bonds,
+                salt_bridge_restraints,
+                coordination_restraints,
+                atom_list,
+            ) = self._setup_openmm_modeller(
+                topology,
+                positions,
+                add_hydrogens,
+                cyclic,
+                coordination_param,
+                atom_list,
             )
 
             # ── Stage 3: System + forces + Simulation context ───────────────

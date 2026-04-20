@@ -15,7 +15,7 @@ import logging
 import os
 import random
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -168,8 +168,8 @@ def _calculate_bfactor(
         base_bfactor -= 3.0
 
     # Add small random variation
-    _rng = rng if rng is not None else random
-    random_variation = _rng.uniform(-2.0, 2.0)
+    _rng: Any = rng if rng is not None else random
+    random_variation = float(_rng.uniform(-2.0, 2.0))
 
     # Calculate final B-factor
     bfactor = base_bfactor + random_variation
@@ -212,8 +212,8 @@ def _calculate_occupancy(
     bfactor_correlation = -0.08 * normalized_bfactor
 
     # Random variation
-    _rng = rng if rng is not None else random
-    random_variation = _rng.uniform(-0.01, 0.01)
+    _rng: Any = rng if rng is not None else random
+    random_variation = float(_rng.uniform(-0.01, 0.01))
 
     # Calculate and clamp
     occupancy = (
@@ -294,7 +294,7 @@ def _generate_random_amino_acid_sequence(
         List of 3-letter amino acid codes.
     """
     # Use global random if no local rng provided (for backward compatibility)
-    _rng = rng if rng is not None else random
+    _rng: Any = rng if rng is not None else random
 
     # Handle potential non-standard types like numpy._NoValue
     if length is None or str(length) == "<no value>":
@@ -312,9 +312,9 @@ def _generate_random_amino_acid_sequence(
     if use_plausible_frequencies:
         amino_acids = list(AMINO_ACID_FREQUENCIES.keys())
         weights = list(AMINO_ACID_FREQUENCIES.values())
-        return _rng.choices(amino_acids, weights=weights, k=length)
+        return cast(List[str], _rng.choices(amino_acids, weights=weights, k=length))
     else:
-        return [_rng.choice(STANDARD_AMINO_ACIDS) for _ in range(length)]
+        return [str(_rng.choice(STANDARD_AMINO_ACIDS)) for _ in range(length)]
 
 
 def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
@@ -536,7 +536,7 @@ def _sample_ramachandran_angles(
         Lovell et al. (2003) Proteins: Structure, Function, and Bioinformatics
 
     """
-    _rng = rng if rng is not None else random
+    _rng: Any = rng if rng is not None else random
 
     # Get residue-specific or general distribution
     if res_name in RAMACHANDRAN_REGIONS:

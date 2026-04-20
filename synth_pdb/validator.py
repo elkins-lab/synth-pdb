@@ -318,6 +318,7 @@ class PDBValidator:
                     rad = 1.7
             except Exception:
                 rad = 1.7
+
             radii.append(rad)
 
         sasa_per_atom = struc.sasa(b_struc, probe_radius=1.4, vdw_radii=np.array(radii))

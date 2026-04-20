@@ -78,7 +78,7 @@ def apply_ph_titration(
             # Note: Standard PDB often uses just "HIS" implying neural.
             # But explicit modelling requires choosing one.
             # If we want to be explicit:
-            _rng = rng if rng is not None else random
+            _rng: Any = rng if rng is not None else random
             new_name = "HIE" if _rng.random() < 0.8 else "HID"
 
             # Update this residue
@@ -370,7 +370,9 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
         if a_atom.res_id == b_atom.res_id:
             continue
 
-        pair_key = tuple(sorted([a_atom.res_id, b_atom.res_id]))
+        # Ensure pair_key is a Tuple[int, int]
+        res_i, res_j = sorted([int(a_atom.res_id), int(b_atom.res_id)])
+        pair_key = (res_i, res_j)
         dist = dists[acid_idx, base_idx]
 
         # We pick the closest atom pair for each residue-residue interaction
