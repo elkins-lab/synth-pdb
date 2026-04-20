@@ -57,14 +57,9 @@ from .relaxation import predict_order_parameters
 # Re-export for backward compatibility with tests
 _position_atom_3d_from_internal_coords = position_atom_3d_from_internal_coords
 
-# Convert angles to radians for numpy trigonometric functions
+# Used in _build_peptide_chain to orient the first residue's C atom
 ANGLE_N_CA_C_RAD = np.deg2rad(ANGLE_N_CA_C)
-ANGLE_CA_C_N_RAD = np.deg2rad(ANGLE_CA_C_N)
-ANGLE_CA_C_O_RAD = np.deg2rad(ANGLE_CA_C_O)
 
-# Ideal Ramachandran angles for a generic alpha-helix
-PHI_ALPHA_HELIX = -57.0
-PSI_ALPHA_HELIX = -47.0
 # Ideal Omega for trans peptide bond
 OMEGA_TRANS = 180.0
 OMEGA_VARIATION = 4.0  # degrees - adds thermal fluctuation to peptide bond
@@ -74,8 +69,6 @@ logger = logging.getLogger(__name__)
 
 # This constant is used in test_generator.py for coordinate calculations.
 CA_DISTANCE = 3.8  # Approximate C-alpha to C-alpha distance in Angstroms for a linear chain
-
-PDB_ATOM_FORMAT = "ATOM  {atom_number: >5} {atom_name: <4}{alt_loc: <1}{residue_name: >3} {chain_id: <1}{residue_number: >4}{insertion_code: <1}   {x_coord: >8.3f}{y_coord: >8.3f}{z_coord: >8.3f}{occupancy: >6.2f}{temp_factor: >6.2f}          {element: >2}{charge: >2}"
 
 
 def _calculate_bfactor(
@@ -267,9 +260,7 @@ def _place_atom_with_dihedral(
 
     Wrapper around position_atom_3d_from_internal_coords with clearer naming.
     """
-    import typing
-
-    return typing.cast(
+    return cast(
         np.ndarray,
         position_atom_3d_from_internal_coords(
             atom1, atom2, atom3, bond_length, bond_angle, dihedral
@@ -842,9 +833,6 @@ def _build_peptide_chain(
             if cyclic:
                 res_conformation = "curved"
 
-        # Compatibility alias for rotamer selection logic downstream
-        current_conformation = res_conformation
-
         # ── Backbone coordinate placement ───────────────────────────────────
         if i == 0:
             # First residue (N-terminus)
@@ -885,9 +873,6 @@ def _build_peptide_chain(
 
             current_phi = None
             current_psi = None
-
-            # Handle Beta-Turns explicitly
-            pass
 
             if prev_conformation in RAMACHANDRAN_PRESETS:
                 prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]["psi"]
@@ -1012,9 +997,6 @@ def _build_peptide_chain(
             "O": o_coord,
         }
 
-        # Store Psi for next iteration (kept for readability; recomputed in loop)
-        prev_psi = current_psi  # type: ignore[assignment]
-
         # ── Biotite reference template ───────────────────────────────────────
         # CRITICAL FIX: Always use .copy() — residue() returns a cached template.
         ref_res_template = struc.info.residue(res_name).copy()
@@ -1054,8 +1036,8 @@ def _build_peptide_chain(
         # ── Rotamer selection ────────────────────────────────────────────────
         rotamers = None
         if res_name in BACKBONE_DEPENDENT_ROTAMER_LIBRARY:
-            if current_conformation in BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name]:
-                rotamers = BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name][current_conformation]
+            if res_conformation in BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name]:
+                rotamers = BACKBONE_DEPENDENT_ROTAMER_LIBRARY[res_name][res_conformation]
         if rotamers is None and res_name in ROTAMER_LIBRARY:
             rotamers = ROTAMER_LIBRARY[res_name]
 
@@ -1210,11 +1192,6 @@ def _build_peptide_chain(
             peptide = transformed_res.copy()
         else:
             peptide += transformed_res
-
-        # Store for next iteration (dead code, residue_coordinates takes precedence)
-        prev_n_coord = n_coord
-        prev_ca_coord = ca_coord
-        prev_c_coord = c_coord
 
     # Ensure global chain_id is 'A'
     peptide.chain_id = np.array(["A"] * peptide.array_length(), dtype="U1")

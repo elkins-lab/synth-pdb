@@ -13,11 +13,11 @@ from .data import (
     BOND_LENGTH_C_O,
     BOND_LENGTH_CA_C,
     BOND_LENGTH_N_CA,
-    CHARGED_AMINO_ACIDS,  # This was in the original, not explicitly in the diff, so keep it
+    CHARGED_AMINO_ACIDS,
     HYDROPHOBIC_AMINO_ACIDS,
-    L_TO_D_MAPPING,  # Added from diff
+    L_TO_D_MAPPING,
     NEGATIVE_AMINO_ACIDS,
-    POLAR_UNCHARGED_AMINO_ACIDS,  # This was in the original, not explicitly in the diff, so keep it
+    POLAR_UNCHARGED_AMINO_ACIDS,
     POSITIVE_AMINO_ACIDS,
     RAMACHANDRAN_POLYGONS,
     VAN_DER_WAALS_RADII,
@@ -171,7 +171,6 @@ class PDBValidator:
             chain_atoms = chains[chain_id]
             for atom in chain_atoms:
                 pdb_lines.append(PDBValidator.atoms_to_pdb_line(atom))
-                atom["atom_number"]
 
             # Add a TER record after the last atom of the chain, but only if it's a polymer (contains ATOMs)
             if chain_atoms:
@@ -717,7 +716,6 @@ class PDBValidator:
         """Ray-casting algorithm to check if a point is inside a polygon.
         Polygon is defined by a list of (x, y) tuples.
         """
-        logger.info("Performing Ramachandran angle validation (polygonal regions).")
         x, y = point
         n = len(polygon)
         inside = False
@@ -882,11 +880,6 @@ class PDBValidator:
                             f"Ramachandran violation: Chain {chain_id}, Residue {res_num} {res_name} "
                             f"(Phi={phi_str}°, Psi={psi_str}°) is an Outlier for '{category}' category."
                         )
-                    elif status == "Allowed":
-                        # Optional: warn for "Allowed" (not outlier but not optimal)
-                        # MolProbity usually only flags Outliers as errors, but Allowed as warnings.
-                        # For synth-pdb, we'll log it but not fail strictly unless desired.
-                        pass
 
     def validate_steric_clashes(
         self,
@@ -904,15 +897,7 @@ class PDBValidator:
         logger.info(f"Performing steric clash validation (backbone_only={backbone_only}).")
 
         if backbone_only:
-            # Filter atoms to only include backbone heavy atoms
             backbone_names = {"N", "CA", "C", "O", "OXT"}
-            # We need to filter self.atoms but keep indices aligned?
-            # No, the loop iterates over range(num_atoms).
-            # If we filter self.atoms, indices change.
-            # But bonded_pairs (from Biotite) uses indices into the ORIGINAL array?
-            # If we exclude sidechains, we must be careful with indices.
-            # Easiest way: Keep self.atoms as is, but SKIP non-backbone atoms inside the loop.
-            pass
 
         num_atoms = len(self.atoms)
 
@@ -974,38 +959,10 @@ class PDBValidator:
                 f"Biotite bond perception failed, falling back to simple backbone heuristic: {e}"
             )
 
-            # Intra-residue backbone bonds (N-CA, CA-C, C-O)
-            # Inter-residue peptide bond (C(i)-N(i+1))
-            for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
-                sorted_res_numbers = sorted(residues_in_chain.keys())
-                for _i, res_num in enumerate(sorted_res_numbers):
-                    current_res_atoms = residues_in_chain[res_num]
+            pass  # bonded_pairs will be populated by the fallback below if still empty
 
-                    current_res_atoms.get("N")
-                    current_res_atoms.get("CA")
-                    current_res_atoms.get("C")
-                    current_res_atoms.get("O")
-
-                    # Note: We need INDICES into self.atoms list, not atom_numbers (serial).
-                    # My previous code used atom_numbers for bonded_pairs, but loop used indices?
-                    # No, loop used `self.atoms[i]` and `self.atoms[j]` and compared `atom_number`.
-                    # And `bonded_pairs` stored `atom_number` tuples.
-                    # Biotite returns INDICES.
-                    # I must align them.
-
-                    # WAIT: The OUTER loop uses indices i, j.
-                    # atom1 = self.atoms[i]. atom1["atom_number"] is the PDB serial.
-                    # If I use Biotite indices (0-based), I must check clashes using INDICES.
-                    pass
-
-        # RE-WRITE LOOP TO USE INDICES
-        # My previous code logic for bonded_pairs used `atom_number`.
-        # But Biotite gives me array indices (0..N-1).
-        # self.atoms is a list of N atoms.
-        # So I should change excluded check to use (i, j) list indices.
-
-        # Fallback Implementation (if Biotite fails, map atoms to indices)
-        if not bonded_pairs:  # If bonded_pairs empty (failed or fallback needed)
+        # Fallback: if Biotite bond perception failed, build bonded_pairs from backbone heuristic.
+        if not bonded_pairs:
             # Map atom_number to index for lookup
             atom_num_to_idx = {a["atom_number"]: i for i, a in enumerate(self.atoms)}
 
@@ -1052,10 +1009,7 @@ class PDBValidator:
                 if backbone_only and atom2["atom_name"] not in backbone_names:
                     continue
 
-                # Check if atoms are covalently bonded (or 1-3)
-
-                # Check if atoms are covalently bonded (or 1-3)
-                # bonded_pairs now contains indices (i, j)
+                # Skip covalently bonded atoms (direct bonds and 1-3 angles)
                 if tuple(sorted((i, j))) in bonded_pairs:
                     continue
 
