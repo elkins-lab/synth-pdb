@@ -176,6 +176,7 @@ warn_redundant_casts = true
 warn_unused_ignores = false
 no_implicit_optional = true
 strict_equality = true
+exclude = "build/"
 
 [[tool.mypy.overrides]]
 module = [
@@ -183,11 +184,14 @@ module = [
     "biotite.*",
     "numpy.*",
     "openmm.*",
+    "scipy.*",
     "torch.*",
     "numba.*",
     "synth_nmr.*",
     "torch_geometric.*",
     "transformers.*",
+    "setuptools",
+    "pynmrstar",
 ]
 ignore_missing_imports = true
 

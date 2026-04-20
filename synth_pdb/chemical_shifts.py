@@ -294,7 +294,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> Dic
     # We cast to standard Python float to ensure the output is JSON serializable
     # and consistent with other project validation reports across the tool.
     # These metrics serve as objective functions for structural refinement.
-    return {"rmsd": float(rmsd), "correlation": float(r)}
+    return {"rmsd": float(cast(Any, rmsd)), "correlation": float(cast(Any, r))}
 
 
 def read_shift_file(file_path: str) -> List[Dict[str, Any]]:
