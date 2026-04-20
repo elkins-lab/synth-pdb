@@ -997,13 +997,9 @@ def _build_peptide_chain(
 
         # ── Place Oxygen (O) explicitly ──
         # EDUCATIONAL NOTE - Oxygen Orientation:
-        # In the peptide bond, the Carbonyl Oxygen (O) must be placed correctly
-        # relative to the next residue's Nitrogen to form H-bonds.
-        # It rotates around the CA-C bond with the Psi angle.
-        # Since O is roughly trans to the next N relative to the CA-C line,
-        # its dihedral angle is Psi + 180.
-        # For the C-terminal residue, Psi is undefined (None); we use 180.0 as default.
-        o_dihedral = (current_psi if current_psi is not None else 0.0) + 180.0
+        # In the peptide bond, the Carbonyl Oxygen (O) position relative to N, CA, C
+        # is fixed within the residue. The dihedral N-CA-C-O is ~180 degrees (trans).
+        o_dihedral = 180.0
         o_coord = _place_atom_with_dihedral(
             n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
         )
@@ -1164,6 +1160,12 @@ def _build_peptide_chain(
         )
         transformed_res = ref_res_template
         transformed_res.coord = transformation.apply(transformed_res.coord)
+
+        # Rigorously set the Carbonyl Oxygen (O) position to our constructed coordinate.
+        # This ensures H-bond detection logic (Biotite) works as expected.
+        o_mask = transformed_res.atom_name == "O"
+        if o_mask.any():
+            transformed_res.coord[o_mask] = o_coord
 
         # EDUCATIONAL NOTE - Chiral Mirroring strategy:
         # -------------------------------------------

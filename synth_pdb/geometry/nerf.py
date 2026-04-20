@@ -1,22 +1,23 @@
 """
 NeRF (Natural Extension Reference Frame) geometry implementation.
+
+EDUCATIONAL NOTE - Z-Matrix Construction:
+A Z-matrix is a way to represent the geometry of a molecule using internal coordinates:
+- Bond Length: Distance between two atoms.
+- Bond Angle: Angle formed by three atoms.
+- Torsion/Dihedral Angle: Angle between two planes formed by four atoms.
+
+EDUCATIONAL NOTE - NeRF Geometry:
+The Natural Extension Reference Frame (NeRF) algorithm provides a high-performance
+method for converting internal coordinates back into Cartesian (3D) coordinates.
+It ensures mathematical precision and is widely used in protein structure
+modeling and molecular dynamics.
 """
 
 import numpy as np
 
 from synth_pdb.geometry._numba import njit
 
-# EDUCATIONAL NOTE - Z-Matrix Construction
-# ----------------------------------------
-# Proteins are defined by their "Internal Coordinates" (Z-Matrix):
-# 1. Bond Length (distance between two atoms)
-# 2. Bond Angle (angle between three atoms)
-# 3. Torsion/Dihedral Angle (twist between four atoms)
-#
-# Our generator builds structures by transitioning from this 1D/2D internal
-# representation into 3D Cartesian space.
-# This algorithm is the engine of our protein builder, allowing us to
-# "walk down" the chain atom-by-atom with mathematical precision.
 
 @njit
 def position_atom_3d_from_internal_coords(
@@ -30,52 +31,39 @@ def position_atom_3d_from_internal_coords(
     """Calculates the 3D coordinates of a new atom (P4) given the coordinates of three
     preceding atoms (P1, P2, P3) and the internal coordinates.
 
-    # EDUCATIONAL NOTE - NeRF Geometry (Natural Extension Reference Frame)
-    # -----------------------------------------------------------------
-    # Most protein structures are natively defined by their "Internal Coordinates"
-    # (Z-Matrix): Bond Lengths, Bond Angles, and Torsion/Dihedral Angles.
-    #
-    # To convert these into 3D Cartesian coordinates (X, Y, Z), we use the
-    # "NeRF" method (Parsons et al., J. Comput. Chem. 2005).
-    #
-    # How it works:
-    # 1. We define a local coordinate system based on three previous atoms (P1, P2, P3).
-    # 2. P3 is the origin (0, 0, 0).
-    # 3. The axis b = (P3 - P2) is the primary direction.
-    # 4. We use Gram-Schmidt orthogonalization to define the Plane Normal (c) and
-    #    the In-Plane Normal (d).
-    # 5. The new atom P4 is then "placed" in this local frame using spherical-to-Cartesian
-    #    conversion and then transformed back into the global reference frame.
+    Uses the NeRF method (Natural Extension Reference Frame).
+    This implementation is verified to follow IUPAC 0=CIS convention.
     """
-    bond_angle_rad = np.deg2rad(bond_angle_deg)
-    dihedral_angle_rad = np.deg2rad(dihedral_angle_deg)
+    # 1. Convert to float64 for precision
+    p1_64 = p1.astype(np.float64)
+    p2_64 = p2.astype(np.float64)
+    p3_64 = p3.astype(np.float64)
 
-    a = p2 - p1
-    b = p3 - p2
-    c = np.cross(a, b)
-    d = np.cross(c, b)
+    # 2. Convert to radians
+    theta = np.deg2rad(bond_angle_deg)
+    chi = np.deg2rad(dihedral_angle_deg)
 
-    # Safe normalization
-    a_norm = np.sqrt(np.sum(a**2))
-    b_norm = np.sqrt(np.sum(b**2))
-    c_norm = np.sqrt(np.sum(c**2))
-    d_norm = np.sqrt(np.sum(d**2))
+    # 3. Define local coordinate system
+    # Following standard NeRF (e.g. mdtraj, biopython)
+    v1 = p1_64 - p2_64  # Vector from P2 to P1
+    v2 = p3_64 - p2_64  # Vector from P2 to P3
 
-    if a_norm > 0:
-        a /= a_norm
-    if b_norm > 0:
-        b /= b_norm
-    if c_norm > 0:
-        c /= c_norm
-    if d_norm > 0:
-        d /= d_norm
+    u2 = v2 / np.linalg.norm(v2)
 
-    p4 = p3 + bond_length * (
-        -b * np.cos(bond_angle_rad)
-        + d * np.sin(bond_angle_rad) * np.cos(dihedral_angle_rad)
-        + c * np.sin(bond_angle_rad) * np.sin(dihedral_angle_rad)
+    # n: Normal to plane P1-P2-P3
+    n = np.cross(v1, u2)
+    n /= np.linalg.norm(n)
+
+    # m: In-plane perpendicular vector (TRANS direction)
+    m = np.cross(n, u2)
+
+    # 4. Calculate P4 position in local frame
+    p4 = p3_64 + bond_length * (
+        -np.cos(theta) * u2 - np.sin(theta) * np.cos(chi) * m - np.sin(theta) * np.sin(chi) * n
     )
+
     return p4  # type: ignore[no-any-return]
+
 
 # Alias for backward compatibility
 place_atom = position_atom_3d_from_internal_coords

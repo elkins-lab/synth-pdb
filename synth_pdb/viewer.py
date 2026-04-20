@@ -823,19 +823,24 @@ def _find_hbonds(pdb_content: str) -> list:
         hbonds: List[Dict[str, Any]] = []
 
         if len(triplets) > 0:
-            # Strict mode worked
+            # Strict mode worked, but we still apply sequence separation filter
             for donor_idx, _h_idx, acceptor_idx in triplets:
                 donor = structure[donor_idx]
                 acceptor = structure[acceptor_idx]
-                hbonds.append(
-                    {
-                        "start_resi": int(acceptor.res_id),
-                        "start_atom": str(acceptor.atom_name),  # O
-                        "end_resi": int(donor.res_id),
-                        "end_atom": str(donor.atom_name),  # N
-                    }
-                )
-        else:
+
+                # Check sequence separation (k >= 3) to avoid peptide bond false positives
+                if abs(int(donor.res_id) - int(acceptor.res_id)) >= 3:
+                    hbonds.append(
+                        {
+                            "start_resi": int(acceptor.res_id),
+                            "start_atom": str(acceptor.atom_name),  # O
+                            "end_resi": int(donor.res_id),
+                            "end_atom": str(donor.atom_name),  # N
+                        }
+                    )
+
+        # If strict mode found nothing valid, or was skipped, use Geometric Fallback
+        if len(hbonds) == 0:
             # Fallback: Geometric distance check (O...N < 4.5 A)
             # This is "good enough" for visualization and handles synthetic drift
             ns = structure[structure.atom_name == "N"]
@@ -857,7 +862,7 @@ def _find_hbonds(pdb_content: str) -> list:
                     o_atom = os_atoms[j]
 
                     # Check sequence separation (k >= 3)
-                    if abs(n_atom.res_id - o_atom.res_id) >= 3:
+                    if abs(int(n_atom.res_id) - int(o_atom.res_id)) >= 3:
                         hbonds.append(
                             {
                                 "start_resi": int(o_atom.res_id),
