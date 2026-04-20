@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.29.0] - 2026-04-20
+
+### Added
+- **Aggressive Scientific Validation Framework**: Implemented a comprehensive, evidence-based quality filter in `PDBValidator` that proactively defends generated models using peer-reviewed biophysical standards.
+  - **Engh & Huber Z-Scores**: Integrated backbone geometry validation against the landmark Engh & Huber (1991) standard deviations for bond lengths and angles.
+  - **Dunbrack Rotamer Quality**: Added sidechain packaging assessment based on the Dunbrack Rotamer Library, ensuring models follow natural PDB conformational probabilities.
+  - **SASA-based Burial Validation**: Implemented `calculate_residue_sasa()` using the Shrake-Rupley algorithm (via `biotite`) and a "Burial Ratio" metric to verify hydrophobic core formation (Kauzmann 1959).
+  - **Modern Geometric Standards**: Upgraded Ramachandran validation logic to align with the high-resolution Top2018 dataset (~15,000 chains).
+- **Structural Integrity Report**: New `get_quality_report()` method providing a multi-layered defense (Geometry + Physics + Biophysics) for structural plausibility.
+- **NMR Integrations**: New validation tests against **mirror-image Protein G (BMRB 36464)** and **AI-refined Influenza NS1B-CTD (BMRB 51544)**.
+
+### Fixed
+- **Backbone Superimposition**: Corrected a critical regression where 4-atom superimposition caused backbone distortions. Restored stable 3-atom transformation (N, CA, C) for consistent global frame orientation.
+- **D-Amino Acid Chirality**: Fixed torsion negation logic to correctly handle mirror-image proteins via sidechain reflection while maintaining standard L-conformation backbone traces.
+- **CI/CD Cleanup**: Resolved numerous `mypy` and `ruff` issues across the source package; implemented warning filters to suppress external library noise (e.g., `biotite` deprecations).
+
 ## [1.28.0] - 2026-04-04
 
 ### Added
