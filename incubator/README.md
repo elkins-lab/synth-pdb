@@ -102,6 +102,42 @@ This document serves as a roadmap and brainstorming space for experimental, high
 
 ---
 
+## 💧 11. Explicit Solvent "Water Box" Simulator
+**The Vision:** Surround generated structures with explicit water molecules (TIP3P model) to simulate realistic solvent-protein interactions.
+
+*   **The Scientific Gap:** Implicit solvent models (GBSA) fail to capture "water-bridging" interactions—highly ordered water molecules that stabilize specific loops or binding sites.
+*   **The `synth-pdb` Angle:** Our core generation logic is fast; the bottleneck is the physics of thousands of water molecules. By implementing a "sparse" water box (only hydrating the surface or active site), we can maintain high performance while improving biophysical realism.
+*   **Current Status:** 💡 Concept Stage.
+
+---
+
+## 🏗️ 12. Heterogeneous BMRB Dataset Integration
+**The Vision:** Extend the ML dataset factory to produce mixed training sets containing both perfectly clean synthetic structures and noisy, experimental BMRB/PDB data pairs.
+
+*   **The Scientific Gap:** AI models trained only on synthetic data often fail on real, noisy experimental data.
+*   **The `synth-pdb` Angle:** `synth_nmr` already has a BMRB downloader. We can bridge this into `dataset.py` to create "Heterogeneous Batches"—half synthetic, half experimental—to improve the generalization of downstream GNNs and transformers.
+*   **Current Status:** 💡 Concept Stage.
+
+---
+
+## 🔄 13. Ensemble-Average NMR observables (RDC & RPF)
+**The Vision:** Shift from single-structure predictions to ensemble-averaged RDCs and RPF scores, reflecting the dynamic nature of proteins in solution.
+
+*   **The Scientific Gap:** Proteins are not static. NMR observables like RDCs are an average across all states in an ensemble. Standard predictors only look at a single PDB file.
+*   **The `synth-pdb` Angle:** Since we can generate ensembles at scale, we can compute observables for *each* member and average them (optionally weighted by energy). This provides a "Virtual NMR" experience that matches the complexity of real lab data.
+*   **Current Status:** 🛠️ Active Development (RDC shim implemented; RPF integration in progress).
+
+---
+
+## 📉 14. Interactive Q-Factor Validation Panel
+**The Vision:** Add a real-time "Q-factor" agreement score to the interactive quality tutorials, teaching users how to measure structural "truth" against RDC data.
+
+*   **The Scientific Gap:** Understanding RDC agreement (Q-factor) is mathematically non-trivial for many students.
+*   **The `synth-pdb` Angle:** Extend the `protein_quality_assessment.ipynb` tutorial to show how Q-factor changes as you "drift" a structure away from its native fold. It provides a visual, interactive bridge between raw coordinates and experimental validation metrics.
+*   **Current Status:** 🧪 Prototype Stage (Linked to Vision #13).
+
+---
+
 ## 📝 How to Contribute an Exploration
 1.  **Draft a Vision**: Define the "What If?".
 2.  **Define the Gap**: Why can't traditional tools do this easily?
