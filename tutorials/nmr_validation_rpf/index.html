@@ -4182,7 +4182,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="measuring-structural-truth-the-rpf-score">📏 Measuring Structural Truth: The RPF Score<a class="anchor-link" href="#measuring-structural-truth-the-rpf-score">¶</a></h1><h3 id="validating-protein-structures-against-nmr-restraints">Validating Protein Structures against NMR Restraints<a class="anchor-link" href="#validating-protein-structures-against-nmr-restraints">¶</a></h3><hr/>
+<h1 id="measuring-structural-truth-the-rpf-score">📏 Measuring Structural Truth: The RPF Score<a class="anchor-link" href="#measuring-structural-truth-the-rpf-score">¶</a></h1><h3 id="validating-protein-structures-against-nmr-restraints">Validating Protein Structures against NMR Restraints<a class="anchor-link" href="#validating-protein-structures-against-nmr-restraints">¶</a></h3><p><strong>Run this notebook in the cloud:</strong> <a href="https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/nmr_validation_rpf.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
+<hr/>
 <h2 id="objectives">🎯 Objectives<a class="anchor-link" href="#objectives">¶</a></h2><p>In this tutorial, you will learn how to:</p>
 <ol>
 <li><strong>Define "Structural Truth"</strong> in the context of solution NMR.</li>
@@ -4211,7 +4212,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6808d34e">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6a4e1488">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -4220,6 +4221,96 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy for="cell-1">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># @title 🛠️ Setup &amp; Installation { display-mode: "form" }</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># ── Environment detection ──────────────────────────────────────────────────</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+
+<span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>  <span class="c1"># already installed (e.g. via pip in a previous run)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb and dependencies..."</span><span class="p">)</span>
+        <span class="c1"># biotite is bundled as a dependency of synth-pdb; listed explicitly</span>
+        <span class="c1"># so Colab users see exactly what is being installed.</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">,</span>
+             <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">,</span> <span class="s2">"matplotlib"</span><span class="p">],</span>
+            <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Local / CI: add the repository root so the development copy is used</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
+    <span class="n">_repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">"../.."</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">_repo_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_repo_root</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   📌 Added repo root to path: </span><span class="si">{</span><span class="n">_repo_root</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment ready!"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-1"># @title 🛠️ Setup &amp; Installation { display-mode: "form" }
+import os
+import sys
+
+# ── Environment detection ──────────────────────────────────────────────────
+IN_COLAB = "google.colab" in sys.modules
+
+if IN_COLAB:
+    print("🌐 Running in Google Colab")
+    try:
+        import synth_pdb  # already installed (e.g. via pip in a previous run)
+        print("   ✅ synth-pdb already installed")
+    except ImportError:
+        print("   📦 Installing synth-pdb and dependencies...")
+        # biotite is bundled as a dependency of synth-pdb; listed explicitly
+        # so Colab users see exactly what is being installed.
+        import subprocess
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-q",
+             "synth-pdb", "biotite", "matplotlib"],
+            check=True,
+        )
+        print("   ✅ Installation complete")
+else:
+    # Local / CI: add the repository root so the development copy is used
+    print("💻 Running in local Jupyter environment")
+    _repo_root = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
+        print(f"   📌 Added repo root to path: {_repo_root}")
+
+print("✅ Environment ready!")
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6808d34e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy for="cell-2">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4240,7 +4331,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ NMR Validation module loaded!"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import numpy as np
+<div class="clipboard-copy-txt" id="cell-2">import numpy as np
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 import matplotlib.pyplot as plt
@@ -4275,7 +4366,7 @@ print("✅ NMR Validation module loaded!")</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy for="cell-2">
+<clipboard-copy for="cell-3">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4286,28 +4377,39 @@ print("✅ NMR Validation module loaded!")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-<span class="c1"># Generate a high-quality helix</span>
-<span class="n">seq</span> <span class="o">=</span> <span class="s2">"AKAAKAKAAK"</span> <span class="o">*</span> <span class="mi">2</span>
-<span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1"># Parse with Biotite</span>
+<span class="c1"># Generate a high-quality helix and observe its NOEs as "ground truth"</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="s2">"AKAAKAKAAK"</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Physics-based refinement for realistic coordinates</span>
+<span class="p">)</span>
+
+<span class="c1"># Parse the PDB string into a Biotite AtomArray</span>
 <span class="n">structure</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># Generate "Experimental" NOEs from this ground truth</span>
+<span class="c1"># Derive "experimental" NOE restraints from the ground-truth geometry</span>
 <span class="n">restraints</span> <span class="o">=</span> <span class="n">calculate_synthetic_noes</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">restraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> NOE restraints from Ground Truth."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">restraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> synthetic NOE restraints from ground truth."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Structure: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms, sequence length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import io
-# Generate a high-quality helix
-seq = "AKAAKAKAAK" * 2
-pdb_content = generate_pdb_content(sequence_str=seq, minimize_energy=True)
+<div class="clipboard-copy-txt" id="cell-3">import io
 
-# Parse with Biotite
+# Generate a high-quality helix and observe its NOEs as "ground truth"
+seq = "AKAAKAKAAK" * 2
+pdb_content = generate_pdb_content(
+    sequence_str=seq,
+    minimize_energy=True,  # Physics-based refinement for realistic coordinates
+)
+
+# Parse the PDB string into a Biotite AtomArray
 structure = pdb.PDBFile.read(io.StringIO(pdb_content)).get_structure(model=1)
 
-# Generate "Experimental" NOEs from this ground truth
+# Derive "experimental" NOE restraints from the ground-truth geometry
 restraints = calculate_synthetic_noes(structure)
-print(f"Generated {len(restraints)} NOE restraints from Ground Truth.")</div>
+print(f"Generated {len(restraints)} synthetic NOE restraints from ground truth.")
+print(f"Structure: {len(structure)} atoms, sequence length {len(seq)} residues")
+</div>
 </div>
 </div>
 </div>
@@ -4333,7 +4435,7 @@ print(f"Generated {len(restraints)} NOE restraints from Ground Truth.")</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy for="cell-3">
+<clipboard-copy for="cell-4">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4348,7 +4450,7 @@ print(f"Generated {len(restraints)} NOE restraints from Ground Truth.")</div>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">scores = calculate_rpf_score(structure, restraints)
+<div class="clipboard-copy-txt" id="cell-4">scores = calculate_rpf_score(structure, restraints)
 print("--- Ground Truth Scores ---")
 for k, v in scores.items():
     print(f"{k.capitalize()}: {v:.4f}")</div>
@@ -4377,7 +4479,7 @@ for k, v in scores.items():
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy for="cell-4">
+<clipboard-copy for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -4400,7 +4502,7 @@ for k, v in scores.items():
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">collapsed_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4"># Create a 'collapsed' version by scaling coordinates towards the center
+<div class="clipboard-copy-txt" id="cell-5"># Create a 'collapsed' version by scaling coordinates towards the center
 coords = structure.coord
 center = np.mean(coords, axis=0)
 collapsed_coords = (coords - center) * 0.7 + center # 30% collapse
