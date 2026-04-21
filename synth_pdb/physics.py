@@ -1468,16 +1468,6 @@ class EnergyMinimizer:
             # (and visualizers like PyMOL) know that the SG atoms are covalently linked,
             # rather than just displaying them as physically close.
 
-            if added_bonds:
-                for s, (id1, id2) in enumerate(added_bonds, 1):
-                    try:
-                        f.write(
-                            f"SSBOND{s:4d} CYS A {int(id1):4d}    "
-                            f"CYS A {int(id2):4d}                          \n"
-                        )
-                    except Exception:
-                        pass
-
             # Build PDB buffer
             # EDUCATIONAL NOTE - PDB Atom Sorting:
             # ------------------------------------
