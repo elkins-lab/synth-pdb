@@ -103,6 +103,21 @@ Choose a path based on your background and goals:
 - [Glossary of Scientific Terms & Acronyms](#glossary-of-scientific-terms--acronyms)
 - [License](#license)
 
+---
+
+## 🔬 Experimental Incubator
+
+The [`/incubator`](./incubator/) directory is our frontier for "What If?" scenarios and advanced structural biology research. This space is dedicated to developing use cases that push `synth-pdb` beyond traditional experimental boundaries:
+
+- **Cryo-EM "Standard Candle"**: Generating atomic-resolution density maps for software benchmarking.
+- **IDP Ensemble-First Validation**: Automated pipelines for modeling Intrinsically Disordered Proteins.
+- **Mapping the "Dark Proteome"**: Creating hard decoys for unverified AI-predicted structures.
+- **De Novo Miniprotein Forge**: Rapid prototyping for synthetic biology designs.
+
+Check out the [Incubator README](./incubator/README.md) for the full roadmap of these experimental explorations.
+
+---
+
 ## Features
 
 ✨ **Structure Generation**
