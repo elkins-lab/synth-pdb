@@ -1309,20 +1309,30 @@ For students and researchers interested in the physics behind the code, here are
 
 ## Glossary of Scientific Terms & Acronyms
 
-This section provides definitions and seminal references for the biophysical and computational terms used throughout `synth-pdb`.
+This section provides definitions and seminal references for the biophysical and computational terms used throughout `synth-pdb`. Entries are sorted alphabetically.
 
 | Term | Definition | Reference |
 | :--- | :--- | :--- |
-| **PDB** | **Protein Data Bank**. The global repository for 3D structural data of proteins, nucleic acids, and complex assemblies. | Berman, H. M., et al. (2000). *Nucleic Acids Res.* |
+| **AMBER** | **Assisted Model Building with Energy Refinement**. A widely-used suite of molecular simulation programs and force fields for biomolecules. | Case, D. A., et al. (2005). *J. Comput. Chem.* |
+| **B-factor** | **Temperature Factor** (8π²⟨u²⟩). Measures atomic displacement due to thermal motion and static disorder. Higher values indicate greater flexibility; lower values indicate rigidity. | — |
+| **Backbone-Dependent Rotamer** | A side-chain conformation probability that depends on the local backbone angles (φ, ψ). Used to select realistic side-chain orientations based on secondary structure context. | Dunbrack & Cohen (1997). *Protein Science.* |
 | **CASP** | **Critical Assessment of Structure Prediction**. A community-wide experiment held every two years to establish the state-of-the-art in protein structure modeling. | Kryshtafovych, A., et al. (2021). *Proteins.* |
-| **NOE** | **Nuclear Overhauser Effect**. A phenomenon where magnetization is transferred between spins through space, allowing for the measure of inter-atomic distances (r⁻⁶ dependency). | Wüthrich, K. (1986). *NMR of Proteins and Nucleic Acids.* |
+| **Chi Angles (χ)** | Dihedral angles describing side-chain conformation about successive bonds from Cα outward (χ₁, χ₂, …). Discrete preferred values define rotamers. | — |
 | **CSI** | **Chemical Shift Index**. A standard method used to deduce protein secondary structure (alpha helix vs. beta sheet) from detected NMR chemical shift deviations. | Wishart, D. S., et al. (1992). *Biochemistry.* |
+| **Macrocycle** | A cyclic macromolecule or macromolecular network, such as a cyclic peptide or a crown ether. In therapeutic chemistry, macrocyclization improves metabolic stability and binding affinity. | IUPAC Gold Book. |
+| **MolProbity** | A structure validation web service and scoring function providing the gold standard for Ramachandran and rotamer analysis. | Chen, V. B., et al. (2010). *Acta Cryst. D.* |
 | **NEF** | **NMR Exchange Format**. A unified, open standard for the exchange of NMR restraint data among various software packages. | Gutmanas, A., et al. (2015). *Nat. Struct. Mol. Biol.* |
 | **NeRF** | **Natural Extension Reference Frame**. An algorithm for rapidly constructing 3D Cartesian coordinates from internal coordinates (bond lengths, angles, and dihedrals). | Parsons, J., et al. (2005). *J. Comput. Chem.* |
-| **S²** | **Model-Free Order Parameter**. A value between 0 (random) and 1 (rigid) that describes the degree of spatial restriction of local backbone motion. | Lipari, G., & Szabo, A. (1982). *J. Am. Chem. Soc.* |
-| **OBC2** | **Onufriev-Bashford-Case**. A computationally efficient implicit solvent model (Generalized Born) used to simulate the screening effect of water. | Onufriev, A., et al. (2004). *Proteins.* |
-| **AMBER** | **Assisted Model Building with Energy Refinement**. A widely-used suite of molecular simulation programs and force fields for biomolecules. | Case, D. A., et al. (2005). *J. Comput. Chem.* |
-| **Macrocycle** | A cyclic macromolecule or a macromolecular network, such as a cyclic peptide or a crown ether. | IUPAC Gold Book. |
+| **NOE** | **Nuclear Overhauser Effect**. A phenomenon where magnetization is transferred between spins through space, allowing measurement of inter-atomic distances (r⁻⁶ dependency). | Wüthrich, K. (1986). *NMR of Proteins and Nucleic Acids.* |
+| **OBC2** | **Onufriev-Bashford-Case model 2**. A computationally efficient implicit solvent model (Generalized Born) used to simulate the screening effect of water on charged groups. | Onufriev, A., et al. (2004). *Proteins.* |
+| **PDB** | **Protein Data Bank**. The global repository for 3D structural data of proteins, nucleic acids, and complex assemblies. | Berman, H. M., et al. (2000). *Nucleic Acids Res.* |
+| **Phi/Psi (φ, ψ)** | Backbone dihedral angles. φ is defined by C(i−1)−N−Cα−C; ψ is defined by N−Cα−C−N(i+1). Together they determine backbone geometry and are plotted on the Ramachandran plot. | — |
+| **Pre-Proline** | The residue immediately preceding a Proline. It has restricted conformational freedom due to steric clash with the Proline ring, and uses a distinct Ramachandran distribution. | — |
+| **Ramachandran Plot** | A 2D plot of φ vs ψ angles showing energetically allowed and disallowed backbone conformations for amino acids. The basis for structural validation. | Ramachandran et al. (1963). *J. Mol. Biol.* |
+| **Rotamer** | Short for "Rotational Isomer". Preferred, low-energy side-chain conformations defined by discrete χ-angle clusters. | Dunbrack, R. L. (2002). *Curr. Opin. Struct. Biol.* |
+| **S²** | **Model-Free Order Parameter** (Lipari-Szabo). A value between 0 (random/flexible) and 1 (perfectly rigid) describing the degree of spatial restriction of local backbone motion on ps–ns timescales. | Lipari, G., & Szabo, A. (1982). *J. Am. Chem. Soc.* |
+| **SASA** | **Solvent Accessible Surface Area**. The surface area of a biomolecule accessible to a solvent probe (typically a 1.4 Å water molecule). Low SASA indicates a buried residue; high SASA indicates solvent exposure. | Shrake & Rupley (1973). *J. Mol. Biol.* |
+| **Top8000** | A high-quality curated dataset of ~8000 protein chains (resolution < 2.0 Å, low sequence homology) used to derive accurate Ramachandran contours and rotamer libraries. | Lovell, S. C., et al. (2003). *Proteins.* |
 
 ## License
 
@@ -1494,20 +1504,6 @@ For production-quality structure generation, consider:
 - **Rosetta** (de novo structure prediction)
 - **AlphaFold** (AI-based prediction)
 - **PyMOL/Chimera** (structure visualization and manipulation)
-
-## Glossary of Scientific Terms & Acronyms
-
-- **B-factor**: Temperature factor (\pi^2\langle u^2 \rangle$) measuring atomic displacement/flexibility.
-- **Backbone-Dependent Rotamer**: A side-chain conformation probability that depends on the local backbone angles ($\phi, \psi$).
-- **Chi Angles ($\chi$)**: Dihedral angles describing side-chain conformation.
-- **MolProbity**: A structure validation web service providing the gold standard for Ramachandran and rotamer analysis.
-- **OBC2**: Onufriev-Bashford-Case model 2. An implicit solvent model used in OpenMM.
-- **Phi/Psi ($\phi, \psi$)**: Backbone dihedral angles. $\phi$ (N-C$\alpha$), $\psi$ (C$\alpha569XilsC).
-- **Ramachandran Plot**: A 2D plot of $\phi$ vs $\psi$ angles showing allowed backbone conformations.
-- **Pre-Proline**: The residue preceding a Proline. It has restricted conformational freedom due to steric clash with the Proline ring.
-- **Rotamer**: Short for "Rotational Isomer". Preferred, low-energy side-chain conformations.
-- **SASA**: Solvent Accessible Surface Area. The surface area of a biomolecule that is accessible to a solvent (like water). Used to determine if a residue is buried (low SASA) or exposed (high SASA).
-- **Top8000**: A high-quality dataset of ~8000 protein chains (resolution < 2.0Å, low homology) used to derive accurate Ramachandran contours and rotamer libraries. (Reference: Lovell et al., 2003).
 
 ## References & Acknowledgements
 

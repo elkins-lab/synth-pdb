@@ -337,21 +337,21 @@ class PDBValidator:
             res_id = int(atom.res_id)
             if res_id not in res_sasa:
                 res_sasa[res_id] = 0.0
-            res_sasa[res_id] += sasa_per_atom[i]
+            res_sasa[res_id] += float(sasa_per_atom[i])
 
         for res_id, total_sasa in res_sasa.items():
             # Find residue name for this ID
             res_name = b_struc[b_struc.res_id == res_id].res_name[0]
             if res_name in hydrophobic_res:
-                hydro_vals.append(total_sasa)
+                hydro_vals.append(float(total_sasa))
             else:
-                polar_vals.append(total_sasa)
+                polar_vals.append(float(total_sasa))
 
         mean_hydro = np.mean(hydro_vals) if hydro_vals else 0.0
         mean_polar = np.mean(polar_vals) if polar_vals else 1.0  # Avoid div by zero
 
         return {
-            "SASA": res_sasa,
+            "SASA": {res_id: float(val) for res_id, val in res_sasa.items()},
             "mean_hydrophobic_sasa": float(mean_hydro),
             "mean_polar_sasa": float(mean_polar),
             "burial_ratio": float(mean_polar / (mean_hydro + 1e-6)),
