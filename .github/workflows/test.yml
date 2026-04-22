@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: ["3.11", "3.12", "3.13"]
-        numpy-version: ["1.26.4", "2.2.6"]
+        numpy-version: ["1.26.4", "2.2.6", "2.3.5"]
         exclude:
           # NumPy 2.x requires Python >=3.9; 1.26.x is the last 1.x release
           # All our supported Pythons are >=3.11 here so no exclusions needed,
