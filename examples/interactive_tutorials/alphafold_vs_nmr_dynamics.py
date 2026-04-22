@@ -1,213 +1,159 @@
 #!/usr/bin/env python
+"""AlphaFold pLDDT vs. NMR S² — companion script.
 
-# # 🤖 AlphaFold Confidence (pLDDT) vs. NMR Flexibility ($S^2$)
-# ### Validating AI predictions with physical molecular dynamics
-#
-# ---
-#
-# ## 🎯 Overview & Academic Context
-#
-# When AlphaFold2 predicts a protein structure, it assigns a confidence score to every residue called **pLDDT** (predicted Local Distance Difference Test, 0-100).
-#
-# A major finding in recent structural biology is that regions with low pLDDT (<70) are not necessarily "wrong" predictions. Instead, they often physically correspond to **Intrinsically Disordered Regions (IDRs)** or highly flexible loops.
-#
-# ### 📚 Key Literature References
-# 1. **Ruff & Pappu (2021)** - *"AlphaFold and Implications for Intrinsically Disordered Proteins" (JMB)*. Demonstrated that low pLDDT strongly correlates with dynamic disorder.
-# 2. **Alderson et al. (2022)** - *"Local unfolding of the p53 DNA binding domain... predicted by AlphaFold2" (PNAS)*. Correlated pLDDT with experimental NMR relaxation dispersion.
-# 3. **Zweckstetter (2021)** - *"NMR: prediction of protein flexibility" (Nature Comm)*. Showed that AI confidence maps directly to NMR $S^2$ order parameters.
-#
-# ### 🧪 The Experiment
-# In real NMR, backbone flexibility is measured by the **Lipari-Szabo order parameter ($S^2$)**, which ranges from 0 (completely flexible) to 1 (completely rigid). In Molecular Dynamics, flexibility is measured by **RMSF** (Root Mean Square Fluctuation).
-#
-# In this tutorial, we will:
-# 1. Generate a synthetic structure with a mix of rigid helices and a flexible unstructured loop.
-# 2. Use `synth_pdb.physics` to run a brief molecular dynamics simulation of this chain.
-# 3. Calculate the RMSF of each residue across the trajectory.
-# 4. Correlate the simulated physical flexibility directly to the known secondary structure profile, demonstrating how static sequence/structure mappings give rise to dynamic physical observables.
-
-# In[ ]:
-
-
-# 🔧 Environment Detection & Setup
-import os
-import sys
-
-IN_COLAB = "google.colab" in sys.modules
-
-if IN_COLAB:
-    print("🌐 Running in Google Colab")
-    try:
-        import synth_pdb
-
-        print("   ✅ synth-pdb already installed")
-    except ImportError:
-        print("   📦 Installing synth-pdb and dependencies...")
-        get_ipython().system("pip install -q synth-pdb py3Dmol biotite mdtraj")
-        print("   ✅ Installation complete")
-    import plotly.io as pio
-
-    pio.renderers.default = "colab"
-else:
-    print("💻 Running in local Jupyter environment")
-    sys.path.append(os.path.abspath("../../"))
-
-print("✅ Environment configured!")
-
-
-# In[ ]:
-
+Mirrors the notebook logic without py3Dmol (no interactive viewer in plain
+Python). Run this as a smoke test for the full tutorial pipeline.
+"""
 
 import io
+import os
+import sys
+from typing import List
 
-import biotite.structure.io.pdb as pdb
+import biotite.structure.io.pdb as bpdb
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import py3Dmol
+import numpy.typing as npt
 
-from synth_pdb.generator import generate_pdb_content
-from synth_pdb.physics import simulate_trajectory
+# ── Repo path setup (local dev) ───────────────────────────────────────────────
+_here = os.path.dirname(os.path.abspath(__file__))
+_repo_root = os.path.abspath(os.path.join(_here, "../../"))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
 
-print("📦 All imports successful!")
+# Standard imports after path manipulation to satisfy E402
+from synth_pdb.generator import generate_pdb_content  # noqa: E402
+from synth_pdb.geometry.superposition import kabsch_superposition  # noqa: E402
+from synth_pdb.physics import simulate_trajectory  # noqa: E402
 
+matplotlib.use("Agg")  # non-interactive backend for script execution
 
-# ## 1. Generating a Test Structure
-#
-# We will design a 45-residue protein with two rigid Alpha-helices connected by a long, 15-residue "random coil" loop.
-#
-# In AlphaFold, the helices would score pLDDT > 90, while the long unstructured loop would score pLDDT < 50.
+# ── Constants ─────────────────────────────────────────────────────────────────
+SEQUENCE = "MEAAAQAAAAEAAAK" + "GSGSGSGSSGGSGSG" + "MAAAAQAAAAEAAAK"
+STRUCTURE_DEF = "1-15:alpha, 16-30:random, 31-45:alpha"
+HELIX1 = slice(0, 15)
+LOOP = slice(15, 30)
+HELIX2 = slice(30, 45)
 
-# In[ ]:
-
-
-# Sequence: Helix (15) - Flexible Loop (15) - Helix (15)
-sequence = "MEAAAQAAAAEAAAK" + "GSGSGSGSSGGSGSG" + "MAAAAQAAAAEAAAK"
-structure_def = "1-15:alpha, 16-30:random, 31-45:alpha"
-
+# ── Step 1: Generate structure ────────────────────────────────────────────────
 print("🧬 Generating initial structure and minimizing energy...")
-# Must minimize energy to resolve steric clashes before MD simulation
 initial_pdb = generate_pdb_content(
-    sequence_str=sequence, structure=structure_def, optimize_sidechains=True, minimize_energy=True
+    sequence_str=SEQUENCE,
+    structure=STRUCTURE_DEF,
+    optimize_sidechains=True,
+    minimize_energy=True,
 )
-
 print("✅ Baseline structure ready!")
 
-
-# ## 2. Simulating Physical Dynamics (MD)
-#
-# To measure flexibility, we need to observe the molecule moving over time. We will use `synth_pdb.physics.simulate_trajectory` to run a brief Molecular Dynamics (MD) simulation using OpenMM.
-#
-# *Note: Real NMR characterizes nanosecond to millisecond motions. Our short MD run will just capture fast picosecond thermal fluctuations.*
-
-# In[ ]:
-
-
-print("🔥 Heating up and simulating thermal dynamics (This may take 10-20 seconds)...")
+# ── Step 2: MD simulation ─────────────────────────────────────────────────────
+print("🔥 Running MD simulation (10–30 s on CPU)...")
 trajectory_pdbs = simulate_trajectory(
     pdb_content=initial_pdb,
-    temperature_kelvin=400.0,  # High temperature to accelerate unfolding of the loop while helices resist
-    steps=5000,  # 5x longer simulation for clearer RMSF separation
-    report_interval=50,  # Save 100 frames to the trajectory
+    temperature_kelvin=350.0,
+    steps=5000,
+    report_interval=50,
 )
+print(f"✅ Simulation complete! Captured {len(trajectory_pdbs)} trajectory frames.")
 
-print(f"✅ Sim complete! Captured {len(trajectory_pdbs)} trajectory frames.")
-
-
-# ## 3. Visualizing the Trajectory
-#
-# Let's overlay all the frames from the trajectory. You should visibly see the two alpha-helices remaining relatively tight and static (dark blue/red lines), while the central disordered loop whips around wildly (green/yellow spectrum).
-
-# In[ ]:
+# ── Step 3: Kabsch-aligned RMSF ───────────────────────────────────────────────
 
 
-view = py3Dmol.view(width=800, height=500)
+def calculate_ca_rmsf_aligned(trajectory_list: List[str]) -> npt.NDArray[np.float64]:
+    """Per-residue Cα RMSF with Kabsch alignment of every frame.
 
-# Add the initial structure as a thick tube
-view.addModel(initial_pdb, "pdb")
-view.setStyle({"model": -1}, {"tube": {"color": "white", "radius": 0.5, "opacity": 0.3}})
-
-# Add all trajectory frames as thin lines colored by spectrum (N -> C terminus)
-for frame_pdb in trajectory_pdbs:
-    view.addModel(frame_pdb, "pdb")
-    view.setStyle({"model": -1}, {"line": {"color": "spectrum", "linewidth": 2}})
-
-view.zoomTo()
-view.show()
-
-print("White Tube: Starting position.\nRainbow Lines: The 50 thermal motion frames superimposed.")
-
-
-# ## 4. Calculating Flexibility (RMSF)
-#
-# Root Mean Square Fluctuation (RMSF) measures the standard deviation of each atom's position from its average position over the trajectory.
-#
-# - **Low RMSF** = Rigid (High NMR $S^2$, High AlphaFold pLDDT)
-# - **High RMSF** = Flexible (Low NMR $S^2$, Low AlphaFold pLDDT)
-
-# In[ ]:
-
-
-def calculate_ca_rmsf(trajectory_pdbs):
-    """Calculates the RMSF of the C-alpha atoms across the trajectory."""
-    ca_coords = []
-
-    # Extract CA coordinates for every frame
-    for frame in trajectory_pdbs:
-        struct = pdb.PDBFile.read(io.StringIO(frame)).get_structure(model=1)
+    Algorithm:
+      1. Extract Cα coordinates → shape (F, N, 3).
+      2. Compute coarse mean structure.
+      3. Kabsch-align each frame to the mean.
+      4. Recompute refined mean of aligned frames.
+      5. RMSF = sqrt(mean squared deviation from aligned mean).
+    """
+    ca_coords_list = []
+    for frame in trajectory_list:
+        struct = bpdb.PDBFile.read(io.StringIO(frame)).get_structure(model=1)
         ca = struct[struct.atom_name == "CA"]
-        ca_coords.append(ca.coord)
+        ca_coords_list.append(ca.coord)
 
-    ca_coords = np.array(ca_coords)  # Shape: (frames, residues, 3)
+    ca_coords = np.array(ca_coords_list, dtype=np.float64)  # (F, N, 3)
 
-    # For a perfect RMSF, we should structurally align (superimpose) the frames first.
-    # To keep this tutorial fast and dependency-light, we rely on the short simulation
-    # not having diffused away significantly (which is true for 1000 steps).
+    # Pass 1 — coarse mean
+    mean_coords = ca_coords.mean(axis=0)
 
-    # Calculate mean position for each residue
-    mean_coords = np.mean(ca_coords, axis=0)  # Shape: (residues, 3)
+    # Kabsch-align every frame to the coarse mean
+    aligned = np.empty_like(ca_coords)
+    for i, frame_coords in enumerate(ca_coords):
+        rot_matrix, translation = kabsch_superposition(frame_coords, mean_coords)
+        aligned[i] = (rot_matrix @ frame_coords.T).T + translation
 
-    # Calculate squared deviations
-    deviations = ca_coords - mean_coords  # Shape: (frames, residues, 3)
-    sq_deviations = np.sum(deviations**2, axis=2)  # Shape: (frames, residues)
+    # Pass 2 — refined mean
+    aligned_mean = aligned.mean(axis=0)
 
-    # RMSF = sqrt(mean of squared deviations)
-    rmsf = np.sqrt(np.mean(sq_deviations, axis=0))
-
+    sq_dev = np.sum((aligned - aligned_mean) ** 2, axis=2)  # (F, N)
+    rmsf: npt.NDArray[np.float64] = np.sqrt(sq_dev.mean(axis=0))  # (N,)
     return rmsf
 
 
-rmsf_profile = calculate_ca_rmsf(trajectory_pdbs)
-print("✅ RMSF calculation complete.")
+rmsf_profile = calculate_ca_rmsf_aligned(trajectory_pdbs)
+print(f"✅ RMSF calculation complete ({len(rmsf_profile)} residues).")
+print(f"   Mean RMSF helix 1 : {rmsf_profile[HELIX1].mean():.3f} Å")
+print(f"   Mean RMSF loop    : {rmsf_profile[LOOP].mean():.3f} Å")
+print(f"   Mean RMSF helix 2 : {rmsf_profile[HELIX2].mean():.3f} Å")
 
+# ── Step 4: S² from RMSF ─────────────────────────────────────────────────────
+rmsf_max = rmsf_profile.max() + 1e-9
+s2_profile = np.clip(1.0 - (rmsf_profile / rmsf_max) ** 2, 0.0, 1.0)
 
-# In[ ]:
+# Simulated AlphaFold pLDDT from known secondary structure
+rng = np.random.default_rng(42)
+plddt = np.empty(45)
+plddt[HELIX1] = rng.normal(90, 4, 15)
+plddt[LOOP] = rng.normal(45, 7, 15)
+plddt[HELIX2] = rng.normal(90, 4, 15)
+plddt = np.clip(plddt, 0, 100)
 
+# ── Step 5: Plot ─────────────────────────────────────────────────────────────
+residues = np.arange(1, 46)
 
-plt.figure(figsize=(10, 5))
-
-residues = np.arange(1, len(rmsf_profile) + 1)
-plt.plot(residues, rmsf_profile, "o-", color="purple", linewidth=2, markersize=6)
-
-# Shade the regions to match our initial sequence definition
-plt.axvspan(1, 15, color="blue", alpha=0.1, label="Helix 1 (Expected High pLDDT)")
-plt.axvspan(16, 30, color="orange", alpha=0.1, label="Disordered Loop (Expected Low pLDDT)")
-plt.axvspan(31, 45, color="green", alpha=0.1, label="Helix 2 (Expected High pLDDT)")
-
-plt.xlabel("Residue Number", fontsize=12)
-plt.ylabel("RMSF (Ångströms)", fontsize=12)
-plt.title(
-    "Simulated Physical Flexibility (MD RMSF vs. Sequence Regions)", fontsize=14, fontweight="bold"
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
+fig.suptitle(
+    "The Three-Way Correlation: MD Flexibility, NMR S², AlphaFold pLDDT",
+    fontsize=13,
+    fontweight="bold",
 )
-plt.legend(loc="upper right")
-plt.grid(alpha=0.3)
-plt.xlim(1, 45)
-plt.ylim(bottom=0)
-plt.show()
 
-print("\n💡 EXPERIMENTAL CONCLUSION:")
+for ax in (ax1, ax2):
+    ax.axvspan(1, 15, color="#3b82f6", alpha=0.10)
+    ax.axvspan(16, 30, color="#f97316", alpha=0.10)
+    ax.axvspan(31, 45, color="#22c55e", alpha=0.10)
+    ax.set_xlim(1, 45)
+    ax.grid(alpha=0.20)
+
+ax1.plot(residues, s2_profile, "s-", color="#60a5fa", lw=2, ms=5, label="Synthetic S²")
+ax1.axhline(0.85, color="#3b82f6", ls="--", lw=1, alpha=0.7, label="Helix benchmark (S²=0.85)")
+ax1.axhline(0.45, color="#f97316", ls="--", lw=1, alpha=0.7, label="Loop benchmark (S²=0.45)")
+ax1.set_ylabel("Order Parameter S²")
+ax1.set_ylim(0, 1.15)
+ax1.legend(fontsize=9, loc="lower right")
+
+ax2.plot(residues, plddt, "o-", color="#f59e0b", lw=2, ms=5, label="Simulated pLDDT")
+ax2.axhline(70, color="gray", ls=":", lw=1.2, alpha=0.8, label="pLDDT=70 threshold")
+ax2.set_xlabel("Residue Number")
+ax2.set_ylabel("pLDDT Score")
+ax2.set_ylim(0, 110)
+ax2.legend(fontsize=9, loc="lower right")
+
+plt.tight_layout()
+out_path = os.path.join(_here, "alphafold_vs_nmr_dynamics_output.png")
+plt.savefig(out_path, dpi=150)
+print(f"📊 Plot saved to {out_path}")
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+print("\n💡 CONCLUSION:")
 print("=" * 60)
-print("As shown in the plot, the unstructured loop (residues 16-30) exhibits significantly ")
-print("higher physical flexibility (RMSF) than the flanking rigid helices. ")
-print("\nThis perfectly mirrors modern structural biology findings: AlphaFold assigns a low ")
-print("pLDDT confidence score to the loop not because it 'failed' to predict it, but ")
-print("because the sequence physically corresponds to a highly dynamic, flexible region ")
-print("with a low NMR S² order parameter. The AI is successfully predicting disorder!")
+print(f"  Helix mean S²  : {s2_profile[HELIX1].mean():.2f} (rigid — high pLDDT expected)")
+print(f"  Loop  mean S²  : {s2_profile[LOOP].mean():.2f}   (flexible — low pLDDT expected)")
+print()
+print("  Low pLDDT ≠ prediction failure.")
+print("  AlphaFold correctly flags flexible regions as low-confidence.")
+print("  Low pLDDT = low S² = high RMSF.")
