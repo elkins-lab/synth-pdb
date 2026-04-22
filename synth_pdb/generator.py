@@ -1459,11 +1459,16 @@ def _assemble_pdb_output(
     n_term_serial = None
     c_term_serial = None
     sg_serials: Dict[int, int] = {}
-    serial = 0  # Initialize to avoid UnboundLocalError
+    serial = 0  # tracks last serial of any ATOM/HETATM line
+    last_atom_serial = 0  # tracks last serial of ATOM (polymer) lines only
+    last_protein_atom_line: Optional[str] = None  # last ATOM line text
 
     for line in atomic_and_ter_content.splitlines():
         if line.startswith("ATOM") or line.startswith("HETATM"):
             serial = int(line[6:11].strip())
+            if line.startswith("ATOM"):
+                last_atom_serial = serial
+                last_protein_atom_line = line
             atom_name = line[12:16].strip()
             res_name = line[17:20].strip()
             res_num = int(line[22:26].strip())
@@ -1496,15 +1501,27 @@ def _assemble_pdb_output(
         logger.error("Generated PDB content is empty! Falling back to raw sequence string.")
         return atomic_and_ter_content
 
-    last_line = lines[-1]
-    if last_line.startswith("ATOM") or last_line.startswith("HETATM"):
-        last_atom = peptide[-1]
-        ter_atom_num = serial + 1
+    has_ter = any(line_str.startswith("TER") for line_str in lines)
+    if not has_ter and last_protein_atom_line is not None:
+        # TER serial = last ATOM serial + 1 (PDB standard: TER follows polymer,
+        # not HETATM records — ZN/metal ions must not shift the TER serial).
+        ter_atom_num = last_atom_serial + 1
+        # Residue info from the last ATOM line, not from peptide[-1] which may
+        # be a HETATM/metal atom appended to the AtomArray.
+        ter_res_name = last_protein_atom_line[17:20].strip()
+        ter_chain_id = last_protein_atom_line[21].strip()
+        ter_res_num = int(last_protein_atom_line[22:26].strip())
         ter_record = (
-            f"TER   {ter_atom_num: >5}      {last_atom.res_name: >3} "
-            f"{last_atom.chain_id: <1}{last_atom.res_id: >4}"
+            f"TER   {ter_atom_num: >5}      {ter_res_name: >3} "
+            f"{ter_chain_id: <1}{ter_res_num: >4}"
         ).ljust(80)
-        atomic_and_ter_content = atomic_and_ter_content.strip() + "\n" + ter_record + "\n"
+        # Insert TER immediately after the last ATOM line, before any trailing HETATMs
+        insert_lines = atomic_and_ter_content.strip().splitlines()
+        last_atom_idx = max(
+            i for i, line_str in enumerate(insert_lines) if line_str.startswith("ATOM")
+        )
+        insert_lines.insert(last_atom_idx + 1, ter_record)
+        atomic_and_ter_content = "\n".join(insert_lines) + "\n"
 
     # Pad to 80 chars
     padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]

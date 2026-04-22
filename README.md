@@ -3,7 +3,7 @@
 A command-line tool to generate Protein Data Bank (PDB) files with full atomic representation for testing, benchmarking and educational purposes.
 
 [![PyPI version](https://img.shields.io/badge/pypi-v1.29.0-blue)](https://pypi.org/project/synth-pdb/)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18357242.svg)](https://doi.org/10.5281/zenodo.18357242)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)
@@ -17,7 +17,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 ## 📚 Interactive Tutorials
 
 ### Prerequisites
-- **Python 3.8+** and basic Python knowledge
+- **Python 3.10+** and basic Python knowledge
 - **Google Colab** account (free) or local Jupyter environment
 - Specific tutorials may require domain knowledge (noted in difficulty levels)
 
@@ -289,7 +289,7 @@ pip install .
 ```
 
 ### Requirements
-- Python 3.8+
+- Python 3.10+
 - NumPy
 - Biotite (for residue templates and structure manipulation)
 
@@ -1248,7 +1248,7 @@ pytest tests/test_generator.py -v
 ```
 
 **Test Coverage**: 87% overall
-- 842 tests covering generation, validation, CLI, and edge cases
+- 889 tests covering generation, validation, CLI, and edge cases
 
 ### Project Structure
 
