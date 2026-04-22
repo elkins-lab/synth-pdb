@@ -28,6 +28,34 @@ def test_read_shift_file_success() -> None:
             os.remove(temp_path)
 
 
+def test_read_shift_file_whitespace_and_comments() -> None:
+    """Verify robust parsing of varied whitespace and comments."""
+    content = """
+    # Multiple comment lines
+    # To test robustness
+
+    10    CA    55.20
+
+    11    CB    32.1    # Inline comment should be ignored (if handled by line.split)
+
+    # Another comment
+    12    N     115.5
+    """
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".str", delete=False) as f:
+        f.write(content)
+        temp_path = f.name
+
+    try:
+        shifts = read_shift_file(temp_path)
+        assert len(shifts) == 3
+        assert shifts[0]["res_id"] == 10
+        assert shifts[1]["atom_name"] == "CB"
+        assert shifts[2]["value"] == 115.5
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
 def test_read_shift_file_not_found() -> None:
     """Verify FileNotFoundError."""
     with pytest.raises(FileNotFoundError):
