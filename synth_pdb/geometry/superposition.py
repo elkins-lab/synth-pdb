@@ -9,12 +9,13 @@ For overall fold alignment, C-alpha (CA) only is often used.
 """
 
 import logging
-from typing import List, cast
+from typing import List
 
 import numpy as np
 import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
+
 
 def kabsch_superposition(
     P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]  # noqa: N803
@@ -47,9 +48,7 @@ def kabsch_superposition(
     # Validate input
     if P.shape != Q.shape:
         logger.error(f"Shape mismatch: P.shape={P.shape}, Q.shape={Q.shape}")
-        raise ValueError(
-            f"Coordinate arrays must have same shape. Got P: {P.shape}, Q: {Q.shape}"
-        )
+        raise ValueError(f"Coordinate arrays must have same shape. Got P: {P.shape}, Q: {Q.shape}")
 
     if len(P.shape) != 2 or P.shape[1] != 3:
         logger.error(f"Invalid shape: {P.shape}")
@@ -131,7 +130,7 @@ def apply_transformation(
         >>> np.allclose(transformed, coords + t)
         True
     """
-    return cast(npt.NDArray[np.float64], (rotation @ coords.T).T + translation)
+    return (rotation @ coords.T).T + translation
 
 
 def superimpose_structures(
@@ -159,10 +158,7 @@ def superimpose_structures(
     return apply_transformation(mobile, R, t)
 
 
-
-def find_medoid(
-    coords_list: List[npt.NDArray[np.float64]], superimpose: bool = True
-) -> int:
+def find_medoid(coords_list: List[npt.NDArray[np.float64]], superimpose: bool = True) -> int:
     """
     Find medoid structure (most representative) from ensemble.
 
@@ -187,6 +183,7 @@ def find_medoid(
         True
     """
     from synth_pdb.geometry.rmsd import calculate_pairwise_rmsd
+
     rmsd_matrix = calculate_pairwise_rmsd(coords_list, superimpose=superimpose)
     sum_rmsds = rmsd_matrix.sum(axis=1)
     return int(np.argmin(sum_rmsds))
