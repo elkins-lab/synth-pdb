@@ -101,13 +101,13 @@ print(f"R={score.recall:.3f}  P={score.precision:.3f}  F={score.f_score:.3f}  DP
 | F 0.50–0.70 | Moderate — review restraint completeness |
 | F < 0.50 | Poor — significant structural errors |
 
-See the [RPF Validation tutorial](../tutorials/nmr_validation_rpf.ipynb) for an interactive demonstration.
+See the [RPF Validation tutorial](tutorials/nmr_validation_rpf.ipynb) for an interactive demonstration.
 
 ---
 
 ## Residual Dipolar Couplings (RDC)
 
-See the dedicated **[RDC module documentation](api/rdc.md)** and the [RDC Alignment Explorer tutorial](../tutorials/rdc_alignment_explorer.ipynb).
+See the dedicated **[RDC module documentation](api/rdc.md)** and the [RDC Alignment Explorer tutorial](tutorials/rdc_alignment_explorer.ipynb).
 
 ---
 

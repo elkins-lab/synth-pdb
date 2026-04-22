@@ -170,4 +170,4 @@ print(f"Representative model: #{stats.medoid_index + 1}")
 
 - [Tutorial: IDP Conformational Ensembles](../tutorials/idp_ensemble_validation.ipynb)
 - [API: geometry module](geometry.md) — Kabsch superposition used internally
-- [Glossary: DAOP, RMSF, S²](../../README.md#glossary-of-scientific-terms--acronyms)
+- [Glossary: DAOP, RMSF, S²](https://github.com/elkins/synth-pdb#glossary-of-scientific-terms--acronyms)

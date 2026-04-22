@@ -67,6 +67,7 @@ nav:
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
       - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
       - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
+      - RPF Validation: tutorials/nmr_validation_rpf.ipynb
       - Coevolution MSA Factory: tutorials/coevolution_msa_factory.ipynb
       - Executed MSA Pipeline: tutorials/executed_msa.ipynb
     - ML Integration:
@@ -83,6 +84,8 @@ nav:
       - Ubiquitin Chemical Shift: tutorials/ubiquitin_chemical_shift_validation.ipynb
       - Ubiquitin J-Coupling: tutorials/ubiquitin_j_coupling_validation.ipynb
       - Ubiquitin RDCs: tutorials/ubiquitin_rdc_validation.ipynb
+      - SASA & Hydrophobic Burial: tutorials/sasa_hydrophobic_burial.ipynb
+      - Defensibility Dashboard: tutorials/structure_defensibility_dashboard.ipynb
   - Examples:
     - Gallery: examples/gallery.md
     - Biologically-Inspired: examples/biological.md
