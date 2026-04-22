@@ -1,7 +1,7 @@
 # synth-pdb
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/demo.ipynb)
-[![PyPI version](https://badge.fury.io/py/synth-pdb.svg)](https://badge.fury.io/py/synth-pdb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/virtual_nmr_spectrometer.ipynb)
+[![PyPI version](https://img.shields.io/pypi/v/synth-pdb.svg?label=pypi%20package&color=brightgreen)](https://pypi.org/project/synth-pdb/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education, and tool development.**
