@@ -1049,6 +1049,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#energy-minimization-metadata-preservation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Energy Minimization &amp; Metadata Preservation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Energy Minimization &amp; Metadata Preservation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ptm-and-residue-restoration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PTM and Residue Restoration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3548,6 +3576,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#energy-minimization-metadata-preservation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Energy Minimization &amp; Metadata Preservation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Energy Minimization &amp; Metadata Preservation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ptm-and-residue-restoration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PTM and Residue Restoration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3606,6 +3662,15 @@ To ensure restraints are drawn even if metadata is slightly mismatched:
 1.  <strong>Strict Match</strong>: Try selecting atom by <code>Chain + Residue + Name</code>.
 2.  <strong>Fallback</strong>: If strict match returns 0 atoms, retry with <code>Residue + Name</code> (ignoring chain).
 3.  <strong>Debug</strong>: If both fail, log a detailed error listing available atoms in that residue.</p>
+<h2 id="energy-minimization-metadata-preservation">Energy Minimization &amp; Metadata Preservation</h2>
+<h3 id="ptm-and-residue-restoration">PTM and Residue Restoration</h3>
+<p>OpenMM's standard forcefields require specific residue naming conventions for template matching (e.g., <code>SEP</code> must be renamed to <code>SER</code> if using a standard forcefield without PTM parameters, or simply because OpenMM internally reverts them during certain operations).</p>
+<p><strong>The Issue:</strong>
+Downstream tools and viewers (PyMOL, ChimeraX) rely on the original PTM names (<code>SEP</code>, <code>TPO</code>, <code>PTR</code>) to render modifications correctly. If the names are reverted to standard residues during minimization, the modification "disappears" visually.</p>
+<p><strong>The Solution:</strong>
+After minimization, the <code>_do_energy_minimization</code> function in <code>generator.py</code> manually restores these names by mapping the original sequence back onto the minimized coordinates. This is applied to both the <code>Biotite</code> AtomArray and the raw PDB string output.</p>
+<p><strong>Future Enhancement:</strong>
+Currently, this restoration logic covers PTMs (<code>SEP</code>, <code>TPO</code>, <code>PTR</code>) and Histidine tautomers (<code>HIE</code>, <code>HID</code>, <code>HIP</code>). It should be extended to include <strong>D-Amino Acids</strong> (e.g., <code>DAL</code>, <code>DSE</code>, etc.), which are also renamed to standard types before simulation in <code>physics.py</code>.</p>
 
 
 
