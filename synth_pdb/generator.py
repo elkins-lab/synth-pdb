@@ -1379,6 +1379,9 @@ def _do_energy_minimization(
 
             # RESTORE PTM NAMES (Fix for "Missing Orange Balls"):
             # OpenMM reverted SEP→SER etc.; restore for downstream viewers.
+            # We must rename in BOTH the AtomArray (peptide.res_name) AND in the
+            # raw PDB string (atomic_and_ter_content) — the final output is assembled
+            # from the string, so only patching the array leaves PTMs silently absent.
             try:
                 unique_res_ids = np.unique(peptide.res_id)
                 n_seq = len(sequence)
@@ -1392,12 +1395,33 @@ def _do_energy_minimization(
                         if first_res_name_local == "ACE":
                             logger.info("Detected N-terminal ACE cap. Applying start offset of 1.")
                             start_offset = 1
+
+                # Build a mapping: PDB residue-number → new PTM name
+                ptm_rename_map: dict = {}  # {res_id_int: "SEP"/"TPO"/...}
                 if n_min >= n_seq + start_offset:
                     for idx, res_name_target in enumerate(sequence):
                         rid = unique_res_ids[idx + start_offset]
                         if res_name_target in ["SEP", "TPO", "PTR", "HIE", "HID", "HIP"]:
                             mask = peptide.res_id == rid
                             peptide.res_name[mask] = res_name_target
+                            ptm_rename_map[int(rid)] = res_name_target
+
+                # Apply the same renames to the raw PDB string so the final
+                # assembled output contains the correct PTM residue names.
+                if ptm_rename_map:
+                    patched_lines = []
+                    for line in atomic_and_ter_content.splitlines():
+                        if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
+                            try:
+                                line_res_id = int(line[22:26].strip())
+                                if line_res_id in ptm_rename_map:
+                                    new_name = f"{ptm_rename_map[line_res_id]:>3}"
+                                    line = line[:17] + new_name + line[20:]
+                            except (ValueError, IndexError):
+                                pass
+                        patched_lines.append(line)
+                    atomic_and_ter_content = "\n".join(patched_lines) + "\n"
+
             except Exception as ptm_err:
                 logger.warning(f"Failed to restore PTM names: {ptm_err}")
 

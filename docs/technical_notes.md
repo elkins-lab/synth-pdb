@@ -51,3 +51,17 @@ To ensure restraints are drawn even if metadata is slightly mismatched:
 1.  **Strict Match**: Try selecting atom by `Chain + Residue + Name`.
 2.  **Fallback**: If strict match returns 0 atoms, retry with `Residue + Name` (ignoring chain).
 3.  **Debug**: If both fail, log a detailed error listing available atoms in that residue.
+
+## Energy Minimization & Metadata Preservation
+
+### PTM and Residue Restoration
+OpenMM's standard forcefields require specific residue naming conventions for template matching (e.g., `SEP` must be renamed to `SER` if using a standard forcefield without PTM parameters, or simply because OpenMM internally reverts them during certain operations).
+
+**The Issue:**
+Downstream tools and viewers (PyMOL, ChimeraX) rely on the original PTM names (`SEP`, `TPO`, `PTR`) to render modifications correctly. If the names are reverted to standard residues during minimization, the modification "disappears" visually.
+
+**The Solution:**
+After minimization, the `_do_energy_minimization` function in `generator.py` manually restores these names by mapping the original sequence back onto the minimized coordinates. This is applied to both the `Biotite` AtomArray and the raw PDB string output.
+
+**Future Enhancement:**
+Currently, this restoration logic covers PTMs (`SEP`, `TPO`, `PTR`) and Histidine tautomers (`HIE`, `HID`, `HIP`). It should be extended to include **D-Amino Acids** (e.g., `DAL`, `DSE`, etc.), which are also renamed to standard types before simulation in `physics.py`.
