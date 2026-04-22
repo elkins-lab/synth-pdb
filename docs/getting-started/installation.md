@@ -80,7 +80,7 @@ synth-pdb --version
 
 Expected output:
 ```
-synth-pdb version 1.29.0
+synth-pdb version 1.30.0
 ```
 
 Test basic functionality:

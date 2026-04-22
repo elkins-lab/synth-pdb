@@ -100,6 +100,8 @@ nav:
       - chemical_shifts: api/chemical_shifts.md
       - relaxation: api/relaxation.md
       - nmr: api/nmr.md
+      - rdc: api/rdc.md
+      - ensemble: api/ensemble.md
       - biophysics: api/biophysics.md
       - plm: api/plm.md
     - Utilities:
@@ -109,6 +111,7 @@ nav:
   - Scientific Background:
     - Biophysics Fundamentals: science/biophysics.md
     - Intrinsically Disordered Proteins: science/idp-dynamics.md
+    - NMR Ensemble Analysis: science/ensemble-analysis.md
     - Ramachandran Plots: science/ramachandran.md
     - Rotamer Libraries: science/rotamers.md
     - NeRF Geometry: science/nerf-geometry.md

@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.30.0] - 2026-04-22
+
+### Added
+- **New Documentation Pages**:
+  - `docs/api/rdc.md`: Full API reference for `synth_pdb.rdc` — Saupe-matrix RDC back-calculation, Q-factor interpretation table, alignment media comparison, and complete workflow example.
+  - `docs/api/ensemble.md`: Full API reference for `synth_pdb.ensemble` — `DAOPCalculator`, `EnsembleStatistics`, and `QualityAssessment` with Tejero 2013 quality thresholds.
+  - `docs/science/ensemble-analysis.md`: Science background page explaining DAOP circular statistics, coordinate RMSD/RMSF, medoid selection, and IDP ensemble caveats.
+- **Documentation Expansions**:
+  - `docs/getting-started/first-structure.md`: Rewrote stub into a full 5-step walkthrough (generate → visualise → validate → minimise → Python API).
+  - `docs/physics.md`: Added `simulate_trajectory()` section with Kabsch-aligned RMSF example and autodoc integration.
+  - `docs/nmr.md`: Expanded from 26-line stub to comprehensive coverage of all NMR observables (NOE/NEF, chemical shifts, relaxation, RPF scores, RDCs, J-couplings).
+- **README Additions**:
+  - Added 6 new feature blocks: RDC module, NMR Ensemble Analysis, MSA Co-Evolution, PLM Embeddings, GNN Quality Scorer, and Engh & Huber / Top2018 validation details.
+  - Updated project structure tree to reflect current 30+ module layout including `geometry/`, `ensemble/`, `quality/gnn/`, `rdc.py`, `msa.py`, `plm.py`.
+  - Added 20 new glossary entries (BMRB, DAOP, DCA, Engh & Huber, ESM-2/PLM, GNN, IDR/IDP, Kauzmann, Magic Step, MCMC, Orientogram, pLDDT, Potts Model, PPII, PRE, Q-factor, RDC, RMSF, Saupe Matrix, Top2018).
+  - Added 11 new references (Engh & Huber 1991, Hyberts 1992, Tejero 2013, Tjandra & Bax 1997, Saupe 1968, Morcos 2011, Lin 2023, Jumper 2021, Ruff & Pappu 2021, Clore & Iwahara 2009, Cornilescu 1998).
+
+### Fixed
+- **Docs site badges**: Replaced broken `Open in Colab` badge (pointed to non-existent `demo.ipynb`) with correct link to `docs/tutorials/virtual_nmr_spectrometer.ipynb`.
+- **PyPI badge**: Replaced unreliable `badge.fury.io` endpoint with live `shields.io/pypi/v` badge.
+- **mkdocs.yml**: Added `api/rdc.md` and `api/ensemble.md` to the API Reference nav; added `science/ensemble-analysis.md` to the Scientific Background nav.
+
 ## [1.29.0] - 2026-04-20
 
 ### Added

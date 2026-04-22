@@ -2,7 +2,7 @@
 
 A command-line tool to generate Protein Data Bank (PDB) files with full atomic representation for testing, benchmarking and educational purposes.
 
-[![PyPI version](https://img.shields.io/badge/pypi-v1.29.0-blue)](https://pypi.org/project/synth-pdb/)
+[![PyPI version](https://img.shields.io/badge/pypi-v1.30.0-blue)](https://pypi.org/project/synth-pdb/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18357242.svg)](https://doi.org/10.5281/zenodo.18357242)
@@ -143,6 +143,17 @@ Check out the [Incubator README](./incubator/README.md) for the full roadmap of 
     - **Post-Translational Modifications**: Support for Phosphorylation (SEP, TPO, PTR) with valid physics parameters.
 - **Cyclic Peptides (Macrocycles)**: Support for **Head-to-Tail cyclization**. Closes the peptide bond between N- and C-termini using physics-based minimization.
 - **NMR Functionality**: As of v1.16.0, all NMR-related features (chemical shifts, relaxation, NOEs, J-couplings) have been refactored into the separate [`synth-nmr`](https://pypi.org/project/synth-nmr/) Python package.  This allows for independent use and development of NMR tools.
+- **Residual Dipolar Couplings (RDCs)**: `synth_pdb.rdc` computes backbone N–H RDCs using the Saupe-matrix formalism given an alignment tensor (`Da`, `R`). Q-factor validation is demonstrated against published ubiquitin (1D3Z) data. Interactive alignment-tensor exploration is available in the `rdc_alignment_explorer.ipynb` tutorial.
+- **NMR Ensemble Analysis** (`synth_pdb.ensemble`): Comprehensive tools for evaluating NMR structure bundles:
+    - **`DAOPCalculator`**: Dihedral Angle Order Parameter (Hyberts et al. 1992) for quantifying backbone consistency across an ensemble; includes `find_well_defined_residues` (PDBStat S(φ)+S(ψ) ≥ 1.8 convention).
+    - **`EnsembleStatistics`**: Typed dataclass reporting pairwise RMSD, RMSF, medoid, well-defined residues, and overall quality (Tejero et al. 2013 thresholds).
+- **MSA Co-Evolution** (`synth_pdb.msa`): Generates deep multiple sequence alignments by simulating MCMC evolution on a 3D structural Potts Model — enabling zero-shot generation of DCA/AlphaFold-ready MSAs.
+    - Metropolis-Hastings sampling with O(1) Δ-Energy evaluation (~500× speedup).
+    - "Magic Step" coupled mutations for contacting residues (20% proposal rate).
+    - SASA selective pressure enforcing hydrophobic core isolation.
+    - Electrostatic salt-bridge rewards and charge-repulsion penalties in J_ij couplings.
+- **Protein Language Model Embeddings** (`synth_pdb.quality.plm`): ESM-2 per-residue and pooled embeddings for zero-shot quality scoring and downstream ML tasks. Install with `pip install synth-pdb[plm]`.
+- **GNN Quality Scorer** (`synth_pdb.quality.gnn`): Graph Neural Network model for structure quality assessment where nodes represent residues and edges encode sequence proximity and spatial contacts. Install with `pip install synth-pdb[gnn]`.
 
 🚀 **High Performance Physics**
 - **Hardware Acceleration**: Automatically detects and uses **GPU acceleration** (CUDA, OpenCL/Metal) if available.
@@ -152,12 +163,14 @@ Check out the [Incubator README](./incubator/README.md) for the full roadmap of 
 
 🔬 **Validation Suite**
 - Bond length validation
-- Bond angle validation
-- Ramachandran angle checking (phi/psi dihedral angles)
-- Side-Chain Rotamer validation (Chi1/Chi2 angles checked against backbone-dependent library)
+- Bond angle validation (**Engh & Huber Z-scores**: geometry validated against the landmark 1991 standard deviations)
+- Ramachandran angle checking — upgraded to **Top2018** high-resolution dataset (~15,000 chains)
+- Side-Chain Rotamer validation (Chi1/Chi2 angles checked against backbone-dependent Dunbrack library)
 - Steric clash detection (minimum distance + van der Waals overlap)
 - Peptide plane planarity (omega angle)
 - Sequence improbability detection (charge clusters, hydrophobic stretches, etc.)
+- **SASA-based Burial Validation**: Shrake-Rupley algorithm (via biotite) confirming hydrophobic core formation (Kauzmann 1959)
+- **`get_quality_report()`**: Multi-layered structural plausibility report covering Geometry, Physics, and Biophysics layers with peer-reviewed thresholds
 
 ⚙️ **Quality Control**
 - `--best-of-N`: Generate multiple structures and select the one with fewest violations
@@ -1256,16 +1269,50 @@ pytest tests/test_generator.py -v
 synth-pdb/
 ├── synth_pdb/
 │   ├── __init__.py
-│   ├── main.py          # CLI entry point
-│   ├── generator.py     # PDB structure generation
-│   ├── validator.py     # Validation checks
-│   └── data.py          # Constants and rotamer library
+│   ├── main.py              # CLI entry point
+│   ├── generator.py         # PDB structure generation (NeRF, rotamers, PTMs, D-AAs)
+│   ├── validator.py         # Validation checks & get_quality_report()
+│   ├── physics.py           # OpenMM energy minimization, MD, simulate_trajectory()
+│   ├── data.py              # Constants, rotamer library, Ramachandran polygons
+│   ├── nmr.py               # RPF scores, NOE compatibility shims (delegates to synth-nmr)
+│   ├── rdc.py               # Residual Dipolar Coupling (Saupe-matrix formalism)
+│   ├── msa.py               # MCMC Potts-model MSA co-evolution generator
+│   ├── plm.py               # ESM-2 protein language model embeddings
+│   ├── orientogram.py       # 6D rotation-invariant inter-residue orientation
+│   ├── batch_generator.py   # Vectorized BatchedGenerator for AI training
+│   ├── decoys.py            # Hard-decoy generation (threading, drift, shuffle)
+│   ├── dataset.py           # Bulk dataset generation (NPZ / PDB format)
+│   ├── chemical_shifts.py   # SPARTA-lite + ring-current shift prediction
+│   ├── biophysics.py        # Biophysical utility functions
+│   ├── viewer.py            # 3Dmol.js browser-based visualizer
+│   ├── geometry/            # Geometry subpackage (v1.27+)
+│   │   ├── superposition.py # Kabsch algorithm, apply_transformation, find_medoid
+│   │   ├── rmsd.py          # RMSD, pairwise RMSD, symmetry-aware variants
+│   │   ├── dihedral.py      # Dihedral angle calculations
+│   │   ├── nerf.py          # NeRF backbone construction kernels
+│   │   ├── sidechain.py     # Side-chain geometry helpers
+│   │   └── vectorized.py    # NumPy-vectorized / Numba-JIT geometry kernels
+│   ├── ensemble/            # NMR ensemble analysis subpackage (v1.28+)
+│   │   ├── daop.py          # DAOPCalculator (Hyberts 1992 dihedral order parameters)
+│   │   └── statistics.py    # EnsembleStatistics, QualityAssessment dataclasses
+│   └── quality/             # Structure quality scoring (v1.18+)
+│       ├── gnn/             # Graph Neural Network quality scorer
+│       ├── classifier.py    # Random Forest / GNN quality filter interface
+│       └── features.py      # Feature extraction for quality models
 ├── tests/
 │   ├── test_generator.py
-│   ├── test_generator_rotamer.py
 │   ├── test_validator.py
-│   └── test_main_cli.py
-├── setup.py
+│   ├── test_scientific_validation.py
+│   ├── test_coupling.py
+│   ├── unit/                # Unit tests for geometry, ensemble, quality modules
+│   └── ... (many more)
+├── examples/
+│   ├── interactive_tutorials/
+│   ├── ml_integration/
+│   └── ml_loading/          # JAX / PyTorch / MLX zero-copy handover
+├── docs/
+├── incubator/
+├── pyproject.toml
 └── README.md
 ```
 
@@ -1352,6 +1399,26 @@ This section provides definitions and seminal references for the biophysical and
 | **Rotamer** | Short for "Rotational Isomer". Preferred, low-energy side-chain conformations defined by discrete χ-angle clusters. | Dunbrack, R. L. (2002). *Curr. Opin. Struct. Biol.* |
 | **S²** | **Model-Free Order Parameter** (Lipari-Szabo). A value between 0 (random/flexible) and 1 (perfectly rigid) describing the degree of spatial restriction of local backbone motion on ps–ns timescales. | Lipari, G., & Szabo, A. (1982). *J. Am. Chem. Soc.* |
 | **SASA** | **Solvent Accessible Surface Area**. The surface area of a biomolecule accessible to a solvent probe (typically a 1.4 Å water molecule). Low SASA indicates a buried residue; high SASA indicates solvent exposure. | Shrake & Rupley (1973). *J. Mol. Biol.* |
+| **BMRB** | **BioMagResBank**. The international repository for NMR spectroscopic data derived from biological molecules, including chemical shift assignments, restraint files, and relaxation data. | Ulrich, E. L., et al. (2008). *Nucleic Acids Res.* |
+| **DAOP** | **Dihedral Angle Order Parameter**. A circular statistics metric (range 0–1) quantifying the consistency of backbone dihedral angles (φ, ψ) across an NMR ensemble. Well-defined residues satisfy S(φ)+S(ψ) ≥ 1.8 (PDBStat convention). Available via `synth_pdb.ensemble.daop`. | Hyberts, S. G., et al. (1992). *Protein Science* 1:736. |
+| **DCA** | **Direct Coupling Analysis**. A statistical inference method that identifies evolutionarily co-varying residue pairs in a multiple sequence alignment to predict spatial contacts and generate AlphaFold-ready MSA inputs. | Morcos, F., et al. (2011). *PNAS* 108:E1293. |
+| **Engh & Huber** | The landmark (1991) set of ideal bond lengths and bond angles for the 20 standard amino acids, derived from small-molecule crystallography. `PDBValidator` uses these as Z-score reference distributions (v1.29+). | Engh, R. A., & Huber, R. (1991). *Acta Cryst. A* 47:392. |
+| **ESM-2 / PLM** | **Evolutionary Scale Modeling 2 / Protein Language Model**. A large transformer trained on millions of protein sequences that produces per-residue embeddings for zero-shot quality scoring. Available via `synth_pdb.quality.plm`; install with `pip install synth-pdb[plm]`. | Lin, Z., et al. (2023). *Science* 379:1123. |
+| **GNN** | **Graph Neural Network**. A deep learning model operating on graph-structured data. In `synth_pdb.quality.gnn`, residues are nodes and spatial/sequence contacts are edges, enabling structure quality assessment. Install with `pip install synth-pdb[gnn]`. | Kipf, T. N., & Welling, M. (2017). *ICLR.* |
+| **IDR / IDP** | **Intrinsically Disordered Region / Protein**. A protein region that lacks a stable 3D fold under physiological conditions. Characterised by high RMSF, low S², and low AlphaFold pLDDT. Validated against PRE NMR data in `idp_ensemble_validation.ipynb`. | Dyson, H. J., & Wright, P. E. (2005). *Nat. Rev. Mol. Cell Biol.* |
+| **Kauzmann (Hydrophobic Effect)** | The thermodynamic driving force for hydrophobic residues to bury in a protein's core, arising from the entropic cost of ordering water around non-polar groups. Cited in SASA burial validation (v1.29). | Kauzmann, W. (1959). *Adv. Protein Chem.* 14:1. |
+| **Magic Step** | A coupled MCMC mutation proposal in the MSA Potts-Model sampler where two spatially contacting residues are mutated simultaneously, preserving co-evolutionary constraints (20% proposal rate, v1.26+). | — |
+| **MCMC / Metropolis-Hastings** | **Markov Chain Monte Carlo**. A class of algorithms for sampling from probability distributions. Used in `synth_pdb.msa` to simulate protein sequence evolution on the Potts Model energy landscape. | Metropolis, N., et al. (1953). *J. Chem. Phys.* 21:1087. |
+| **Orientogram** | A 6D rotation-invariant representation of inter-residue orientations in a protein structure, used as a structural fingerprint and neural network input feature. See `synth_pdb.orientogram`. | — |
+| **pLDDT** | **Predicted Local Distance Difference Test**. AlphaFold2's per-residue confidence score (0–100). Low pLDDT (< 50) accurately signals intrinsically disordered regions — not prediction failure. Correlates inversely with NMR S² and MD RMSF. | Jumper, J., et al. (2021). *Nature* 596:583. |
+| **Potts Model** | A statistical physics model of interacting spins on a lattice, applied in `synth_pdb.msa` to protein sequences: each position is a spin (amino acid) and J_ij couplings encode co-evolutionary interactions between residue pairs. | Weigt, M., et al. (2009). *PNAS* 106:67. |
+| **PPII** | **Polyproline II Helix**. A left-handed helical conformation (φ ≈ −75°, ψ ≈ +145°) common in collagen and proline-rich sequences. Specifiable via `--conformation ppii`. | — |
+| **PRE** | **Paramagnetic Relaxation Enhancement**. An NMR phenomenon where a paramagnetic spin label broadens nearby nuclear resonances proportional to r⁻⁶. Used to validate IDP conformational ensembles. | Clore, G. M., & Iwahara, J. (2009). *Chem. Rev.* 109:4108. |
+| **Q-factor** | A dimensionless goodness-of-fit metric for Residual Dipolar Couplings: Q = RMSD(D_calc − D_obs) / RMSD(D_obs). Lower is better; high-quality structures typically achieve Q < 0.20. | Cornilescu, G., et al. (1998). *J. Biomol. NMR* 12:373. |
+| **RDC** | **Residual Dipolar Coupling**. An NMR observable arising when a molecule is partially aligned in an anisotropic medium. Encodes long-range bond-vector orientation information relative to the molecular alignment frame. Computed by `synth_pdb.rdc`. | Tjandra, N., & Bax, A. (1997). *Science* 278:1111. |
+| **RMSF** | **Root Mean Square Fluctuation**. The standard deviation of each residue's position over time in an MD trajectory (after Kabsch rigid-body alignment). High RMSF = flexibility; Low RMSF = rigidity. Inversely related to S² and pLDDT. | — |
+| **Saupe Matrix / Alignment Tensor** | The 3×3 traceless symmetric tensor describing the degree and orientation of molecular alignment in an anisotropic medium. Parameterised by axial component `Da` and rhombicity `R` for RDC calculations. | Saupe, A. (1968). *Angew. Chem.* 7:97. |
+| **Top2018** | A high-resolution Ramachandran reference dataset derived from ~15,000 protein chains (resolution < 1.5 Å), superseding Top8000. Adopted in `PDBValidator` from v1.29 for more accurate φ/ψ boundary validation. | — |
 | **Top8000** | A high-quality curated dataset of ~8000 protein chains (resolution < 2.0 Å, low sequence homology) used to derive accurate Ramachandran contours and rotamer libraries. | Lovell, S. C., et al. (2003). *Proteins.* |
 
 ## License
@@ -1411,6 +1478,19 @@ These external tools can import the data generated by `synth-pdb`:
     *   [Link to Publisher](https://www.nature.com/articles/nsmb.3041)
     *   **Extension Proposal:** "Proposal For Incorporating NMR Relaxation Data In NEF" (GitHub PDF)
         *   [Link to Proposal](https://github.com/NMRExchangeFormat/NEF/blob/master/specification/Proposal%20For%20Incorporating%20NMR%20Relaxation%20Data%20In%20NEF.pdf)
+
+
+### New Modules & Algorithms
+
+- **Engh & Huber Bond Geometry**: Engh, R. A., & Huber, R. (1991). "Accurate bond and angle parameters for X-ray protein structure refinement." *Acta Crystallographica Section A*, 47(4), 392–400.
+- **DAOP / NMR Ensemble Analysis**: Hyberts, S. G., Goldberg, M. S., Havel, T. F., & Wagner, G. (1992). "The solution structure of eglin c based on measurements of many NOEs and coupling constants and its comparison with X-ray structures." *Protein Science*, 1(6), 736–751.
+- **Ensemble Quality Thresholds**: Tejero, R., Snyder, D., Mao, B., Aramini, J. M., & Montelione, G. T. (2013). "PDBStat: a universal restraint converter and restraint quality analyzer for protein NMR structures." *Journal of Biomolecular NMR*, 56(4), 337–351.
+- **Residual Dipolar Couplings (RDC)**: Tjandra, N., & Bax, A. (1997). "Direct measurement of distances and angles in biomolecules by NMR in a dilute liquid crystalline medium." *Science*, 278, 1111–1114.
+- **Saupe Alignment Tensor**: Saupe, A. (1968). "Recent results in the field of liquid crystals." *Angewandte Chemie International Edition*, 7(2), 97–112.
+- **MSA Co-Evolution / DCA**: Morcos, F., et al. (2011). "Direct-coupling analysis of residue coevolution captures native contacts across many protein families." *PNAS*, 108(49), E1293–E1301.
+- **Protein Language Models / ESM-2**: Lin, Z., Akin, H., Rao, R., et al. (2023). "Evolutionary-scale prediction of atomic-level protein structure with a language model." *Science*, 379(6637), 1123–1130.
+- **pLDDT / AlphaFold2**: Jumper, J., et al. (2021). "Highly accurate protein structure prediction with AlphaFold." *Nature*, 596, 583–589.
+- **IDP / Disorder**: Ruff, K. M., & Pappu, R. V. (2021). "AlphaFold and Implications for Intrinsically Disordered Proteins." *Journal of Molecular Biology*, 433(20), 167208.
 
 ### General Protein Structure References
 
