@@ -36,6 +36,7 @@ from .data import (
     BOND_LENGTH_CA_C,
     BOND_LENGTH_N_CA,
     L_TO_D_MAPPING,
+    NON_STANDARD_RESIDUES,
     ONE_TO_THREE_LETTER_CODE,
     RAMACHANDRAN_PRESETS,
     RAMACHANDRAN_REGIONS,
@@ -1401,7 +1402,7 @@ def _do_energy_minimization(
                 if n_min >= n_seq + start_offset:
                     for idx, res_name_target in enumerate(sequence):
                         rid = unique_res_ids[idx + start_offset]
-                        if res_name_target in ["SEP", "TPO", "PTR", "HIE", "HID", "HIP"]:
+                        if res_name_target in NON_STANDARD_RESIDUES:
                             mask = peptide.res_id == rid
                             peptide.res_name[mask] = res_name_target
                             ptm_rename_map[int(rid)] = res_name_target

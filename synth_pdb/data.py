@@ -96,6 +96,18 @@ MODIFIED_AMINO_ACIDS: List[str] = [
     "PTR",  # Phosphotyrosine
 ]
 
+# All residue names that are non-standard and must be restored after OpenMM
+# processing (which reverts them to their parent L-amino acid names).
+# Includes PTMs, histidine tautomers, and D-amino acids.
+# D-amino acids are currently generated without OpenMM (no AMBER parameters),
+# so the D-name entries have no runtime effect today — but they future-proof
+# the restoration logic if D-amino acid forcefield support is added later.
+NON_STANDARD_RESIDUES: Set[str] = (
+    set(MODIFIED_AMINO_ACIDS)
+    | {"HIE", "HID", "HIP"}  # Histidine tautomers
+    | set(D_AMINO_ACIDS)  # DAL, DCY, DLE, ... (mirror image residues)
+)
+
 ALL_VALID_AMINO_ACIDS: List[str] = STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS
 
 # --- Amino Acid Frequencies (Approximate percentages in proteins) ---
