@@ -4491,6 +4491,8 @@ except ImportError as e:
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">openmm</span> <span class="n">matplotlib</span> <span class="n">ipywidgets</span> <span class="n">py3Dmol</span> <span class="o">-</span><span class="n">c</span> <span class="n">constraints</span><span class="o">.</span><span class="n">txt</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">elkins</span><span class="o">/</span><span class="n">synth</span><span class="o">-</span><span class="n">pdb</span><span class="o">.</span><span class="n">git</span><span class="nd">@master</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span><span class="o">&gt;=</span><span class="mf">0.8.0</span>  <span class="c1"># required dependency (installs separately due to --no-deps above)</span>
+        <span class="c1"># Optional: GNN-based neural shift predictor (large install)</span>
+        <span class="c1"># !pip install -q 'synth-nmr[ml]'  # uncomment if needed</span>
 
         <span class="c1"># 3. Create marker</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -4533,6 +4535,8 @@ if not os.path.exists("installed.marker"):
         !pip install -q openmm matplotlib ipywidgets py3Dmol -c constraints.txt
         !pip install -q --no-deps git+https://github.com/elkins/synth-pdb.git@master
         !pip install -q synth-nmr&gt;=0.8.0  # required dependency (installs separately due to --no-deps above)
+        # Optional: GNN-based neural shift predictor (large install)
+        # !pip install -q 'synth-nmr[ml]'  # uncomment if needed
 
         # 3. Create marker
         with open("installed.marker", "w") as f:
@@ -6906,12 +6910,7 @@ The network takes the explicit atomic geometry (dihedral angles $\phi, \psi$), t
         <span class="kn">import</span><span class="w"> </span><span class="nn">torch_geometric</span>  <span class="c1"># noqa: F401</span>
         <span class="n">HAS_TORCH_GEO</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️  torch_geometric is not installed — the GNN-based NeuralShiftPredictor"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"   requires it. Install the full ML extras with:"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"   !pip install synth-nmr[ml]"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"   (Note: torch_geometric must match your torch version — see"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"    https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html )"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"   Skipping Neural Shift section."</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️  Neural Shift section requires torch_geometric. Install with: pip install synth-nmr[ml]  (Skipping.)"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">HAS_TORCH</span> <span class="ow">and</span> <span class="n">HAS_TORCH_GEO</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">synth_nmr.neural_shifts</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeuralShiftPredictor</span>
@@ -6973,12 +6972,7 @@ if HAS_TORCH:
         import torch_geometric  # noqa: F401
         HAS_TORCH_GEO = True
     except ImportError:
-        print("⚠️  torch_geometric is not installed — the GNN-based NeuralShiftPredictor")
-        print("   requires it. Install the full ML extras with:")
-        print("   !pip install synth-nmr[ml]")
-        print("   (Note: torch_geometric must match your torch version — see")
-        print("    https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html )")
-        print("   Skipping Neural Shift section.")
+        print("ℹ️  Neural Shift section requires torch_geometric. Install with: pip install synth-nmr[ml]  (Skipping.)")
 
 if HAS_TORCH and HAS_TORCH_GEO:
     from synth_nmr.neural_shifts import NeuralShiftPredictor

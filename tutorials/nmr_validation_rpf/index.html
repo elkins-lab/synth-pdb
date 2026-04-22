@@ -4202,6 +4202,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <li><strong>Identify Over-fitting</strong> by observing drops in the Precision score.</li>
 <li><strong>Benchmark Refinement</strong> using real-world validation metrics from the Montelione group.</li>
 </ol>
+<blockquote>
+<p><strong>Key Reference:</strong> Huang, Y. J. <em>et al.</em> (2005). Protein NMR recall, precision, and F-measure scores (RPF scores). <em>J. Am. Chem. Soc.</em> <strong>127</strong>, 1665–1674.</p>
+</blockquote>
 </div>
 </div>
 </div>
@@ -4214,11 +4217,33 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="background-what-are-rpf-scores">🧬 Background: What are RPF Scores?<a class="anchor-link" href="#background-what-are-rpf-scores">¶</a></h2><p>NMR structure determination relies on <strong>distance restraints</strong> derived from the Nuclear Overhauser Effect (NOE). However, a structural model can look "perfect" geometrically (no clashes, good angles) but completely fail to represent the experimental data.</p>
 <p>To bridge this gap, the <strong>Montelione group</strong> developed RPF scores (<em>Huang et al. 2005, JACS</em>):</p>
-<ul>
-<li><strong>Recall (R)</strong>: Of the restraints we observed, how many are satisfied by the model? (Sensitivity)</li>
-<li><strong>Precision (P)</strong>: Of the short distances in our model, how many are supported by our data? (Specificity)</li>
-<li><strong>F-measure (F)</strong>: The harmonic mean of Recall and Precision. This is our single "Global Quality Score."</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Question it answers</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Recall (R)</strong></td>
+<td>Of the restraints observed, how many does the model satisfy?</td>
+<td>R = satisfied / total restraints</td>
+</tr>
+<tr>
+<td><strong>Precision (P)</strong></td>
+<td>Of the short distances in the model, how many are supported by data?</td>
+<td>P = supported / total short distances</td>
+</tr>
+<tr>
+<td><strong>F-measure (F)</strong></td>
+<td>The harmonic mean of Recall and Precision.</td>
+<td>F = 2PR / (P+R)</td>
+</tr>
+</tbody>
+</table>
+<p>A high-quality NMR structure generally targets <strong>F &gt; 0.70–0.80</strong>. This threshold is used by the BMRB and PDB as a quality gate for deposited structures.</p>
 </div>
 </div>
 </div>
@@ -4245,7 +4270,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="c1"># ── Environment detection ──────────────────────────────────────────────────</span>
+<span class="c1"># ── Environment detection ────────────────────────────────────────────────────</span>
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
@@ -4255,17 +4280,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb and dependencies..."</span><span class="p">)</span>
-        <span class="c1"># biotite is bundled as a dependency of synth-pdb; listed explicitly</span>
-        <span class="c1"># so Colab users see exactly what is being installed.</span>
+        <span class="c1"># synth-nmr provides calculate_synthetic_noes; biotite is a core dep.</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
             <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">,</span>
-             <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">,</span> <span class="s2">"matplotlib"</span><span class="p">],</span>
+             <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"synth-nmr"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">,</span> <span class="s2">"matplotlib"</span><span class="p">],</span>
             <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="c1"># Local / CI: add the repository root so the development copy is used</span>
+    <span class="c1"># Local / CI: add the repository root so the development copy is used.</span>
+    <span class="c1"># This notebook lives at docs/tutorials/ — two levels below the repo root.</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
     <span class="n">_repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">"../.."</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">_repo_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
@@ -4278,7 +4303,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 import os
 import sys
 
-# ── Environment detection ──────────────────────────────────────────────────
+# ── Environment detection ────────────────────────────────────────────────────
 IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
@@ -4288,25 +4313,24 @@ if IN_COLAB:
         print("   ✅ synth-pdb already installed")
     except ImportError:
         print("   📦 Installing synth-pdb and dependencies...")
-        # biotite is bundled as a dependency of synth-pdb; listed explicitly
-        # so Colab users see exactly what is being installed.
+        # synth-nmr provides calculate_synthetic_noes; biotite is a core dep.
         import subprocess
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "-q",
-             "synth-pdb", "biotite", "matplotlib"],
+             "synth-pdb", "synth-nmr", "biotite", "matplotlib"],
             check=True,
         )
         print("   ✅ Installation complete")
 else:
-    # Local / CI: add the repository root so the development copy is used
+    # Local / CI: add the repository root so the development copy is used.
+    # This notebook lives at docs/tutorials/ — two levels below the repo root.
     print("💻 Running in local Jupyter environment")
     _repo_root = os.path.abspath(os.path.join(os.getcwd(), "../.."))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
         print(f"   📌 Added repo root to path: {_repo_root}")
 
-print("✅ Environment ready!")
-</div>
+print("✅ Environment ready!")</div>
 </div>
 </div>
 </div>
@@ -4331,10 +4355,11 @@ print("✅ Environment ready!")
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdb</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.nmr</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rpf_score</span><span class="p">,</span> <span class="n">calculate_synthetic_noes</span>
@@ -4342,10 +4367,11 @@ print("✅ Environment ready!")
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ NMR Validation module loaded!"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import numpy as np
-import biotite.structure as struc
+<div class="clipboard-copy-txt" id="cell-2">import io
+
 import biotite.structure.io.pdb as pdb
 import matplotlib.pyplot as plt
+import numpy as np
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.nmr import calculate_rpf_score, calculate_synthetic_noes
@@ -4364,7 +4390,9 @@ print("✅ NMR Validation module loaded!")</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="step-1-generate-a-ground-truth-structure">🟢 Step 1: Generate a "Ground Truth" Structure<a class="anchor-link" href="#step-1-generate-a-ground-truth-structure">¶</a></h2><p>We will start by generating a high-quality, energy-minimized structure of a small protein domain and "observing" its NOEs.</p>
+<h2 id="step-1-generate-a-ground-truth-structure">🟢 Step 1: Generate a "Ground Truth" Structure<a class="anchor-link" href="#step-1-generate-a-ground-truth-structure">¶</a></h2><p>We start by generating a high-quality, energy-minimized structure of a small protein domain
+and "observing" its NOEs. These restraints become our <strong>experimental ground truth</strong> —
+the reference set every model will be scored against.</p>
 </div>
 </div>
 </div>
@@ -4387,9 +4415,7 @@ print("✅ NMR Validation module loaded!")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-
-<span class="c1"># Generate a high-quality helix and observe its NOEs as "ground truth"</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate a high-quality helix and observe its NOEs as "ground truth"</span>
 <span class="n">seq</span> <span class="o">=</span> <span class="s2">"AKAAKAKAAK"</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span>
@@ -4404,9 +4430,7 @@ print("✅ NMR Validation module loaded!")</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generated </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">restraints</span><span class="p">)</span><span class="si">}</span><span class="s2"> synthetic NOE restraints from ground truth."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Structure: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span><span class="si">}</span><span class="s2"> atoms, sequence length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import io
-
-# Generate a high-quality helix and observe its NOEs as "ground truth"
+<div class="clipboard-copy-txt" id="cell-3"># Generate a high-quality helix and observe its NOEs as "ground truth"
 seq = "AKAAKAKAAK" * 2
 pdb_content = generate_pdb_content(
     sequence_str=seq,
@@ -4419,8 +4443,7 @@ structure = pdb.PDBFile.read(io.StringIO(pdb_content)).get_structure(model=1)
 # Derive "experimental" NOE restraints from the ground-truth geometry
 restraints = calculate_synthetic_noes(structure)
 print(f"Generated {len(restraints)} synthetic NOE restraints from ground truth.")
-print(f"Structure: {len(structure)} atoms, sequence length {len(seq)} residues")
-</div>
+print(f"Structure: {len(structure)} atoms, sequence length {len(seq)} residues")</div>
 </div>
 </div>
 </div>
@@ -4433,7 +4456,8 @@ print(f"Structure: {len(structure)} atoms, sequence length {len(seq)} residues")
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="step-2-validating-the-perfect-fit">🏅 Step 2: Validating the Perfect Fit<a class="anchor-link" href="#step-2-validating-the-perfect-fit">¶</a></h2><p>If we test the Ground Truth structure against its own NOEs, all scores should be <strong>1.0</strong>.</p>
+<h2 id="step-2-validating-the-perfect-fit">🏅 Step 2: Validating the Perfect Fit<a class="anchor-link" href="#step-2-validating-the-perfect-fit">¶</a></h2><p>If we test the Ground Truth structure against its own NOEs, all scores should be <strong>1.0</strong>.
+This is our sanity check: the model that <em>generated</em> the restraints must perfectly satisfy them.</p>
 </div>
 </div>
 </div>
@@ -4459,12 +4483,12 @@ print(f"Structure: {len(structure)} atoms, sequence length {len(seq)} residues")
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="n">calculate_rpf_score</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">restraints</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"--- Ground Truth Scores ---"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">:</span><span class="s2">12s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">scores = calculate_rpf_score(structure, restraints)
 print("--- Ground Truth Scores ---")
 for k, v in scores.items():
-    print(f"{k.capitalize()}: {v:.4f}")</div>
+    print(f"  {k.capitalize():12s}: {v:.4f}")</div>
 </div>
 </div>
 </div>
@@ -4477,7 +4501,14 @@ for k, v in scores.items():
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="step-3-identifying-the-over-folded-decoy">⚠️ Step 3: Identifying the "Over-folded" Decoy<a class="anchor-link" href="#step-3-identifying-the-over-folded-decoy">¶</a></h2><p>What happens if we "compact" the protein artificially? The Recall will remain high (as the original contacts are still there), but the <strong>Precision</strong> will plummet because we have created many "new" short distances that are NOT supported by the data.</p>
+<h2 id="step-3-identifying-the-over-folded-decoy">⚠️ Step 3: Identifying the "Over-folded" Decoy<a class="anchor-link" href="#step-3-identifying-the-over-folded-decoy">¶</a></h2><p>What happens if we <strong>artificially compact</strong> the protein?</p>
+<ul>
+<li><strong>Recall</strong> will stay high — the original short-range contacts are still present.</li>
+<li><strong>Precision</strong> will plummet — the collapsed structure creates many <em>new</em> close contacts
+that are <strong>not supported</strong> by any NOE restraint.</li>
+</ul>
+<p>This is exactly what happens when a structure determination program over-refines a model,
+creating an unrealistically compact fold.</p>
 </div>
 </div>
 </div>
@@ -4503,7 +4534,7 @@ for k, v in scores.items():
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Create a 'collapsed' version by scaling coordinates towards the center</span>
 <span class="n">coords</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">coord</span>
 <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">collapsed_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.7</span> <span class="o">+</span> <span class="n">center</span> <span class="c1"># 30% collapse</span>
+<span class="n">collapsed_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.7</span> <span class="o">+</span> <span class="n">center</span>  <span class="c1"># 30% collapse</span>
 
 <span class="n">collapsed_structure</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">collapsed_structure</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">collapsed_coords</span>
@@ -4511,12 +4542,12 @@ for k, v in scores.items():
 <span class="n">collapsed_scores</span> <span class="o">=</span> <span class="n">calculate_rpf_score</span><span class="p">(</span><span class="n">collapsed_structure</span><span class="p">,</span> <span class="n">restraints</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"--- Collapsed Model Scores ---"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">collapsed_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">:</span><span class="s2">12s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># Create a 'collapsed' version by scaling coordinates towards the center
 coords = structure.coord
 center = np.mean(coords, axis=0)
-collapsed_coords = (coords - center) * 0.7 + center # 30% collapse
+collapsed_coords = (coords - center) * 0.7 + center  # 30% collapse
 
 collapsed_structure = structure.copy()
 collapsed_structure.coord = collapsed_coords
@@ -4524,7 +4555,7 @@ collapsed_structure.coord = collapsed_coords
 collapsed_scores = calculate_rpf_score(collapsed_structure, restraints)
 print("--- Collapsed Model Scores ---")
 for k, v in collapsed_scores.items():
-    print(f"{k.capitalize()}: {v:.4f}")</div>
+    print(f"  {k.capitalize():12s}: {v:.4f}")</div>
 </div>
 </div>
 </div>
@@ -4566,7 +4597,8 @@ many atom pairs that are <em>newly</em> close together but unsupported by any NO
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"dark_background"</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
 
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Recall"</span><span class="p">,</span> <span class="s2">"Precision"</span><span class="p">,</span> <span class="s2">"F-measure"</span><span class="p">]</span>
 <span class="n">keys</span>    <span class="o">=</span> <span class="p">[</span><span class="s2">"recall"</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">,</span> <span class="s2">"f_measure"</span><span class="p">]</span>
@@ -4578,33 +4610,40 @@ many atom pairs that are <em>newly</em> close together but unsupported by any NO
 <span class="n">width</span> <span class="o">=</span> <span class="mf">0.35</span>
 
 <span class="n">bars_gt</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">ground_truth_vals</span><span class="p">,</span>
-                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ground Truth"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#2ecc71"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ground Truth"</span><span class="p">,</span>    <span class="n">color</span><span class="o">=</span><span class="s2">"#2ecc71"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">bars_co</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">collapsed_vals</span><span class="p">,</span>
-                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Collapsed Model"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#e74c3c"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Collapsed Model"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#e74c3c"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 
 <span class="c1"># Value labels on each bar</span>
-<span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">bars_gt</span><span class="p">:</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">bars_co</span><span class="p">:</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">bars_gt</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">bars_co</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.015</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">)</span>
+
+<span class="c1"># Community acceptance threshold</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gold"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+           <span class="n">label</span><span class="o">=</span><span class="s2">"BMRB acceptance threshold (F ≥ 0.70)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span>  <span class="n">linestyle</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span>  <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Score"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"RPF Scores: Ground Truth vs Over-Compacted Model"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.22</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Score"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"RPF Scores: Ground Truth vs Over-Compacted Model"</span><span class="p">,</span>
+             <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Precision drop: </span><span class="si">{</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> "</span>
-      <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> percentage points)"</span><span class="p">)</span>
+<span class="n">precision_drop</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Precision drop: </span><span class="si">{</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> → "</span>
+      <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> "</span>
+      <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">precision_drop</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> percentage points)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">fig, ax = plt.subplots(figsize=(8, 5))
+<div class="clipboard-copy-txt" id="cell-6">plt.style.use("dark_background")
+fig, ax = plt.subplots(figsize=(9, 5.5))
 
 metrics = ["Recall", "Precision", "F-measure"]
 keys    = ["recall", "precision", "f_measure"]
@@ -4616,32 +4655,37 @@ x = range(len(metrics))
 width = 0.35
 
 bars_gt = ax.bar([i - width/2 for i in x], ground_truth_vals,
-                 width, label="Ground Truth", color="#2ecc71", alpha=0.85)
+                 width, label="Ground Truth",    color="#2ecc71", alpha=0.9)
 bars_co = ax.bar([i + width/2 for i in x], collapsed_vals,
-                 width, label="Collapsed Model", color="#e74c3c", alpha=0.85)
+                 width, label="Collapsed Model", color="#e74c3c", alpha=0.9)
 
 # Value labels on each bar
-for bar in bars_gt:
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
-            f"{bar.get_height():.3f}", ha="center", va="bottom", fontsize=9)
-for bar in bars_co:
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.01,
-            f"{bar.get_height():.3f}", ha="center", va="bottom", fontsize=9)
+for bar in list(bars_gt) + list(bars_co):
+    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.015,
+            f"{bar.get_height():.3f}", ha="center", va="bottom",
+            fontsize=10, fontweight="bold", color="white")
+
+# Community acceptance threshold
+ax.axhline(0.7, color="gold", linestyle="--", linewidth=1.2, alpha=0.8,
+           label="BMRB acceptance threshold (F ≥ 0.70)")
+ax.axhline(1.0, color="gray",  linestyle=":",  linewidth=0.8, alpha=0.5)
 
 ax.set_xticks(list(x))
-ax.set_xticklabels(metrics, fontsize=12)
-ax.set_ylim(0, 1.15)
-ax.set_ylabel("Score", fontsize=11)
-ax.set_title("RPF Scores: Ground Truth vs Over-Compacted Model", fontsize=13, fontweight="bold")
-ax.legend(fontsize=10)
-ax.axhline(1.0, color="gray", linestyle="--", linewidth=0.8, alpha=0.6)
+ax.set_xticklabels(metrics, fontsize=13)
+ax.set_ylim(0, 1.22)
+ax.set_ylabel("Score", fontsize=12)
+ax.set_title("RPF Scores: Ground Truth vs Over-Compacted Model",
+             fontsize=14, fontweight="bold", pad=14)
+ax.legend(fontsize=10, loc="upper right")
+ax.grid(axis="y", alpha=0.2)
 
 plt.tight_layout()
 plt.show()
 
-print(f"\nPrecision drop: {scores.get('precision',0):.3f} → {collapsed_scores.get('precision',0):.3f} "
-      f"({(scores.get('precision',0)-collapsed_scores.get('precision',0))*100:.1f} percentage points)")
-</div>
+precision_drop = scores.get('precision', 0) - collapsed_scores.get('precision', 0)
+print(f"\nPrecision drop: {scores.get('precision',0):.3f} → "
+      f"{collapsed_scores.get('precision',0):.3f} "
+      f"({precision_drop*100:.1f} percentage points)")</div>
 </div>
 </div>
 </div>
@@ -4654,10 +4698,41 @@ print(f"\nPrecision drop: {scores.get('precision',0):.3f} → {collapsed_scores.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="summary">🚀 Summary<a class="anchor-link" href="#summary">¶</a></h2><p>The RPF score is a powerful way to detect <strong>over-fitting</strong>. In real-world structure determination, we aim to maximize the F-measure.</p>
+<h2 id="summary">🚀 Summary<a class="anchor-link" href="#summary">¶</a></h2><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Ground Truth</th>
+<th>Collapsed Decoy</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Recall</strong></td>
+<td>~1.0</td>
+<td>~1.0</td>
+<td>Both models satisfy the distance bounds — collapse doesn't <em>violate</em> existing contacts</td>
+</tr>
+<tr>
+<td><strong>Precision</strong></td>
+<td>~1.0</td>
+<td>≪ 1.0</td>
+<td>Collapse creates many spurious close contacts unsupported by data</td>
+</tr>
+<tr>
+<td><strong>F-measure</strong></td>
+<td>~1.0</td>
+<td>Low</td>
+<td>Overall quality collapses with Precision</td>
+</tr>
+</tbody>
+</table>
+<p>The RPF score is a powerful tool for detecting <strong>over-fitting</strong>:</p>
 <ul>
-<li><strong>High Recall, Low Precision</strong>? Your protein is likely too compact or "misfolded" locally.</li>
-<li><strong>Low Recall, High Precision</strong>? You haven't satisfied your experimental constraints yet.</li>
+<li><strong>High Recall, Low Precision</strong> → The model is likely too compact or incorrectly folded (extra contacts).</li>
+<li><strong>Low Recall, High Precision</strong> → The structure hasn't yet satisfied all experimental constraints.</li>
+<li><strong>Both High</strong> → The model agrees well with the data — a high-quality determination.</li>
 </ul>
 </div>
 </div>
