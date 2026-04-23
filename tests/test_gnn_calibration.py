@@ -2,6 +2,11 @@ import io
 
 import biotite.structure.io.pdb as pdb_io
 import numpy as np
+import pytest
+
+# Skip the entire module if GNN dependencies are missing
+pytest.importorskip("torch")
+pytest.importorskip("torch_geometric")
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
