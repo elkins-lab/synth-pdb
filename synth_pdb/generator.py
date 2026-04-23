@@ -1144,6 +1144,9 @@ def _build_peptide_chain(
         transformed_res = ref_res_template
         transformed_res.coord = transformation.apply(transformed_res.coord)
 
+        # Ensure it's marked as non-hetero (polymer) for capping/physics logic
+        transformed_res.hetero[:] = False
+
         # Rigorously set the Carbonyl Oxygen (O) position to our constructed coordinate.
         # This ensures H-bond detection logic (Biotite) works as expected.
         o_mask = transformed_res.atom_name == "O"
@@ -1479,6 +1482,7 @@ def _assemble_pdb_output(
     # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
     # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
     protein_res_ids = peptide.res_id[~peptide.hetero]
+    protein_res_ids_set = set(protein_res_ids)
     max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
     total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
     s2_map = predict_order_parameters(peptide)
@@ -1496,13 +1500,21 @@ def _assemble_pdb_output(
 
     for line in atomic_and_ter_content.splitlines():
         if line.startswith("ATOM") or line.startswith("HETATM"):
+            res_num = int(line[22:26].strip())
+
+            # EDUCATIONAL NOTE - HETATM vs ATOM:
+            # OpenMM's PDB writer may output non-standard amino acids (like PTMs)
+            # as HETATM. We forcefully convert them back to ATOM if they are part
+            # of the main polymer chain.
+            if res_num in protein_res_ids_set and line.startswith("HETATM"):
+                line = "ATOM  " + line[6:]
+
             serial = int(line[6:11].strip())
             if line.startswith("ATOM"):
                 last_atom_serial = serial
                 last_protein_atom_line = line
             atom_name = line[12:16].strip()
             res_name = line[17:20].strip()
-            res_num = int(line[22:26].strip())
 
             if cyclic:
                 if res_num == 1 and atom_name == "N":

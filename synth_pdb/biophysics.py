@@ -145,11 +145,18 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
 
         # 1. Place ACE C (Carbonyl)
         # We position it relative to N-CA-C frame of first residue.
-        # Bond: C(ace)-N = 1.33 A
+        #
+        # EDUCATIONAL NOTE - Conformational Assumptions:
+        # ----------------------------------------------
+        # Since the ACE cap is being added to a pre-existing chain, we must
+        # assume a reasonable torsion angle (Phi) for the new peptide bond.
+        # A value of -135.0 (Beta-sheet range) is used here as a physically
+        # plausible default that minimizes initial steric clashes with the
+        # rest of the protein chain.
+        #
+        # Bond: C(ace)-N = 1.33 A (Standard Amide Bond)
         # Angle: C(ace)-N-CA = 121.7 deg
-        # Dihedral: C(ace)-N-CA-C. This corresponds to the Phi angle definition (C_prev-N-CA-C).
-        # We'll assume a standard Extended conformation (Phi=-135) or similar to avoid clashes.
-        # Or even better, 180 (Trans) relative to CA-C for maximum clearance.
+        # Dihedral: C(ace)-N-CA-C. This corresponds to the Phi angle definition.
         phi_assume = -135.0  # Beta sheet-like, safe usually
 
         c_ace_coord = position_atom_3d_from_internal_coords(
@@ -160,9 +167,11 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # Bond: O-C = 1.23 A
         # Angle: O-C-N = 123.0 deg (approx)
         # Dihedral: O-C-N-CA.
-        # Peptide bond is planar. O is usually trans to H(N), which means cis to CA?
-        # Actually in trans peptide bond, O and H are trans. atomic config: O=C-N-H.
-        # O and CA are usually 'trans' (180).
+        #
+        # SCIENTIFIC NOTE - Planarity:
+        # The peptide bond (omega) is nearly always trans (180 deg) and planar
+        # due to resonance between the Carbonyl Oxygen and the Amide Nitrogen.
+        # Setting O and CA to be 'trans' (180) ensures this planarity.
         o_ace_coord = position_atom_3d_from_internal_coords(
             ca_1.coord, n_1.coord, c_ace_coord, BOND_LENGTH_C_O, 123.0, 180.0
         )
@@ -273,33 +282,52 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     final_structure = structure
 
     if ace_structure:
-        # Re-index existing residues: Shift all by +1 to make room for ACE at Res 1
+        # ── Residue ID Management ─────────────────────────────────────────────
+        # To maintain a valid PDB structure, every residue must have a unique ID.
+        # Adding an N-terminal cap requires shifting the entire protein chain
+        # forward to make room for the ACE residue at index 1.
+
+        # Re-index existing residues: Shift all by +1
         final_structure.res_id += 1
         # ACE is now Res 1
         ace_structure.res_id[:] = 1
-        # Prepend
+
+        # ── Protonation Correction ────────────────────────────────────────────
+        # When a terminal NH3+ group becomes an internal amide bond (via ACE),
+        # it must lose its N-terminal specific hydrogens (H2, H3).
+        n_term_mask = (final_structure.res_id == (n_term_id + 1)) & np.isin(
+            final_structure.atom_name, ["H2", "H3"]
+        )
+        if n_term_mask.any():
+            final_structure = final_structure[~n_term_mask]
+            logger.debug("Removed N-terminal H2/H3 to accommodate ACE cap.")
+
+        # Prepend to the global array
         final_structure = ace_structure + final_structure
         # Update c_term_id for OXT check since it shifted
         c_term_id += 1
 
     if nme_structure:
-        # nme_res_id should be one higher than the current last residue
+        # ── C-Terminal Indexing ───────────────────────────────────────────────
+        # Unlike ACE (which prepends), NME is appended to the end. We simply
+        # find the current highest ID and increment.
         current_res_ids = sorted(set(final_structure.res_id))
         last_id = current_res_ids[-1]
         nme_structure.res_id[:] = last_id + 1
 
-        # Critical Fix for OpenMM: Remove OXT from the C-terminal residue.
-        # OpenMM sees OXT and thinks it's a terminal residue (e.g., CLYS).
-        # But since we attach NME, it should be an internal residue (LYS).
-        # The presence of OXT (+ bond to NME) causes "1 C atom too many" error.
+        # ── Carboxyl Correction ───────────────────────────────────────────────
+        # A free C-terminus typically ends with a Carboxyl group (COO-) which
+        # includes an OXT atom. When we cap it with N-Methylamide (NME), the
+        # residue becomes an internal amide and must lose the OXT/HXT atoms
+        # to satisfy forcefield valence requirements.
+        c_term_mask = (final_structure.res_id == c_term_id) & np.isin(
+            final_structure.atom_name, ["OXT", "HXT"]
+        )
+        if c_term_mask.any():
+            final_structure = final_structure[~c_term_mask]
+            logger.debug(f"Removed terminal atoms from residue {c_term_id} to accommodate NME cap.")
 
-        # Identify OXT at c_term_id
-        oxt_mask = (final_structure.res_id == c_term_id) & (final_structure.atom_name == "OXT")
-        if oxt_mask.any():
-            final_structure = final_structure[~oxt_mask]
-            logger.debug(f"Removed OXT from residue {c_term_id} to accommodate NME cap.")
-
-        # Append
+        # Append to the global array
         final_structure = final_structure + nme_structure
 
     return final_structure
@@ -348,7 +376,12 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
             - distance: The measured distance
 
     """
-    # Filter for Acidic and Basic atoms only to speed up search
+    # Filter for Acidic and Basic atoms only to speed up search.
+    #
+    # EDUCATIONAL NOTE - Vectorized Proximity Search:
+    # -----------------------------------------------
+    # Instead of nested loops over all atoms (O(N^2)), we use NumPy masking
+    # to extract only the candidates that can participate in salt bridges.
     acid_mask = np.isin(structure.res_name, ACIDIC_RESIDUES) & np.isin(
         structure.atom_name, ACIDIC_ATOMS
     )
@@ -359,16 +392,19 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
     acids = structure[acid_mask]
     bases = structure[base_mask]
 
+    # Early exit if no candidates found
     if len(acids) == 0 or len(bases) == 0:
         return []
 
     # Compute Distance Matrix between all Acid atoms and Base atoms
-    # acids.coord: (N, 3), bases.coord: (M, 3)
-    # diffs: (N, M, 3)
+    #
+    # PERFORMANCE NOTE:
+    # Using broadcasting to create an (N, M, 3) tensor and then summing
+    # squares allows us to leverage SIMD instructions for the search.
     diffs = acids.coord[:, np.newaxis, :] - bases.coord[np.newaxis, :, :]
     dists = np.sqrt(np.sum(diffs**2, axis=-1))
 
-    # Find pairs within cutoff
+    # Find pairs within cutoff (typically 4.0 - 5.0 Angstroms)
     indices = np.where(dists < cutoff)
 
     found_pairs: Dict[Tuple[int, int], Dict[str, Any]] = {}  # (res_ia, res_ib) -> bridge_dict
@@ -382,11 +418,14 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
             continue
 
         # Ensure pair_key is a Tuple[int, int]
+        # We sort to ensure consistent mapping regardless of order (ia, ib vs ib, ia)
         res_i, res_j = sorted([int(a_atom.res_id), int(b_atom.res_id)])
         pair_key = (res_i, res_j)
         dist = dists[acid_idx, base_idx]
 
-        # We pick the closest atom pair for each residue-residue interaction
+        # SCIENTIFIC NOTE: Selecting the Optimal Pair
+        # A single residue might have multiple charged atoms (e.g. ASP OD1/OD2).
+        # We pick the closest atom pair to represent the center of the salt bridge.
         if pair_key not in found_pairs or dist < found_pairs[pair_key]["distance"]:
             found_pairs[pair_key] = {
                 "res_ia": int(a_atom.res_id),
