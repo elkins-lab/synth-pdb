@@ -159,7 +159,7 @@ logger = logging.getLogger(__name__)
 # This re-export allows users to perform secondary structure validation
 # directly on the predicted shifts returned by this module without
 # needing to import synth-nmr explicitly.
-get_secondary_structure = _cs.get_secondary_structure
+_get_secondary_structure = _cs.get_secondary_structure
 
 # RANDOM_COIL_SHIFTS: Baseline values for a disordered, extended chain.
 # Essential for calculating 'secondary shifts' (Delta-delta).
@@ -182,7 +182,7 @@ SECONDARY_SHIFTS = _cs.SECONDARY_SHIFTS
 # 1 = Helix, -1 = Sheet, 0 = Coil.
 # This logic is captured from the global fold signature.
 # The algorithm performs a window-based smoothing of index values.
-calculate_csi = _cs.calculate_csi
+_calculate_csi = _cs.calculate_csi
 
 # _calculate_ring_current_shift: Low-level internal math for ring shielding.
 # Re-exported as an alias for internal unit test coverage in coverage suite.
@@ -412,6 +412,68 @@ def predict_chemical_shifts(
         return cast(
             Dict[str, Dict[int, Dict[str, float]]], _cs.predict_chemical_shifts(working_struc)
         )
+
+
+def calculate_csi(
+    shifts: Dict[str, Dict[int, Dict[str, float]]], structure: Any
+) -> Dict[str, Dict[int, float]]:
+    """
+    Calculate the Chemical Shift Index (CSI) for a protein structure.
+
+    SCIENTIFIC BACKGROUND:
+    ----------------------
+    The CSI is a method for identifying secondary structure elements (helices,
+    sheets) based on the deviation of chemical shifts from random-coil values.
+    Continuous values (Delta-delta) are returned, where positive C-alpha
+    deviations indicate helical character.
+
+    Args:
+        shifts: Predicted or experimental shifts in the nested dictionary format.
+        structure: The Biotite AtomArray used for sequence and residue mapping.
+
+    Returns:
+        Dict: Nested dictionary {chain: {res_id: deviation}}.
+    """
+    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # CSI calculation relies on looking up random-coil values based on the
+    # residue name. We must map non-standard residues to their parents.
+    working_struc = structure.copy()
+    for res_name, parent_name in _PARENT_MAP.items():
+        mask = working_struc.res_name == res_name
+        if np.any(mask):
+            logger.debug(f"Mapping {res_name} -> {parent_name} for CSI calculation.")
+            working_struc.res_name[mask] = parent_name
+
+    return cast(Dict[str, Dict[int, float]], _calculate_csi(shifts, working_struc))
+
+
+def get_secondary_structure(
+    shifts: Dict[str, Dict[int, Dict[str, float]]], structure: Any
+) -> List[str]:
+    """
+    Infers categorical secondary structure (H, E, C) from chemical shifts.
+
+    Args:
+        shifts: Predicted or experimental shifts.
+        structure: The Biotite AtomArray used for mapping and sequence length.
+
+    Returns:
+        List[str]: A list of 3-state (H, E, C) or DSSP labels per residue.
+    """
+    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    working_struc = structure.copy()
+    for res_name, parent_name in _PARENT_MAP.items():
+        mask = working_struc.res_name == res_name
+        if np.any(mask):
+            logger.debug(f"Mapping {res_name} -> {parent_name} for SS assignment.")
+            working_struc.res_name[mask] = parent_name
+
+    # Latest synth-nmr might require structure for residue count consistency
+    try:
+        return cast(List[str], _get_secondary_structure(working_struc))
+    except TypeError:
+        # Fallback for older versions that might only take shifts
+        return cast(List[str], _get_secondary_structure(shifts))
 
 
 def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> Dict[str, float]:

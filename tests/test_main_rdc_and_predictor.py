@@ -40,6 +40,7 @@ References:
 """
 
 import logging
+from typing import Any
 
 import pytest
 
@@ -51,7 +52,7 @@ from synth_pdb.generator import create_atom_line
 # ---------------------------------------------------------------------------
 
 
-def _minimal_pdb_with_nh():
+def _minimal_pdb_with_nh() -> str:
     """Minimal PDB with a backbone N and H atom so RDC calculation is possible."""
     return (
         "HEADER    rdc_test\n"
@@ -82,7 +83,9 @@ def _minimal_pdb_with_nh():
 class TestOutputRDCsFlag:
     """Verify that the --output-rdcs flag triggers RDC calculation and CSV export."""
 
-    def test_output_rdcs_calls_calculate_rdcs(self, mocker, tmp_path, caplog):
+    def test_output_rdcs_calls_calculate_rdcs(
+        self, mocker: Any, tmp_path: Any, caplog: Any
+    ) -> None:
         """When --output-rdcs is provided, calculate_rdcs() must be called.
 
         This test initially FAILS because the CLI argument does not exist yet
@@ -116,7 +119,7 @@ class TestOutputRDCsFlag:
 
         mock_calc.assert_called_once()
 
-    def test_output_rdcs_creates_csv_file(self, mocker, tmp_path, caplog):
+    def test_output_rdcs_creates_csv_file(self, mocker: Any, tmp_path: Any, caplog: Any) -> None:
         """The RDC CSV file must be created at the specified output path."""
         caplog.set_level(logging.INFO)
         output_pdb = tmp_path / "rdc_test.pdb"
@@ -141,7 +144,7 @@ class TestOutputRDCsFlag:
 
         assert output_csv.exists(), f"Expected CSV file at {output_csv}"
 
-    def test_output_rdcs_csv_has_correct_header(self, mocker, tmp_path):
+    def test_output_rdcs_csv_has_correct_header(self, mocker: Any, tmp_path: Any) -> None:
         """CSV must begin with the column header: res_id,residue,RDC_NH_Hz."""
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
@@ -171,7 +174,7 @@ class TestOutputRDCsFlag:
             header == "res_id,residue,RDC_NH_Hz"
         ), f"Expected 'res_id,residue,RDC_NH_Hz', got '{header}'"
 
-    def test_output_rdcs_csv_has_data_rows(self, mocker, tmp_path):
+    def test_output_rdcs_csv_has_data_rows(self, mocker: Any, tmp_path: Any) -> None:
         """CSV must contain at least one data row with the computed RDC values."""
         output_pdb = tmp_path / "rdc_test.pdb"
         output_csv = tmp_path / "rdc_test.csv"
@@ -196,7 +199,7 @@ class TestOutputRDCsFlag:
         main.main()
 
         with open(output_csv) as f:
-            lines = [l.strip() for l in f.readlines() if l.strip()]
+            lines = [line.strip() for line in f.readlines() if line.strip()]
         # Header + at least 1 data row
         assert len(lines) >= 2, "CSV must have at least one data row"
         # Verify numeric content is plausible
@@ -205,7 +208,7 @@ class TestOutputRDCsFlag:
         assert len(parts) == 3, f"Each data row must have 3 columns, got: {data_line}"
         float(parts[2])  # Should be parseable as float without raising
 
-    def test_output_rdcs_logs_export_message(self, mocker, tmp_path, caplog):
+    def test_output_rdcs_logs_export_message(self, mocker: Any, tmp_path: Any, caplog: Any) -> None:
         """A 'RDC data exported to:' log message must be emitted."""
         caplog.set_level(logging.INFO)
         output_pdb = tmp_path / "rdc_test.pdb"
@@ -232,7 +235,7 @@ class TestOutputRDCsFlag:
 
         assert "RDC data exported to:" in caplog.text
 
-    def test_output_rdcs_not_called_without_flag(self, mocker, tmp_path):
+    def test_output_rdcs_not_called_without_flag(self, mocker: Any, tmp_path: Any) -> None:
         """Without --output-rdcs, calculate_rdcs must NOT be called."""
         output_pdb = tmp_path / "no_rdc.pdb"
 
@@ -257,7 +260,7 @@ class TestOutputRDCsFlag:
 
         mock_calc.assert_not_called()
 
-    def test_rdc_da_and_r_flags_passed_through(self, mocker, tmp_path):
+    def test_rdc_da_and_r_flags_passed_through(self, mocker: Any, tmp_path: Any) -> None:
         """Custom --rdc-da and --rdc-r values must be forwarded to calculate_rdcs.
 
         Physical note: Da and R together define the alignment tensor.
@@ -293,8 +296,8 @@ class TestOutputRDCsFlag:
 
         mock_calc.assert_called_once()
         _, call_kwargs = mock_calc.call_args
-        assert call_kwargs.get("Da") == pytest.approx(15.0), "Da should be 15.0 Hz as specified"
-        assert call_kwargs.get("R") == pytest.approx(0.3), "R should be 0.3 as specified"
+        assert call_kwargs.get("da") == pytest.approx(15.0), "da should be 15.0 Hz as specified"
+        assert call_kwargs.get("r") == pytest.approx(0.3), "r should be 0.3 as specified"
 
 
 # ---------------------------------------------------------------------------
@@ -324,7 +327,9 @@ class TestShiftPredictorFlag:
     e.g., 'empirical' for reproducible CI runs where SHIFTX2 is unavailable.
     """
 
-    def _run_with_shift_predictor(self, mocker, tmp_path, predictor, mock_predict):
+    def _run_with_shift_predictor(
+        self, mocker: Any, tmp_path: Any, predictor: str, mock_predict: Any
+    ) -> None:
         """Helper: runs main() with --gen-shifts and a given --shift-predictor."""
         output_pdb = tmp_path / "shifts_test.pdb"
         pdb_with_h = (
@@ -353,7 +358,9 @@ class TestShiftPredictorFlag:
         mocker.patch("sys.exit")
         main.main()
 
-    def test_shift_predictor_shiftx2_passes_use_shiftx2_true(self, mocker, tmp_path):
+    def test_shift_predictor_shiftx2_passes_use_shiftx2_true(
+        self, mocker: Any, tmp_path: Any
+    ) -> None:
         """--shift-predictor shiftx2 must call predict_chemical_shifts with use_shiftx2=True."""
         mock_predict = mocker.patch(
             "synth_pdb.chemical_shifts.predict_chemical_shifts",
@@ -367,7 +374,9 @@ class TestShiftPredictorFlag:
             call_kwargs.get("use_shiftx2") is True
         ), "--shift-predictor shiftx2 must pass use_shiftx2=True"
 
-    def test_shift_predictor_empirical_passes_use_shiftx2_false(self, mocker, tmp_path):
+    def test_shift_predictor_empirical_passes_use_shiftx2_false(
+        self, mocker: Any, tmp_path: Any
+    ) -> None:
         """--shift-predictor empirical must call predict_chemical_shifts with use_shiftx2=False."""
         mock_predict = mocker.patch(
             "synth_pdb.chemical_shifts.predict_chemical_shifts",
@@ -381,7 +390,7 @@ class TestShiftPredictorFlag:
             call_kwargs.get("use_shiftx2") is False
         ), "--shift-predictor empirical must pass use_shiftx2=False"
 
-    def test_shift_predictor_default_is_shiftx2(self, mocker, tmp_path):
+    def test_shift_predictor_default_is_shiftx2(self, mocker: Any, tmp_path: Any) -> None:
         """When --gen-shifts is used without --shift-predictor, the default must be
         use_shiftx2=True (consistent with synth-nmr's own default behaviour).
         """
@@ -424,7 +433,7 @@ class TestShiftPredictorFlag:
             call_kwargs.get("use_shiftx2") is True
         ), "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
 
-    def test_shift_predictor_appears_in_command_string(self, mocker, tmp_path):
+    def test_shift_predictor_appears_in_command_string(self, mocker: Any, tmp_path: Any) -> None:
         """The --shift-predictor flag must appear in the command string recorded
         in the PDB REMARK header so the generation is fully reproducible.
 

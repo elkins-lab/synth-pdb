@@ -36,7 +36,7 @@ import pytest
 class TestRDCShimImport:
     """Verify the shim module is importable and exports the correct interface."""
 
-    def test_rdc_shim_importable(self):
+    def test_rdc_shim_importable(self) -> None:
         """The synth_pdb.rdc module must exist and expose calculate_rdcs.
 
         EDUCATIONAL NOTE — Why shims?
@@ -52,7 +52,7 @@ class TestRDCShimImport:
 
         assert callable(calculate_rdcs)
 
-    def test_rdc_all_exports(self):
+    def test_rdc_all_exports(self) -> None:
         """__all__ must include calculate_rdcs so 'from synth_pdb.rdc import *' works."""
         import synth_pdb.rdc as rdc_module
 
@@ -73,14 +73,16 @@ class TestRDCPhysics:
     """
 
     @pytest.fixture
-    def da(self):
+    def da(self) -> float:
         return 10.0
 
     @pytest.fixture
-    def R(self):  # noqa: N802
+    def R(self) -> float:  # noqa: N802
         return 0.5
 
-    def _make_nh_structure(self, n_coord, h_coord, res_name="GLY"):
+    def _make_nh_structure(
+        self, n_coord: list, h_coord: list, res_name: str = "GLY"
+    ) -> "struc.AtomArray":
         """Helper: creates a minimal structure with one N and one H atom."""
         n_atom = struc.Atom(
             coord=list(n_coord),
@@ -100,7 +102,7 @@ class TestRDCPhysics:
         )
         return struc.array([n_atom, h_atom])
 
-    def test_z_axis_aligned_vector(self, da, R):  # noqa: N803
+    def test_z_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
         """A vector perfectly aligned with the Z-axis (principal axis) gives RDC = 2·Da.
 
         Derivation (Tjandra & Bax, 1997):
@@ -114,13 +116,13 @@ class TestRDCPhysics:
         from synth_pdb.rdc import calculate_rdcs
 
         structure = self._make_nh_structure([0, 0, 0], [0, 0, 1.02])
-        rdcs = calculate_rdcs(structure, Da=da, R=R)
+        rdcs = calculate_rdcs(structure, da=da, r=R)
 
         expected = 2 * da  # = 20.0 Hz
         assert 1 in rdcs
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
-    def test_x_axis_aligned_vector(self, da, R):  # noqa: N803
+    def test_x_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
         """A vector along the X-axis gives RDC = Da·(−1 + 1.5·R).
 
         Derivation:
@@ -136,12 +138,12 @@ class TestRDCPhysics:
         from synth_pdb.rdc import calculate_rdcs
 
         structure = self._make_nh_structure([0, 0, 0], [1.02, 0, 0])
-        rdcs = calculate_rdcs(structure, Da=da, R=R)
+        rdcs = calculate_rdcs(structure, da=da, r=R)
 
         expected = da * (-1 + 1.5 * R)  # = −2.5 Hz
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
-    def test_y_axis_aligned_vector(self, da, R):  # noqa: N803
+    def test_y_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
         """A vector along the Y-axis gives RDC = Da·(−1 − 1.5·R).
 
         Derivation:
@@ -156,12 +158,12 @@ class TestRDCPhysics:
         from synth_pdb.rdc import calculate_rdcs
 
         structure = self._make_nh_structure([0, 0, 0], [0, 1.02, 0])
-        rdcs = calculate_rdcs(structure, Da=da, R=R)
+        rdcs = calculate_rdcs(structure, da=da, r=R)
 
         expected = da * (-1 - 1.5 * R)  # = −17.5 Hz
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
-    def test_rdc_value_in_physical_range(self, da, R):  # noqa: N803
+    def test_rdc_value_in_physical_range(self, da: float, R: float) -> None:  # noqa: N803
         """RDC values must fall within [Da·(−1−1.5R), 2·Da].
 
         Physical constraint (Prestegard et al., 2000):
@@ -172,7 +174,7 @@ class TestRDCPhysics:
 
         # Use a diagonal vector (not on any axis)
         structure = self._make_nh_structure([0, 0, 0], [0.59, 0.59, 0.59])
-        rdcs = calculate_rdcs(structure, Da=da, R=R)
+        rdcs = calculate_rdcs(structure, da=da, r=R)
 
         if rdcs:
             val = rdcs[1]
@@ -186,7 +188,7 @@ class TestRDCPhysics:
 class TestRDCEdgeCases:
     """Validate graceful handling of biologically special cases."""
 
-    def test_proline_skipped(self):
+    def test_proline_skipped(self) -> None:
         """Proline (PRO) has no backbone amide proton due to its cyclic side-chain
         linking the nitrogen: the N atom forms a tertiary amine with no H attached.
 
@@ -209,11 +211,11 @@ class TestRDCEdgeCases:
             [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="PRO", chain_id="A"
         )
         structure = struc.array([pro_n])
-        rdcs = calculate_rdcs(structure, Da=10.0, R=0.5)
+        rdcs = calculate_rdcs(structure, da=10.0, r=0.5)
 
         assert 1 not in rdcs, "Proline should never appear in the RDC output"
 
-    def test_missing_amide_h_skipped(self):
+    def test_missing_amide_h_skipped(self) -> None:
         """A residue with a backbone N but no corresponding H atom is silently skipped.
         This handles truncated structures or non-standard residues gracefully.
         """
@@ -227,11 +229,11 @@ class TestRDCEdgeCases:
             [0, 0, 1], atom_name="H", element="H", res_id=2, res_name="ALA", chain_id="A"
         )
         structure = struc.array([n_atom, h_atom])
-        rdcs = calculate_rdcs(structure, Da=10.0, R=0.5)
+        rdcs = calculate_rdcs(structure, da=10.0, r=0.5)
 
         assert 1 not in rdcs
 
-    def test_multi_residue_structure(self):
+    def test_multi_residue_structure(self) -> None:
         """A 3-residue structure (GLY, PRO, ALA) should only produce RDCs for
         non-Proline residues that have both N and H atoms.
 
@@ -257,14 +259,14 @@ class TestRDCEdgeCases:
             ),
         ]
         structure = struc.array(atoms)
-        rdcs = calculate_rdcs(structure, Da=10.0, R=0.0)  # R=0 → pure axial
+        rdcs = calculate_rdcs(structure, da=10.0, r=0.0)  # R=0 → pure axial
 
         assert 1 in rdcs, "GLY residue should have an RDC"
         assert 2 not in rdcs, "PRO should be absent (no amide H)"
         assert 3 in rdcs, "ALA residue should have an RDC"
         assert len(rdcs) == 2
 
-    def test_returns_dict(self):
+    def test_returns_dict(self) -> None:
         """Return type must always be a dictionary, even for edge-case inputs."""
         from synth_pdb.rdc import calculate_rdcs
 
@@ -275,6 +277,6 @@ class TestRDCEdgeCases:
             [0, 0, 1], atom_name="H", element="H", res_id=1, res_name="GLY", chain_id="A"
         )
         structure = struc.array([n_atom, h_atom])
-        result = calculate_rdcs(structure, Da=10.0, R=0.0)
+        result = calculate_rdcs(structure, da=10.0, r=0.0)
 
         assert isinstance(result, dict)
