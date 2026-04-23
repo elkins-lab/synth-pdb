@@ -162,9 +162,7 @@ class BatchedPeptide:
             self.coords, self.atom_names, self.residue_indices, self.n_residues
         )
 
-    def analyze_ensemble(
-        self, superimpose: bool = True
-    ) -> Dict[str, Any]:
+    def analyze_ensemble(self, superimpose: bool = True) -> Dict[str, Any]:
         """Performs NMR-style ensemble analysis on the batch.
 
         Calculates the average structure, the average RMSD to that structure
@@ -243,9 +241,12 @@ class BatchedGenerator:
         self.offsets = []
 
         current_offset = 0
-        for i, res_name in enumerate(self.sequence):
+        for i, full_res_name in enumerate(self.sequence):
+            is_d = full_res_name.startswith("D-")
+            res_name = full_res_name[2:] if is_d else full_res_name
+
             if full_atom:
-                # Get full-atom template from biotite
+                # Get full-atom template from biotite (Always L-template)
                 template = struc.info.residue(res_name).copy()
 
                 # Remove terminal atoms (OXT, H2, H3) to match peptide chain logic
@@ -406,10 +407,53 @@ class BatchedGenerator:
                 rotated = np.matmul(rot, template_coords.T).transpose(0, 2, 1)
                 aligned = rotated + trans[:, np.newaxis, :]
 
+                # EDUCATIONAL NOTE - D-amino acid chiral mirroring:
+                # -------------------------------------------------
+                # To convert an L-template to its D-form, we reflect all sidechain
+                # atoms across the plane defined by the backbone (N, CA, C).
+                # This must be done for EACH member of the batch independently.
+                full_res_name = self.sequence[i]
+                is_d = full_res_name.startswith("D-")
+                if is_d and "GLY" not in full_res_name:
+                    # Target backbone plane for this residue in each batch member
+                    # target_bb: (b, 3, 3) -> N, CA, C
+                    ca_coords_batch = target_bb[:, 1, :]
+                    c_coords_batch = target_bb[:, 2, :]
+                    n_coords_batch = target_bb[:, 0, :]
+
+                    v1 = c_coords_batch - ca_coords_batch
+                    v2 = n_coords_batch - ca_coords_batch
+                    normal = np.cross(v1, v2, axis=-1)
+                    norm = np.linalg.norm(normal, axis=-1, keepdims=True)
+                    norm = np.where(norm == 0, 1.0, norm)
+                    normal /= norm  # (b, 3)
+
+                    backbone_names = {"N", "CA", "C", "O", "H", "HA"}
+                    res_atom_names = list(self.templates[i].atom_name)
+
+                    for atom_idx, name in enumerate(res_atom_names):
+                        if name not in backbone_names:
+                            # p: (b, 3) coordinates for this atom in the batch
+                            p = aligned[:, atom_idx, :]
+                            w = p - ca_coords_batch
+                            # Dot product batch-wise: (b, 3) * (b, 3) sum along -1
+                            dist_to_plane = np.sum(w * normal, axis=-1, keepdims=True)
+                            aligned[:, atom_idx, :] = p - 2 * dist_to_plane * normal
+
                 # Write to global tensor
                 offset = self.offsets[i]
                 n_res_atoms = template_coords.shape[0]
                 fa_coords[:, offset : offset + n_res_atoms] = aligned
+
+                # EDUCATIONAL NOTE - Rigorous Backbone Overwrite:
+                # To ensure perfect alignment with the serial generator (generator.py),
+                # we explicitly overwrite the Oxygen (O) from the template with the
+                # idealized NeRF coordinate.
+                target_o = coords[:, i * 4 + 3]
+                res_atom_names = self.atom_names[offset : offset + n_res_atoms]
+                if "O" in res_atom_names:
+                    o_local_idx = res_atom_names.index("O")
+                    fa_coords[:, offset + o_local_idx] = target_o
 
             return BatchedPeptide(fa_coords, self.sequence, self.atom_names, self.residue_indices)
 
