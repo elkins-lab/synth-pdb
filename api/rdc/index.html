@@ -2767,27 +2767,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#synth_pdb.rdc.read_rdc_file--expected-file-format" class="md-nav__link">
+  <a href="#synth_pdb.rdc.read_rdc_file--expected-file-format-5-columns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EXPECTED FILE FORMAT:
+        EXPECTED FILE FORMAT (5 Columns):
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#synth_pdb.rdc.read_rdc_file--n-h-rdcs-for-ubiquitin-in-phage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        N-H RDCs for Ubiquitin in Phage
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="N-H RDCs for Ubiquitin in Phage">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#expected-file-format" class="md-nav__link">
@@ -2797,11 +2785,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -3981,27 +3964,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#synth_pdb.rdc.read_rdc_file--expected-file-format" class="md-nav__link">
+  <a href="#synth_pdb.rdc.read_rdc_file--expected-file-format-5-columns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EXPECTED FILE FORMAT:
+        EXPECTED FILE FORMAT (5 Columns):
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#synth_pdb.rdc.read_rdc_file--n-h-rdcs-for-ubiquitin-in-phage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        N-H RDCs for Ubiquitin in Phage
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="N-H RDCs for Ubiquitin in Phage">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#expected-file-format" class="md-nav__link">
@@ -4011,11 +3982,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -4168,24 +4134,22 @@ Core RDC back-calculation is delegated to the <code>synth-nmr</code> package (<c
 
         <p>Calculates the Cornilescu Q-factor for RDC validation.</p>
 <h4 id="synth_pdb.rdc.calculate_rdc_q_factor--scientific-rationale">SCIENTIFIC RATIONALE:</h4>
-<p>The Q-factor provides a quantitative measure of the agreement between
+<p>The Q-factor provide a quantitative measure of the agreement between
 experimentally observed RDCs and those back-calculated from a structural
 model. It is analogous to the R-factor used in X-ray crystallography,
 measuring the normalized residual of the data fit.</p>
 <h4 id="synth_pdb.rdc.calculate_rdc_q_factor--formula-cornilescu-et-al-1998">FORMULA (Cornilescu et al., 1998):</h4>
 <p>Q = sqrt( sum((D_obs - D_calc)^2) / sum(D_obs^2) )</p>
-<p>This specific formulation uses the observed values for normalization,
-which makes the score sensitive to the distribution of the data.</p>
+<p>This formulation emphasizes large RDC values, making it highly sensitive
+to the global orientation of the principal structural motifs.</p>
 <h4 id="synth_pdb.rdc.calculate_rdc_q_factor--interpretation-of-results">INTERPRETATION OF RESULTS:</h4>
 <ul>
-<li>Q = 0.0: Perfect mathematical agreement (rare in real systems).</li>
-<li>Q &lt; 0.2: Excellent agreement; typical of high-quality NMR structures
-           where the local geometry and global fold are correct.</li>
-<li>Q ~ 0.3-0.5: Moderate agreement; suggests local geometry errors,
-               alignment tensor inaccuracies, or significant internal
-               dynamics not captured by a static structural model.</li>
-<li>Q &gt; 0.5: Poor agreement; indicates potential misfolding, incorrect
-           residue assignments, or a completely mismatched tensor.</li>
+<li>Q = 0.0: Perfect mathematical agreement (rare in real solutions).</li>
+<li>Q &lt; 0.2: Excellent agreement; typical of high-quality NMR structures.</li>
+<li>Q ~ 0.3-0.5: Moderate agreement; suggests local geometry errors or
+               tensor mismatches.</li>
+<li>Q &gt; 0.5: Poor agreement; indicates potential misfolding or assignment
+           errors in the restraint file.</li>
 </ul>
 
 
@@ -4321,26 +4285,20 @@ which makes the score sensitive to the distribution of the data.</p>
         <p>Reads RDC values from a whitespace-separated file.</p>
 <h4 id="synth_pdb.rdc.read_rdc_file--scientific-relevance">SCIENTIFIC RELEVANCE:</h4>
 <p>RDC data is typically provided as a list of residues and their associated
-coupling values in Hz. While many formats exist (e.g., PALES, TALOS, .rdc),
-<code>synth-pdb</code> supports a robust standard format used in structural genomic
-pipelines like those at the NESG and the Protein Data Bank.</p>
-<h4 id="synth_pdb.rdc.read_rdc_file--expected-file-format">EXPECTED FILE FORMAT:</h4>
-<p>The file should contain five whitespace-separated columns:
-Column 1: Residue ID of the first nucleus (integer)
+coupling values in Hz. <code>synth-pdb</code> supports the standard NESG/PDB format.
+This ensures compatibility with legacy NMR data processing pipelines
+like TALOS+, PALES, and CYANA.</p>
+<h4 id="synth_pdb.rdc.read_rdc_file--expected-file-format-5-columns">EXPECTED FILE FORMAT (5 Columns):</h4>
+<p>Column 1: Residue ID of the first nucleus (integer)
 Column 2: Atom name of the first nucleus (e.g., 'N')
 Column 3: Residue ID of the second nucleus (integer)
-Column 4: Atom name of the second nucleus (e.g., 'HN')
+Column 4: Atom name of the second nucleus (e.g., 'H')
 Column 5: The measured RDC value (float, in Hz)</p>
-<p>Lines starting with '#' are treated as comments and ignored.
-Blank lines are skipped.</p>
+<p>RESEARCH NOTE: Ensure atom names match the structure object (e.g. 'HN' vs 'H').
+Mismatched atom names will lead to KeyError in the structural mapping phase.
+The file is expected to be a flat text file without binary formatting.
+Empty lines and lines starting with '#' are ignored.</p>
 
-
-<details class="example" open>
-  <summary>Example</summary>
-  <h3 id="synth_pdb.rdc.read_rdc_file--n-h-rdcs-for-ubiquitin-in-phage">N-H RDCs for Ubiquitin in Phage</h3>
-<p>1 N 1 HN -12.4
-2 N 2 HN 5.2</p>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
