@@ -273,10 +273,21 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     final_structure = structure
 
     if ace_structure:
+        # Re-index existing residues: Shift all by +1 to make room for ACE at Res 1
+        final_structure.res_id += 1
+        # ACE is now Res 1
+        ace_structure.res_id[:] = 1
         # Prepend
         final_structure = ace_structure + final_structure
+        # Update c_term_id for OXT check since it shifted
+        c_term_id += 1
 
     if nme_structure:
+        # nme_res_id should be one higher than the current last residue
+        current_res_ids = sorted(set(final_structure.res_id))
+        last_id = current_res_ids[-1]
+        nme_structure.res_id[:] = last_id + 1
+
         # Critical Fix for OpenMM: Remove OXT from the C-terminal residue.
         # OpenMM sees OXT and thinks it's a terminal residue (e.g., CLYS).
         # But since we attach NME, it should be an internal residue (LYS).
