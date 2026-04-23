@@ -1163,7 +1163,7 @@ def _build_peptide_chain(
         # 3. Backbone Compatibility: Because we reflect *across* the backbone plane,
         #    the positions of the backbone atoms (N, CA, C) remain unchanged,
         #    ensuring the chain connectivity is not broken.
-        # ── D-amino acid chiral mirroring ─────────────────────────────────
+        # EDUCATIONAL NOTE - D-amino acid chiral mirroring
         if is_d and res_name != "GLY":
             vec1 = c_coord - ca_coord
             vec2 = n_coord - ca_coord
@@ -1207,7 +1207,7 @@ def _apply_biophysical_mods(
     ph: float,
     metal_ions: str,
     rng: Optional[random.Random] = None,
-) -> struc.AtomArray:
+) -> Tuple[struc.AtomArray, List[Dict]]:
     """Apply post-construction biophysical modifications in-place on a copy.
 
     Order of application matches the original generator logic:
@@ -1225,7 +1225,7 @@ def _apply_biophysical_mods(
         metal_ions: ``'auto'`` detects Zn coordination sites; any other value skips.
 
     Returns:
-        Modified AtomArray (may be the same object or a new one with ions).
+        Tuple[struc.AtomArray, List[Dict]]: Modified AtomArray and coordination sites.
 
     """
     # EDUCATIONAL NOTE - Biophysical Realism (Phase 2):
@@ -1251,6 +1251,7 @@ def _apply_biophysical_mods(
     # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.
+    sites: List[Dict] = []
     if metal_ions == "auto":
         from .cofactors import add_metal_ion, find_metal_binding_sites
 
@@ -1258,7 +1259,7 @@ def _apply_biophysical_mods(
         for site in sites:
             peptide = add_metal_ion(peptide, site)
 
-    return peptide
+    return peptide, sites
 
 
 def _do_energy_minimization(
@@ -1273,6 +1274,7 @@ def _do_energy_minimization(
     solvent_model: str,
     solvent_padding: float,
     keep_solvent: bool,
+    coordination: Optional[List[Dict]] = None,
 ) -> Tuple[Optional[str], struc.AtomArray]:
     """Run OpenMM energy minimization (or MD equilibration) and return results.
 
@@ -1289,6 +1291,7 @@ def _do_energy_minimization(
         cyclic: If ``True``, caps termini before writing temp PDB for OpenMM.
         equilibrate: Run MD equilibration instead of pure minimization.
         equilibrate_steps: Number of 2 fs MD steps for equilibration.
+        coordination: Optional metal coordination sites.
 
     Returns:
         ``(atomic_and_ter_content, updated_peptide)`` where *atomic_and_ter_content*
@@ -1341,6 +1344,7 @@ def _do_energy_minimization(
                     tolerance=minimization_k,
                     cyclic=cyclic,
                     disulfides=current_disulfides,
+                    coordination=coordination,
                 )
 
             if not success:
@@ -1474,7 +1478,9 @@ def _assemble_pdb_output(
     # EDUCATIONAL NOTE - Adding Realistic Occupancy:
     # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
     # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
-    total_residues = len(set(peptide.res_id))
+    protein_res_ids = peptide.res_id[~peptide.hetero]
+    max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
+    total_residues = max_protein_res_id
     s2_map = predict_order_parameters(peptide)
 
     # Sanitize: Extract only atomic content to avoid header duplication
@@ -1501,7 +1507,7 @@ def _assemble_pdb_output(
             if cyclic:
                 if res_num == 1 and atom_name == "N":
                     n_term_serial = serial
-                if res_num == total_residues and atom_name == "C":
+                if res_num == max_protein_res_id and atom_name == "C":
                     c_term_serial = serial
 
             if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
@@ -1741,7 +1747,7 @@ def generate_pdb_content(
     )
 
     # Sidechain optimization, terminal capping, pH titration, metal ions
-    peptide = _apply_biophysical_mods(
+    peptide, sites = _apply_biophysical_mods(
         peptide,
         optimize_sidechains,
         cap_termini,
@@ -1766,6 +1772,7 @@ def generate_pdb_content(
             solvent_model,
             solvent_padding,
             keep_solvent,
+            coordination=sites,
         )
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records

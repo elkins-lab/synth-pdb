@@ -727,7 +727,7 @@ class EnergyMinimizer:
 
         import biotite.structure.io.pdb as biotite_pdb
 
-        coordination_restraints = coordination_param if coordination_param is not None else []
+        coordination_restraints: list = []
         salt_bridge_restraints: list = []
 
         # EDUCATIONAL NOTE: We do NOT add the bond to the Topology here.
@@ -858,48 +858,77 @@ class EnergyMinimizer:
                 b_struc = None
 
             if b_struc is not None:
-                sites = find_metal_binding_sites(b_struc)
-            logger.debug(f"DEBUG: Found {len(sites)} metal binding sites.")
-            for site in sites:
-                i_idx = -1
-                for atom in atom_list:
-                    if atom.residue.name == site["type"]:
-                        i_idx = atom.index
-                        break
-                if i_idx != -1:
-                    for l_idx in site["ligand_indices"]:
-                        l_at = b_struc[l_idx]
-                        for atom in atom_list:
-                            if (
-                                int(atom.residue.id) == int(l_at.res_id)
-                                and atom.name == l_at.atom_name
-                            ):
-                                coordination_restraints.append((i_idx, atom.index))
-                                break
+                # We use BOTH caller-supplied sites (if any) and internally detected ones.
+                # Convert caller-supplied site dictionaries into the list of atom-index pairs
+                # that _build_simulation_context expects.
 
-            # Salt bridges
-            try:
-                salt_bridges = find_salt_bridges(b_struc, cutoff=5.0)
-                logger.info(f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges")
-                if salt_bridges:
-                    current_atoms = list(modeller.topology.atoms())
-                    for br in salt_bridges:
-                        ia, ib = -1, -1
-                        for atom in current_atoms:
-                            if (
-                                str(atom.residue.id).strip() == str(br["res_ia"]).strip()
-                                and atom.name == br["atom_a"]
-                            ):
-                                ia = atom.index
-                            if (
-                                str(atom.residue.id).strip() == str(br["res_ib"]).strip()
-                                and atom.name == br["atom_b"]
-                            ):
-                                ib = atom.index
-                        if ia != -1 and ib != -1:
-                            salt_bridge_restraints.append((ia, ib, br["distance"] / 10.0))
-            except Exception as e:
-                logger.debug(f"Internal salt bridge detection failed: {e}")
+                # 1. Process caller sites (from generator)
+                if coordination_param:
+                    for site in coordination_param:
+                        i_idx_at = -1
+                        # Find the ion atom index in the topology
+                        for atom in atom_list:
+                            if atom.residue.name == site["type"]:
+                                i_idx_at = atom.index
+                                break
+                        if i_idx_at != -1:
+                            # Map ligand indices from b_struc to topology
+                            for l_idx in site["ligand_indices"]:
+                                l_at = b_struc[l_idx]
+                                for atom in atom_list:
+                                    if (
+                                        int(atom.residue.id) == int(l_at.res_id)
+                                        and atom.name == l_at.atom_name
+                                    ):
+                                        coordination_restraints.append((i_idx_at, atom.index))
+                                        break
+
+                # 2. Add internally detected sites (if not already covered)
+                internal_sites = find_metal_binding_sites(b_struc)
+                for site in internal_sites:
+                    i_idx_at = -1
+                    for atom in atom_list:
+                        if atom.residue.name == site["type"]:
+                            i_idx_at = atom.index
+                            break
+                    if i_idx_at != -1:
+                        for l_idx in site["ligand_indices"]:
+                            l_at = b_struc[l_idx]
+                            for atom in atom_list:
+                                if (
+                                    int(atom.residue.id) == int(l_at.res_id)
+                                    and atom.name == l_at.atom_name
+                                ):
+                                    pair = (i_idx_at, atom.index)
+                                    if pair not in coordination_restraints:
+                                        coordination_restraints.append(pair)
+                                    break
+
+                # Salt bridges
+                try:
+                    salt_bridges = find_salt_bridges(b_struc, cutoff=5.0)
+                    logger.info(
+                        f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges"
+                    )
+                    if salt_bridges:
+                        current_atoms = list(modeller.topology.atoms())
+                        for br in salt_bridges:
+                            ia, ib = -1, -1
+                            for atom in current_atoms:
+                                if (
+                                    str(atom.residue.id).strip() == str(br["res_ia"]).strip()
+                                    and atom.name == br["atom_a"]
+                                ):
+                                    ia = atom.index
+                                if (
+                                    str(atom.residue.id).strip() == str(br["res_ib"]).strip()
+                                    and atom.name == br["atom_b"]
+                                ):
+                                    ib = atom.index
+                            if ia != -1 and ib != -1:
+                                salt_bridge_restraints.append((ia, ib, br["distance"] / 10.0))
+                except Exception as e:
+                    logger.debug(f"Internal salt bridge detection failed: {e}")
         except Exception as e:
             logger.warning(f"Metadata/SaltBridge detection failed: {e}")
 
@@ -1131,6 +1160,8 @@ class EnergyMinimizer:
             force_ext.addPerBondParameter("r0")
             new_ats = list(topology.atoms())
             for i_o, l_o in coordination_restraints:
+                # Ensure indices are integers
+                i_o, l_o = int(i_o), int(l_o)
                 oi, ol = atom_list[i_o], atom_list[l_o]
                 ni, nl = -1, -1
                 for a in new_ats:
