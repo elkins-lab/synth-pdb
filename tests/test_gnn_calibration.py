@@ -26,6 +26,13 @@ class TestGNNCalibration:
     def setup_class(cls) -> None:
         # Initialize the classifier with the trained model
         cls.clf = GNNQualityClassifier()
+
+        # If no pre-trained model was found, skip the calibration tests.
+        # These tests validate model performance, which is not applicable to
+        # a randomly-initialized (untrained) model.
+        if cls.clf._model_path is None:
+            pytest.skip("GNN checkpoint not found. Skipping calibration sensitivity tests.")
+
         # Use 20 residues for better graph resolution
         cls.sequence = "ALA-GLY-SER-LEU-GLU-VAL-ASP-THR-LYS-ILE-" * 2
         cls.sequence = cls.sequence.strip("-")
