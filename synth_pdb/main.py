@@ -1227,7 +1227,7 @@ def main() -> None:
                                 # Back-calculate RDCs from model
                                 # We use the same Da/R as provided or defaults
                                 calc_rdcs_dict = calculate_rdcs(
-                                    structure, Da=args.rdc_da, R=args.rdc_r
+                                    structure, da=args.rdc_da, r=args.rdc_r
                                 )
 
                                 # Align obs and calc
@@ -1244,9 +1244,9 @@ def main() -> None:
                                         target["atom_2"],
                                     )
 
-                                    if tuple_key in calc_rdcs_dict:
+                                    if tuple_key in calc_rdcs_dict:  # type: ignore[comparison-overlap]
                                         obs_vals.append(target["value"])
-                                        calc_vals.append(calc_rdcs_dict[tuple_key])
+                                        calc_vals.append(calc_rdcs_dict[tuple_key])  # type: ignore[index]
                                     elif res_key in calc_rdcs_dict:
                                         obs_vals.append(target["value"])
                                         calc_vals.append(calc_rdcs_dict[res_key])
@@ -1462,7 +1462,7 @@ def main() -> None:
                                 # tertiary/secondary amine in the pyrrolidine ring).
                                 from .rdc import calculate_rdcs
 
-                                rdcs = calculate_rdcs(structure, Da=args.rdc_da, R=args.rdc_r)
+                                rdcs = calculate_rdcs(structure, da=args.rdc_da, r=args.rdc_r)
                                 rdc_csv = args.output_rdcs
                                 # Build a lookup from res_id (1-indexed) to one-letter code.
                                 # res_names is already built above as a list of 3-letter codes.

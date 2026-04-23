@@ -197,7 +197,6 @@ module = [
     "torch_geometric.*",
     "transformers.*",
     "setuptools",
-    "pynmrstar",
 ]
 ignore_missing_imports = true
 
