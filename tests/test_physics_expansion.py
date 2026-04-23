@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import synth_pdb.physics
@@ -6,7 +7,7 @@ import synth_pdb.physics
 class TestPhysicsExpansion:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.os.path.exists")
-    def test_calculate_energy_with_file_path(self, mock_exists):
+    def test_calculate_energy_with_file_path(self, mock_exists: MagicMock) -> None:
         """Test calculate_energy using a mocked existing PDB file."""
         mock_exists.return_value = True
         minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -23,7 +24,7 @@ class TestPhysicsExpansion:
             assert called_kwargs["cyclic"] is True
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
-    def test_calculate_energy_with_string_content(self):
+    def test_calculate_energy_with_string_content(self) -> None:
         """Test calculate_energy using raw PDB string content."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
@@ -42,7 +43,7 @@ class TestPhysicsExpansion:
             assert called_kwargs["cyclic"] is False
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
-    def test_calculate_energy_with_object(self):
+    def test_calculate_energy_with_object(self) -> None:
         """Test calculate_energy using an object that has a .pdb property."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
@@ -56,7 +57,7 @@ class TestPhysicsExpansion:
             assert energy == 100.0
             mock_run.assert_called_once()
 
-    def test_calculate_energy_no_openmm(self):
+    def test_calculate_energy_no_openmm(self) -> None:
         """calculate_energy should return 0.0 if OpenMM is missing."""
         with patch("synth_pdb.physics.HAS_OPENMM", False):
             minimizer = synth_pdb.physics.EnergyMinimizer()
@@ -64,15 +65,17 @@ class TestPhysicsExpansion:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_create_system_robust_suppress_implicit(self, mock_app):
+    def test_create_system_robust_suppress_implicit(self, mock_app: MagicMock) -> None:
         """Test _create_system_robust retry logic when implicitSolvent fails."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
         minimizer.forcefield = MagicMock()
 
         # Raise exception on first call (with implicitSolvent), succeed on second
-        def create_system_side_effect(topo, **kwargs):
+        def create_system_side_effect(topo: Any, **kwargs: Any) -> Any:
             if "implicitSolvent" in kwargs:
-                raise Exception("implicitSolvent was specified to createSystem() but was never used")
+                raise Exception(
+                    "implicitSolvent was specified to createSystem() but was never used"
+                )
             return "mock_system"
 
         minimizer.forcefield.createSystem.side_effect = create_system_side_effect
@@ -91,7 +94,7 @@ class TestPhysicsExpansion:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_create_system_robust_template_mismatch(self, mock_app):
+    def test_create_system_robust_template_mismatch(self, mock_app: MagicMock) -> None:
         """Test _create_system_robust fallback for 'No template found'."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
         minimizer.forcefield = MagicMock()
@@ -99,7 +102,7 @@ class TestPhysicsExpansion:
 
         call_count = {"count": 0}
 
-        def create_system_side_effect(topo, **kwargs):
+        def create_system_side_effect(topo: Any, **kwargs: Any) -> Any:
             if call_count["count"] == 0:
                 call_count["count"] += 1
                 raise Exception("No template found for residue")
@@ -118,10 +121,10 @@ class TestPhysicsExpansion:
 
         mock_repaired_topo = MagicMock()
 
-        def side_effect_addHydrogens(ff):
+        def side_effect_add_hydrogens(ff: Any) -> None:
             mock_modeller.topology = mock_repaired_topo
 
-        mock_modeller.addHydrogens.side_effect = side_effect_addHydrogens
+        mock_modeller.addHydrogens.side_effect = side_effect_add_hydrogens
 
         system, topo, pos = minimizer._create_system_robust("mock_topo", None, mock_modeller)
 
@@ -132,7 +135,7 @@ class TestPhysicsExpansion:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_create_system_robust_final_fallback(self, mock_app):
+    def test_create_system_robust_final_fallback(self, mock_app: MagicMock) -> None:
         """Test _create_system_robust total crash fallback."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
         minimizer.forcefield = MagicMock()
@@ -141,7 +144,7 @@ class TestPhysicsExpansion:
         # Always throw an exception that doesn't match specific fallbacks
         minimizer.forcefield.createSystem.side_effect = [
             Exception("Severe segmentation fault simulation explosion"),
-            "fallback_system"
+            "fallback_system",
         ]
 
         mock_modeller = MagicMock()
@@ -159,7 +162,9 @@ class TestPhysicsExpansion:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     @patch("synth_pdb.physics.mm")
-    def test_coordination_restraints_application(self, mock_mm, mock_app):
+    def test_coordination_restraints_application(
+        self, mock_mm: MagicMock, mock_app: MagicMock
+    ) -> None:
         """Test the application of CustomBondForce for coordination restraints."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
@@ -187,11 +192,22 @@ class TestPhysicsExpansion:
         mock_system = MagicMock()
         mock_app.Simulation.return_value = MagicMock()
 
-        minimizer._create_system_robust = MagicMock(return_value=(mock_system, mock_modeller.topology, mock_modeller.positions))
-
-        simulation, system, n_idx, c_idx, topo, pos = minimizer._build_simulation_context(
-            mock_modeller, False, [], [], coordination_restraints, atom_list
-        )
+        with patch.object(
+            minimizer,
+            "_create_system_robust",
+            return_value=(mock_system, mock_modeller.topology, mock_modeller.positions),
+        ):
+            (
+                simulation,
+                system,
+                integrator,
+                n_idx,
+                c_idx,
+                topo,
+                pos,
+            ) = minimizer._build_simulation_context(
+                mock_modeller, False, [], [], coordination_restraints, atom_list
+            )
 
         # Assert CustomBondForce was created and added
         mock_mm.CustomBondForce.assert_any_call("0.5*k*(r-r0)^2")
@@ -199,7 +215,7 @@ class TestPhysicsExpansion:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_finalize_output_cyclic_cleanup(self, mock_app):
+    def test_finalize_output_cyclic_cleanup(self, mock_app: MagicMock) -> None:
         """Test the post-simulation cleanup of cyclic termini in _finalize_output."""
         minimizer = synth_pdb.physics.EnergyMinimizer()
 
@@ -256,7 +272,7 @@ class TestPhysicsExpansion:
                     coordination_restraints=[],
                     hetatm_lines=[],
                     original_metadata={},
-                    atom_list=[]
+                    atom_list=[],
                 )
 
         # Check pruning

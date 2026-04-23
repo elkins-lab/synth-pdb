@@ -24,6 +24,10 @@ SSBOND_CAPTURE_RADIUS = 18.0
 
 logger = logging.getLogger(__name__)
 
+# Global cache for ForceField objects to prevent memory leaks and speed up initialization.
+# Loading XML forcefield files repeatedly is expensive and can accumulate memory.
+_FORCEFIELD_CACHE: Dict[Tuple[str, ...], "app.ForceField"] = {}
+
 
 class EnergyMinimizer:
     """Performs energy minimization on molecular structures using OpenMM.
@@ -62,6 +66,7 @@ class EnergyMinimizer:
         forcefield_name: str = "amber14-all.xml",
         solvent_model: str = "app.OBC2",
         box_size: float = 1.0,
+        disable_cache: bool = False,
     ) -> None:
         """Initialize the Minimizer with a Forcefield and Solvent Model.
 
@@ -74,6 +79,7 @@ class EnergyMinimizer:
                              'app.OBC2' is an "Implicit Solvent" model (High Performance).
             box_size:        The padding distance (in nm) for the explicit solvent box.
                              Default 1.0 nm ensures the protein doesn't see its own image.
+            disable_cache:   If True, reloads ForceField from scratch (used for testing).
 
         ### EDUCATIONAL NOTE - Explicit vs. Implicit Solvent:
         ---------------------------------------------------
@@ -162,7 +168,15 @@ class EnergyMinimizer:
                 self.implicit_solvent_enum = None
 
         try:
-            self.forcefield = app.ForceField(*ff_files)
+            # Use global cache to avoid redundant loading (unless disabled for tests)
+            if not disable_cache:
+                ff_key = tuple(sorted(ff_files))
+                if ff_key not in _FORCEFIELD_CACHE:
+                    logger.debug(f"Loading ForceField: {ff_key}")
+                    _FORCEFIELD_CACHE[ff_key] = app.ForceField(*ff_files)
+                self.forcefield = _FORCEFIELD_CACHE[ff_key]
+            else:
+                self.forcefield = app.ForceField(*ff_files)
         except Exception as e:
             logger.error(f"Failed to load forcefield: {e}")
             raise
@@ -1014,7 +1028,8 @@ class EnergyMinimizer:
         salt_bridge_restraints: List,
         coordination_restraints: List,
         atom_list: List[Any],
-    ) -> Tuple[Any, Any, int, int, Any, Any]:
+        positions: Optional[Any] = None,
+    ) -> Tuple[Any, Any, Any, int, int, Any, Any]:
         """Create OpenMM System + Simulation, apply forces, return context objects.
 
         Wraps system creation (implicit/explicit solvent), cyclic terminal
@@ -1028,12 +1043,12 @@ class EnergyMinimizer:
             salt_bridge_restraints: ``[(ia, ib, r0_nm), ...]`` from detection.
             coordination_restraints: ``[(i_idx, l_idx), ...]`` metal restraints.
             atom_list: Atom list at system-creation time (for index mapping).
+            positions: Optional positions override.
 
         Returns:
-            ``(simulation, system, n_idx, c_idx, topology, positions)``
+            ``(simulation, system, integrator, n_idx, c_idx, topology, positions)``
             where *n_idx*/*c_idx* are the N/C-terminus atom indices used for
             the cyclic pull force (``-1`` for non-cyclic structures).
-
         """
         topology, positions = modeller.topology, modeller.positions
 
@@ -1352,7 +1367,7 @@ class EnergyMinimizer:
 
         simulation.context.setPositions(positions)
 
-        return simulation, system, n_idx, c_idx, topology, positions
+        return simulation, system, integrator, n_idx, c_idx, topology, positions
 
     def _finalize_output(
         self,
@@ -1611,7 +1626,21 @@ class EnergyMinimizer:
             )
 
             # ── Stage 3: System + forces + Simulation context ───────────────
-            simulation, system, n_idx, c_idx, topology, positions = self._build_simulation_context(
+            simulation: Any
+            system: Any
+            integrator: Any
+            n_idx: int
+            c_idx: int
+
+            (
+                simulation,
+                system,
+                integrator,
+                n_idx,
+                c_idx,
+                topology,
+                positions,
+            ) = self._build_simulation_context(
                 modeller,
                 cyclic,
                 added_bonds,
@@ -1782,7 +1811,22 @@ class EnergyMinimizer:
             )
             if write_ok is False:
                 return None
-            return float(final_energy)
+
+            res_energy = float(final_energy)
+
+            # Explicitly clean up OpenMM objects to prevent memory leaks.
+            # Python's GC sometimes fails to reclaim OpenMM's C++ resources
+            # unless the context is explicitly destroyed.
+            try:
+                del simulation.context
+                del simulation
+                del system
+                del integrator
+                del modeller
+            except Exception as cleanup_err:
+                logger.debug(f"OpenMM cleanup failed (non-critical): {cleanup_err}")
+
+            return res_energy
 
         except Exception as e:
             logger.error(f"Simulation failed: {e}", exc_info=True)

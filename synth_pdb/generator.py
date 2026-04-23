@@ -1480,7 +1480,7 @@ def _assemble_pdb_output(
     # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
     protein_res_ids = peptide.res_id[~peptide.hetero]
     max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
-    total_residues = max_protein_res_id
+    total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
     s2_map = predict_order_parameters(peptide)
 
     # Sanitize: Extract only atomic content to avoid header duplication

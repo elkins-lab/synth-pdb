@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 from unittest.mock import MagicMock, mock_open, patch
 
 import numpy as np
@@ -8,19 +9,18 @@ import synth_pdb.physics
 
 
 class TestPhysicsCoverage:
-
-    def test_missing_openmm_dependency(self):
+    def test_missing_openmm_dependency(self) -> None:
         """Test that methods return gracefully when OpenMM is not installed."""
         # Mock HAS_OPENMM = False
         with patch("synth_pdb.physics.HAS_OPENMM", False):
-            minimizer = synth_pdb.physics.EnergyMinimizer()
+            minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
             # Should fail/return False gracefully
             assert minimizer.minimize("dummy.pdb", "out.pdb") is False
             assert minimizer.equilibrate("dummy.pdb", "out.pdb") is False
             assert minimizer.add_hydrogens_and_minimize("dummy.pdb", "out.pdb") is False
 
-    def test_init_missing_openmm_returns_early(self):
+    def test_init_missing_openmm_returns_early(self) -> None:
         """When HAS_OPENMM is False, __init__ returns early without setting attrs."""
         # Use patch to mock HAS_OPENMM at the module level
         with patch("synth_pdb.physics.HAS_OPENMM", False):
@@ -30,7 +30,9 @@ class TestPhysicsCoverage:
             # If it returned early, it didn't set self.forcefield_name
             assert not hasattr(minimizer, "forcefield_name")
 
-    def test_init_unknown_solvent_model_falls_back_to_explicit(self, caplog):
+    def test_init_unknown_solvent_model_falls_back_to_explicit(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Unknown implicit solvent model logs a warning and defaults to 'explicit'."""
         import logging
 
@@ -43,7 +45,7 @@ class TestPhysicsCoverage:
         assert "Unknown solvent model 'app.UnknownModel123'" in caplog.text
         assert "Defaulting to 'explicit'" in caplog.text
 
-    def test_init_invalid_box_size_raises_valueerror(self):
+    def test_init_invalid_box_size_raises_valueerror(self) -> None:
         """box_size <= 0 must raise ValueError."""
         from synth_pdb.physics import EnergyMinimizer
 
@@ -55,21 +57,21 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_forcefield_loading_error(self, mock_app):
+    def test_forcefield_loading_error(self, mock_app: MagicMock) -> None:
         """Test that init handles ForceField loading errors."""
         # ForceField constructor raises Exception
         mock_app.ForceField.side_effect = Exception("XML file missing")
         mock_app.OBC2 = "OBC2"  # Needed for defaults
 
         with pytest.raises(Exception, match="XML file missing"):
-            synth_pdb.physics.EnergyMinimizer()
+            synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_simulation_failure(self, mock_app):
+    def test_simulation_failure(self, mock_app: MagicMock) -> None:
         """Test general simulation failure (e.g., bad topology)."""
         # Set up a working minimizer mock
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Mock PDBFile to fail
         mock_app.PDBFile.side_effect = Exception("Corrupt PDB")
@@ -79,7 +81,9 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_hetatm_restoration_logic(self, mock_app, caplog):
+    def test_hetatm_restoration_logic(
+        self, mock_app: MagicMock, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test the specific logic for preserving ZN ions during hydrogen checking.
         The "AI Trinity" logic: identifying non-protein atoms, storing them,
         and restoring them after addHydrogens.
@@ -88,7 +92,7 @@ class TestPhysicsCoverage:
 
         caplog.set_level(logging.INFO)
 
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Initialize mock objects explicitly to avoid NameErrors in partial edits
         mock_res_ala = MagicMock()
@@ -130,14 +134,14 @@ class TestPhysicsCoverage:
 
         # Mock addHydrogens behavior
         # After addHydrogens is called, we simulate the Modeller losing the ZN residue
-        def side_effect_add_hydrogens(*args, **kwargs):
+        def side_effect_add_hydrogens(*args: Any, **kwargs: Any) -> None:
             mock_topology.residues.side_effect = None
             # Only ALA is left after hydrogen addition
             # Reset atoms iterator to only return ALA atoms
             mock_topology.residues.return_value = [mock_res_ala]
             mock_topology.atoms.side_effect = lambda: iter([MagicMock()])
 
-            def side_effect_add_atom(*args, **kwargs):
+            def side_effect_add_atom(*args: Any, **kwargs: Any) -> None:
                 pass
 
             mock_topology.addAtom.side_effect = side_effect_add_atom
@@ -225,9 +229,9 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_minimize_calls_run_simulation(self, mock_app):
+    def test_minimize_calls_run_simulation(self, mock_app: MagicMock) -> None:
         """Test that minimize() correctly calls _run_simulation with add_hydrogens=False."""
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Mock the internal _run_simulation method
         with patch.object(minimizer, "_run_simulation", return_value=True) as mock_run:
@@ -247,13 +251,15 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_zero_atoms_in_topology(self, mock_app, caplog):
+    def test_zero_atoms_in_topology(
+        self, mock_app: MagicMock, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that _run_simulation returns False if topology has 0 atoms."""
         import logging
 
         caplog.set_level(logging.ERROR)
 
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Mock PDB with empty atoms list
         mock_pdb = MagicMock()
@@ -276,13 +282,15 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_empty_positions_from_openmm(self, mock_app, caplog):
+    def test_empty_positions_from_openmm(
+        self, mock_app: MagicMock, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that we catch empty positions returned by OpenMM state."""
         import logging
 
         caplog.set_level(logging.ERROR)
 
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Setup successful initialization but empty positions at end
         mock_pdb = MagicMock()
@@ -323,13 +331,15 @@ class TestPhysicsCoverage:
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
     @patch("synth_pdb.physics.mm")
-    def test_salt_bridge_force_application(self, mock_mm, mock_app, caplog):
+    def test_salt_bridge_force_application(
+        self, mock_mm: MagicMock, mock_app: MagicMock, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that salt bridge forces are applied when bridges are detected."""
         import logging
 
         caplog.set_level(logging.DEBUG)
 
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Mock PDB & Topology
         mock_pdb = MagicMock()
@@ -401,9 +411,9 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_wrapper_methods(self, mock_app):
+    def test_wrapper_methods(self, mock_app: MagicMock) -> None:
         """Test utility wrappers add_hydrogens_and_minimize and equilibrate steps."""
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Test add_hydrogens_and_minimize
         with patch.object(minimizer, "_run_simulation", return_value=True) as mock_run:
@@ -437,13 +447,15 @@ class TestPhysicsCoverage:
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
     @patch("synth_pdb.physics.app")
-    def test_create_system_exception_fallback(self, mock_app, caplog):
+    def test_create_system_exception_fallback(
+        self, mock_app: MagicMock, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that createSystem() succeeds on the first call now that the implicit
         solvent is configured exclusively via the XML file loaded at construction
         time (not as a redundant kwarg to createSystem).  The old retry-and-warn
         loop should no longer be exercised under normal operation.
         """
-        minimizer = synth_pdb.physics.EnergyMinimizer()
+        minimizer = synth_pdb.physics.EnergyMinimizer(disable_cache=True)
 
         # Standard Setup
         mock_pdb = MagicMock()
