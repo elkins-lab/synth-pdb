@@ -107,9 +107,9 @@ def find_metal_binding_sites(
                 count = 0
                 for ci in range(4):
                     for cj in range(ci + 1, 4):
-                        spread += np.linalg.norm(cluster_coords[ci] - cluster_coords[cj])
+                        spread += float(np.linalg.norm(cluster_coords[ci] - cluster_coords[cj]))
                         count += 1
-                avg_spread = spread / count
+                avg_spread = float(spread / count)
 
                 # Track the tightest cluster found in this iteration
                 if avg_spread < min_spread:
