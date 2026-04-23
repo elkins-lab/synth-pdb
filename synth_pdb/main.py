@@ -660,7 +660,7 @@ def main() -> None:
 
     # Validate length only if no sequence is provided
     if args.sequence is None:
-        if args.length is None or args.length <= 0:
+        if args.length is None:
             # Check if we can infer length from structure parameter
             if args.structure:
                 # Parse structure to find maximum residue number
@@ -726,8 +726,8 @@ def main() -> None:
         return  # Exit after visualization generation
 
     if args.mode == "decoys":
-        if not args.sequence and not args.length:
-            logger.error("Decoy generation requires --sequence or --length.")
+        if not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("Decoy generation requires --sequence or a positive --length.")
             sys.exit(1)
 
         target_sequence = args.sequence

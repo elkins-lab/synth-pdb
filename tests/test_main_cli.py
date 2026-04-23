@@ -1,5 +1,6 @@
 import logging  # Import logging to set level for caplog
-import sys
+from pathlib import Path
+from typing import Any
 
 import numpy as np  # Import numpy for array creation
 import pytest
@@ -11,7 +12,7 @@ from synth_pdb.validator import PDBValidator
 
 class TestMainCLI:
     # --- Tests for --guarantee-valid ---
-    def test_guarantee_valid_success(self, mocker, caplog):
+    def test_guarantee_valid_success(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         # Set caplog level to DEBUG to capture all relevant messages, especially the one about current_violations
         caplog.set_level(logging.DEBUG)
 
@@ -67,7 +68,7 @@ class TestMainCLI:
         mocker.patch("sys.argv", test_args)
 
         # Mock sys.exit to prevent actual exit
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -76,9 +77,9 @@ class TestMainCLI:
         assert "PDB generated in attempt 2 has 1 violations. Retrying..." in caplog.text
         assert "Successfully generated a valid PDB file after 3 attempts." in caplog.text
         assert "test_gv_success.pdb" in caplog.text
-        sys.exit.assert_not_called()  # Should not exit with error
+        mock_exit.assert_not_called()  # Should not exit with error
 
-    def test_guarantee_valid_failure(self, mocker, caplog):
+    def test_guarantee_valid_failure(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         caplog.set_level(logging.INFO)  # Set to INFO to capture relevant messages
 
         # PDB content that causes steric clashes (2 violations: min_distance and VdW overlap)
@@ -114,7 +115,7 @@ class TestMainCLI:
         mock_sys_exit.assert_called_once_with(1)
 
     # --- Tests for --best-of-N ---
-    def test_best_of_N_selection(self, mocker, caplog):
+    def test_best_of_n_selection(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         caplog.set_level(logging.INFO)  # Set to INFO to capture relevant messages
 
         # PDB content with 2 violations (steric clash, VdW overlap)
@@ -177,7 +178,7 @@ class TestMainCLI:
             "test_best_of_N.pdb",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")  # Should not exit with error
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -188,10 +189,12 @@ class TestMainCLI:
         assert (
             "No violations found in the final PDB for" in caplog.text
         )  # Because the 0-violation PDB was chosen
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
     # --- Tests for --refine-clashes ---
-    def test_refine_clashes_reduces_violations(self, mocker, caplog):
+    def test_refine_clashes_reduces_violations(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         caplog.set_level(logging.INFO)  # Set to INFO to capture relevant messages
 
         # PDB content that causes steric clashes (2 violations: min_distance and VdW overlap)
@@ -259,7 +262,7 @@ class TestMainCLI:
             "1",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -269,9 +272,11 @@ class TestMainCLI:
         assert "Refinement iteration 1: Reduced violations from 1 to 0." in caplog.text
         assert "Refinement process completed. Reduced total violations from 1 to 0." in caplog.text
         assert "No violations found in the final PDB for" in caplog.text
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
-    def test_refine_clashes_no_improvement(self, mocker, caplog):
+    def test_refine_clashes_no_improvement(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         caplog.set_level(logging.INFO)  # Set to INFO to capture relevant messages
 
         # PDB content that causes steric clashes (2 violations: min_distance and VdW overlap)
@@ -336,7 +341,7 @@ class TestMainCLI:
             "2",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -349,9 +354,11 @@ class TestMainCLI:
         )
         assert "Refinement process completed. No change in total violations (1)." in caplog.text
         assert "Final PDB has 1 violations." in caplog.text
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
-    def test_header_with_best_of_N_and_refine_clashes(self, mocker, tmp_path, caplog):
+    def test_header_with_best_of_n_and_refine_clashes(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         caplog.set_level(logging.INFO)
         output_filepath = tmp_path / "test_best_refine_header.pdb"
 
@@ -520,7 +527,7 @@ class TestMainCLI:
             str(output_filepath),
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -553,9 +560,9 @@ class TestMainCLI:
         assert lines[-2].startswith("ENDMDL"), "PDB file should contain an ENDMDL record."
         assert lines[-1].startswith("END"), "PDB file should contain an END record."
 
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
-    def test_run_dataset_generation(self, mocker, caplog):
+    def test_run_dataset_generation(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test --mode dataset calls DatasetGenerator.
 
         SCIENTIFIC BASIS:
@@ -568,13 +575,17 @@ class TestMainCLI:
 
         test_args = [
             "synth_pdb",
-            "--mode", "dataset",
-            "--num-samples", "10",
-            "--output", "my_dataset",
-            "--train-ratio", "0.8"
+            "--mode",
+            "dataset",
+            "--num-samples",
+            "10",
+            "--output",
+            "my_dataset",
+            "--train-ratio",
+            "0.8",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -585,8 +596,9 @@ class TestMainCLI:
         assert kwargs["train_ratio"] == 0.8
         mock_ds_instance.generate.assert_called_once()
         assert "Dataset generation complete" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_ai_interpolate(self, mocker, caplog):
+    def test_run_ai_interpolate(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test --mode ai --ai-op interpolate.
 
         SCIENTIFIC BASIS:
@@ -599,25 +611,32 @@ class TestMainCLI:
 
         test_args = [
             "synth_pdb",
-            "--mode", "ai",
-            "--ai-op", "interpolate",
-            "--start-pdb", "start.pdb",
-            "--end-pdb", "end.pdb",
-            "--steps", "20",
-            "--output", "my_morph"
+            "--mode",
+            "ai",
+            "--ai-op",
+            "interpolate",
+            "--start-pdb",
+            "start.pdb",
+            "--end-pdb",
+            "end.pdb",
+            "--steps",
+            "20",
+            "--output",
+            "my_morph",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         mock_interp.assert_called_once_with("start.pdb", "end.pdb", 20, "my_morph")
         assert "Interpolation complete" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_ai_missing_args(self, mocker, caplog):
+    def test_run_ai_missing_args(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test error handling for missing AI arguments."""
         caplog.set_level(logging.ERROR)
-        test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "interpolate"] # missing PDBS
+        test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "interpolate"]  # missing PDBS
         mocker.patch("sys.argv", test_args)
         mock_exit = mocker.patch("sys.exit")
 
@@ -626,7 +645,7 @@ class TestMainCLI:
         assert "Interpolation requires --start-pdb and --end-pdb" in caplog.text
         mock_exit.assert_called_with(1)
 
-    def test_run_ai_invalid_op(self, mocker, caplog):
+    def test_run_ai_invalid_op(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test error handling for invalid AI operation."""
         caplog.set_level(logging.ERROR)
         test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "invalid"]
@@ -638,7 +657,9 @@ class TestMainCLI:
         assert "AI mode requires --ai-op {interpolate, cluster}" in caplog.text
         mock_exit.assert_called_with(1)
 
-    def test_run_ai_cluster_not_implemented(self, mocker, caplog):
+    def test_run_ai_cluster_not_implemented(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test cluster op reports not implemented."""
         caplog.set_level(logging.ERROR)
         test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "cluster"]
@@ -652,8 +673,8 @@ class TestMainCLI:
 
     # --- Additional tests for error conditions and edge cases ---
 
-    def test_invalid_length_without_sequence(self, tmp_path):
-        """Test that length=0 without sequence uses default length=10."""
+    def test_invalid_length_without_sequence(self, tmp_path: Path) -> None:
+        """Test that length=0 without sequence raises SystemExit."""
         output_file = tmp_path / "test.pdb"
 
         # Mock sys.argv with invalid length (0)
@@ -662,14 +683,13 @@ class TestMainCLI:
 
         sys.argv = test_args
 
-        # Should not exit - uses default length=10
-        main.main()
+        # Should exit with code 1
+        with pytest.raises(SystemExit) as excinfo:
+            main.main()
+        assert excinfo.value.code == 1
 
-        # Should successfully create file with default length
-        assert output_file.exists()
-
-    def test_negative_length_without_sequence(self, tmp_path):
-        """Test that negative length without sequence uses default length=10."""
+    def test_negative_length_without_sequence(self, tmp_path: Path) -> None:
+        """Test that negative length without sequence raises SystemExit."""
         output_file = tmp_path / "test.pdb"
 
         # Mock sys.argv with negative length
@@ -678,13 +698,14 @@ class TestMainCLI:
 
         sys.argv = test_args
 
-        # Should not exit - uses default length=10
-        main.main()
+        # Should exit with code 1
+        with pytest.raises(SystemExit) as excinfo:
+            main.main()
+        assert excinfo.value.code == 1
 
-        # Should successfully create file with default length
-        assert output_file.exists()
-
-    def test_failed_pdb_generation_empty_content(self, mocker, caplog):
+    def test_failed_pdb_generation_empty_content(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test handling when generate_pdb_content returns None/empty."""
         caplog.set_level(logging.WARNING)
 
@@ -706,7 +727,7 @@ class TestMainCLI:
         )
         mock_sys_exit.assert_called_with(1)
 
-    def test_generation_value_error(self, mocker, caplog):
+    def test_generation_value_error(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test handling of ValueError during PDB generation."""
         caplog.set_level(logging.ERROR)
 
@@ -730,7 +751,9 @@ class TestMainCLI:
         assert "Invalid amino acid code" in caplog.text
         mock_sys_exit.assert_called_once_with(1)
 
-    def test_generation_unexpected_exception(self, mocker, caplog):
+    def test_generation_unexpected_exception(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test handling of unexpected exception during PDB generation."""
         caplog.set_level(logging.ERROR)
 
@@ -755,7 +778,9 @@ class TestMainCLI:
         assert "Unexpected error" in caplog.text
         mock_sys_exit.assert_called_once_with(1)
 
-    def test_refine_clashes_early_exit_no_violations(self, mocker, caplog):
+    def test_refine_clashes_early_exit_no_violations(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that refinement exits early when no violations remain."""
         caplog.set_level(logging.INFO)
 
@@ -780,7 +805,7 @@ class TestMainCLI:
             "test_early_exit.pdb",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -789,9 +814,11 @@ class TestMainCLI:
         assert "No violations remain, stopping refinement early." in caplog.text
         # Should NOT see iteration 2
         assert "Refinement iteration 2" not in caplog.text
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
-    def test_refine_clashes_increases_violations(self, mocker, caplog):
+    def test_refine_clashes_increases_violations(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test warning when refinement increases violations (should not happen but edge case)."""
         caplog.set_level(logging.INFO)
 
@@ -852,7 +879,7 @@ class TestMainCLI:
             "test_worse.pdb",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -860,9 +887,11 @@ class TestMainCLI:
         # To actually test line 290 (violations increasing), we need a scenario where they go UP
         # For now, this tests the refinement path without improvement
         assert "Refinement process completed" in caplog.text
-        sys.exit.assert_not_called()
+        mock_exit.assert_not_called()
 
-    def test_custom_filename_generation_no_output_flag(self, mocker, tmp_path, caplog):
+    def test_custom_filename_generation_no_output_flag(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that custom filename is generated when --output is not provided."""
         import os
 
@@ -882,7 +911,7 @@ class TestMainCLI:
             # Mock sys.argv WITHOUT --output flag
             test_args = ["synth_pdb", "--length", "5"]
             mocker.patch("sys.argv", test_args)
-            mocker.patch("sys.exit")
+            mock_exit = mocker.patch("sys.exit")
 
             main.main()
 
@@ -895,11 +924,11 @@ class TestMainCLI:
             assert "random_linear_peptide_5_" in filename
             assert filename.endswith(".pdb")
 
-            sys.exit.assert_not_called()
+            mock_exit.assert_not_called()
         finally:
             os.chdir(original_cwd)
 
-    def test_file_write_error(self, mocker, caplog):
+    def test_file_write_error(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test handling when file write fails."""
         caplog.set_level(logging.ERROR)
 
@@ -925,7 +954,9 @@ class TestMainCLI:
         assert "Permission denied" in caplog.text
         mock_sys_exit.assert_called_once_with(1)
 
-    def test_header_contains_all_arguments(self, mocker, tmp_path, caplog):
+    def test_header_contains_all_arguments(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that all CLI arguments are recorded in PDB REMARKs."""
         caplog.set_level(logging.INFO)
         output_file = tmp_path / "header_test.pdb"
@@ -948,7 +979,7 @@ class TestMainCLI:
             str(output_file),
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -970,8 +1001,9 @@ class TestMainCLI:
         assert "--optimize" in full_command_remark
         assert "--gen-shifts" in full_command_remark
         assert "--forcefield amber14-all.xml" in full_command_remark
+        mock_exit.assert_not_called()
 
-    def test_run_decoys(self, mocker, caplog):
+    def test_run_decoys(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test --mode decoys calls the generator."""
         caplog.set_level(logging.INFO)
 
@@ -982,7 +1014,7 @@ class TestMainCLI:
         # Mock sys.argv
         test_args = ["synth_pdb", "--mode", "decoys", "--sequence", "AAA", "--n-decoys", "5"]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -993,8 +1025,11 @@ class TestMainCLI:
         assert kwargs["n_decoys"] == 5
         assert kwargs["rmsd_min"] == 0.0
         assert kwargs["rmsd_max"] == 999.0
+        mock_exit.assert_not_called()
 
-    def test_decoys_missing_sequence_generates_random(self, mocker, caplog):
+    def test_decoys_missing_sequence_generates_random(
+        self, mocker: Any, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that missing sequence triggers random generation."""
         caplog.set_level(logging.INFO)
 
@@ -1004,7 +1039,7 @@ class TestMainCLI:
         # Mock sys.argv with length but no sequence
         test_args = ["synth_pdb", "--mode", "decoys", "--length", "10", "--n-decoys", "1"]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -1013,21 +1048,23 @@ class TestMainCLI:
         mock_gen_instance.generate_ensemble.assert_called_once()
         args, kwargs = mock_gen_instance.generate_ensemble.call_args
         assert len(kwargs["sequence"]) == 10
+        mock_exit.assert_not_called()
 
-    def test_run_docking(self, mocker, caplog):
+    def test_run_docking(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test --mode docking calls DockingPrep."""
         caplog.set_level(logging.INFO)
         mocker.patch("synth_pdb.main.DockingPrep")
 
         test_args = ["synth_pdb", "--mode", "docking", "--input-pdb", "test.pdb"]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "Docking preparation complete" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_pymol(self, mocker, caplog):
+    def test_run_pymol(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test --mode pymol generation."""
         caplog.set_level(logging.INFO)
         mocker.patch("synth_pdb.nef_io.read_nef_restraints", return_value=[])
@@ -1045,13 +1082,16 @@ class TestMainCLI:
             "o.pml",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "PyMOL script generated successfully" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_export_features(self, mocker, tmp_path, caplog):
+    def test_run_export_features(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test generation of NEF, Relax, Shifts, and Constraints."""
         caplog.set_level(logging.INFO)
         output_file = tmp_path / "export_test.pdb"
@@ -1089,7 +1129,7 @@ class TestMainCLI:
             str(tmp_path / "c.casp"),
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -1098,8 +1138,11 @@ class TestMainCLI:
             "Calculating NOE Restraints" in caplog.text or "Calculate NOE Restraints" in caplog.text
         )
         assert "Constraints exported to" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_export_torsion(self, mocker, tmp_path, caplog):
+    def test_run_export_torsion(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test generation of Torsion Angles."""
         caplog.set_level(logging.INFO)
         output_file = tmp_path / "torsion_test.pdb"
@@ -1131,13 +1174,16 @@ class TestMainCLI:
             str(tmp_path / "angles.csv"),
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "Torsion angles exported to" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_msa_generation(self, mocker, tmp_path, caplog):
+    def test_run_msa_generation(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test generation of Synthetic MSA."""
         caplog.set_level(logging.INFO)
         output_file = tmp_path / "msa_test.pdb"
@@ -1168,22 +1214,20 @@ class TestMainCLI:
             "--gen-msa",
             "--msa-depth",
             "10",
-            "--mutation-rate",
-            "0.5",
+            "--evolution-temp",
+            "1.5",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
-
-        # We need SASA calc to work or be mocked if calculate_relative_sasa is called inside generate_msa_sequences.
-        # But here we mocked generate_msa_sequences top-level function, so it won't call SASA.
-        # Wait, calculate_relative_sasa is inside generate_msa_sequences.
-        # Since I mocked generate_msa_sequences, I don't need to mock internals.
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "Synthetic MSA generated" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_distogram_export(self, mocker, tmp_path, caplog):
+    def test_run_distogram_export(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test generation of Distogram."""
         caplog.set_level(logging.INFO)
         output_file = tmp_path / "dist_test.pdb"
@@ -1215,13 +1259,14 @@ class TestMainCLI:
             str(tmp_path / "dist.json"),
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "Distogram exported to" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_run_biophysics_options(self, mocker, tmp_path):
+    def test_run_biophysics_options(self, mocker: Any, tmp_path: Path) -> None:
         """Test PH and Capping flags are passed correctly."""
         output_file = tmp_path / "bio_test.pdb"
 
@@ -1239,7 +1284,7 @@ class TestMainCLI:
             "--cap-termini",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -1248,8 +1293,9 @@ class TestMainCLI:
         call_kwargs = mock_gen.call_args.kwargs
         assert call_kwargs["ph"] == 4.5
         assert call_kwargs["cap_termini"] is True
+        mock_exit.assert_not_called()
 
-    def test_run_md_equilibration_options(self, mocker, tmp_path):
+    def test_run_md_equilibration_options(self, mocker: Any, tmp_path: Path) -> None:
         """Test MD Equilibration flags are passed correctly."""
         output_file = tmp_path / "md_test.pdb"
 
@@ -1267,7 +1313,7 @@ class TestMainCLI:
             "500",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -1276,10 +1322,11 @@ class TestMainCLI:
         call_kwargs = mock_gen.call_args.kwargs
         assert call_kwargs["equilibrate"] is True
         assert call_kwargs["equilibrate_steps"] == 500
+        mock_exit.assert_not_called()
 
     # --- New Failure Case Tests ---
 
-    def test_structure_parsing_failure(self, mocker, caplog):
+    def test_structure_parsing_failure(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test failure when --structure parameter is invalid."""
         caplog.set_level(logging.ERROR)
 
@@ -1292,7 +1339,7 @@ class TestMainCLI:
 
         assert "Failed to parse --structure parameter" in caplog.text
 
-    def test_docking_missing_input_pdb(self, mocker, caplog):
+    def test_docking_missing_input_pdb(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test failing docking mode without input-pdb."""
         caplog.set_level(logging.ERROR)
 
@@ -1305,7 +1352,7 @@ class TestMainCLI:
 
         assert "Docking mode requires --input-pdb" in caplog.text
 
-    def test_pymol_missing_arguments(self, mocker, caplog):
+    def test_pymol_missing_arguments(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test failing pymol mode without required args."""
         caplog.set_level(logging.ERROR)
 
@@ -1326,7 +1373,9 @@ class TestMainCLI:
 
         assert "PyMOL mode requires --input-pdb, --input-nef, and --output-pml" in caplog.text
 
-    def test_nef_generation_no_hydrogens_error(self, mocker, tmp_path, caplog):
+    def test_nef_generation_no_hydrogens_error(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test error when generating NEF without hydrogens."""
         caplog.set_level(logging.ERROR)
         output_file = tmp_path / "nef_error.pdb"
@@ -1342,13 +1391,16 @@ class TestMainCLI:
 
         test_args = ["synth_pdb", "--length", "1", "--output", str(output_file), "--gen-nef"]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
         assert "Structure has no hydrogens! NEF/Relaxation requires protons" in caplog.text
+        mock_exit.assert_not_called()
 
-    def test_visualization_highlights_passing(self, mocker, tmp_path, caplog):
+    def test_visualization_highlights_passing(
+        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Regression Test: Verify that using --visualize with --structure correctly parses
         highlights and passes them to the viewer without UnboundLocalError.
         """
@@ -1375,7 +1427,7 @@ class TestMainCLI:
             "1-3:alpha,4-5:typeII",
         ]
         mocker.patch("sys.argv", test_args)
-        mocker.patch("sys.exit")
+        mock_exit = mocker.patch("sys.exit")
 
         main.main()
 
@@ -1396,3 +1448,4 @@ class TestMainCLI:
         assert type_ii["start"] == 4
         assert type_ii["end"] == 5
         assert type_ii["color"] == "purple"
+        mock_exit.assert_not_called()
