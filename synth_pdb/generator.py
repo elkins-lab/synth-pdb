@@ -856,7 +856,8 @@ def _build_peptide_chain(
                 current_psi = -47.0  # Default Alpha
 
             # Mirror psi for D-amino acids (Backbone chirality)
-            if is_d and (psi_list is None or i >= len(psi_list)):
+            # Apply D-amino acid mirroring to the psi of the first residue
+            if is_d:
                 current_psi = -current_psi
 
         else:
@@ -876,6 +877,10 @@ def _build_peptide_chain(
 
             prev_conformation = residue_conformations.get(prev_res_idx, conformation)
             prev_is_d = sequence[prev_res_idx].startswith("D-")
+
+            # Detect if previous residue was D-amino acid to mirror the peptide bond
+            prev_full_res_name = sequence[prev_res_idx]
+            prev_is_d = prev_full_res_name.startswith("D-")
 
             current_phi = None
             current_psi = None
@@ -903,18 +908,14 @@ def _build_peptide_chain(
                 else:
                     prev_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
             elif prev_conformation == "random":
-                prev_full_res_name = sequence[prev_res_idx]
-                prev_base_res_name = (
-                    prev_full_res_name[2:]
-                    if prev_full_res_name.startswith("D-")
-                    else prev_full_res_name
-                )
+                prev_base_res_name = prev_full_res_name[2:] if prev_is_d else prev_full_res_name
                 _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name, rng=rng)
             else:
                 prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
             # Mirror previous psi for D-amino acids if not explicitly overridden
-            if prev_is_d and (psi_list is None or prev_res_idx >= len(psi_list)):
+            # Apply D-amino acid mirroring to the psi of the previous residue
+            if prev_is_d:
                 prev_psi = -prev_psi
 
             # Place N(i)
@@ -1065,6 +1066,7 @@ def _build_peptide_chain(
             if "chi1" in selected_rotamer:
                 _chi1_val = selected_rotamer["chi1"]
                 chi1_target = _chi1_val[0] if isinstance(_chi1_val, list) else float(_chi1_val)
+
                 gamma_atom_name = None
                 for candidate in ["CG", "CG1", "OG", "OG1", "SG"]:
                     if len(ref_res_template[ref_res_template.atom_name == candidate]) > 0:
@@ -1188,7 +1190,9 @@ def _build_peptide_chain(
             vec2 = n_coord - ca_coord
             normal = np.cross(vec1, vec2)
             normal /= np.linalg.norm(normal)
-            backbone_names = {"N", "CA", "C", "O", "H", "HA"}
+            # Only exclude N, CA, C from mirroring to keep them fixed in the backbone.
+            # Sidechain atoms and HA MUST be mirrored to flip chirality.
+            backbone_names = {"N", "CA", "C"}
             for atom_idx in range(len(transformed_res)):
                 if transformed_res.atom_name[atom_idx] not in backbone_names:
                     p = transformed_res.coord[atom_idx]

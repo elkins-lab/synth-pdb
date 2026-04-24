@@ -577,7 +577,6 @@ def predict_chemical_shifts(
             merged_shifts[c_id] = {}
 
         is_d_amino_acid = r_name in _D_AMINO_ACIDS
-
         source_shifts = inverted_shifts if is_d_amino_acid else base_shifts
 
         # Only copy if the residue was actually predicted by the engine
