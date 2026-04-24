@@ -28,16 +28,18 @@ import os
 import sys
 import urllib.request
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
-    get_ipython().system('pip install -q synth-pdb pynmrstar biotite py3dmol matplotlib numpy scipy scikit-learn')
+    print("🌐 Running in Google Colab")
+    get_ipython().system(
+        "pip install -q synth-pdb pynmrstar biotite py3dmol matplotlib numpy scipy scikit-learn"
+    )
 else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
 
-print('✅ Environment configured!')
+print("✅ Environment configured!")
 
 
 # ## 1. Downloading the Experimental Data
@@ -52,16 +54,19 @@ print('✅ Environment configured!')
 import subprocess
 
 # Download 1D3Z structure if not present
-pdb_file = '1D3Z.pdb'
+pdb_file = "1D3Z.pdb"
 if not os.path.exists(pdb_file):
     print("Downloading 1D3Z.pdb...")
-    urllib.request.urlretrieve('https://files.rcsb.org/download/1D3Z.pdb', pdb_file)
+    urllib.request.urlretrieve("https://files.rcsb.org/download/1D3Z.pdb", pdb_file)
 
 # Download experimental NMR restraints if not present
-rdc_file = '1d3z_mr.str'
+rdc_file = "1d3z_mr.str"
 if not os.path.exists(rdc_file):
     print("Downloading 1d3z NMR restraints...")
-    subprocess.run("curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz", shell=True)
+    subprocess.run(
+        "curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz",
+        shell=True,
+    )
     subprocess.run("gunzip -f 1d3z_mr.str.gz", shell=True)
 
 print("✅ Experimental data downloaded.")
@@ -86,36 +91,37 @@ def extract_nh_rdcs_from_xplor(filepath):
         content = f.read()
 
     # Extract the block containing N-H RDCs in bicelles
-    start_idx = content.find('!!! DipolarCouplings.HN-N.tbl\n')
-    end_idx = content.find('!!! DipolarCouplings.HN-CO.tbl\n', start_idx)
+    start_idx = content.find("!!! DipolarCouplings.HN-N.tbl\n")
+    end_idx = content.find("!!! DipolarCouplings.HN-CO.tbl\n", start_idx)
 
     if start_idx == -1:
         raise ValueError("Could not find HN-N RDC table in file")
 
-    rdc_block = content[start_idx:end_idx if end_idx != -1 else len(content)]
+    rdc_block = content[start_idx : end_idx if end_idx != -1 else len(content)]
 
     rdc_data = []
-    lines = rdc_block.split('\n')
+    lines = rdc_block.split("\n")
 
     current_res = None
 
     for line in lines:
-        if 'HN' in line and 'and name' in line:
-            parts = line.split(')')
+        if "HN" in line and "and name" in line:
+            parts = line.split(")")
             if len(parts) > 1:
-                res_match = re.search(r'resid\s+(\d+)\s+and\s+name', line)
+                res_match = re.search(r"resid\s+(\d+)\s+and\s+name", line)
                 if res_match:
                     current_res = int(res_match.group(1))
                 nums = parts[1].strip().split()
                 if nums and current_res is not None:
                     try:
                         val = float(nums[0])
-                        rdc_data.append({'res_index': current_res, 'D_exp': val})
+                        rdc_data.append({"res_index": current_res, "D_exp": val})
                     except ValueError:
                         pass
 
-    df = pd.DataFrame(rdc_data).drop_duplicates(subset=['res_index'])
-    return df.sort_values('res_index').reset_index(drop=True)
+    df = pd.DataFrame(rdc_data).drop_duplicates(subset=["res_index"])
+    return df.sort_values("res_index").reset_index(drop=True)
+
 
 df_rdc = extract_nh_rdcs_from_xplor(rdc_file)
 print(f"Extracted {len(df_rdc)} experimental N-H RDCs from bicelles.")
@@ -135,8 +141,8 @@ import biotite.structure.io.pdb as bpdb
 pdb_struct = bpdb.PDBFile.read(pdb_file).get_structure(model=1)
 
 # Extract N and H coordinates for the residues we have experimental data for
-n_atoms = pdb_struct[pdb_struct.atom_name == 'N']
-h_atoms = pdb_struct[(pdb_struct.atom_name == 'H') | (pdb_struct.atom_name == 'HN')]
+n_atoms = pdb_struct[pdb_struct.atom_name == "N"]
+h_atoms = pdb_struct[(pdb_struct.atom_name == "H") | (pdb_struct.atom_name == "HN")]
 
 # Create a mapping of residue index to N-H bond vector
 nh_vectors = {}
@@ -157,19 +163,19 @@ D = []
 
 valid_res = []
 for idx, row in df_rdc.iterrows():
-    res_id = int(row['res_index'])
+    res_id = int(row["res_index"])
     if res_id in nh_vectors:
         v = nh_vectors[res_id]
         x, y, z = v[0], v[1], v[2]
 
         # Coefficients for the 5 independent elements: Sxx, Syy, Sxy, Sxz, Syz
         # Using the relation D = D_max * sum_i sum_j v_i S_ij v_j
-        row_B = [x**2 - z**2, y**2 - z**2, 2*x*y, 2*x*z, 2*y*z]
+        row_B = [x**2 - z**2, y**2 - z**2, 2 * x * y, 2 * x * z, 2 * y * z]
         B.append(row_B)
 
         # D_max for N-H is approx -21700 Hz (assuming rigid bond length 1.04 A)
         # But we fit a scaled relative tensor directly to the experimental Hz
-        D.append(row['D_exp'])
+        D.append(row["D_exp"])
         valid_res.append(res_id)
 
 B = np.array(B)
@@ -179,11 +185,13 @@ D = np.array(D)
 S_vec, residuals, rank, s = np.linalg.lstsq(B, D, rcond=None)
 
 # Reconstruct the 3x3 symmetric Saupe Matrix (S)
-S = np.array([
-    [S_vec[0], S_vec[2], S_vec[3]],
-    [S_vec[2], S_vec[1], S_vec[4]],
-    [S_vec[3], S_vec[4], -(S_vec[0] + S_vec[1])] # Trace is zero
-])
+S = np.array(
+    [
+        [S_vec[0], S_vec[2], S_vec[3]],
+        [S_vec[2], S_vec[1], S_vec[4]],
+        [S_vec[3], S_vec[4], -(S_vec[0] + S_vec[1])],  # Trace is zero
+    ]
+)
 
 # Diagonalize the matrix to find Principal Axes and Eigenvalues
 eigenvalues, eigenvectors = np.linalg.eigh(S)
@@ -203,7 +211,7 @@ print(f"Fitted Axial Component (Da): {Da:.2f} Hz")
 print(f"Fitted Rhombicity (R): {R:.3f}")
 
 # Now calculate the theoretical RDCs using this exact fitted tensor
-from synth_nmr.rdc import calculate_rdcs
+from synth_pdb.rdc import calculate_rdcs
 
 # Note: The 'calculate_rdcs' function expects the PDB to be oriented such that
 # its coordinates align with the principal axes of the tensor.
@@ -218,12 +226,11 @@ rotated_struct = pdb_struct.copy()
 rotated_struct.coord = np.dot(rotated_struct.coord, rotation_matrix)
 
 # Now standard calculation works perfectly:
-theoretical_rdcs = calculate_rdcs(rotated_struct, Da=Da, R=R)
+theoretical_rdcs = calculate_rdcs(rotated_struct, da=Da, r=R)
 
-df_rdc['D_calc'] = df_rdc['res_index'].map(lambda x: theoretical_rdcs.get(int(x), np.nan))
+df_rdc["D_calc"] = df_rdc["res_index"].map(lambda x: theoretical_rdcs.get(int(x), np.nan))
 df_clean = df_rdc.dropna().copy()
 print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
-
 
 
 # ## 4. Q-Factor Validation & Correlation
@@ -236,11 +243,11 @@ print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-D_exp = df_clean['D_exp'].values
-D_calc = df_clean['D_calc'].values
+D_exp = df_clean["D_exp"].values
+D_calc = df_clean["D_calc"].values
 
 # Q-Factor Calculation (Cornilescu et al. 1998)
-rms_diff = np.sqrt(np.mean((D_exp - D_calc)**2))
+rms_diff = np.sqrt(np.mean((D_exp - D_calc) ** 2))
 rms_exp = np.sqrt(np.mean(D_exp**2))
 q_factor = rms_diff / rms_exp
 
@@ -249,33 +256,44 @@ r_val, _ = pearsonr(D_exp, D_calc)
 r_sq = r_val**2
 
 plt.figure(figsize=(8, 8))
-plt.scatter(D_exp, D_calc, color='darkblue', alpha=0.7, edgecolor='white', s=80)
+plt.scatter(D_exp, D_calc, color="darkblue", alpha=0.7, edgecolor="white", s=80)
 
 # Diagonal parity line
 min_val = min(D_exp.min(), D_calc.min()) - 2
 max_val = max(D_exp.max(), D_calc.max()) + 2
-plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, label='Perfect Agreement')
+plt.plot([min_val, max_val], [min_val, max_val], "k--", alpha=0.5, label="Perfect Agreement")
 
-plt.title("synth-pdb Validation: Synthetic vs Experimental RDCs", fontsize=14, fontweight='bold')
+plt.title("synth-pdb Validation: Synthetic vs Experimental RDCs", fontsize=14, fontweight="bold")
 plt.xlabel("Experimental RDC $D_{HN}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated RDC $D_{HN}$ (Hz)", fontsize=12)
 
 # Annotate stats
 bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
-plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
-         fontsize=12, bbox=bbox_props, family='monospace')
+plt.text(
+    min_val + 2,
+    max_val - 5,
+    f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
+    fontsize=12,
+    bbox=bbox_props,
+    family="monospace",
+)
 
 plt.grid(alpha=0.2)
-plt.axis('equal')
+plt.axis("equal")
 plt.legend()
 plt.show()
 
 print("\n🏆 SCIENTIFIC CONCLUSION:")
 print("=" * 60)
 if q_factor < 0.25:
-    print(f"SUCCESS! The computed Q-factor is {q_factor:.3f}, which is well below the <0.25 threshold.")
+    print(
+        f"SUCCESS! The computed Q-factor is {q_factor:.3f}, which is well below the <0.25 threshold."
+    )
     print("This proves the `synth-pdb` orientation math and N-H vector extraction properly ")
-    print("recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool.")
+    print(
+        "recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool."
+    )
 else:
-    print(f"WARNING. Q-factor is {q_factor:.3f}. Further tuning of the alignment tensor may be required.")
-
+    print(
+        f"WARNING. Q-factor is {q_factor:.3f}. Further tuning of the alignment tensor may be required."
+    )
