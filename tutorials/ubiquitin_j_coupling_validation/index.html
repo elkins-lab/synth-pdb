@@ -4798,8 +4798,8 @@ print(df_j.head())</div>
 <span class="k">for</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">df_j</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]:</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">res_id_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">res_id_int</span> <span class="ow">in</span> <span class="n">theoretical_couplings</span><span class="p">:</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res_id_int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res_id_int</span> <span class="ow">in</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res_id_int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     <span class="n">calc_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
 <span class="n">df_j</span><span class="p">[</span><span class="s1">'J_calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_vals</span>
@@ -4826,8 +4826,8 @@ calc_vals = []
 for res_id in df_j['res_index']:
     val = np.nan
     res_id_int = int(res_id)
-    if res_id_int in theoretical_couplings:
-        val = theoretical_couplings.get(res_id_int, np.nan)
+    if res_id_int in theoretical_couplings.get('A', {}):
+        val = theoretical_couplings.get('A', {}).get(res_id_int, np.nan)
     calc_vals.append(val)
 
 df_j['J_calc'] = calc_vals
