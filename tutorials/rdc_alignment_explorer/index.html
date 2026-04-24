@@ -5379,7 +5379,7 @@ print("The generator adds idealised H positions even without --minimize.")
         <span class="c1"># Clamp R defensively — floating-point slider steps can accumulate</span>
         <span class="c1"># to a value infinitesimally above 2/3, which the synth-nmr validator rejects.</span>
         <span class="n">R</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="o">/</span><span class="mf">3.0</span> <span class="o">-</span> <span class="mf">1e-9</span><span class="p">))</span>
-        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
+        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rdcs</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ No RDCs computed — structure may lack backbone H atoms."</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"   Try re-running with minimize_energy=True above."</span><span class="p">)</span>
@@ -5491,7 +5491,7 @@ if not IN_CI:
         # Clamp R defensively — floating-point slider steps can accumulate
         # to a value infinitesimally above 2/3, which the synth-nmr validator rejects.
         R = float(np.clip(R, 0.0, 2.0/3.0 - 1e-9))
-        rdcs = calculate_rdcs(structure, Da=Da, R=R)
+        rdcs = calculate_rdcs(structure, da=Da, r=R)
         if not rdcs:
             print("⚠️ No RDCs computed — structure may lack backbone H atoms.")
             print("   Try re-running with minimize_energy=True above.")
@@ -5681,7 +5681,7 @@ if not IN_CI:
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MEDIA</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">2.8</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">MEDIA</span><span class="p">)),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Da</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">MEDIA</span><span class="p">):</span>
-    <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rdcs</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'No RDCs (add H atoms with minimize_energy=True)'</span><span class="p">,</span>
                 <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
@@ -5738,7 +5738,7 @@ MEDIA = [
 fig, axes = plt.subplots(len(MEDIA), 1, figsize=(12, 2.8 * len(MEDIA)), sharex=True)
 
 for ax, (label, Da, R, color) in zip(axes, MEDIA):
-    rdcs = calculate_rdcs(structure, Da=Da, R=R)
+    rdcs = calculate_rdcs(structure, da=Da, r=R)
     if not rdcs:
         ax.text(0.5, 0.5, 'No RDCs (add H atoms with minimize_energy=True)',
                 ha='center', va='center', transform=ax.transAxes)
@@ -5839,7 +5839,7 @@ print("Reference: Bax &amp; Grishaev (2005), Curr Opin Struct Biol 15:563.")
 
 <span class="c1"># Compute RDCs (current slider values) and NOEs</span>
 <span class="n">Da_final</span><span class="p">,</span> <span class="n">R_final</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.1</span>
-<span class="n">rdcs_final</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">Da_final</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R_final</span><span class="p">)</span>
+<span class="n">rdcs_final</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da_final</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R_final</span><span class="p">)</span>
 <span class="n">noes</span>       <span class="o">=</span> <span class="n">calculate_synthetic_noes</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
 <span class="n">ca_dists</span>   <span class="o">=</span> <span class="n">compute_contact_map</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'ca'</span><span class="p">,</span> <span class="n">power</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
@@ -5938,7 +5938,7 @@ from synth_pdb.nmr import calculate_synthetic_noes
 
 # Compute RDCs (current slider values) and NOEs
 Da_final, R_final = 10.0, 0.1
-rdcs_final = calculate_rdcs(structure, Da=Da_final, R=R_final)
+rdcs_final = calculate_rdcs(structure, da=Da_final, r=R_final)
 noes       = calculate_synthetic_noes(structure, cutoff=5.0)
 ca_dists   = compute_contact_map(structure, method='ca', power=None)
 
@@ -6083,7 +6083,7 @@ plt.show()
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">Da_h</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">da_vals</span><span class="p">,</span> <span class="n">hist_colors</span><span class="p">):</span>
-    <span class="n">rdcs_h</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">Da_h</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">rdcs_h</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da_h</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rdcs_h</span><span class="p">:</span>
         <span class="n">vals_h</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rdcs_h</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">vals_h</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span>
@@ -6154,7 +6154,7 @@ hist_colors = ['#3498db', '#e74c3c', '#2ecc71']
 
 ax = axes[0]
 for Da_h, col in zip(da_vals, hist_colors):
-    rdcs_h = calculate_rdcs(structure, Da=Da_h, R=0.1)
+    rdcs_h = calculate_rdcs(structure, da=Da_h, r=0.1)
     if rdcs_h:
         vals_h = list(rdcs_h.values())
         ax.hist(vals_h, bins=14, color=col, alpha=0.65,
@@ -6275,7 +6275,7 @@ print("  • Very narrow distribution → poorly aligned sample (small Da) or di
 <h3 id="next-steps">🔗 Next Steps<a class="anchor-link" href="#next-steps">¶</a></h3><ul>
 <li><strong><code>virtual_nmr_spectrometer.ipynb</code></strong> — see how RDCs fit into the full NMR observable pipeline alongside relaxation, HSQC, and J-couplings</li>
 <li><strong><code>--output-rdcs</code> CLI flag</strong> — generate RDC CSVs for your own sequences: <code>synth-pdb --sequence ACDEF --output-rdcs rdcs.csv --rdc-da 12 --rdc-r 0.15</code></li>
-<li><strong><code>synth_pdb.rdc</code> API</strong> — call <code>calculate_rdcs(structure, Da=10, R=0.1)</code> directly in Python</li>
+<li><strong><code>synth_pdb.rdc</code> API</strong> — call <code>calculate_rdcs(structure, da=10, r=0.1)</code> directly in Python</li>
 </ul>
 </div>
 </div>

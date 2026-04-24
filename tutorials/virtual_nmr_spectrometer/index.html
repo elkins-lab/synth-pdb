@@ -6634,7 +6634,7 @@ While NOEs measure <em>distance</em>, RDCs measure <strong>angle</strong> relati
 
         <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
 
-        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">da</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rdcs</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -6700,7 +6700,7 @@ While NOEs measure <em>distance</em>, RDCs measure <strong>angle</strong> relati
     <span class="k">def</span><span class="w"> </span><span class="nf">update_rdc_3d</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">da_slider</span><span class="o">.</span><span class="n">value</span>
         <span class="n">r</span>  <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">r_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">RDCS_TWO_THIRDS</span> <span class="o">-</span> <span class="mf">1e-9</span><span class="p">))</span>
-        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">da</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">rdcs</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -6861,7 +6861,7 @@ if not IN_CI:
 
         plt.ioff()
 
-        rdcs = calculate_rdcs(structure, Da=da, R=r)
+        rdcs = calculate_rdcs(structure, da=da, r=r)
         if not rdcs:
             return
 
@@ -6927,7 +6927,7 @@ if not IN_CI:
     def update_rdc_3d(change=None):
         da = da_slider.value
         r  = float(np.clip(r_slider.value, 0.0, RDCS_TWO_THIRDS - 1e-9))
-        rdcs = calculate_rdcs(structure, Da=da, R=r)
+        rdcs = calculate_rdcs(structure, da=da, r=r)
         if not rdcs:
             return
 

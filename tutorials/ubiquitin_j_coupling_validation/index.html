@@ -4791,7 +4791,7 @@ print(df_j.head())</div>
         <span class="n">phi_map</span><span class="p">[</span><span class="n">angle_data</span><span class="p">[</span><span class="s2">"res_id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">angle_data</span><span class="p">[</span><span class="s2">"phi"</span><span class="p">]</span>
 
 <span class="c1"># Calculate theoretical couplings directly from computed phi coordinates</span>
-<span class="n">theoretical_couplings</span> <span class="o">=</span> <span class="n">predict_couplings_from_structure</span><span class="p">(</span><span class="n">phi_map</span><span class="p">)</span>
+<span class="n">theoretical_couplings</span> <span class="o">=</span> <span class="n">predict_couplings_from_structure</span><span class="p">(</span><span class="n">pdb_struct</span><span class="p">)</span>
 
 <span class="c1"># Merge into our dataframe</span>
 <span class="n">calc_vals</span> <span class="o">=</span> <span class="p">[]</span>
@@ -4819,7 +4819,7 @@ for angle_data in angles_list:
         phi_map[angle_data["res_id"]] = angle_data["phi"]
 
 # Calculate theoretical couplings directly from computed phi coordinates
-theoretical_couplings = predict_couplings_from_structure(phi_map)
+theoretical_couplings = predict_couplings_from_structure(pdb_struct)
 
 # Merge into our dataframe
 calc_vals = []

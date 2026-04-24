@@ -4851,7 +4851,7 @@ df_rdc.head()</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fitted Rhombicity (R): </span><span class="si">{</span><span class="n">R</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Now calculate the theoretical RDCs using this exact fitted tensor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_nmr.rdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rdcs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.rdc</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rdcs</span>
 
 <span class="c1"># Note: The 'calculate_rdcs' function expects the PDB to be oriented such that</span>
 <span class="c1"># its coordinates align with the principal axes of the tensor.</span>
@@ -4866,7 +4866,7 @@ df_rdc.head()</div>
 <span class="n">rotated_struct</span><span class="o">.</span><span class="n">coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rotated_struct</span><span class="o">.</span><span class="n">coord</span><span class="p">,</span> <span class="n">rotation_matrix</span><span class="p">)</span>
 
 <span class="c1"># Now standard calculation works perfectly:</span>
-<span class="n">theoretical_rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">rotated_struct</span><span class="p">,</span> <span class="n">Da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
+<span class="n">theoretical_rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">rotated_struct</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
 
 <span class="n">df_rdc</span><span class="p">[</span><span class="s1">'D_calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_rdc</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">theoretical_rdcs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
 <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_rdc</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -4946,7 +4946,7 @@ print(f"Fitted Axial Component (Da): {Da:.2f} Hz")
 print(f"Fitted Rhombicity (R): {R:.3f}")
 
 # Now calculate the theoretical RDCs using this exact fitted tensor
-from synth_nmr.rdc import calculate_rdcs
+from synth_pdb.rdc import calculate_rdcs
 
 # Note: The 'calculate_rdcs' function expects the PDB to be oriented such that
 # its coordinates align with the principal axes of the tensor.
@@ -4961,7 +4961,7 @@ rotated_struct = pdb_struct.copy()
 rotated_struct.coord = np.dot(rotated_struct.coord, rotation_matrix)
 
 # Now standard calculation works perfectly:
-theoretical_rdcs = calculate_rdcs(rotated_struct, Da=Da, R=R)
+theoretical_rdcs = calculate_rdcs(rotated_struct, da=Da, r=R)
 
 df_rdc['D_calc'] = df_rdc['res_index'].map(lambda x: theoretical_rdcs.get(int(x), np.nan))
 df_clean = df_rdc.dropna().copy()
