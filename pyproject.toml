@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synth-pdb"
-version = "1.30.0"
-description = "Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education, and tool development"
+version = "1.31.0"
+description = "Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education and tool development"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}

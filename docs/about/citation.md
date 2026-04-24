@@ -10,7 +10,7 @@ If you use synth-pdb in your research, please cite it using the following:
   title = {synth-pdb: High-Performance Protein Structure Generator for AI/ML and Education},
   year = {2026},
   url = {https://github.com/elkins/synth-pdb},
-  version = {1.30.0}
+  version = {1.31.0}
 }
 ```
 

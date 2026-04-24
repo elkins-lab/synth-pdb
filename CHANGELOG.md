@@ -5,11 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.31.0] - 2026-04-24
+
+### Added
+- **GNN Quality Filter Calibration**: New sensitivity suite in `tests/test_gnn_calibration.py` validating that the GNN model correctly responds to coordinate noise, steric clashes and backbone distortions.
+- **Comprehensive Testing Suite**: Added massive coverage expansion for evolution kernels, packing algorithms, scoring functions and geometric edge cases (RMSD/superposition).
+- **Non-Standard Residue Support**: Enhanced chemical shift and RDC predictors to gracefully handle non-standard residues (PTMs, D-amino acids) while maintaining pedagogical documentation density.
+- **Local Notebook Validation**: Added scripts and environment setups (`scripts/setup_colab_venv.sh`, `test_notebooks_local.sh`) to verify tutorial notebooks in a production-like local environment.
+
+### Fixed
+- **D-Amino Acid Stereochemistry**: Corrected critical bugs in D-amino acid generation, ensuring biophysically accurate backbone mirroring and side-chain placement.
+- **Chiral NMR Inversion**: Implemented a dual-pass coordinate inversion strategy for D-amino acid chemical shifts, ensuring predicted values respect chiral symmetry.
+- **Physics Engine Stability**: Resolved memory leaks and ensured consistent implicit solvent behavior across the `EnergyMinimizer` pipeline.
+- **Generator Parity**: Guaranteed 1:1 structural parity between `BatchedGenerator` and the standard `PeptideGenerator`.
+- **CLI Robustness**: Strengthened argument validation in `main.py` and added regression tests for CLI flag collisions.
+- **PTM Template Mismatch**: Fixed an issue where PTM residue templates (SEP/TPO/PTR) were incorrectly handled during physics preprocessing.
+
+### Changed
+- **Documentation Density**: Significantly increased inline "Educational Notes" in `coupling.py`, `msa.py` and `physics.py`.
+- **CI Modernization**: Added Numpy 2.3.5 to the automated test matrix; refactored the J-Coupling shim for structural TDD.
+
 ## [1.30.0] - 2026-04-22
 
 ### Added
 - **New Documentation Pages**:
-  - `docs/api/rdc.md`: Full API reference for `synth_pdb.rdc` — Saupe-matrix RDC back-calculation, Q-factor interpretation table, alignment media comparison, and complete workflow example.
+  - `docs/api/rdc.md`: Full API reference for `synth_pdb.rdc` — Saupe-matrix RDC back-calculation, Q-factor interpretation table, alignment media comparison and complete workflow example.
   - `docs/api/ensemble.md`: Full API reference for `synth_pdb.ensemble` — `DAOPCalculator`, `EnsembleStatistics`, and `QualityAssessment` with Tejero 2013 quality thresholds.
   - `docs/science/ensemble-analysis.md`: Science background page explaining DAOP circular statistics, coordinate RMSD/RMSF, medoid selection, and IDP ensemble caveats.
 - **Documentation Expansions**:
