@@ -657,10 +657,10 @@ class TestMainCLI:
         assert "AI mode requires --ai-op {interpolate, cluster}" in caplog.text
         mock_exit.assert_called_with(1)
 
-    def test_run_ai_cluster_not_implemented(
+    def test_run_ai_cluster_missing_pattern(
         self, mocker: Any, caplog: pytest.LogCaptureFixture
     ) -> None:
-        """Test cluster op reports not implemented."""
+        """Test cluster op reports error when pattern is missing."""
         caplog.set_level(logging.ERROR)
         test_args = ["synth_pdb", "--mode", "ai", "--ai-op", "cluster"]
         mocker.patch("sys.argv", test_args)
@@ -668,7 +668,7 @@ class TestMainCLI:
 
         main.main()
 
-        assert "Clustering not yet implemented" in caplog.text
+        assert "Clustering requires --input-pattern" in caplog.text
         mock_exit.assert_called_with(1)
 
     # --- Additional tests for error conditions and edge cases ---
