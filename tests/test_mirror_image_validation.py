@@ -52,12 +52,14 @@ def test_mirror_image_protein_g_validation() -> None:
     ), f"Should have 0 chirality violations, got: {chirality_violations}"
 
     # 5. Backbone Check
-    # By default, the generator keeps the standard backbone (negative Phi/Psi)
-    # but mirrors the sidechains to create D-amino acids.
+    # Updated: The generator now correctly mirrors the backbone (positive Phi/Psi)
+    # for D-amino acids to produce physically realistic conformations.
     phi_psi = validator.calculate_all_phi_psi()
     for res_num in sorted(phi_psi.keys())[:5]:
         phi, psi = phi_psi[res_num]
-        assert phi < 0, f"Residue {res_num} should have negative Phi (L-conformation backbone)"
+        # Residue 1 is M (D-MET), Res 2 is T (D-THR), etc.
+        # Mirror image of L-backbone (negative phi) is positive phi.
+        assert phi > 0, f"Residue {res_num} should have positive Phi (D-conformation backbone)"
 
 
 @pytest.mark.network

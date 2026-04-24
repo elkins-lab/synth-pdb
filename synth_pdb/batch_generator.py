@@ -326,6 +326,12 @@ class BatchedGenerator:
         psi = np.full((b, length), p_psi)
         omega = np.full((b, length), 180.0)
 
+        # Mirror phi/psi for D-amino acids
+        for i, full_res_name in enumerate(self.sequence):
+            if full_res_name.startswith("D-"):
+                phi[:, i] *= -1
+                psi[:, i] *= -1
+
         if drift > 0:
             phi += np.random.normal(0, drift, (b, length))
             psi += np.random.normal(0, drift, (b, length))

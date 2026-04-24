@@ -855,6 +855,10 @@ def _build_peptide_chain(
             else:
                 current_psi = -47.0  # Default Alpha
 
+            # Mirror psi for D-amino acids (Backbone chirality)
+            if is_d and (psi_list is None or i >= len(psi_list)):
+                current_psi = -current_psi
+
         else:
             # Subsequent residues use internal-coordinate (NeRF) placement
             prev_res_idx = i - 1
@@ -871,6 +875,7 @@ def _build_peptide_chain(
             )
 
             prev_conformation = residue_conformations.get(prev_res_idx, conformation)
+            prev_is_d = sequence[prev_res_idx].startswith("D-")
 
             current_phi = None
             current_psi = None
@@ -907,6 +912,10 @@ def _build_peptide_chain(
                 _, prev_psi = _sample_ramachandran_angles(prev_base_res_name, res_name, rng=rng)
             else:
                 prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
+
+            # Mirror previous psi for D-amino acids if not explicitly overridden
+            if prev_is_d and (psi_list is None or prev_res_idx >= len(psi_list)):
+                prev_psi = -prev_psi
 
             # Place N(i)
             n_coord = _place_atom_with_dihedral(
@@ -969,6 +978,13 @@ def _build_peptide_chain(
             else:
                 current_phi = RAMACHANDRAN_PRESETS["alpha"]["phi"]
                 current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
+
+            # Mirror current phi/psi for D-amino acids if not explicitly overridden
+            if is_d:
+                if phi_list is None or i >= len(phi_list):
+                    current_phi = -current_phi
+                if psi_list is None or i >= len(psi_list):
+                    current_psi = -current_psi
 
             # Apply hard-decoy torsion drift
             if drift > 0:
