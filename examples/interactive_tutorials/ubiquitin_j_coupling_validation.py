@@ -151,8 +151,8 @@ calc_vals = []
 for res_id in df_j["res_index"]:
     val = np.nan
     res_id_int = int(res_id)
-    if res_id_int in theoretical_couplings:
-        val = theoretical_couplings.get(res_id_int, np.nan)
+    if res_id_int in theoretical_couplings.get('A', {}):
+        val = theoretical_couplings.get('A', {}).get(res_id_int, np.nan)
     calc_vals.append(val)
 
 df_j["J_calc"] = calc_vals
