@@ -1,9 +1,10 @@
+from typing import Any, Dict
 from unittest.mock import MagicMock, patch
 
 from synth_pdb.bmrb_api import BMRBAPI, PDBValidationAPI
 
 
-def test_fetch_restraints_parsing_logic():
+def test_fetch_restraints_parsing_logic() -> None:
     """Test that BMRBAPI correctly parses a raw BMRB-style JSON response.
     This closes the gap where we previously mocked the whole method.
     """
@@ -12,14 +13,13 @@ def test_fetch_restraints_parsing_logic():
         "6457": {
             "tags": [
                 "ID",
-                "Auth_seq_id_1", "Atom_id_1",
-                "Auth_seq_id_2", "Atom_id_2",
-                "Distance_upper_bound_val"
+                "Auth_seq_id_1",
+                "Atom_id_1",
+                "Auth_seq_id_2",
+                "Atom_id_2",
+                "Distance_upper_bound_val",
             ],
-            "data": [
-                ["1", "1", "H", "2", "H", "5.0"],
-                ["2", "43", "H", "44", "H", "3.5"]
-            ]
+            "data": [["1", "1", "H", "2", "H", "5.0"], ["2", "43", "H", "44", "H", "3.5"]],
         }
     }
 
@@ -45,7 +45,8 @@ def test_fetch_restraints_parsing_logic():
         # BMRBAPI tries _Gen_dist_constraint first
         mock_get.assert_called_with("https://api.bmrb.io/v2/entry/6457/loop/_Gen_dist_constraint")
 
-def test_fetch_restraints_fallback_logic():
+
+def test_fetch_restraints_fallback_logic() -> None:
     """Test that BMRBAPI tries legacy category names if the first one fails."""
     with patch("requests.get") as mock_get:
         # First call fails (404), second call succeeds
@@ -56,8 +57,15 @@ def test_fetch_restraints_fallback_logic():
         mock_resp_success.status_code = 200
         mock_resp_success.json.return_value = {
             "Gen_dist_constraint": {
-                "tags": ["ID", "res_id_1", "atom_name_1", "res_id_2", "atom_name_2", "distance_upper_bound_val"],
-                "data": [["1", "10", "HA", "11", "HA", "4.0"]]
+                "tags": [
+                    "ID",
+                    "res_id_1",
+                    "atom_name_1",
+                    "res_id_2",
+                    "atom_name_2",
+                    "distance_upper_bound_val",
+                ],
+                "data": [["1", "10", "HA", "11", "HA", "4.0"]],
             }
         }
 
@@ -69,7 +77,8 @@ def test_fetch_restraints_fallback_logic():
         assert restraints[0]["index_1"] == 10
         assert mock_get.call_count == 2
 
-def test_get_entry_metadata():
+
+def test_get_entry_metadata() -> None:
     """Test that BMRBAPI correctly fetches and extracts entry metadata."""
     mock_data = {"6457": {"entry_title": "Ubiquitin", "author": "Bax"}}
     with patch("requests.get") as mock_get:
@@ -81,7 +90,8 @@ def test_get_entry_metadata():
         assert meta["entry_title"] == "Ubiquitin"
         mock_get.assert_called_with("https://api.bmrb.io/v2/entry/6457")
 
-def test_search_entries_with_restraints():
+
+def test_search_entries_with_restraints() -> None:
     """Test BMRB entry search logic."""
     mock_data = {"results": [{"entry_id": "6457"}, {"entry_id": "1234"}]}
     with patch("requests.get") as mock_get:
@@ -94,7 +104,8 @@ def test_search_entries_with_restraints():
         assert len(results) == 2
         assert "6457" in results
 
-def test_pdbe_validation_summary():
+
+def test_pdbe_validation_summary() -> None:
     """Test PDBValidationAPI summary fetching."""
     mock_data = {"1ubq": {"summary_metric": 0.95}}
     with patch("requests.get") as mock_get:
@@ -107,9 +118,10 @@ def test_pdbe_validation_summary():
         assert summary["summary_metric"] == 0.95
         mock_get.assert_called_with("https://www.ebi.ac.uk/pdbe/api/validation/summary/entry/1ubq")
 
-def test_pdbe_validation_outliers():
+
+def test_pdbe_validation_outliers() -> None:
     """Test PDBValidationAPI outliers fetching."""
-    mock_data = {"1ubq": {"outliers": []}}
+    mock_data: Dict[str, Any] = {"1ubq": {"outliers": []}}
     with patch("requests.get") as mock_get:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -120,7 +132,8 @@ def test_pdbe_validation_outliers():
         assert "outliers" in outliers
         mock_get.assert_called_with("https://www.ebi.ac.uk/pdbe/api/validation/outliers/entry/1ubq")
 
-def test_api_error_handling(caplog):
+
+def test_api_error_handling(caplog: Any) -> None:
     """Verify that APIs handle network errors gracefully by logging and returning defaults."""
     with patch("requests.get", side_effect=Exception("Network down")):
         # BMRB search returns empty list on error
@@ -132,3 +145,35 @@ def test_api_error_handling(caplog):
 
         # fetch_restraints returns empty list
         assert BMRBAPI.fetch_restraints("6457") == []
+
+
+def test_fetch_chemical_shifts_mocked() -> None:
+    """Test chemical shift fetching with a mocked pynmrstar entry."""
+    mock_loop = MagicMock()
+    # Tags must match what fetch_chemical_shifts expects (lowercase keys)
+    mock_loop.tags = ["Comp_index_ID", "Atom_ID", "Val"]
+    mock_loop.data = [["1", "CA", "55.0"], ["1", "CB", "30.0"]]
+
+    mock_entry = MagicMock()
+    mock_entry.get_loops_by_category.return_value = [mock_loop]
+
+    # We patch where it's used
+    with patch("synth_pdb.bmrb_api.pynmrstar.Entry.from_database", return_value=mock_entry):
+        shifts = BMRBAPI.fetch_chemical_shifts("6457")
+        assert len(shifts) == 1
+        assert shifts[1]["CA"] == 55.0
+        assert shifts[1]["CB"] == 30.0
+
+
+def test_download_pdb_mocked() -> None:
+    """Test PDB downloading with a mocked requests response."""
+    with patch("requests.get") as mock_get, patch("builtins.open", MagicMock()):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.text = "HEADER    PROTEIN"
+        mock_get.return_value = mock_resp
+
+        success = BMRBAPI.download_pdb("1UBQ", "dummy.pdb")
+        assert success is True
+        # Code uses pdb_id.upper() and .pdb
+        mock_get.assert_called_with("https://files.rcsb.org/download/1UBQ.pdb")
