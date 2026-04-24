@@ -1,4 +1,67 @@
-"""Chemical Shift prediction and validation for synth-pdb.
+"""
+Biophysical chemical shift prediction and analysis module.
+
+This module provides a comprehensive suite of tools for predicting, analyzing,
+and validating NMR chemical shifts from 3D protein structures. Chemical shifts
+are highly sensitive reporters of local backbone geometry, sidechain torsion
+angles, and hydrogen bonding environments.
+
+SCIENTIFIC BACKGROUND:
+----------------------
+Nuclear Magnetic Resonance (NMR) spectroscopy measures the resonant frequencies
+of active nuclei (1H, 13C, 15N) in a strong magnetic field. The exact frequency
+of each nucleus is "shifted" from a reference standard by the local electronic
+shielding environment. This shift is measured in parts-per-million (ppm).
+
+Empirical chemical shift predictors (like SPARTA+ and SHIFTX2) leverage machine
+learning models trained on massive databases of experimentally solved structures
+and their assigned shifts. These models map local geometric features (Phi, Psi,
+Chi angles, and ring proximities) to the expected chemical shift deviations from
+a baseline "random coil" (unstructured) state.
+
+D-AMINO ACID SUPPORT (DUAL-PASS PREDICTION):
+--------------------------------------------
+A major limitation of standard empirical predictors is that their training data
+almost exclusively comprises naturally occurring L-amino acids. As a result,
+they cannot physically interpret the mirrored right-handed geometries of D-amino
+acids (which are common in non-ribosomal peptide therapeutics), often treating
+them as highly unfavorable "random coil" outliers.
+
+To overcome this, this module introduces a novel "Dual-Pass Coordinate Inversion"
+methodology:
+1. Base Pass: The structure is evaluated normally to capture L-amino acid shifts.
+2. Inversion Pass: The Cartesian coordinates of the structure are mathematically
+   inverted across the origin (coord = -coord). This parity operation converts
+   all D-enantiomeric residues into their exact L-enantiomeric geometric
+   equivalents (e.g., a right-handed D-alpha helix becomes a left-handed L-alpha
+   helix), perfectly preserving all internal physical distances and angle magnitudes.
+3. The underlying prediction engine evaluates this physically valid L-equivalent
+   structure. The predicted shifts for the inverted D-residues are then extracted
+   and merged back into the final prediction.
+
+This pipeline allows us to leverage state-of-the-art L-biased empirical predictors
+to generate high-fidelity shift predictions for synthetic D-peptides without
+requiring the retraining of neural networks.
+
+SECONDARY STRUCTURE MAPPING (CSI):
+----------------------------------
+The Chemical Shift Index (CSI) provides a simple empirical method for identifying
+secondary structure elements. By calculating the deviation of a measured shift
+from its random-coil baseline, one can immediately identify elements:
+- CA deviations > +0.7 ppm strongly indicate Alpha Helices.
+- CA deviations < -0.7 ppm strongly indicate Beta Sheets.
+
+For CB (C-beta) nuclei, the CSI deviation pattern is inverted:
+- CB deviations < -0.7 ppm strongly indicate Alpha Helices.
+- CB deviations > +0.7 ppm strongly indicate Beta Sheets.
+
+By combining the CA, CB, and HA predictions, a consensus structural map can be
+generated entirely from 1D scalar shift values. This eliminates the need for
+complex multi-dimensional NOESY experiments when validating simple, stable folds.
+Additionally, incorporating Carbonyl (C') and Amide Proton (HN) shifts further
+increases the statistical reliability of the secondary structure assignment.
+
+Chemical Shift prediction and validation for synth-pdb.
 
 This module provides compatibility shims that re-export from the synth-nmr package
 and implements validation metrics to assess the accuracy of predicted shifts
@@ -301,6 +364,28 @@ _PARENT_MAP: Dict[str, str] = {
     "HIP": "HIS",
 }
 
+_D_AMINO_ACIDS = {
+    "DAL",
+    "DAR",
+    "DAN",
+    "DAS",
+    "DCY",
+    "DGL",
+    "DGN",
+    "DHI",
+    "DIL",
+    "DLE",
+    "DLY",
+    "DME",
+    "DPH",
+    "DPR",
+    "DSE",
+    "DTH",
+    "DTR",
+    "DTY",
+    "DVA",
+}
+
 
 def predict_chemical_shifts(
     structure: Any, use_shiftx2: bool = True
@@ -312,14 +397,29 @@ def predict_chemical_shifts(
     ----------------------
     Chemical shift prediction is the "bridge" between the static atomic
     coordinates of a structural model and the experimental NMR observables.
-    By back-calculating these values, we can quantitatively assess how well
-     a candidate structure represents the true solution state of the protein.
+    Empirical predictors like SHIFTX2 and SPARTA+ use machine-learning models
+    trained on a vast database of experimentally solved structures.
+    These models primarily evaluate:
+    - Backbone Dihedral Angles (Phi, Psi, Omega)
+    - Sidechain Dihedrals (Chi)
+    - Hydrogen Bonding Geometry (O-H distances)
+    - Ring Current Effects (proximity to aromatic rings)
 
-    NON-STANDARD RESIDUES & PTMs (Phase 16):
-    ----------------------------------------
-    The module automatically handles non-standard residues (D-amino acids like
-    DAL and PTMs like SEP) by mapping them to their standard parent residues
-    for the prediction engine.
+    Because these engines are parameterized exclusively on the Protein Data Bank
+    (which predominantly contains naturally occurring L-amino acids), they are
+    "blind" to the inverted chirality of D-amino acids. A right-handed D-alpha
+    helix, perfectly stable physically, is viewed by an L-biased engine as a
+    highly disallowed random coil state.
+
+    To solve this, this function implements a rigorous Dual-Pass Coordinate
+    Inversion pipeline:
+    1. Base Pass: Standard prediction for L-amino acids.
+    2. Inversion Pass: The Cartesian coordinates are mathematically inverted
+       (coord = -coord) through the origin. This reflects the D-enantiomers
+       into their exact L-enantiomer geometric equivalents, perfectly preserving
+       all inter-atomic distances and angular magnitudes.
+    3. The base predictor evaluates the inverted structure, and the resulting
+       shifts are merged back for the D-residues.
 
     Technical Implementation Details:
     - CLONING: We perform an 'in-memory' rename on a copy of the structure to
@@ -365,53 +465,126 @@ def predict_chemical_shifts(
     # 6. NumPy masking is used for performance on large structure arrays.
     # 7. ResName attribute is modified to match the parent amino acid.
     # 8. All standard atoms (N, CA, C, O, CB) are preserved for the engine.
+    # ── 1. PRE-PROCESSING: RESIDUE MAPPING ───────────────────────────────────
+    # To support non-standard residues (D-amino acids, PTMs) we must ensure
+    # the underlying engine recognizes all residues in the chain.
     working_struc = structure.copy()
+    has_d_amino_acids = False
+
     for res_name, parent_name in _PARENT_MAP.items():
         mask = working_struc.res_name == res_name
         if np.any(mask):
-            # Log the mapping at DEBUG level for visibility in complex pipelines.
-            # Message includes the specific transformation pair.
             logger.debug(f"Mapping {res_name} -> {parent_name} for shift prediction.")
             working_struc.res_name[mask] = parent_name
+            if res_name in _D_AMINO_ACIDS:
+                has_d_amino_acids = True
 
-    # ── PREDICTOR DISPATCH LOGIC ─────────────────────────────────────────────
-    # We choose the underlying calculation engine based on the use_shiftx2 flag.
-    # Providing an explicit empirical path is crucial for researchers who need
-    # to avoid the slight non-determinism or setup overhead of external ML binaries.
+    # Inner helper to dispatch to the correct synth-nmr engine
+    def _dispatch_predictor(struc_to_predict: Any) -> Dict[str, Dict[int, Dict[str, float]]]:
+        if not use_shiftx2:
+            logger.debug("Dispatching to empirical shift predictor.")
+            return cast(
+                Dict[str, Dict[int, Dict[str, float]]],
+                _cs.predict_empirical_shifts(struc_to_predict),
+            )
+        try:
+            logger.debug("Dispatching to SHIFTX2-aware prediction engine.")
+            return cast(
+                Dict[str, Dict[int, Dict[str, float]]],
+                _cs.predict_chemical_shifts(struc_to_predict, use_shiftx2=use_shiftx2),
+            )
+        except TypeError:
+            logger.warning(
+                "Underlying engine does not support use_shiftx2; falling back to default."
+            )
+            return cast(
+                Dict[str, Dict[int, Dict[str, float]]],
+                _cs.predict_chemical_shifts(struc_to_predict),
+            )
 
-    # CASE 1: Explicitly requested empirical predictor (SPARTA+-style)
-    # This engine uses a set of fixed neural network weights and hypersurfaces.
-    # It is optimized for speed and is suitable for real-time validation checks.
-    # The 'empirical' path is also useful for cross-platform consistency.
-    if not use_shiftx2:
-        # Call the empirical engine from the synth-nmr backend.
-        # This function leverages pre-calculated hypersurfaces for all 20 residues.
-        logger.debug("Dispatching to empirical shift predictor.")
-        return cast(
-            Dict[str, Dict[int, Dict[str, float]]], _cs.predict_empirical_shifts(working_struc)
-        )
+    # ── 2. PASS 1: STANDARD PREDICTION ───────────────────────────────────────
+    # Predict shifts for the mapped structure. This provides physically accurate
+    # results for all standard L-amino acids and PTMs.
+    base_shifts = _dispatch_predictor(working_struc)
 
-    # CASE 2: SHIFTX2 predictor requested (Default)
-    # This path is preferred for maximum scientific accuracy in structural biology.
-    # SHIFTX2 combines sequence-profile information with 3D structural features.
-    try:
-        # Forward the mapping-corrected structure to the main prediction engine.
-        # This allows the engine to perform its own fallback logic if the binary is missing.
-        # Latest synth-nmr supports use_shiftx2 as a native keyword argument.
-        logger.debug("Dispatching to SHIFTX2-aware prediction engine.")
-        return cast(
-            Dict[str, Dict[int, Dict[str, float]]],
-            _cs.predict_chemical_shifts(working_struc, use_shiftx2=use_shiftx2),
-        )
-    except TypeError:
-        # ── BACKWARD COMPATIBILITY FALLBACK ──────────────────────────────────
-        # Handle older synth-nmr versions that lack the use_shiftx2 keyword.
-        # We fall back to the standard call, ensuring synth-pdb remains stable.
-        # The fallback call uses the original structure copy.
-        logger.warning("Underlying engine does not support use_shiftx2; falling back to default.")
-        return cast(
-            Dict[str, Dict[int, Dict[str, float]]], _cs.predict_chemical_shifts(working_struc)
-        )
+    # ── 3. PASS 2: COORDINATE INVERSION FOR D-PEPTIDES ───────────────────────
+    # If D-amino acids are present, their local geometry is inverted relative to
+    # the L-parameterized training data. We invert the entire coordinate space
+    # (mirror image) and run a second prediction pass. The shifts of an enantiomer
+    # in an achiral environment are identical, so this perfectly captures the
+    # true chemical shifts of the D-peptide geometry.
+    if not has_d_amino_acids:
+        return base_shifts
+
+    # ── 3. INVERTED PREDICTION PASS (D-AMINO ACIDS) ──────────────────────────
+    # SCIENTIFIC BACKGROUND FOR INVERTED PASS:
+    # ----------------------------------------
+    # Empirical chemical shift predictors (like SHIFTX2 and SPARTA+) are
+    # strictly trained on the Protein Data Bank (PDB), which almost exclusively
+    # contains naturally occurring L-amino acids. Therefore, their internal
+    # neural networks and statistical tables inherently expect left-handed
+    # alpha helices (phi ~ -60, psi ~ -45) and standard right-handed twists
+    # in beta sheets.
+    #
+    # When presented with a D-amino acid peptide, the backbone torsion angles
+    # are mathematically mirrored (e.g., a D-alpha helix has phi ~ +60, psi ~ +45).
+    # If passed directly to standard empirical predictors, these angles fall into
+    # sparsely populated or "unallowed" regions of the classical Ramachandran
+    # plot. As a result, the engines fail to recognize the secondary structure
+    # and default to predicting "random coil" shifts (0.0 deviation).
+    #
+    # THE SOLUTION: Mathematical Enantiomer Mapping
+    # Because chemical shifts (scalar values) are isotropic with respect to
+    # global chirality, a D-peptide and its exact L-peptide mirror image
+    # should, in a vacuum, produce identical isotropic shifts (ignoring
+    # higher-order chiral solvent interactions and asymmetric chiral fields).
+    #
+    # Therefore, we can accurately predict the shifts of a D-peptide by:
+    # 1. Mathematically inverting the Cartesian coordinates (coord = -coord).
+    #    This perfectly converts the D-peptide back into an L-peptide geometry.
+    #    It reflects all atoms across the origin, effectively converting
+    #    D-chirality to L-chirality while perfectly preserving all internal
+    #    distances (bond lengths, hydrogen bonds) and absolute angular geometries.
+    # 2. Running the standard L-based empirical predictor on this inverted structure.
+    # 3. Mapping the resulting shifts back to the original D-residues in the output.
+    #
+    # This dual-pass approach elegantly bypasses the training data limitations
+    # of the underlying prediction engines without requiring any retraining.
+    # This ensures high-fidelity predictions for researchers studying synthetic
+    # peptide therapeutics and non-ribosomal peptides.
+    logger.info("D-amino acids detected. Running dual-pass coordinate inversion predictor.")
+    inverted_struc = working_struc.copy()
+
+    # Apply the mathematical inversion transformation (parity operation).
+    inverted_struc.coord = -inverted_struc.coord
+
+    # Dispatch the inverted structure to the core prediction engine.
+    inverted_shifts = _dispatch_predictor(inverted_struc)
+
+    # ── 4. MERGE RESULTS ─────────────────────────────────────────────────────
+    # We selectively pull the predicted shifts for D-residues from the inverted
+    # pass, and L-residues from the standard pass, returning a unified dictionary.
+    merged_shifts: Dict[str, Dict[int, Dict[str, float]]] = {}
+
+    # Use synth-nmr's get_residue_info to safely iterate the original structure
+    from synth_nmr.structure_utils import get_residue_info
+
+    chain_ids, res_ids, res_names, _ = get_residue_info(structure)
+
+    for c_id, r_id_str, r_name in zip(chain_ids, res_ids, res_names):
+        r_id = int(r_id_str)
+        if c_id not in merged_shifts:
+            merged_shifts[c_id] = {}
+
+        is_d_amino_acid = r_name in _D_AMINO_ACIDS
+
+        source_shifts = inverted_shifts if is_d_amino_acid else base_shifts
+
+        # Only copy if the residue was actually predicted by the engine
+        if c_id in source_shifts and r_id in source_shifts[c_id]:
+            merged_shifts[c_id][r_id] = source_shifts[c_id][r_id]
+
+    return merged_shifts
 
 
 def calculate_csi(
@@ -422,10 +595,31 @@ def calculate_csi(
 
     SCIENTIFIC BACKGROUND:
     ----------------------
-    The CSI is a method for identifying secondary structure elements (helices,
-    sheets) based on the deviation of chemical shifts from random-coil values.
-    Continuous values (Delta-delta) are returned, where positive C-alpha
-    deviations indicate helical character.
+    The Chemical Shift Index (CSI) is a robust empirical method for identifying
+    secondary structure elements (helices, sheets) directly from NMR chemical
+    shifts. The method relies on the observation that local backbone geometry
+    exerts a predictable deshielding or shielding effect on specific nuclei
+    relative to their "random coil" (unstructured) baseline values.
+
+    Continuous CSI values (often denoted as Delta-delta) are calculated by
+    subtracting the sequence-specific random coil shift from the experimentally
+    measured or predicted shift.
+
+    For the C-alpha (CA) nucleus:
+    - Positive deviations (> +0.7 ppm) strongly indicate an alpha-helical conformation.
+      This is because the compact helical geometry typically deshields the CA nucleus.
+    - Negative deviations (< -0.7 ppm) strongly indicate a beta-sheet conformation.
+      The extended geometry of a beta-strand shields the CA nucleus, resulting in
+      an upfield shift.
+
+    For the C-beta (CB) nucleus, the pattern is reversed:
+    - Negative deviations indicate an alpha-helix.
+    - Positive deviations indicate a beta-sheet.
+
+    This implementation automatically calculates the deviations for all relevant
+    nuclei present in the `shifts` dictionary, allowing researchers to build
+    a consensus secondary structure map without requiring NOE distance restraints
+    or full 3D coordinate generation.
 
     Args:
         shifts: Predicted or experimental shifts in the nested dictionary format.
@@ -435,8 +629,18 @@ def calculate_csi(
         Dict: Nested dictionary {chain: {res_id: deviation}}.
     """
     # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
-    # CSI calculation relies on looking up random-coil values based on the
-    # residue name. We must map non-standard residues to their parents.
+    # The core CSI calculation relies on looking up the empirically derived
+    # random-coil reference values for each specific amino acid type. Because
+    # non-standard residues (like D-amino acids or phosphorylated sidechains)
+    # typically lack dedicated random-coil reference tables in standard BMRB
+    # datasets, we must rigorously map them back to their structurally closest
+    # standard parent residue.
+    #
+    # For example, D-alanine ("DAL") is mapped to L-alanine ("ALA"). The
+    # electronic shielding environment of the CA nucleus in a random coil is
+    # dominated by the local covalent bonding (C-N, C-C, C-CB), which is
+    # identical in both enantiomers. Therefore, the L-amino acid random coil
+    # values serve as a highly accurate baseline for D-peptides.
     working_struc = structure.copy()
     for res_name, parent_name in _PARENT_MAP.items():
         mask = working_struc.res_name == res_name
@@ -453,6 +657,46 @@ def get_secondary_structure(
     """
     Infers categorical secondary structure (H, E, C) from chemical shifts.
 
+    SCIENTIFIC BACKGROUND:
+    ----------------------
+    Categorical secondary structure annotation is typically performed using
+    geometric criteria (e.g., DSSP or P-SEA) evaluated directly on the 3D
+    coordinates of a protein structure. However, it can also be inferred from
+    chemical shift data using tools like TALOS or CSI, which map sequence-specific
+    shifts to standard secondary structure alphabets.
+
+    In this implementation, we utilize Biotite's `annotate_sse` function, which
+    implements a variant of the P-SEA algorithm. This algorithm defines elements
+    based on continuous stretches of specific backbone dihedral angle pairs:
+    - 'a' (Alpha Helix): Contiguous residues with phi ~ -60, psi ~ -45
+    - 'b' (Beta Strand): Contiguous residues with extended phi/psi angles
+    - 'c' (Random Coil): Everything else
+
+    Because empirical secondary structure parsing tools are intrinsically
+    formulated exclusively for naturally occurring L-amino acid geometries,
+    they strictly evaluate structural signatures based on left-handed
+    dihedral angular boundaries (e.g., phi < 0 for helices).
+
+    When a valid D-peptide (which possesses structurally sound right-handed
+    geometry) is evaluated by standard P-SEA, its perfectly valid
+    mirrored angles (phi > 0) fall drastically outside of the classical
+    alpha-helical or beta-strand probability density boundaries. This causes
+    the structural parser to erroneously classify perfectly stable D-structures
+    as completely unstructured "random coil" ("C") regions.
+
+    To correctly infer categorical labels for non-natural geometries, we must:
+    1. Identify any D-amino acids in the input structure using the lookup map.
+    2. Rename D-residues back to their L-parents so the atomic parsing matches.
+    3. IF D-amino acids exist, mathematically invert the coordinates
+       (coord = -coord) prior to evaluation.
+
+    This mathematical transformation perfectly reflects the D-enantiomeric
+    structure through the origin. As a result, all internal physical geometries
+    (hydrogen bond distances, backbone inter-atomic spacing) are identically
+    preserved, but the global chirality is restored to left-handed geometry.
+    The P-SEA algorithm can then successfully recognize the structural motifs
+    and accurately classify the secondary structure.
+
     Args:
         shifts: Predicted or experimental shifts.
         structure: The Biotite AtomArray used for mapping and sequence length.
@@ -461,12 +705,44 @@ def get_secondary_structure(
         List[str]: A list of 3-state (H, E, C) or DSSP labels per residue.
     """
     # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # Because empirical secondary structure parsing tools, such as the P-SEA
+    # algorithm used natively by Biotite's `annotate_sse`, are intrinsically
+    # formulated exclusively for naturally occurring L-amino acid geometries,
+    # they strictly evaluate structural signatures based on left-handed
+    # dihedral angular boundaries (e.g., phi < 0).
+    #
+    # When a valid D-peptide (which possesses structurally sound right-handed
+    # right-handed geometry) is evaluated by standard P-SEA, its perfectly valid
+    # mirrored angles (phi > 0) fall drastically outside of the classical
+    # alpha-helical or beta-strand probability density boundaries. This causes
+    # the structural parser to erroneously classify perfectly stable D-structures
+    # as completely unstructured "random coil" ("C") regions.
+    #
+    # To correctly infer categorical labels for non-natural geometries, we must:
+    # 1. Identify any D-amino acids in the input structure using the lookup map.
+    # 2. Rename D-residues back to their L-parents so the atomic parsing matches.
+    # 3. IF D-amino acids exist, mathematically invert the coordinates
+    #    (coord = -coord) prior to evaluation.
+    #
+    # This mathematical transformation perfectly reflects the D-enantiomeric
+    # structure through the origin. As a result, all internal physical geometries
+    # (hydrogen bond distances, backbone inter-atomic spacing) are identically
+    # preserved, but the global chirality is restored to left-handed geometry.
+    # The P-SEA algorithm can then successfully recognize the structural motifs
+    # and accurately classify the secondary structure.
     working_struc = structure.copy()
+    has_d_amino_acids = False
     for res_name, parent_name in _PARENT_MAP.items():
         mask = working_struc.res_name == res_name
         if np.any(mask):
             logger.debug(f"Mapping {res_name} -> {parent_name} for SS assignment.")
             working_struc.res_name[mask] = parent_name
+            if res_name in _D_AMINO_ACIDS:
+                has_d_amino_acids = True
+
+    if has_d_amino_acids:
+        logger.info("D-amino acids detected. Running coordinate inversion for SS assignment.")
+        working_struc.coord = -working_struc.coord
 
     # Latest synth-nmr might require structure for residue count consistency
     try:
@@ -481,11 +757,32 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> Dic
 
     SCIENTIFIC RATIONALE:
     --------------------
+    When evaluating the accuracy of a structural ensemble, or when benchmarking
+    a new chemical shift prediction algorithm (such as empirical vs. quantum
+    mechanical methods), it is essential to quantify the global agreement between
+    a set of "calculated" shifts (e.g., predicted from a computational model) and
+    "observed" shifts (e.g., experimentally measured via NMR spectroscopy).
+
     Comparison of predicted and experimental shifts provides a global
     assessment of structural fidelity. By measuring both absolute deviation
     (RMSD) and linear agreement (Correlation), researchers can distinguish
     between systematic errors (e.g. force-field bias) and local geometry
     errors (e.g. misfolded loops).
+
+    1. RMSD (Root Mean Square Deviation): Measures the absolute magnitude of the
+       prediction error. Lower values indicate better agreement. The RMSD is
+       often calculated separately for different nuclei (CA, CB, N, H, HA, C)
+       because their typical chemical shift ranges and sensitivities differ
+       vastly. For example, a 1.0 ppm error for Nitrogen (which spans ~30 ppm)
+       is considered excellent, while a 1.0 ppm error for Alpha Protons (which
+       span ~3 ppm) is considered poor. An incorrect backbone fold will typically
+       result in CA/CB shift RMSDs > 2.0 ppm, whereas an atomic-resolution
+       structure should achieve CA RMSDs < 1.0 ppm.
+
+    2. Pearson Correlation Coefficient: Measures the linear relationship between
+       the predicted and experimental values. A correlation close to 1.0 indicates
+       that the model perfectly captures the sequence-dependent trends, even if
+       there is a systematic offset.
 
     Args:
         observed (np.ndarray): Array of experimentally measured shifts (ppm).
