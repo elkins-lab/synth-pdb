@@ -74,10 +74,21 @@ def predict_couplings_from_structure(
     Returns:
         Dict keyed by Chain ID -> Residue ID -> J-coupling value (Hz).
     """
+    # ── 1. PRIMARY PREDICTION ────────────────────────────────────────────────
+    # We first delegate to the core synth-nmr engine to calculate raw couplings.
+    # The engine uses a highly optimized C++ backend or Numba-jitted array ops
+    # to evaluate the Karplus equation for all residues simultaneously.
     raw_couplings = _j.calculate_hn_ha_coupling(structure)
     filtered_couplings: typing.Dict[str, typing.Dict[int, float]] = {}
 
+    # ── 2. BIOPHYSICAL FILTER DEFINITIONS ────────────────────────────────────
+    # Proline-like residues do not have an amide proton when in a peptide bond.
+    # Therefore, they cannot produce a 3J_HNHa coupling.
     proline_names = {"PRO", "DPR"}
+
+    # We maintain an exhaustive list of D-amino acids (the D-stereoisomers).
+    # This allows us to intercept them and perform the requisite stereochemical
+    # inversion on their backbone phi angles before evaluating Karplus.
     d_amino_acids = {
         "DAL",
         "DAR",
@@ -100,35 +111,47 @@ def predict_couplings_from_structure(
         "DVA",
     }
 
-    # Pre-calculate phi map for D-amino acid correction
+    # ── 3. PRE-CALCULATING STRUCTURAL ANGLES ─────────────────────────────────
+    # We extract the entire array of backbone phi dihedrals from the structure.
+    # Biotite returns these in radians, so we convert them to degrees, which
+    # the Karplus parametrization expects.
     phi, _, _ = struc.dihedral_backbone(structure)
     chain_ids, res_ids, _, _ = get_residue_info(structure)
+
+    # Build a rapid-lookup dictionary for phi angles keyed by (chain_id, res_id).
+    # We explicitly cast res_id to int to ensure type-matching with raw_couplings.
     phi_map = {}
     for c, r, p in zip(chain_ids, res_ids, phi):
         phi_map[(c, int(r))] = np.degrees(p)
 
+    # ── 4. ITERATIVE FILTERING & CORRECTION ──────────────────────────────────
+    # We iterate over the raw predictions and selectively copy/modify them
+    # into our sanitized output dictionary.
     for chain_id, res_dict in raw_couplings.items():
         filtered_chain = {}
         for res_id, j_val in res_dict.items():
-            # Check residue name from structure
+            # Check residue name from structure by generating a boolean mask.
+            # We select the first matching atom's residue name.
             res_mask = (structure.chain_id == chain_id) & (structure.res_id == res_id)
             if not res_mask.any():
                 continue
             res_name = structure.res_name[res_mask][0]
 
-            # 1. Proline has no HN proton; skip
+            # Physics check: Proline has no HN proton; skip entirely.
             if res_name in proline_names:
                 continue
 
-            # 2. D-amino acids require stereochemical inversion for Karplus evaluation
+            # Stereochemistry check: D-amino acids require phase inversion.
             if res_name in d_amino_acids:
                 p_angle = phi_map.get((chain_id, res_id))
                 if p_angle is not None and not np.isnan(p_angle):
-                    # J_D(phi) = J_L(-phi) due to stereochemical inversion
+                    # J_D(phi) = J_L(-phi) due to stereochemical inversion.
+                    # We round to 2 decimal places to match typical NMR precision.
                     j_val = float(round(_j.calculate_hn_ha_coupling_from_phi(-p_angle), 2))
 
             filtered_chain[res_id] = j_val
 
+        # Only append chains that contain valid couplings.
         if filtered_chain:
             filtered_couplings[chain_id] = filtered_chain
 
