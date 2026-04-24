@@ -77,6 +77,17 @@ python -m synth_pdb.main --sequence "ALA-GLY-SER-THR-VAL" --output test.pdb
 -   `dataset`: Bulk generation for machine learning datasets.
 -   `ai`: Structure interpolation and clustering.
 
+### AI Mode Options
+
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `--ai-op` | AI operation: `interpolate` or `cluster`. | - |
+| `--start-pdb` | Start PDB file for `interpolate`. | - |
+| `--end-pdb` | End PDB file for `interpolate`. | - |
+| `--steps` | Number of steps for `interpolate`. | 10 |
+| `--input-pattern` | Glob pattern for input PDB files for `cluster` (e.g., 'decoys/*.pdb'). | - |
+| `--n-clusters` | Number of clusters to form for `cluster`. | 5 |
+
 ## Visualization
 
 Use the `--visualize` flag to open the generated structure in a browser-based 3D viewer (powered by 3Dmol.js).

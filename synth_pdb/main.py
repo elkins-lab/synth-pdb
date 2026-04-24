@@ -602,10 +602,21 @@ def main() -> None:
         help="End PDB file for interpolation.",
     )
     parser.add_argument(
-        "--steps",
+        "--input-pattern",
+        type=str,
+        help="Glob pattern for input PDB files (e.g., 'decoys/*.pdb') for clustering.",
+    )
+    parser.add_argument(
+        "--n-clusters",
         type=int,
         default=5,
-        help="Number of steps for interpolation (default: 5).",
+        help="Number of clusters to form in 'ai' clustering mode (default: 5).",
+    )
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=10,
+        help="Number of steps for interpolation (default: 10).",
     )
 
     parser.add_argument(
@@ -821,8 +832,24 @@ def main() -> None:
                 sys.exit(1)
             return
         elif args.ai_op == "cluster":
-            logger.error("Clustering not yet implemented.")
-            sys.exit(1)
+            from .quality.cluster import cluster_structures
+
+            if not args.input_pattern:
+                logger.error("Clustering requires --input-pattern (e.g., 'decoys/*.pdb').")
+                sys.exit(1)
+
+            try:
+                out_dir = args.output if args.output else "clusters"
+                cluster_structures(args.input_pattern, args.n_clusters, out_dir, args.seed or 42)
+            except ImportError:
+                logger.error(
+                    "AI modules require scikit-learn. Install with `pip install synth-pdb[ai]`."
+                )
+                sys.exit(1)
+            except Exception as e:
+                logger.error(f"Clustering failed: {e}")
+                sys.exit(1)
+            return
         else:
             logger.error("AI mode requires --ai-op {interpolate, cluster}.")
             sys.exit(1)
