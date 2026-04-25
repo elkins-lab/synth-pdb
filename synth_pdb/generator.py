@@ -1017,7 +1017,21 @@ def _build_peptide_chain(
 
         # ── Biotite reference template ───────────────────────────────────────
         # CRITICAL FIX: Always use .copy() — residue() returns a cached template.
-        ref_res_template = struc.info.residue(res_name).copy()
+        template_res_name = res_name
+        if res_name in ["HID", "HIE", "HIP"]:
+            template_res_name = "HIS"
+        # Map D-amino acids back to L for template lookup
+        elif res_name in L_TO_D_MAPPING.values():
+            # Invert mapping to find L-code
+            d_to_l = {v: k for k, v in L_TO_D_MAPPING.items()}
+            template_res_name = d_to_l[res_name]
+
+        try:
+            ref_res_template = struc.info.residue(template_res_name).copy()
+        except KeyError:
+            # Fallback for other non-standard residues that might not be in Biotite info
+            logger.warning(f"Residue {res_name} not found in Biotite info, skipping.")
+            continue
 
         # EDUCATIONAL NOTE - Peptide Bond Chemistry:
         # A peptide bond forms via dehydration synthesis (loss of H2O).

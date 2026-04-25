@@ -14,10 +14,16 @@ This document serves as a roadmap and brainstorming space for experimental, high
 ---
 
 ## ☁️ 2. IDP "Ensemble-First" Validation
-**The Vision:** Create the first automated pipeline for generating and validating "Conformational Ensembles" for Intrinsically Disordered Proteins (IDPs) like Alpha-synuclein.
+**The Vision:** Create the first automated pipeline for generating and validating "Conformational Ensembles" for Intrinsically Disordered Proteins (IDPs).
 
 *   **The Scientific Gap:** IDPs are "invisible" to X-ray and Cryo-EM. NMR provides data, but interpreting that data requires a massive ensemble of potential shapes that is computationally expensive to generate.
 *   **The `synth-pdb` Angle:** Our `BatchedGenerator` can create 10,000+ physically plausible random-coil conformations in seconds, providing the raw material for ensemble-averaging calculations (PRE, RDC, SAXS).
+*   **Primary Candidate: Alpha-synuclein (N-terminal fragment)**
+    *   **Sequence:** `MDVFMKGLSKAKEGVVAA`
+    *   **Context:** Associated with Parkinson's; no fixed structure in solution.
+*   **Secondary Candidate: TDP-43 C-terminal Domain**
+    *   **Sequence:** `GNWGNQGSGNSNYGSGGSGNDQNQSGNSNYGSGGSGNDQNQSGNSNY`
+    *   **Context:** Involved in ALS; extreme low-complexity disordered region.
 *   **Current Status:** 🛠️ Active Development (See `examples/interactive_tutorials/idp_ensemble_validation.ipynb`).
 
 ---
@@ -27,6 +33,12 @@ This document serves as a roadmap and brainstorming space for experimental, high
 
 *   **The Scientific Gap:** AlphaFold-3 and ESM-Fold have predicted millions of structures, but we don't know where they might be "hallucinating" (e.g., in flexible loops or orphan proteins).
 *   **The `synth-pdb` Angle:** We can generate "near-native" decoys—structures that look like the AI prediction but have subtle, physically plausible changes—to test if the AI's confidence scores (pLDDT) can actually distinguish them.
+*   **High-Priority Target: CASP16 Target T1207 (Viral 2A protein)**
+    *   **Sequence:** (Check CASP16 Target List for exact sequence)
+    *   **Context:** A "Hard" target from 2024; few prediction groups were able to solve it correctly due to its novel fold and lack of homologs.
+*   **Orphan Protein Candidate: Human APELA (O95782)**
+    *   **Sequence:** `MKPMPFHLTLLLFLLVLLSPLLLSLAPAMAGSPSFPRRSRLPDLHPCL`
+    *   **Context:** Human orphan protein with no known homologs; blind spot for MSA-based AI tools.
 *   **Current Status:** 💡 Concept Stage.
 
 ---

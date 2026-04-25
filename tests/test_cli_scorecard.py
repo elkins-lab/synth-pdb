@@ -91,3 +91,49 @@ class TestCLIScorecard:
         assert "NMR SPECTROSCOPIC FIDELITY" in captured.out
         assert "NOE Satisfaction" in captured.out
         assert "100.0%" in captured.out
+
+    def test_scorecard_with_invalid_bmrb(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture
+    ) -> None:
+        """Verify scorecard handles BMRB fetch failure gracefully."""
+        output_file = tmp_path / "test_bad_bmrb.pdb"
+        test_args = [
+            "synth_pdb",
+            "--sequence",
+            "AAA",
+            "--scorecard",
+            "--bmrb-id",
+            "invalid_id",
+            "--output",
+            str(output_file),
+        ]
+
+        # Mock BMRB failure
+        with patch("synth_pdb.bmrb_api.BMRBAPI.fetch_restraints", return_value=[]):
+            with patch("sys.argv", test_args):
+                main()
+
+        captured = capsys.readouterr()
+        # NMR layer should be missing if no restraints fetched
+        assert "NMR SPECTROSCOPIC FIDELITY" not in captured.out
+        assert "OVERALL:" in captured.out
+
+    def test_scorecard_interface_metrics_single_chain(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture
+    ) -> None:
+        """Verify scorecard does not show interface layer for single chain."""
+        output_file = tmp_path / "test_single.pdb"
+        test_args = [
+            "synth_pdb",
+            "--sequence",
+            "AAA",
+            "--scorecard",
+            "--output",
+            str(output_file),
+        ]
+
+        with patch("sys.argv", test_args):
+            main()
+
+        captured = capsys.readouterr()
+        assert "STRUCTURAL INTERACTOME" not in captured.out

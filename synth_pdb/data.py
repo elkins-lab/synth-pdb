@@ -108,7 +108,9 @@ NON_STANDARD_RESIDUES: Set[str] = (
     | set(D_AMINO_ACIDS)  # DAL, DCY, DLE, ... (mirror image residues)
 )
 
-ALL_VALID_AMINO_ACIDS: List[str] = STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS
+ALL_VALID_AMINO_ACIDS: List[str] = (
+    STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS + ["HIE", "HID", "HIP"]
+)
 
 # --- Amino Acid Frequencies (Approximate percentages in proteins) ---
 # Source: Based on general protein composition data (e.g., from D. M. Smith, The Encyclopedia of Life Sciences, 2001)
