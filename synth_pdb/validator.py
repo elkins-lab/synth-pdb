@@ -305,7 +305,7 @@ class PDBValidator:
             b_struc = b_struc_raw.get_structure(model=1)
         except Exception as e:
             logger.error(f"SASA calculation failed to parse PDB: {e}")
-            return {"SASA": {}, "mean_hydrophobic_sasa": 0.0}
+            return {"SASA": {}, "mean_hydrophobic_sasa": 0.0, "burial_ratio": 0.0}
 
         # Calculate SASA for all atoms
         # EDUCATIONAL NOTE - VdW Radii:
@@ -329,19 +329,21 @@ class PDBValidator:
 
         # Aggregate by residue
         res_sasa = {}
+        res_names = {}
         hydrophobic_res = ["VAL", "ILE", "LEU", "PHE", "TRP", "MET", "TYR"]
-        hydro_vals = []
-        polar_vals = []
 
         for i, atom in enumerate(b_struc):
             res_id = int(atom.res_id)
             if res_id not in res_sasa:
                 res_sasa[res_id] = 0.0
+                res_names[res_id] = atom.res_name
             res_sasa[res_id] += float(sasa_per_atom[i])
 
+        hydro_vals = []
+        polar_vals = []
+
         for res_id, total_sasa in res_sasa.items():
-            # Find residue name for this ID
-            res_name = b_struc[b_struc.res_id == res_id].res_name[0]
+            res_name = res_names[res_id]
             if res_name in hydrophobic_res:
                 hydro_vals.append(float(total_sasa))
             else:
@@ -350,11 +352,15 @@ class PDBValidator:
         mean_hydro = np.mean(hydro_vals) if hydro_vals else 0.0
         mean_polar = np.mean(polar_vals) if polar_vals else 1.0  # Avoid div by zero
 
+        # Scientific Burial Ratio: ratio of average polar exposure to average hydrophobic exposure.
+        # High value (> 1.0) means hydrophobics are more shielded than polars.
+        burial_ratio = float(mean_polar / (mean_hydro + 1e-6))
+
         return {
             "SASA": {res_id: float(val) for res_id, val in res_sasa.items()},
             "mean_hydrophobic_sasa": float(mean_hydro),
             "mean_polar_sasa": float(mean_polar),
-            "burial_ratio": float(mean_polar / (mean_hydro + 1e-6)),
+            "burial_ratio": burial_ratio,
         }
 
     def calculate_potential_energy(self) -> float:

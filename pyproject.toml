@@ -109,7 +109,7 @@ where = ["."]
 exclude = ["tests*", "scratch*", "benchmarks*", "examples*", "scripts*", "docs*"]
 
 [tool.setuptools.package-data]
-synth_pdb = ["py.typed"]
+synth_pdb = ["py.typed", "quality/models/*.joblib", "quality/models/*.pt"]
 
 [tool.black]
 line-length = 100
