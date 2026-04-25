@@ -174,7 +174,10 @@ This document serves as a roadmap and brainstorming space for experimental, high
 *   **The "Viral Ghost": Pandoravirus ORFan**
     *   **Sequence:** `MASTSRRLLARLLRRRLLRRLRRRLLARLLRRRLLRRLRRRLLARLLRRR`
     *   **Goal:** Explore the stability of giant virus sequences that have no evolutionary signal.
-*   **Current Status:** 🧪 Prototype Stage (Poly-Tryptophan test in progress).
+*   **The "Backbone Knot": Trefoil Protein YbeA**
+    *   **Sequence:** `MREIILLVATDHYNLTNLYSLLKHYRIPLVVHVSDIKEIR`
+    *   **Goal:** Attempt to generate a knotted topology vs. a linear unknotted model.
+*   **Current Status:** 🧪 Prototype Stage (Topological Knot test in progress).
 
 ---
 

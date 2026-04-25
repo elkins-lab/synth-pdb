@@ -1222,6 +1222,12 @@ def main() -> None:
                     rot_status = "✅ PASS" if rot_val > 80.0 else "⚠️ WARN"
                     print(f"| Favored Rotamers: {rot_val:>19.1f}% | {rot_status:<18} |")
 
+                    c_val = report["chirality_stats"]["l_amino_acid_pct"]
+                    c_status = (
+                        "✅ PASS" if report["chirality_stats"]["is_standard_biology"] else "👽 ALIEN"
+                    )
+                    print(f"| Chirality (L-Biology): {c_val:>12.1f}% | {c_status:<18} |")
+
                     # Layer 2: Biophysics
                     print("-" * 60)
                     print(f"| {'BIOPHYSICAL REALISM':<35} | {'STATUS':<18} |")

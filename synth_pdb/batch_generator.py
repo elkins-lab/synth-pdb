@@ -437,26 +437,40 @@ class BatchedGenerator:
                     backbone_coords[:, (i - 1) * 4 + 1],
                     backbone_coords[:, (i - 1) * 4 + 2],
                 )
-                bl, ba, di = np.full(b, BOND_LENGTH_C_N), np.full(b, ANGLE_CA_C_N), psi[:, i - 1]
-                backbone_coords[:, idx] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                bl, ba, di = (
+                    np.full(b, BOND_LENGTH_C_N),
+                    np.full(b, ANGLE_CA_C_N),
+                    psi[:, i - 1],
+                )
+                backbone_coords[:, idx] = position_atoms_batch(
+                    p1, p2, p3, bl, ba, di
+                )  # type: ignore[assignment]
 
-                # Placement of CA(i) using Peptide Bond Torsion (Omega)
+                # Step B: Place CA(i) using Peptide Bond Torsion (Omega)
                 p1, p2, p3 = (
                     backbone_coords[:, (i - 1) * 4 + 1],
                     backbone_coords[:, (i - 1) * 4 + 2],
                     backbone_coords[:, idx],
                 )
-                bl, ba, di = np.full(b, BOND_LENGTH_N_CA), np.full(b, ANGLE_C_N_CA), omega[:, i - 1]
-                backbone_coords[:, idx + 1] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                bl, ba, di = (
+                    np.full(b, BOND_LENGTH_N_CA),
+                    np.full(b, ANGLE_C_N_CA),
+                    omega[:, i - 1],
+                )
+                backbone_coords[:, idx + 1] = position_atoms_batch(
+                    p1, p2, p3, bl, ba, di
+                )  # type: ignore[assignment]
 
-                # Placement of C(i) using the Phi torsion angle
+                # Step C: Place C(i) using Phi angle
                 p1, p2, p3 = (
                     backbone_coords[:, (i - 1) * 4 + 2],
                     backbone_coords[:, idx],
                     backbone_coords[:, idx + 1],
                 )
                 bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]
-                backbone_coords[:, idx + 2] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                backbone_coords[:, idx + 2] = position_atoms_batch(
+                    p1, p2, p3, bl, ba, di
+                )  # type: ignore[assignment]
 
                 # Placement of O(i) using fixed Carbonyl geometry
                 p1, p2, p3 = (

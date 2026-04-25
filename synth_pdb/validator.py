@@ -467,6 +467,30 @@ class PDBValidator:
 
         return {"favored_rotamers_pct": favored_pct, "outlier_count": len(outliers)}
 
+    def get_chirality_statistics(self) -> Dict[str, Any]:
+        """Summary of protein handedness (L vs D amino acids).
+
+        SCIENTIFIC BASIS:
+        Terrestrial biology exclusively uses L-amino acids. The presence of
+        D-amino acids (except in rare bacterial wall peptides) indicates
+        non-biological (synthetic or 'Alien') chemistry.
+        """
+        # Ensure validation has run
+        if not any("stereochemistry" in v for v in self.violations):
+            self.validate_chirality()
+
+        d_count = sum(1 for v in self.violations if "is a D-amino acid" in v)
+        total_residues = sum(len(c) for c in self.grouped_atoms.values())
+        l_count = total_residues - d_count
+
+        l_pct = (l_count / total_residues * 100.0) if total_residues > 0 else 0.0
+
+        return {
+            "l_amino_acid_pct": l_pct,
+            "d_amino_acid_count": d_count,
+            "is_standard_biology": d_count == 0,
+        }
+
     def get_quality_report(
         self, include_ml: bool = False, nmr_restraints: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
@@ -525,6 +549,7 @@ class PDBValidator:
 
         z_scores = self.get_geometric_z_scores()
         rotamers = self.get_rotamer_quality_report()
+        chirality = self.get_chirality_statistics()
 
         # AGGRESSIVE SCIENTIFIC DEFENSE:
         # A model is defensible ONLY if it passes physics AND (if provided) AI/NMR judges.
@@ -534,6 +559,7 @@ class PDBValidator:
             and ramachandran["outlier_pct"] < 5.0
             and energy < 1e5
             and sasa["burial_ratio"] >= 0.8
+            and chirality["is_standard_biology"]
         )
 
         if include_ml and ml_stats:
@@ -552,6 +578,7 @@ class PDBValidator:
             "ramachandran_stats": ramachandran,
             "geometric_z_scores": z_scores,
             "rotamer_stats": rotamers,
+            "chirality_stats": chirality,
             "violation_count": len(self.violations),
             "hydrophobic_burial_ratio": sasa["burial_ratio"],
             "is_physically_plausible": energy < 1e5,
@@ -1660,6 +1687,12 @@ class PDBValidator:
                 # Identify if this is a D-amino acid based on the residues list
                 # (e.g., DAL, DAR, DAN).
                 is_d = res_name in L_TO_D_MAPPING.values()
+                if is_d:
+                    self.violations.append(
+                        f"Non-biological stereochemistry: Chain {chain_id}, Residue {res_num} {res_name} "
+                        f"is a D-amino acid (Earth life uses L-amino acids)."
+                    )
+
                 check_val = -improper if is_d else improper
 
                 # Check for reasonable improper dihedral values
