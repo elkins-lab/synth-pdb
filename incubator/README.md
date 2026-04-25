@@ -24,7 +24,7 @@ This document serves as a roadmap and brainstorming space for experimental, high
 *   **Secondary Candidate: TDP-43 C-terminal Domain**
     *   **Sequence:** `GNWGNQGSGNSNYGSGGSGNDQNQSGNSNYGSGGSGNDQNQSGNSNY`
     *   **Context:** Involved in ALS; extreme low-complexity disordered region.
-*   **Current Status:** 🛠️ Active Development (See `examples/interactive_tutorials/idp_ensemble_validation.ipynb`).
+*   **Current Status:** 🛠️ Active Development (See `examples/interactive_tutorials/idp_ensemble_validation.ipynb` and `incubator/dark_proteome/`).
 
 ---
 
@@ -39,7 +39,7 @@ This document serves as a roadmap and brainstorming space for experimental, high
 *   **Orphan Protein Candidate: Human APELA (O95782)**
     *   **Sequence:** `MKPMPFHLTLLLFLLVLLSPLLLSLAPAMAGSPSFPRRSRLPDLHPCL`
     *   **Context:** Human orphan protein with no known homologs; blind spot for MSA-based AI tools.
-*   **Current Status:** 💡 Concept Stage.
+*   **Current Status:** 🧪 Prototype Stage (See `incubator/dark_proteome/`).
 
 ---
 

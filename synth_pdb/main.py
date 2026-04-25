@@ -129,7 +129,7 @@ def main() -> None:
     parser.add_argument(
         "--sequence",
         type=str,
-        help="Specify an amino acid sequence (e.g., 'AGV' or 'ALA-GLY-VAL'). Overrides random generation.",
+        help="Specify an amino acid sequence (e.g., 'AGV' or 'ALA-GLY-VAL'). Use ':' to separate multiple chains (e.g., 'ALA-GLY:SER-VAL'). Overrides random generation.",
     )
     parser.add_argument(
         "--plausible-frequencies",
@@ -643,6 +643,11 @@ def main() -> None:
     log_level = getattr(logging, args.log_level.upper(), None)
     if not isinstance(log_level, int):
         raise ValueError(f"Invalid log level: {args.log_level}")
+
+    # Configure logging if not already configured (e.g., by pytest or another caller)
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=log_level, format="%(message)s")
+
     logging.getLogger().setLevel(log_level)
     logger.debug("Logging level set to %s.", args.log_level.upper())
 
@@ -1460,13 +1465,25 @@ def main() -> None:
                                 logger.error(f"Chemical Shift Validation failed: {e}")
 
                         # Sequence inference
+                        from .data import L_TO_D_MAPPING, ONE_TO_THREE_LETTER_CODE
+
+                        three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+                        # Add support for Histidine tautomers
+                        three_to_one["HID"] = "H"
+                        three_to_one["HIE"] = "H"
+                        three_to_one["HIP"] = "H"
+                        # Add support for PTMs
+                        three_to_one["SEP"] = "S"
+                        three_to_one["TPO"] = "T"
+                        three_to_one["PTR"] = "Y"
+                        # Add support for D-amino acids
+                        for l_name, d_name in L_TO_D_MAPPING.items():
+                            three_to_one[d_name] = three_to_one[l_name]
+
                         res_names = [
                             structure[structure.res_id == i][0].res_name
                             for i in sorted(set(structure.res_id))
                         ]
-                        from .data import ONE_TO_THREE_LETTER_CODE
-
-                        three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
                         seq_str = "".join([three_to_one.get(r, "X") for r in res_names])
 
                         # Validation: Check for Hydrogens
