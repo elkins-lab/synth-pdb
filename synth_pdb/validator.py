@@ -1626,6 +1626,105 @@ class PDBValidator:
                         f"improper dihedral = {improper:.1f}° ({expected_desc})"
                     )
 
+    def validate_distance_restraints(
+        self, restraints: List[Dict[str, Any]], tolerance: float = 0.5
+    ) -> None:
+        """Validates the structure against NMR distance restraints (NOEs).
+
+        EDUCATIONAL NOTE - NOE Effective Distance:
+        ------------------------------------------
+        Nuclear Overhauser Effect (NOE) intensities are proportional to r^-6.
+        When a restraint involves multiple equivalent atoms (pseudo-atoms like HB,
+        representing HB2 and HB3), we calculate the "effective distance" using
+        r^-6 averaging:
+
+        d_eff = (sum(d_i^-6) / N)^-1/6  (standard) or simply (sum(d_i^-6))^-1/6.
+        The BMRB/X-PLOR standard typically uses the sum.
+
+        Args:
+            restraints: List of restraint dicts (index_1, atom_name_1, index_2, atom_name_2, upper_limit).
+            tolerance: Added buffer to the upper limit in Angstroms (default 0.5).
+        """
+        logger.info(f"Performing NMR distance restraint validation ({len(restraints)} restraints).")
+
+        # Map ambiguous NMR names to PDB-standard atoms
+        pseudo_map = {
+            "H": ["H", "HN"],
+            "HB": ["HB", "HB1", "HB2", "HB3"],
+            "HG": ["HG", "HG1", "HG2", "HG3", "HG11", "HG12", "HG13", "HG21", "HG22", "HG23"],
+            "HD": ["HD1", "HD2", "HD3", "HD11", "HD12", "HD13", "HD21", "HD22", "HD23"],
+            "HE": ["HE", "HE1", "HE2", "HE3", "HE11", "HE12", "HE13", "HE21", "HE22", "HE23"],
+            "HZ": ["HZ", "HZ1", "HZ2", "HZ3", "HZ11", "HZ12", "HZ13"],
+            "QD": ["HD1", "HD2", "HD3", "HD11", "HD12", "HD13"],  # Pseudo-atom Q for methyls
+            "QE": ["HE1", "HE2", "HE3", "HE11", "HE12", "HE13"],
+            "QZ": ["HZ1", "HZ2", "HZ3"],
+        }
+
+        def get_atoms_in_residue(res_id: int, atom_pattern: str) -> List[np.ndarray]:
+            # Get chain 'A' (assume single chain for BMRB comparison unless specified)
+            chain_id = next(iter(self.grouped_atoms.keys()))
+            if res_id not in self.grouped_atoms[chain_id]:
+                return []
+
+            residue = self.grouped_atoms[chain_id][res_id]
+            coords = []
+
+            # 1. Direct Match
+            if atom_pattern in residue:
+                coords.append(residue[atom_pattern]["coords"])
+
+            # 2. Pseudo-atom expansion
+            aliases = pseudo_map.get(atom_pattern, [])
+            for alias in aliases:
+                if alias in residue:
+                    coords.append(residue[alias]["coords"])
+
+            # 3. Wildcard-like match (e.g. HB* matches HB1, HB2)
+            if not coords:
+                for name, data in residue.items():
+                    if name.startswith(atom_pattern):
+                        coords.append(data["coords"])
+
+            return coords
+
+        for rest in restraints:
+            res1_id = rest["index_1"]
+            atom1_name = rest["atom_name_1"]
+            res2_id = rest["index_2"]
+            atom2_name = rest["atom_name_2"]
+            upper_limit = rest["upper_limit"]
+
+            # Fetch coordinates for all involved atoms (could be multiples for pseudo-atoms)
+            coords1 = get_atoms_in_residue(res1_id, atom1_name)
+            coords2 = get_atoms_in_residue(res2_id, atom2_name)
+
+            if not coords1 or not coords2:
+                logger.debug(
+                    f"Restraint {res1_id}:{atom1_name}-{res2_id}:{atom2_name} skipped (atoms missing)."
+                )
+                continue
+
+            # Calculate pairwise distances and perform r^-6 averaging
+            r_minus_6_sum = 0.0
+            pair_count = 0
+            for p1 in coords1:
+                for p2 in coords2:
+                    dist = self._calculate_distance(p1, p2)
+                    # Avoid division by zero for identical coordinates
+                    dist = max(dist, 0.1)
+                    r_minus_6_sum += dist**-6
+                    pair_count += 1
+
+            # Effective distance calculation
+            d_eff = (r_minus_6_sum) ** (-1 / 6)
+
+            if d_eff > upper_limit + tolerance:
+                self.violations.append(
+                    f"NMR Restraint violation: {res1_id}{atom1_name} to {res2_id}{atom2_name}. "
+                    f"Measured effective distance: {d_eff:.2f}Å. Experimental limit: {upper_limit:.2f}Å "
+                    f"(+{tolerance}Å tolerance)."
+                )
+
     def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
         """Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
 
