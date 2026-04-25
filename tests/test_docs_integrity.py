@@ -39,6 +39,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.docking_path = os.path.join(self.base_dir, "synth_pdb", "docking.py")
         self.main_path = os.path.join(self.base_dir, "synth_pdb", "main.py")
         self.cryo_em_path = os.path.join(self.base_dir, "synth_pdb", "cryo_em.py")
+        self.saxs_path = os.path.join(self.base_dir, "synth_pdb", "saxs.py")
 
         # Modular Geometry Paths
         self.geometry_nerf_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "nerf.py")
@@ -341,3 +342,13 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "1024-byte header",
         ]
         self._check_file_contains(self.cryo_em_path, required_notes)
+
+    def test_saxs_educational_notes(self) -> None:
+        """Ensure saxs.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL OVERVIEW - SAXS Curve Simulation:",
+            "The Debye Formula:",
+            "Atomic Form Factors:",
+            "Solvent Contrast:",
+        ]
+        self._check_file_contains(self.saxs_path, required_notes)

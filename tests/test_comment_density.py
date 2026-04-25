@@ -107,6 +107,7 @@ def calculate_comment_ratio(file_path: str) -> float:
         ("synth_pdb/quality/models/__init__.py", 0.00),
         ("synth_pdb/rdc.py", 4.45),
         ("synth_pdb/relaxation.py", 1.04),
+        ("synth_pdb/saxs.py", 0.75),
         ("synth_pdb/scoring.py", 1.07),
         ("synth_pdb/special_chemistry.py", 1.69),
         ("synth_pdb/structure_utils.py", 4.45),

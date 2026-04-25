@@ -268,14 +268,27 @@ def main() -> None:
         help="Optional: Output MRC/CCP4 filename for Cryo-EM maps.",
     )
 
+    # Phase 18: SAXS Curves
+    parser.add_argument(
+        "--q-max",
+        type=float,
+        default=0.5,
+        help="Maximum scattering vector q (A^-1) for SAXS profiles (for --mode saxs). Default 0.5.",
+    )
+    parser.add_argument(
+        "--saxs-output",
+        type=str,
+        help="Optional: Output .dat filename for synthetic SAXS profiles.",
+    )
+
     # Phase 3: Research Utilities Arguments
     # Using 'mode' argument to distinguish workflows without breaking BC (default is 'generate')
     parser.add_argument(
         "--mode",
         type=str,
         default="generate",
-        choices=["generate", "decoys", "docking", "pymol", "dataset", "ai", "cryo-em"],
-        help="Operation mode: 'generate' (default) single structure, 'decoys' ensemble, 'docking' preparation (PQR), 'pymol' visualization script, 'dataset' bulk generation, 'ai' structure interpolation/clustering, 'cryo-em' density map generation.",
+        choices=["generate", "decoys", "docking", "pymol", "dataset", "ai", "cryo-em", "saxs"],
+        help="Operation mode: 'generate' (default) single structure, 'decoys' ensemble, 'docking' preparation (PQR), 'pymol' visualization script, 'dataset' bulk generation, 'ai' structure interpolation/clustering, 'cryo-em' density map generation, 'saxs' scattering curve simulation.",
     )
     parser.add_argument(
         "--n-decoys",
@@ -928,6 +941,61 @@ def main() -> None:
             logger.info(f"Cryo-EM simulation complete. Map saved to {out_file}")
         except Exception as e:
             logger.error(f"Cryo-EM simulation failed: {e}")
+            sys.exit(1)
+
+        return
+
+    if args.mode == "saxs":
+        import numpy as np
+
+        from .batch_generator import BatchedGenerator
+        from .saxs import calculate_saxs_profile, export_saxs_profile
+
+        if not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("SAXS simulation requires --sequence or a positive --length.")
+            sys.exit(1)
+
+        # Resolve target sequence string
+        target_sequence = args.sequence
+        if not target_sequence:
+            import random
+
+            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+
+            rng = random.Random(args.seed)
+            three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+
+            if args.plausible_frequencies:
+                residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
+                weights = list(AMINO_ACID_FREQUENCIES.values())
+                chosen_3 = rng.choices(residues_3, weights=weights, k=args.length)
+                target_sequence = "".join([three_to_one[r] for r in chosen_3])
+            else:
+                residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
+                target_sequence = "".join(rng.choices(residues_1, k=args.length))
+
+        logger.info(f"Generating SAXS profile for sequence: {target_sequence}")
+
+        # 1. Generate Ensemble
+        bg = BatchedGenerator(target_sequence, n_batch=args.n_decoys, full_atom=True)
+        batch = bg.generate_batch(drift=args.drift or 3.0, seed=args.seed)
+
+        # 2. Simulate SAXS (Averaged over ensemble)
+        stack = batch.to_stack()
+        q_vals = np.linspace(0.0, args.q_max, 51)
+        all_intensities = []
+
+        try:
+            for i in range(len(stack)):
+                _, intensity = calculate_saxs_profile(stack[i], q_max=args.q_max)
+                all_intensities.append(intensity)
+
+            avg_intensity = np.mean(all_intensities, axis=0)
+            out_file = args.saxs_output or "synthetic_saxs.dat"
+            export_saxs_profile(q_vals, avg_intensity, out_file)
+            logger.info(f"SAXS simulation complete. Profile saved to {out_file}")
+        except Exception as e:
+            logger.error(f"SAXS simulation failed: {e}")
             sys.exit(1)
 
         return
