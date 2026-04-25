@@ -138,6 +138,16 @@ This document serves as a roadmap and brainstorming space for experimental, high
 
 ---
 
+## 🏗️ 15. The "Structural Interactome" & Complex Validation
+**The Vision:** Transform `synth-pdb` from a single-chain generator into a world-class validator for protein-protein assemblies and the "Structural Interactome."
+
+*   **The Scientific Gap:** While single-protein folding (AlphaFold-2) is largely solved, the current frontier is modeling how proteins interact (the "Interactome"). Tools like AlphaFold-Multimer and ESM-Fold-Multimer often produce structures that look plausible individually but contain subtle physical errors at the interface (e.g., steric clashes, poor buried surface area, or missing ionic complementarity).
+*   **The `synth-pdb` Angle:** We are implementing rigorous **Interface Analytics** to measure Buried Surface Area (BSA), inter-chain steric clashes, and electrostatic complementarity (inter-chain salt bridges). By providing a fast, physics-based "scorecard" for multi-chain assemblies, we allow researchers to rapidly benchmark the physical fidelity of AI-predicted complexes.
+*   **Key Reference:** Levy (2010, *JMB*) established that BSA and the hydrophobic effect at the interface are the most reliable predictors of biological relevance.
+*   **Current Status:** 🧪 Prototype Stage (Interface Metrics implemented in `PDBValidator`).
+
+---
+
 ## 📝 How to Contribute an Exploration
 1.  **Draft a Vision**: Define the "What If?".
 2.  **Define the Gap**: Why can't traditional tools do this easily?

@@ -1725,6 +1725,141 @@ class PDBValidator:
                     f"(+{tolerance}Å tolerance)."
                 )
 
+    def calculate_interface_metrics(self) -> Dict[str, Any]:
+        """Calculates biophysical metrics for protein-protein interfaces.
+
+        EDUCATIONAL NOTE - The Structural Interactome:
+        ----------------------------------------------
+        While single-protein folding is foundational, biological function is driven by
+        how proteins interact (the "Interactome"). Validating these interfaces
+        requires specialized metrics:
+
+        1. Buried Surface Area (BSA): Measures the amount of surface area that
+           is shielded from solvent upon complex formation.
+           BSA = SASA_chainA + SASA_chainB - SASA_complex.
+           A BSA > 1000 Å² typically indicates a stable, biologically relevant interface (Levy, 2010).
+
+        2. Inter-chain Clashes: Steric overlaps between different chains are a
+           common failure mode in AI-predicted complexes (e.g., AlphaFold-Multimer).
+
+        3. Electrostatic Complementarity: Inter-chain salt bridges (ionic handshakes)
+           provide the specificity and strength required for molecular recognition.
+
+        Returns:
+            Dict containing BSA, inter-chain clashes, and inter-chain salt bridges.
+        """
+        chain_ids = sorted(self.grouped_atoms.keys())
+        if len(chain_ids) < 2:
+            logger.debug("Interface metrics skipped: structure has only one chain.")
+            return {}
+
+        logger.info(f"Performing interface analytics for {len(chain_ids)} chains.")
+
+        import io
+
+        import biotite.structure as struc
+        import biotite.structure.io.pdb as biotite_pdb
+        from biotite.structure.info import vdw_radius_single
+
+        # 1. Buried Surface Area (BSA)
+        # Calculate SASA of the complex
+        tmp_io = io.StringIO(self.pdb_content)
+        b_struc = biotite_pdb.PDBFile.read(tmp_io).get_structure(model=1)
+
+        def get_total_sasa(atom_array: struc.AtomArray) -> float:
+            radii = []
+            for atom in atom_array:
+                rad = vdw_radius_single(atom.element)
+                radii.append(rad if rad is not None else 1.7)
+            sasa = struc.sasa(atom_array, probe_radius=1.4, vdw_radii=np.array(radii))
+            return float(np.sum(sasa))
+
+        sasa_complex = get_total_sasa(b_struc)
+
+        sasa_isolated_sum = 0.0
+        for cid in chain_ids:
+            chain_atoms = b_struc[b_struc.chain_id == cid]
+            sasa_isolated_sum += get_total_sasa(chain_atoms)
+
+        bsa = sasa_isolated_sum - sasa_complex
+
+        # 2. Inter-Chain Clashes
+        inter_chain_clashes = []
+        for i in range(len(self.atoms)):
+            a1 = self.atoms[i]
+            for j in range(i + 1, len(self.atoms)):
+                a2 = self.atoms[j]
+
+                if a1["chain_id"] == a2["chain_id"]:
+                    continue
+
+                dist = self._calculate_distance(a1["coords"], a2["coords"])
+                if dist < 2.0:  # Stringent threshold for severe interface clash
+                    inter_chain_clashes.append(
+                        f"Inter-chain clash: {a1['atom_name']}-{a1['residue_number']}(Chain {a1['chain_id']}) "
+                        f"and {a2['atom_name']}-{a2['residue_number']}(Chain {a2['chain_id']}) "
+                        f"are too close ({dist:.2f}Å)."
+                    )
+
+        # 3. Inter-Chain Salt Bridges
+        inter_chain_salt_bridges = []
+        acidic = ["ASP", "GLU"]
+        basic = ["ARG", "LYS", "HIS", "HID", "HIE", "HIP"]
+
+        # We reuse logic from biophysics.py but ensure different chains
+        for cid1_idx in range(len(chain_ids)):
+            for cid2_idx in range(cid1_idx + 1, len(chain_ids)):
+                cid1 = chain_ids[cid1_idx]
+                cid2 = chain_ids[cid2_idx]
+
+                # Check for acidic on chain1 and basic on chain2
+                for res1_id, res1_atoms in self.grouped_atoms[cid1].items():
+                    res1_name = next(iter(res1_atoms.values()))["residue_name"]
+                    for res2_id, res2_atoms in self.grouped_atoms[cid2].items():
+                        res2_name = next(iter(res2_atoms.values()))["residue_name"]
+
+                        # Case 1: res1 acidic, res2 basic
+                        # Case 2: res1 basic, res2 acidic
+                        is_pair = (res1_name in acidic and res2_name in basic) or (
+                            res1_name in basic and res2_name in acidic
+                        )
+
+                        if not is_pair:
+                            continue
+
+                        # Measure distance between donor/acceptor atoms
+                        # Simplified: any pair of sidechain heteroatoms within 4.0A
+                        for a1_name, a1_data in res1_atoms.items():
+                            if a1_name in ["N", "CA", "C", "O", "H", "HN"]:
+                                continue
+                            for a2_name, a2_data in res2_atoms.items():
+                                if a2_name in ["N", "CA", "C", "O", "H", "HN"]:
+                                    continue
+
+                                dist = self._calculate_distance(
+                                    a1_data["coords"], a2_data["coords"]
+                                )
+                                if dist < 4.0:
+                                    inter_chain_salt_bridges.append(
+                                        {
+                                            "chain_a": cid1,
+                                            "res_a": res1_id,
+                                            "res_name_a": res1_name,
+                                            "chain_b": cid2,
+                                            "res_b": res2_id,
+                                            "res_name_b": res2_name,
+                                            "distance": float(dist),
+                                        }
+                                    )
+                                    break  # Only record one per pair of residues
+
+        return {
+            "buried_surface_area": bsa,
+            "inter_chain_clashes": inter_chain_clashes,
+            "inter_chain_salt_bridges": inter_chain_salt_bridges,
+            "is_interface_physically_plausible": len(inter_chain_clashes) == 0,
+        }
+
     def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
         """Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
 
