@@ -350,16 +350,17 @@ class PDBValidator:
                 polar_vals.append(float(total_sasa))
 
         mean_hydro = np.mean(hydro_vals) if hydro_vals else 0.0
-        mean_polar = np.mean(polar_vals) if polar_vals else 0.0
+        mean_polar = np.mean(polar_vals) if polar_vals else 1.0  # Avoid pure div by zero
 
         # Scientific Burial Ratio: ratio of average polar exposure to average hydrophobic exposure.
         # High value (> 1.0) means hydrophobics are more shielded than polars.
-        if mean_hydro > 0:
-            burial_ratio = float(mean_polar / mean_hydro)
-        else:
+        # We use a small epsilon (1e-6) to avoid division by zero and correctly
+        # represent the 'infinite' burial ratio of all-polar sequences.
+        burial_ratio = float(mean_polar / (mean_hydro + 1e-6))
+
+        if not hydro_vals:
             # If there are NO hydrophobics, the protein has no core.
             # This is biophysically impossible for terrestrial life.
-            burial_ratio = 0.0
             self.violations.append(
                 "Biophysical violation: Protein lacks hydrophobic residues and cannot form a stable core."
             )
