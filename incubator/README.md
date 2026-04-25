@@ -174,10 +174,10 @@ This document serves as a roadmap and brainstorming space for experimental, high
 *   **The "Viral Ghost": Pandoravirus ORFan**
     *   **Sequence:** `MASTSRRLLARLLRRRLLRRLRRRLLARLLRRRLLRRLRRRLLARLLRRR`
     *   **Goal:** Explore the stability of giant virus sequences that have no evolutionary signal.
-*   **The "Backbone Knot": Trefoil Protein YbeA**
-    *   **Sequence:** `MREIILLVATDHYNLTNLYSLLKHYRIPLVVHVSDIKEIR`
-    *   **Goal:** Attempt to generate a knotted topology vs. a linear unknotted model.
-*   **Current Status:** 🧪 Prototype Stage (Topological Knot test in progress).
+*   **The "Anti-Hydrophobic" Monster**
+    *   **Sequence:** `KKKKKKKKKKKKKKKKKKKK` (Poly-Lysine)
+    *   **Goal:** Create a compact globular state that is 100% polar, resulting in a Hydrophobic Burial Ratio of zero.
+*   **Current Status:** 🧪 Prototype Stage (Anti-Hydrophobic and Cryo-EM tests in progress).
 
 ---
 

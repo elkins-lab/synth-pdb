@@ -428,7 +428,9 @@ class BatchedGenerator:
                     np.full(b, ANGLE_CA_C_O),
                     np.full(b, 180.0),
                 )
-                backbone_coords[:, idx + 3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                backbone_coords[:, idx + 3] = position_atoms_batch(  # type: ignore[assignment]
+                    p1, p2, p3, bl, ba, di
+                )
             else:
                 # Normal Vectorized NeRF Step (Natural Extension Reference Frame)
                 # Placement of N(i) relative to N(i-1), CA(i-1), C(i-1)
@@ -442,9 +444,9 @@ class BatchedGenerator:
                     np.full(b, ANGLE_CA_C_N),
                     psi[:, i - 1],
                 )
-                backbone_coords[:, idx] = position_atoms_batch(
+                backbone_coords[:, idx] = position_atoms_batch(  # type: ignore[assignment]
                     p1, p2, p3, bl, ba, di
-                )  # type: ignore[assignment]
+                )
 
                 # Step B: Place CA(i) using Peptide Bond Torsion (Omega)
                 p1, p2, p3 = (
@@ -457,9 +459,9 @@ class BatchedGenerator:
                     np.full(b, ANGLE_C_N_CA),
                     omega[:, i - 1],
                 )
-                backbone_coords[:, idx + 1] = position_atoms_batch(
+                backbone_coords[:, idx + 1] = position_atoms_batch(  # type: ignore[assignment]
                     p1, p2, p3, bl, ba, di
-                )  # type: ignore[assignment]
+                )
 
                 # Step C: Place C(i) using Phi angle
                 p1, p2, p3 = (
@@ -468,9 +470,9 @@ class BatchedGenerator:
                     backbone_coords[:, idx + 1],
                 )
                 bl, ba, di = np.full(b, BOND_LENGTH_CA_C), np.full(b, ANGLE_N_CA_C), phi[:, i]
-                backbone_coords[:, idx + 2] = position_atoms_batch(
+                backbone_coords[:, idx + 2] = position_atoms_batch(  # type: ignore[assignment]
                     p1, p2, p3, bl, ba, di
-                )  # type: ignore[assignment]
+                )
 
                 # Placement of O(i) using fixed Carbonyl geometry
                 p1, p2, p3 = (
@@ -483,7 +485,9 @@ class BatchedGenerator:
                     np.full(b, ANGLE_CA_C_O),
                     np.full(b, 180.0),
                 )
-                backbone_coords[:, idx + 3] = position_atoms_batch(p1, p2, p3, bl, ba, di)
+                backbone_coords[:, idx + 3] = position_atoms_batch(  # type: ignore[assignment]
+                    p1, p2, p3, bl, ba, di
+                )
 
         # 3. Batch Sidechain Superimposition (Full-Atom Mode)
         if self.full_atom:
