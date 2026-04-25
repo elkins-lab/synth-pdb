@@ -774,6 +774,10 @@ class EnergyMinimizer:
             }
             for i in range(len(residues) - 1):
                 res1, res2 = residues[i], residues[i + 1]
+                # Only stitch if they are on the same chain
+                if res1.chain.id != res2.chain.id:
+                    continue
+
                 c_s = next((a for a in res1.atoms() if a.name == "C"), None)
                 n_s = next((a for a in res2.atoms() if a.name == "N"), None)
                 if c_s and n_s and frozenset([c_s.index, n_s.index]) not in existing_bonds:

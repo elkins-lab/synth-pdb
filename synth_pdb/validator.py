@@ -454,9 +454,13 @@ class PDBValidator:
         peer-reviewed Dunbrack library.
         """
         # This is a statistical summary based on current validator state.
-        # We rely on validate_side_chain_rotamers having been run.
+        # We ensure validate_side_chain_rotamers has been run.
+        if not any("Rotamer violation" in v for v in self.violations):
+            self.validate_side_chain_rotamers()
+
         total_residues = sum(len(c) for c in self.grouped_atoms.values())
-        outliers = [v for v in self.violations if "Rotamer outlier" in v]
+        # The violation string typically starts with "Rotamer violation"
+        outliers = [v for v in self.violations if "Rotamer violation" in v]
 
         outlier_pct = (len(outliers) / total_residues * 100.0) if total_residues > 0 else 0.0
         favored_pct = 100.0 - outlier_pct
@@ -485,12 +489,11 @@ class PDBValidator:
         energy = self.calculate_potential_energy()
         sasa = self.calculate_residue_sasa()
 
-        # Run standard validations if not yet populated
-        if not self.violations:
-            self.validate_bond_lengths()
-            self.validate_bond_angles()
-            self.validate_ramachandran()
-            self.validate_side_chain_rotamers()
+        # Ensure geometric and side-chain validations are run for the report
+        self.validate_bond_lengths()
+        self.validate_bond_angles()
+        self.validate_ramachandran()
+        self.validate_side_chain_rotamers()
 
         # 6. NMR Restraints (if provided)
         nmr_stats = {}

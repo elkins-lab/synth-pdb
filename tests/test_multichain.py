@@ -96,3 +96,18 @@ class TestMultichainGeneration:
 
         assert 1 in res_ids_a
         assert 1 in [int(line[22:26]) for line in res_ids_b]
+
+    def test_batched_multichain_generation(self) -> None:
+        """Verify that BatchedGenerator supports multichain sequences."""
+        from synth_pdb.batch_generator import BatchedGenerator
+
+        sequence = "ALA-ALA:GLY-GLY"
+        bg = BatchedGenerator(sequence, n_batch=2, full_atom=False)
+        batch = bg.generate_batch()
+
+        assert len(batch) == 2
+        pdb_str = batch.to_pdb(0)
+
+        assert " A   1" in pdb_str
+        # BatchedGenerator uses current_res_global_idx + 1
+        assert " B   3" in pdb_str

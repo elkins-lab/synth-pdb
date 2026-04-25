@@ -1,6 +1,7 @@
+import numpy as np
+
 from synth_pdb.batch_generator import BatchedGenerator
 from synth_pdb.geometry.rmsd import calculate_rmsd
-import numpy as np
 
 sequence = "MDVFMKGLSKAKEGVVAA"
 n_states = 5
@@ -17,7 +18,7 @@ for i in range(n_states):
         rmsd = calculate_rmsd(batch.coords[i], batch.coords[j])
         rmsds.append(rmsd)
 
-print(f"\nDiversity Metrics:")
+print("\nDiversity Metrics:")
 print(f"Mean Pairwise RMSD: {np.mean(rmsds):.2f} Angstroms")
 print(f"Max Pairwise RMSD:  {np.max(rmsds):.2f} Angstroms")
 print("\nConclusion: The 'conformation' is not a single point, but a high-variance cloud.")

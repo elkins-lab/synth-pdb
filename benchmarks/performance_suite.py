@@ -6,6 +6,7 @@ import platform
 import sys
 import time
 from pathlib import Path
+from typing import Any, Dict
 
 import psutil
 
@@ -19,7 +20,7 @@ from synth_pdb.batch_generator import BatchedGenerator  # noqa: E402
 from synth_pdb.generator import generate_pdb_content  # noqa: E402
 
 
-def get_hardware_info():
+def get_hardware_info() -> Dict[str, Any]:
     """Gathers detailed hardware and platform information."""
     return {
         "platform": platform.system(),
@@ -34,16 +35,17 @@ def get_hardware_info():
     }
 
 
-def benchmark_serial(sequence, n_samples):
+def benchmark_serial(sequence: str, n_samples: int) -> float:
     print(f"  Running Serial Benchmark (N={n_samples})...")
     start_time = time.time()
     for _ in range(n_samples):
+        # We use short minimization iteration to keep benchmark reasonable if minimize=True
         _ = generate_pdb_content(sequence_str=sequence, minimize_energy=False)
     elapsed = time.time() - start_time
     return elapsed
 
 
-def benchmark_batched(sequence, n_samples):
+def benchmark_batched(sequence: str, n_samples: int) -> float:
     print(f"  Running Batched Benchmark (N={n_samples})...")
     # Warm up
     bg_warm = BatchedGenerator(sequence, n_batch=10, full_atom=False)
@@ -56,13 +58,16 @@ def benchmark_batched(sequence, n_samples):
     return elapsed
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="synth-pdb Performance Benchmarking Suite")
     parser.add_argument(
         "--n", type=int, default=1000, help="Number of structures to generate (default: 1000)"
     )
     parser.add_argument(
         "--seq", type=str, default="L-K-E-L-E-K-E-L-E-K-E-L-E-K-E-L", help="Sequence to use"
+    )
+    parser.add_argument(
+        "--multichain", action="store_true", help="Run multichain performance tests"
     )
     parser.add_argument(
         "--output", type=str, default="benchmarks/bench_results.csv", help="Output CSV file"
@@ -78,33 +83,43 @@ def main():
         print(f"  - {key}: {value}")
 
     test_sizes = [10, 100, 500, args.n]
+    if args.multichain:
+        test_sequences = [
+            ("Single (32 res)", "A" * 32),
+            ("Dimer (16:16)", "A" * 16 + ":" + "A" * 16),
+            ("Trimer (10:11:11)", "A" * 10 + ":" + "A" * 11 + ":" + "A" * 11),
+        ]
+    else:
+        test_sequences = [("Standard", args.seq)]
+
     results = []
 
-    print(f"\n🚀 Starting Benchmarks (Sequence Length: {len(args.seq.split('-'))})")
+    for name, seq in test_sequences:
+        print(f"\n🚀 Benchmarking {name} (Total Res: {len(seq.replace(':',''))})")
+        for n in test_sizes:
+            print(f"Testing N={n}...")
+            serial_time = benchmark_serial(seq, n)
+            batched_time = benchmark_batched(seq, n)
 
-    for n in test_sizes:
-        print(f"\nTesting N={n}")
-        serial_time = benchmark_serial(args.seq, n)
-        batched_time = benchmark_batched(args.seq, n)
+            speedup = serial_time / batched_time
+            throughput_serial = n / serial_time
+            throughput_batched = n / batched_time
 
-        speedup = serial_time / batched_time
-        throughput_serial = n / serial_time
-        throughput_batched = n / batched_time
+            print(f"  Serial:  {serial_time:.3f}s ({throughput_serial:.1f} struct/sec)")
+            print(f"  Batched: {batched_time:.3f}s ({throughput_batched:.1f} struct/sec)")
+            print(f"  💪 Speedup: {speedup:.1f}x")
 
-        print(f"  Serial:  {serial_time:.3f}s ({throughput_serial:.1f} struct/sec)")
-        print(f"  Batched: {batched_time:.3f}s ({throughput_batched:.1f} struct/sec)")
-        print(f"  💪 Speedup: {speedup:.1f}x")
-
-        result_row = {
-            "N": n,
-            "serial_time": serial_time,
-            "batched_time": batched_time,
-            "speedup": speedup,
-            "throughput_serial": throughput_serial,
-            "throughput_batched": throughput_batched,
-        }
-        result_row.update(hardware_info)
-        results.append(result_row)
+            result_row = {
+                "Type": name,
+                "N": n,
+                "serial_time": serial_time,
+                "batched_time": batched_time,
+                "speedup": speedup,
+                "throughput_serial": throughput_serial,
+                "throughput_batched": throughput_batched,
+            }
+            result_row.update(hardware_info)
+            results.append(result_row)
 
     # Save results
     if results:

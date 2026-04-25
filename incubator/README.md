@@ -160,12 +160,21 @@ This document serves as a roadmap and brainstorming space for experimental, high
 
 ---
 
-## 🔄 16. The "Digital Twin" NMR Refiner
-**The Vision:** Create an autonomous refinement engine that uses the "Scientific Defense Scorecard" as a fitness function to optimize protein ensembles.
+---
 
-*   **The Scientific Gap:** NMR structure refinement is traditionally a manual, iterative process. Researchers must balance competing forces (NOEs, RDCs, forcefields) to find a set of conformations that satisfy all data. There is no lightweight, "self-driving" tool for this.
-*   **The `synth-pdb` Angle:** Since we now have a unified Scorecard that integrates Physics, NMR, and AI (GNN) judges, we can use it as the objective function for a Metropolis-Hastings or Genetic Algorithm sampler. The engine would "drift" and "tweak" the ensemble, discarding structures that fail any scorecard judge, until a "Digital Twin" ensemble—one that perfectly matches the experimental profile—is achieved.
-*   **Current Status:** 💡 Concept Stage.
+## ☣️ 17. Pathological Stress Tests & Physical Limits
+**The Vision:** Use extreme, non-biological, or metamorphic sequences to test the absolute boundaries of protein physics and AI prediction.
+
+*   **The "Lead Pipe": Poly-Tryptophan (20x W)**
+    *   **Sequence:** `WWWWWWWWWWWWWWWWWWWW`
+    *   **Goal:** Force into a helix to observe maximal steric clashing and energy frustration.
+*   **The "Shape-Shifter": Metamorphic XCL1**
+    *   **Sequence:** `VGSEVSDKRTCVSLTTQRLPVSRIKTYTITEGSLRAVIFITKRGLKVCADPQATWVRDVVRSMDRKSNTRNNMIQTKPTGTQQSTNTAVTLTG`
+    *   **Goal:** Demonstrate a sequence with two valid, competing folds.
+*   **The "Viral Ghost": Pandoravirus ORFan**
+    *   **Sequence:** `MASTSRRLLARLLRRRLLRRLRRRLLARLLRRRLLRRLRRRLLARLLRRR`
+    *   **Goal:** Explore the stability of giant virus sequences that have no evolutionary signal.
+*   **Current Status:** 🧪 Prototype Stage (Poly-Tryptophan test in progress).
 
 ---
 
