@@ -1,5 +1,6 @@
 import os
 import unittest
+from typing import List
 
 """
 Enforce the philosophy that the code is the textbook by checking for educational note comments.
@@ -14,7 +15,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
     must be preserved to maintain the pedagogical value of the project.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Define paths relative to this test file
         self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.generator_path = os.path.join(self.base_dir, "synth_pdb", "generator.py")
@@ -37,14 +38,20 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.rdc_path = os.path.join(self.base_dir, "synth_pdb", "rdc.py")
         self.docking_path = os.path.join(self.base_dir, "synth_pdb", "docking.py")
         self.main_path = os.path.join(self.base_dir, "synth_pdb", "main.py")
+        self.cryo_em_path = os.path.join(self.base_dir, "synth_pdb", "cryo_em.py")
 
         # Modular Geometry Paths
         self.geometry_nerf_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "nerf.py")
-        self.geometry_dihedral_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "dihedral.py")
-        self.geometry_vectorized_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "vectorized.py")
+        self.geometry_dihedral_path = os.path.join(
+            self.base_dir, "synth_pdb", "geometry", "dihedral.py"
+        )
+        self.geometry_vectorized_path = os.path.join(
+            self.base_dir, "synth_pdb", "geometry", "vectorized.py"
+        )
 
-    def _check_file_contains(self, filepath, substrings):
+    def _check_file_contains(self, filepath: str, substrings: List[str]) -> None:
         """Helper to assert file contains list of substrings."""
+
         with open(filepath, encoding="utf-8") as f:
             content = " ".join(f.read().split())
 
@@ -56,7 +63,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
                 f"Missing educational note in {os.path.basename(filepath)}: '{substring[:50]}...'",
             )
 
-    def test_decoys_educational_notes(self):
+    def test_decoys_educational_notes(self) -> None:
         """Ensure decoys.py retains key educational blocks."""
         required_notes = [
             'EDUCATIONAL NOTE - "Decoys" vs "NMR Ensembles"',
@@ -71,7 +78,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.decoys_path, required_notes)
 
-    def test_biophysics_educational_notes(self):
+    def test_biophysics_educational_notes(self) -> None:
         """Ensure biophysics.py retains key educational blocks."""
         required_notes = [
             "Educational Note - pH and Protonation:",
@@ -84,7 +91,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.biophysics_path, required_notes)
 
-    def test_physics_educational_notes(self):
+    def test_physics_educational_notes(self) -> None:
         """Ensure physics.py retains key educational blocks."""
         required_notes = [
             "Educational Note: What is Energy Minimization?",
@@ -124,7 +131,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.physics_path, required_notes)
 
-    def test_validator_educational_notes(self):
+    def test_validator_educational_notes(self) -> None:
         """Ensure validator.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE:",
@@ -142,7 +149,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.validator_path, required_notes)
 
-    def test_cofactors_educational_notes(self):
+    def test_cofactors_educational_notes(self) -> None:
         """Ensure cofactors.py retains coordination chemistry note."""
         required_notes = [
             "Educational Note - Coordination Chemistry:",
@@ -151,7 +158,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.cofactors_path, required_notes)
 
-    def test_geometry_educational_notes(self):
+    def test_geometry_educational_notes(self) -> None:
         """Ensure geometry modules retain Z-Matrix, NeRF, and performance notes."""
         nerf_notes = [
             "EDUCATIONAL NOTE - Z-Matrix Construction",
@@ -178,7 +185,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.geometry_vectorized_path, vectorized_notes)
 
-    def test_batch_generator_educational_notes(self):
+    def test_batch_generator_educational_notes(self) -> None:
         """Ensure batch_generator.py retains performance notes."""
         required_notes = [
             "EDUCATIONAL OVERVIEW - Batched Generation (GPU-First):",
@@ -190,7 +197,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.batch_generator_path, required_notes)
 
-    def test_data_educational_notes(self):
+    def test_data_educational_notes(self) -> None:
         """Ensure data.py retains geometric and amino acid notes."""
         required_notes = [
             "EDUCATIONAL NOTE - Engh & Huber Parameters (The Gold Standard):",
@@ -205,7 +212,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.data_path, required_notes)
 
-    def test_packing_and_scoring_educational_notes(self):
+    def test_packing_and_scoring_educational_notes(self) -> None:
         """Ensure packing.py and scoring.py retain optimization notes."""
         self._check_file_contains(
             self.packing_path, ["EDUCATIONAL NOTE - Monte Carlo Optimization"]
@@ -215,7 +222,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             ["EDUCATIONAL NOTE - Steric Repulsion and Forces", "Lennard-Jones Potential"],
         )
 
-    def test_generator_educational_notes(self):
+    def test_generator_educational_notes(self) -> None:
         """Ensure generator.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - B-factors (Temperature Factors)",
@@ -227,7 +234,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.generator_path, required_notes)
 
-    def test_bfactor_test_educational_notes(self):
+    def test_bfactor_test_educational_notes(self) -> None:
         """Ensure test_bfactor.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - What are B-factors?",
@@ -235,7 +242,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.bfactor_test_path, required_notes)
 
-    def test_ramachandran_test_educational_notes(self):
+    def test_ramachandran_test_educational_notes(self) -> None:
         """Ensure test_ramachandran.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - The Ramachandran Plot",
@@ -244,7 +251,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.ramachandran_test_path, required_notes)
 
-    def test_viewer_educational_notes(self):
+    def test_viewer_educational_notes(self) -> None:
         """Ensure viewer.py retains key educational blocks and examples."""
         viewer_path = os.path.join(self.base_dir, "synth_pdb", "viewer.py")
         required_notes = [
@@ -254,7 +261,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(viewer_path, required_notes)
 
-    def test_readme_educational_notes(self):
+    def test_readme_educational_notes(self) -> None:
         """Ensure README.md retains key academic notes."""
         readme_path = os.path.join(self.base_dir, "README.md")
         required_notes = [
@@ -265,7 +272,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(readme_path, required_notes)
 
-    def test_dataset_educational_notes(self):
+    def test_dataset_educational_notes(self) -> None:
         """Ensure dataset.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - The Balanced Dataset Problem:",
@@ -275,7 +282,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.dataset_path, required_notes)
 
-    def test_orientogram_educational_notes(self):
+    def test_orientogram_educational_notes(self) -> None:
         """Ensure orientogram.py retains orientations note."""
         required_notes = [
             "EDUCATIONAL NOTE - trRosetta 6D Orientations:",
@@ -285,7 +292,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.orientogram_path, required_notes)
 
-    def test_special_chemistry_educational_notes(self):
+    def test_special_chemistry_educational_notes(self) -> None:
         """Ensure special_chemistry.py retains GFP note."""
         required_notes = [
             "EDUCATIONAL OVERVIEW - GFP Chromophore Maturation:",
@@ -298,21 +305,21 @@ class TestDocumentationIntegrity(unittest.TestCase):
         ]
         self._check_file_contains(self.special_chemistry_path, required_notes)
 
-    def test_rdc_educational_notes(self):
+    def test_rdc_educational_notes(self) -> None:
         """Ensure rdc.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE — What are Residual Dipolar Couplings (RDCs)?",
         ]
         self._check_file_contains(self.rdc_path, required_notes)
 
-    def test_docking_educational_notes(self):
+    def test_docking_educational_notes(self) -> None:
         """Ensure docking.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE: Ensure connectivity before hydrogen addition",
         ]
         self._check_file_contains(self.docking_path, required_notes)
 
-    def test_main_educational_notes(self):
+    def test_main_educational_notes(self) -> None:
         """Ensure main.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE — Scientific Reproducibility:",
@@ -321,3 +328,16 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE — RDC Calculation:",
         ]
         self._check_file_contains(self.main_path, required_notes)
+
+    def test_cryo_em_educational_notes(self) -> None:
+        """Ensure cryo_em.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL OVERVIEW - Cryo-EM Density Simulation:",
+            "Coulomb potential",
+            "Gaussian Approximation",
+            "Ensemble Averaging",
+            "EDUCATIONAL NOTE - The MRC Format:",
+            "standard for 3D electron microscopy",
+            "1024-byte header",
+        ]
+        self._check_file_contains(self.cryo_em_path, required_notes)

@@ -69,6 +69,7 @@ def calculate_comment_ratio(file_path: str) -> float:
         ("synth_pdb/cofactors.py", 0.79),
         ("synth_pdb/contact.py", 1.33),
         ("synth_pdb/coupling.py", 1.35),
+        ("synth_pdb/cryo_em.py", 0.85),
         ("synth_pdb/data.py", 0.94),
         ("synth_pdb/dataset.py", 0.69),
         ("synth_pdb/decoys.py", 0.65),

@@ -202,6 +202,7 @@ module = [
     "setuptools",
     "pynmrstar",
     "sklearn.*",
+    "mrcfile",
 ]
 ignore_missing_imports = true
 

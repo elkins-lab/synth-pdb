@@ -255,14 +255,27 @@ def main() -> None:
         help="Retain explicit water (HOH) molecules in the final PDB. Default is to strip them.",
     )
 
+    # Phase 17: Cryo-EM Density Maps
+    parser.add_argument(
+        "--resolution",
+        type=float,
+        default=3.0,
+        help="Target resolution (Angstroms) for Cryo-EM density maps (for --mode cryo-em). Default 3.0Å.",
+    )
+    parser.add_argument(
+        "--mrc-output",
+        type=str,
+        help="Optional: Output MRC/CCP4 filename for Cryo-EM maps.",
+    )
+
     # Phase 3: Research Utilities Arguments
     # Using 'mode' argument to distinguish workflows without breaking BC (default is 'generate')
     parser.add_argument(
         "--mode",
         type=str,
         default="generate",
-        choices=["generate", "decoys", "docking", "pymol", "dataset", "ai"],
-        help="Operation mode: 'generate' (default) single structure, 'decoys' ensemble, 'docking' preparation (PQR), 'pymol' visualization script, 'dataset' bulk generation, 'ai' structure interpolation/clustering.",
+        choices=["generate", "decoys", "docking", "pymol", "dataset", "ai", "cryo-em"],
+        help="Operation mode: 'generate' (default) single structure, 'decoys' ensemble, 'docking' preparation (PQR), 'pymol' visualization script, 'dataset' bulk generation, 'ai' structure interpolation/clustering, 'cryo-em' density map generation.",
     )
     parser.add_argument(
         "--n-decoys",
@@ -869,6 +882,55 @@ def main() -> None:
         else:
             logger.error("AI mode requires --ai-op {interpolate, cluster}.")
             sys.exit(1)
+
+    if args.mode == "cryo-em":
+        from .batch_generator import BatchedGenerator
+        from .cryo_em import generate_density_map, save_mrc_file
+
+        if not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("Cryo-EM simulation requires --sequence or a positive --length.")
+            sys.exit(1)
+
+        # Resolve target sequence string
+        target_sequence = args.sequence
+        if not target_sequence:
+            import random
+
+            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+
+            rng = random.Random(args.seed)
+            three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+
+            if args.plausible_frequencies:
+                residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
+                weights = list(AMINO_ACID_FREQUENCIES.values())
+                chosen_3 = rng.choices(residues_3, weights=weights, k=args.length)
+                target_sequence = "".join([three_to_one[r] for r in chosen_3])
+            else:
+                residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
+                target_sequence = "".join(rng.choices(residues_1, k=args.length))
+
+        logger.info(f"Generating Cryo-EM ensemble for sequence: {target_sequence}")
+
+        # 1. Generate Ensemble (using BatchedGenerator for performance)
+        # We use full_atom=True to include all heavy atoms in the density
+        bg = BatchedGenerator(target_sequence, n_batch=args.n_decoys, full_atom=True)
+        batch = bg.generate_batch(drift=args.drift or 3.0, seed=args.seed)
+
+        # 2. Convert to Biotite Stack
+        stack = batch.to_stack()
+
+        # 3. Simulate Density Map
+        try:
+            density, origin = generate_density_map(stack, resolution=args.resolution)
+            out_file = args.mrc_output or "synthetic_density.mrc"
+            save_mrc_file(out_file, density, origin)
+            logger.info(f"Cryo-EM simulation complete. Map saved to {out_file}")
+        except Exception as e:
+            logger.error(f"Cryo-EM simulation failed: {e}")
+            sys.exit(1)
+
+        return
 
     length_for_generator = args.length if args.sequence is None else None
 

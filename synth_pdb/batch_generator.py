@@ -131,6 +131,41 @@ class BatchedPeptide:
         with open(path, "w") as f:
             f.write(self.to_pdb(index))
 
+    def to_stack(self) -> struc.AtomArrayStack:
+        """Converts the batch coordinate tensor into a Biotite AtomArrayStack.
+
+        Returns:
+            A :class:`biotite.structure.AtomArrayStack` containing all structures.
+        """
+        import biotite.structure as struc
+
+        # Create a stack with B models and N atoms
+        stack = struc.AtomArrayStack(self.n_structures, self.n_atoms)
+
+        # Set coordinates directly (vectorized)
+        stack.coord = self.coords
+
+        # Set metadata for all models simultaneously
+        stack.atom_name = np.array(self.atom_names)
+        stack.res_id = np.array(self.residue_indices)
+        stack.chain_id = np.array(self.atom_chain_ids)
+
+        # Biotite requires res_name to be an array of size N
+        # We need to map residue_indices back to sequence
+        res_names = []
+        for ridx in self.residue_indices:
+            res_names.append(self.sequence[ridx - 1])
+        stack.res_name = np.array(res_names)
+
+        # Basic element derivation
+        elements = []
+        for name in self.atom_names:
+            match = re.search(r"[A-Z]", name.strip())
+            elements.append(match.group(0) if match else "C")
+        stack.element = np.array(elements)
+
+        return stack
+
     def to_pdb(self, index: int = 0) -> str:
         """Converts one structure in the batch to a PDB string.
 
