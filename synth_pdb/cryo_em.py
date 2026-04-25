@@ -6,7 +6,13 @@ import logging
 from typing import Tuple, Union
 
 import biotite.structure as struc
-import mrcfile  # type: ignore[import-untyped]
+
+try:
+    import mrcfile  # type: ignore[import-untyped]
+
+    HAS_MRCFILE = True
+except ImportError:
+    HAS_MRCFILE = False
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
@@ -126,6 +132,12 @@ def save_mrc_file(
     - XLEN, YLEN, ZLEN: Physical size of the box in Angstroms.
     - MAPC, MAPR, MAPS: Mapping of array axes to physical axes (usually 1,2,3).
     """
+    if not HAS_MRCFILE:
+        raise ImportError(
+            "mrcfile is not installed. Please install it with `pip install mrcfile` "
+            "to save MRC files."
+        )
+
     with mrcfile.new(path, overwrite=True) as mrc:
         # MRC files expect float32
         mrc.set_data(density.astype(np.float32))

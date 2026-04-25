@@ -7,6 +7,14 @@ import pytest
 
 from synth_pdb.cryo_em import CryoEMSimulator, generate_density_map, save_mrc_file
 
+try:
+    import mrcfile
+
+    HAS_MRCFILE = True
+    del mrcfile
+except ImportError:
+    HAS_MRCFILE = False
+
 
 def test_generate_density_map_shape() -> None:
     """Verify that the generated density map has the correct shape and origin."""
@@ -42,6 +50,7 @@ def test_generate_density_from_stack() -> None:
     assert density[6, 6, 6] > 0
 
 
+@pytest.mark.skipif(not HAS_MRCFILE, reason="mrcfile not installed")
 def test_save_mrc_file(tmp_path: Any) -> None:
     """Verify that MRC files can be saved and re-read."""
     import mrcfile
