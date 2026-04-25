@@ -48,11 +48,14 @@ def position_atom_3d_from_internal_coords(
     v1 = p1_64 - p2_64  # Vector from P2 to P1
     v2 = p3_64 - p2_64  # Vector from P2 to P3
 
-    u2 = v2 / np.linalg.norm(v2)
+    # Use small epsilon to avoid division by zero
+    norm_v2 = np.linalg.norm(v2)
+    u2 = v2 / (norm_v2 + 1e-10)
 
     # n: Normal to plane P1-P2-P3
     n = np.cross(v1, u2)
-    n /= np.linalg.norm(n)
+    norm_n = np.linalg.norm(n)
+    n /= norm_n + 1e-10
 
     # m: In-plane perpendicular vector (TRANS direction)
     m = np.cross(n, u2)
