@@ -190,6 +190,11 @@ def main() -> None:
         help="Optional: Path to an NMR NOE restraint file (.nef or .restraints) for RPF validation.",
     )
     parser.add_argument(
+        "--bmrb-id",
+        type=str,
+        help="Optional: BMRB ID to fetch experimental NOE restraints for validation.",
+    )
+    parser.add_argument(
         "--rdc-restraints",
         type=str,
         help="Optional: Path to an NMR RDC restraint file for Q-factor validation.",
@@ -198,6 +203,11 @@ def main() -> None:
         "--shift-restraints",
         type=str,
         help="Optional: Path to a chemical shift restraint file for validation.",
+    )
+    parser.add_argument(
+        "--scorecard",
+        action="store_true",
+        help="Generate a comprehensive Integrated Scientific Defense Scorecard (Physics + ML + NMR + Interface).",
     )
     parser.add_argument(
         "--visualize",
@@ -576,6 +586,7 @@ def main() -> None:
     # Phase 16: Structure Quality Filter (Random Forest classifier)
     parser.add_argument(
         "--quality-filter",
+        "--include-ml",
         action="store_true",
         help="Enable Random Forest-based structure quality filtering. Rejects structures that score below the cutoff on geometric quality metrics (Ramachandran, clashes, bond lengths).",
     )
@@ -1152,19 +1163,116 @@ def main() -> None:
                     f.write(final_full_pdb_content_to_write)
                 logger.info("Successfully generated PDB file: %s", os.path.abspath(output_filename))
 
-                # Print final validation report
-                if final_violations:
-                    logger.warning(
-                        f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---"
+                # 1. Unified Scorecard and Validation
+                if args.scorecard or args.validate or final_violations:
+                    # Legacy log messages for existing tests
+                    if final_violations:
+                        logger.warning(
+                            f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---"
+                        )
+                        logger.warning(f"Final PDB has {len(final_violations)} violations.")
+                        for violation in final_violations:
+                            logger.warning(violation)
+                        logger.warning("--- End Validation Report ---")
+                    elif args.validate:
+                        logger.info(
+                            f"No violations found in the final PDB for {os.path.abspath(output_filename)}."
+                        )
+
+                    logger.info("Generating Integrated Scientific Defense Scorecard...")
+
+                    # Fetch NMR restraints if BMRB ID provided
+                    input_nmr_restraints = None
+                    if args.bmrb_id:
+                        from .bmrb_api import BMRBAPI
+
+                        input_nmr_restraints = BMRBAPI.fetch_restraints(args.bmrb_id)
+
+                    validator = PDBValidator(final_full_pdb_content_to_write)
+                    report = validator.get_quality_report(
+                        include_ml=args.quality_filter, nmr_restraints=input_nmr_restraints
                     )
-                    logger.warning(f"Final PDB has {len(final_violations)} violations.")
-                    for violation in final_violations:
-                        logger.warning(violation)
-                    logger.warning("--- End Validation Report ---")
-                elif args.validate:
-                    logger.info(
-                        f"No violations found in the final PDB for {os.path.abspath(output_filename)}."
+
+                    print("\n" + "=" * 60)
+                    print("🛡️  INTEGRATED SCIENTIFIC DEFENSE SCORECARD")
+                    print("=" * 60)
+
+                    # Layer 1: Physics & Geometry
+                    print(f"| {'PHYSICS & GEOMETRY':<35} | {'STATUS':<18} |")
+                    print("-" * 60)
+                    e_status = "✅ PASS" if report["is_physically_plausible"] else "❌ FAIL"
+                    print(
+                        f"| Potential Energy: {report['potential_energy_kj_mol']:>15.1f} kJ/mol | {e_status:<18} |"
                     )
+
+                    z_val = report["geometric_z_scores"]["mean_bond_zscore"]
+                    z_status = "✅ PASS" if z_val < 3.0 else "❌ FAIL"
+                    print(f"| Mean Bond Z-Score: {z_val:>18.2f} | {z_status:<18} |")
+
+                    ram_val = report["ramachandran_stats"]["favored_pct"]
+                    ram_status = "✅ PASS" if ram_val > 90.0 else "⚠️ WARN"
+                    print(f"| Ramachandran Favored: {ram_val:>15.1f}% | {ram_status:<18} |")
+
+                    rot_val = report["rotamer_stats"]["favored_rotamers_pct"]
+                    rot_status = "✅ PASS" if rot_val > 80.0 else "⚠️ WARN"
+                    print(f"| Favored Rotamers: {rot_val:>19.1f}% | {rot_status:<18} |")
+
+                    # Layer 2: Biophysics
+                    print("-" * 60)
+                    print(f"| {'BIOPHYSICAL REALISM':<35} | {'STATUS':<18} |")
+                    print("-" * 60)
+                    b_status = "✅ PASS" if report["is_biophysically_plausible"] else "❌ FAIL"
+                    print(
+                        f"| Hydrophobic Burial Ratio: {report['hydrophobic_burial_ratio']:>11.2f} | {b_status:<18} |"
+                    )
+
+                    # Layer 3: NMR (if applicable)
+                    if "nmr_stats" in report:
+                        print("-" * 60)
+                        print(f"| {'NMR SPECTROSCOPIC FIDELITY':<35} | {'STATUS':<18} |")
+                        print("-" * 60)
+                        nmr = report["nmr_stats"]
+                        n_status = "✅ PASS" if nmr["noe_satisfaction_pct"] >= 90.0 else "❌ FAIL"
+                        print(
+                            f"| NOE Satisfaction: {nmr['noe_satisfaction_pct']:>19.1f}% | {n_status:<18} |"
+                        )
+
+                    # Layer 4: AI/ML (if applicable)
+                    if "ml_score" in report:
+                        print("-" * 60)
+                        print(f"| {'AI/GNN QUALITY FILTER':<35} | {'STATUS':<18} |")
+                        print("-" * 60)
+                        ml_status = "✅ PASS" if report["ml_is_plausible"] else "❌ FAIL"
+                        print(
+                            f"| ML Confidence Score: {report['ml_score']:>17.2f} | {ml_status:<18} |"
+                        )
+
+                    # Layer 5: Interface (if multi-chain)
+                    if "interface_metrics" in report:
+                        print("-" * 60)
+                        print(f"| {'STRUCTURAL INTERACTOME (BSA)':<35} | {'STATUS':<18} |")
+                        print("-" * 60)
+                        int_m = report["interface_metrics"]
+                        i_status = (
+                            "✅ PASS" if int_m["is_interface_physically_plausible"] else "❌ FAIL"
+                        )
+                        print(
+                            f"| Buried Surface Area: {int_m['buried_surface_area']:>15.1f} Å² | {i_status:<18} |"
+                        )
+
+                    print("=" * 60)
+                    final_def = report["is_overall_scientifically_defensible"]
+                    overall_status = (
+                        "✅ SCIENTIFICALLY DEFENSIBLE" if final_def else "❌ NOT DEFENSIBLE"
+                    )
+                    print(f"| OVERALL: {overall_status:^47} |")
+                    print("=" * 60 + "\n")
+
+                    if not final_def:
+                        v_count = report.get("violation_count", 0)
+                        logger.warning(f"Structure has {v_count} total violations.")
+                        for violation in report.get("detailed_violations", [])[:5]:
+                            logger.warning(f"  - {violation}")
 
                 # Phase 7, 8, & 9 + 10: Synthetic NMR Data & Exports
                 # We perform calculations first, so we can capture data (like restraints) for visualization if needed.

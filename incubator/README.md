@@ -148,6 +148,15 @@ This document serves as a roadmap and brainstorming space for experimental, high
 
 ---
 
+## 🔄 16. The "Digital Twin" NMR Refiner
+**The Vision:** Create an autonomous refinement engine that uses the "Scientific Defense Scorecard" as a fitness function to optimize protein ensembles.
+
+*   **The Scientific Gap:** NMR structure refinement is traditionally a manual, iterative process. Researchers must balance competing forces (NOEs, RDCs, forcefields) to find a set of conformations that satisfy all data. There is no lightweight, "self-driving" tool for this.
+*   **The `synth-pdb` Angle:** Since we now have a unified Scorecard that integrates Physics, NMR, and AI (GNN) judges, we can use it as the objective function for a Metropolis-Hastings or Genetic Algorithm sampler. The engine would "drift" and "tweak" the ensemble, discarding structures that fail any scorecard judge, until a "Digital Twin" ensemble—one that perfectly matches the experimental profile—is achieved.
+*   **Current Status:** 💡 Concept Stage.
+
+---
+
 ## 📝 How to Contribute an Exploration
 1.  **Draft a Vision**: Define the "What If?".
 2.  **Define the Gap**: Why can't traditional tools do this easily?
