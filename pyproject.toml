@@ -199,6 +199,7 @@ module = [
     "transformers.*",
     "setuptools",
     "pynmrstar",
+    "sklearn.*",
 ]
 ignore_missing_imports = true
 
