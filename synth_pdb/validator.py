@@ -457,16 +457,20 @@ class PDBValidator:
 
         return {"favored_rotamers_pct": favored_pct, "outlier_count": len(outliers)}
 
-    def get_quality_report(self) -> Dict[str, Any]:
+    def get_quality_report(
+        self, include_ml: bool = False, nmr_restraints: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
         """Generates a comprehensive, evidence-based quality assessment.
 
         SCIENTIFIC BASIS:
-        A scientifically defensible model must satisfy four criteria:
+        A scientifically defensible model must satisfy several criteria:
         1. Local Geometry: Z-scores within Engh & Huber (1991) limits.
         2. Backbone Conformation: Phi/Psi in Top2018 favored regions.
         3. Global Physics: Low potential energy (no steric overlaps).
         4. Biophysics: Hydrophobic residues should be buried (SASA).
         5. Sidechains: Rotamers consistent with Dunbrack PDB statistics.
+        6. NMR Fidelity (Optional): Satisfaction of experimental NOE restraints.
+        7. ML Plausibility (Optional): High-confidence prediction by quality filter.
 
         Returns:
             A dictionary containing metrics and a plausibility flag.
@@ -482,14 +486,39 @@ class PDBValidator:
             self.validate_ramachandran()
             self.validate_side_chain_rotamers()
 
+        # 6. NMR Restraints (if provided)
+        nmr_stats = {}
+        if nmr_restraints:
+            pre_nmr_violations = len(self.violations)
+            self.validate_distance_restraints(nmr_restraints)
+            nmr_violations = len(self.violations) - pre_nmr_violations
+            satisfaction = (1.0 - (nmr_violations / len(nmr_restraints))) * 100.0
+            nmr_stats = {
+                "noe_satisfaction_pct": satisfaction,
+                "noe_violation_count": nmr_violations,
+                "total_restraints": len(nmr_restraints),
+            }
+
+        # 7. ML Classifier (if requested)
+        ml_stats: Dict[str, Any] = {}
+        if include_ml:
+            from .quality.classifier import ProteinQualityClassifier
+
+            clf = ProteinQualityClassifier()
+            if clf.model is not None:
+                is_good, prob, _ = clf.predict(self.pdb_content)
+                ml_stats = {"ml_is_plausible": bool(is_good), "ml_score": float(prob)}
+
+        # 8. Interface Metrics (if multichain)
+        interface_metrics = {}
+        if len(self.grouped_atoms) > 1:
+            interface_metrics = self.calculate_interface_metrics()
+
         z_scores = self.get_geometric_z_scores()
         rotamers = self.get_rotamer_quality_report()
 
         # AGGRESSIVE SCIENTIFIC DEFENSE:
-        # A model is defensible ONLY if:
-        # 1. Bond Z-score < 3.0 (No impossible stretches)
-        # 2. Favored Rotamers > 80% (Natural packing)
-        # 3. Overall PLOT defense from previous implemented logic
+        # A model is defensible ONLY if it passes physics AND (if provided) AI/NMR judges.
         is_plausible = (
             z_scores["mean_bond_zscore"] < 3.0
             and rotamers["favored_rotamers_pct"] > 80.0
@@ -498,7 +527,18 @@ class PDBValidator:
             and sasa["burial_ratio"] >= 0.8
         )
 
-        return {
+        if include_ml and ml_stats:
+            is_plausible = is_plausible and ml_stats.get("ml_is_plausible", False)
+
+        if nmr_restraints:
+            is_plausible = is_plausible and nmr_stats.get("noe_satisfaction_pct", 0.0) >= 90.0
+
+        if interface_metrics:
+            is_plausible = is_plausible and interface_metrics.get(
+                "is_interface_physically_plausible", True
+            )
+
+        report = {
             "potential_energy_kj_mol": energy,
             "ramachandran_stats": ramachandran,
             "geometric_z_scores": z_scores,
@@ -510,6 +550,15 @@ class PDBValidator:
             "is_overall_scientifically_defensible": is_plausible,
             "detailed_violations": self.violations[:10],
         }
+
+        if ml_stats:
+            report.update(ml_stats)
+        if nmr_stats:
+            report["nmr_stats"] = nmr_stats
+        if interface_metrics:
+            report["interface_metrics"] = interface_metrics
+
+        return report
 
     def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
         """Extracts the amino acid sequences (list of 3-letter codes) for each chain."""
