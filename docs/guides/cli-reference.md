@@ -72,10 +72,28 @@ python -m synth_pdb.main --sequence "ALA-GLY-SER-THR-VAL" --output test.pdb
 
 -   `generate`: (Default) Generate a single structure.
 -   `decoys`: Generate an ensemble of structures (decoys).
--   `docking`: Prepare structures for docking (PQR format).
+-   `cryo-em`: Generate 3D density maps (MRC format) from structures or ensembles.
+-   `saxs`: Simulate Small-Angle X-ray Scattering (SAXS) profiles.
+-   `docking`: Prepare structures for docking (PQR format, charge assignment).
 -   `pymol`: Generate PyMOL scripts for visualization.
 -   `dataset`: Bulk generation for machine learning datasets.
 -   `ai`: Structure interpolation and clustering.
+
+### Cryo-EM Mode Options
+
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `--resolution` | Target resolution in Angstroms (Å). | 3.0 |
+| `--grid-spacing` | Voxel size in Angstroms (Å). | 1.0 |
+| `--mrc-output` | Filename for the output density map. | `synthetic_map.mrc` |
+
+### SAXS Mode Options
+
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `--q-max` | Maximum scattering vector $q$ (Å⁻¹). | 0.5 |
+| `--saxs-points` | Number of points in the $I(q)$ curve. | 51 |
+| `--saxs-output` | Filename for the output `.dat` file. | `synthetic_saxs.dat` |
 
 ### AI Mode Options
 

@@ -78,6 +78,92 @@ Welcome to the synth-pdb API reference. This section provides detailed documenta
 
     [:octicons-arrow-right-24: View docs](biophysics.md)
 
+-   :material-magnify:{ .lg .middle } __cryo_em__
+
+    ---
+
+    Synthetic Cryo-EM density map generation (MRC)
+
+    [:octicons-arrow-right-24: View docs](cryo_em.md)
+
+-   :material-sine-wave:{ .lg .middle } __saxs__
+
+    ---
+
+    Small-Angle X-ray Scattering simulation
+
+    [:octicons-arrow-right-24: View docs](saxs.md)
+
+-   :material-link-variant:{ .lg .middle } __docking__
+
+    ---
+
+    Docking prep (PQR format, charge assignment)
+
+    [:octicons-arrow-right-24: View docs](docking.md)
+
+-   :material-plus-circle-outline:{ .lg .middle } __cofactors__
+
+    ---
+
+    Inorganic coordination (Zinc fingers, metal binding)
+
+    [:octicons-arrow-right-24: View docs](cofactors.md)
+
+-   :material-auto-fix:{ .lg .middle } __special_chemistry__
+
+    ---
+
+    PTMs and GFP chromophore maturation
+
+    [:octicons-arrow-right-24: View docs](special_chemistry.md)
+
+</div>
+
+### Analysis & Export
+
+<div class="grid cards" markdown>
+
+-   :material-chart-line:{ .lg .middle } __analysis__
+
+    ---
+
+    RMSD, ensemble medoids, and geometric strain
+
+    [:octicons-arrow-right-24: View docs](analysis.md)
+
+-   :material-export:{ .lg .middle } __export__
+
+    ---
+
+    CASP RR and CSV export for AI/ML modeling
+
+    [:octicons-arrow-right-24: View docs](export.md)
+
+-   :material-api:{ .lg .middle } __bmrb_api__
+
+    ---
+
+    Programmatic fetching of BMRB and PDB data
+
+    [:octicons-arrow-right-24: View docs](bmrb_api.md)
+
+-   :material-toy-brick-outline:{ .lg .middle } __packing__
+
+    ---
+
+    Monte Carlo side-chain packing engine
+
+    [:octicons-arrow-right-24: View docs](packing.md)
+
+-   :material-star-outline:{ .lg .middle } __scoring__
+
+    ---
+
+    Biophysical quality scores (Clashes, Density)
+
+    [:octicons-arrow-right-24: View docs](scoring.md)
+
 </div>
 
 ### Utilities
@@ -107,6 +193,14 @@ Welcome to the synth-pdb API reference. This section provides detailed documenta
     Bulk dataset generation and export (NPZ, HDF5)
 
     [:octicons-arrow-right-24: View docs](dataset.md)
+
+-   :material-rotate-3d:{ .lg .middle } __torsion__
+
+    ---
+
+    Backbone and side-chain dihedral analysis
+
+    [:octicons-arrow-right-24: View docs](torsion.md)
 
 </div>
 
@@ -160,12 +254,21 @@ synth_pdb/
 ├── relaxation.py         # NMR relaxation rates
 ├── nmr.py                # NOE restraints
 ├── biophysics.py         # pH, salt bridges, PTMs
+├── cryo_em.py            # Cryo-EM map generation
+├── saxs.py               # SAXS profile simulation
+├── docking.py            # Docking and PQR preparation
+├── cofactors.py          # Inorganic coordination
+├── analysis.py           # Structural analysis suite
+├── export.py             # CASP RR and CSV export
+├── bmrb_api.py           # BMRB and PDB data access
+├── packing.py            # Monte Carlo side-chain packing
 ├── batch_generator.py    # Vectorized batch generation
 ├── viewer.py             # 3D visualization
 ├── dataset.py            # Bulk dataset generation
 ├── data.py               # Rotamer libraries, Ramachandran data
 ├── main.py               # CLI entry point
-└── ...                   # Additional utilities
+├── scoring.py            # Biophysical quality scores
+└── torsion.py            # Dihedral angle analysis
 ```
 
 ## Design Philosophy

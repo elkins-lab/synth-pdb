@@ -46,6 +46,13 @@ In the fields of structural biology and bioinformatics, researchers frequently r
 - `--best-of-N`: Generate multiple structures and select the one with fewest violations
 - `--minimize`: Relax structures using OpenMM (Implicit Solvent / AMBER forcefield)
 
+📚 **Interactive Tutorials**
+- [Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb): A complete end-to-end NMR simulation.
+- [BMRB Validation Pipeline](tutorials/bmrb_validation.md): Programmatic validation against experimental data.
+- [IDP Ensemble Validation](tutorials/idp_ensemble_validation.ipynb): Analyzing flexible protein ensembles.
+- [GFP Molecular Forge](tutorials/gfp_molecular_forge.ipynb): Modeling post-translational modifications.
+- [Dataset Factory](tutorials/dataset_factory.ipynb): Building large-scale AI training sets.
+
 ## Quick Visual Demo
 
 Want to see the **Physics + Visualization** capabilities in action?

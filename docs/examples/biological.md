@@ -54,16 +54,20 @@ python -m synth_pdb.main \
   --output cyclic_peptide.pdb
 ```
 
-The `--cyclic` flag ensures that the N-terminal Nitrogen and C-terminal Carbon are bonded, and the minimizer relaxes the structure into a stable cyclic conformation.
+## 5. Green Fluorescent Protein (GFP)
 
-## 4. D-Amino Acid Peptides
+The Green Fluorescent Protein (GFP) contains a unique chromophore formed by the autocatalytic cyclization of a tripeptide motif (Ser65-Tyr66-Gly67).
 
-D-amino acids are often found in bacterial cell walls and specialized peptides. They are "mirror images" of the standard L-amino acids and can impart resistance to proteases.
+`synth-pdb` can model this post-translational modification using the `special_chemistry` module:
 
 ```bash
 python -m synth_pdb.main \
-  --sequence "DAL-GLY-GLY-DPH" \
-  --output d_peptide.pdb
+  --sequence "FEGUFSYGVQCFS" \
+  --conformation alpha \
+  --minimize \
+  --output gfp_fragment.pdb
 ```
 
-`synth-pdb` supports the standard PDB 3-letter codes for D-amino acids (e.g., `DAL` for D-Alanine, `DPH` for D-Phenylalanine).
+**Key Features:**
+-   **Chromophore Maturation**: When an `SYG`, `TYG`, or `GYG` motif is detected, `synth-pdb` can be instructed to form the five-membered heterocyclic ring.
+-   **Covalent Modeling**: The resulting PDB file contains the matured chromophore with the correct covalent connectivity.

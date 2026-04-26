@@ -287,6 +287,61 @@ synth-pdb --mode decoys \
 
 ---
 
+---
+
+## Multimodal Observables
+
+### Cryo-EM Density Maps
+
+Generate 3D density volumes at a specific resolution.
+
+```bash
+synth-pdb --mode cryo-em \
+    --sequence "MEELQK" \
+    --resolution 4.0 \
+    --output synthetic_map.mrc
+```
+
+**Scientific Context**:
+- Simulates electron density at different resolutions (3.0Å - 10Å).
+- Essential for testing map-to-model fitting algorithms.
+- Supports ensemble averaging for flexible proteins.
+
+---
+
+### SAXS Profiles
+
+Simulate Small-Angle X-ray Scattering solution data.
+
+```bash
+synth-pdb --mode saxs \
+    --sequence "NSDSECPLSHDGYCLHDGVCMYIEALDKY" \
+    --q-max 0.4 \
+    --output protein_saxs.dat
+```
+
+**Scientific Context**:
+- Uses the Debye formula to compute $I(q)$ vs $q$.
+- Probes the global shape and "compactness" of a protein.
+- Includes solvent subtraction (hydration shell) effects.
+
+---
+
+### Docking Preparation
+
+Convert PDB to PQR for electrostatic and docking software.
+
+```bash
+synth-pdb --mode docking \
+    --sequence "ACDEFGHIK" \
+    --output ready_for_docking.pqr
+```
+
+**Scientific Context**:
+- Assigns partial charges and Van der Waals radii.
+- Uses OpenMM and AMBER forcefields for parameterization.
+- Standard input for APBS and many protein-ligand docking engines.
+
 ## Next Steps
 
 - [Biologically-Inspired Examples](biological.md) - More detailed biological examples
