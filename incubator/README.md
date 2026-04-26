@@ -79,7 +79,17 @@ This document serves as a roadmap and brainstorming space for experimental, high
 *   **The Scientific Gap:** SAXS is the only technique that measures IDPs and large complexes in solution at near-physiological conditions — but software validation requires structures whose SAXS curve is "known". Experimental SAXS always has instrument noise; synthetic curves from exact coordinates would be perfectly clean.
 *   **The `synth-pdb` Angle:** A SAXS curve is computed from inter-atomic distances using the Debye formula, which is a direct function of `distogram.calculate_distogram()`. The IDP ensemble machinery already computes pairwise distances. Adding the Debye summation is a tractable extension of existing code with no new dependencies.
 *   **Connects To:** Incubator ideas #2 (IDP ensembles) and #1 (Cryo-EM standard candles) — SAXS curves are used alongside both techniques for cross-validation.
-*   **Current Status:** 💡 Concept Stage. Blocked only on implementing the Debye equation summation (~50 lines of NumPy).
+*   **Current Status:** ✅ Graduated (See `synth_pdb/saxs.py` and `scripts/build_multimodal_dataset.py`).
+
+---
+
+## 🏗️ 16. High-Performance Multi-Modal Dataset Builder
+**The Vision:** Consolidate PDB generation, Cryo-EM simulation, SAXS curves, and NMR observables into a single high-throughput "Dataset Factory" for AI training.
+
+*   **The Scientific Gap:** Modern deep learning models (RoseTTAFold-All-Atom, CryoCloud) require massive, synchronized datasets. Manually running multiple simulation packages for every structure is a major bottleneck.
+*   **The `synth-pdb` Angle:** Our vectorized `BatchedGenerator` combined with the new `cryo_em` and `saxs` modules can generate thousands of labeled, multi-modal data points in minutes. A single command produces a research-ready directory with 3D volumes, 1D curves, and 2D tables, all linked by a master metadata CSV.
+*   **Graduation Path:** `scripts/build_multimodal_dataset.py` is the reference implementation for this factory.
+*   **Current Status:** ✅ Graduated (See `scripts/build_multimodal_dataset.py`).
 
 ---
 
