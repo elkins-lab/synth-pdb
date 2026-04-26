@@ -49,7 +49,7 @@ In the fields of structural biology and bioinformatics, researchers frequently r
 📚 **Interactive Tutorials**
 - [Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb): A complete end-to-end NMR simulation.
 - [Cryo-EM & SAXS Lab](tutorials/cryo_em_saxs_lab.ipynb): Visualizing resolution and conformational heterogeneity.
-- [BMRB Validation Pipeline](tutorials/bmrb_validation.md): Programmatic validation against experimental data.
+- [BMRB Validation Pipeline](tutorials/bmrb_validation.ipynb): Programmatic validation against experimental data.
 - [IDP Ensemble Validation](tutorials/idp_ensemble_validation.ipynb): Analyzing flexible protein ensembles.
 - [GFP Molecular Forge](tutorials/gfp_molecular_forge.ipynb): Modeling post-translational modifications.
 - [Dataset Factory](tutorials/dataset_factory.ipynb): Building large-scale AI training sets.
