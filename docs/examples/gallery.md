@@ -291,6 +291,8 @@ synth-pdb --mode decoys \
 
 ## Multimodal Observables
 
+Simulate integrated data from multiple structural biology techniques. For a hands-on demonstration, see the [Cryo-EM & SAXS Lab](../tutorials/cryo_em_saxs_lab.ipynb).
+
 ### Cryo-EM Density Maps
 
 Generate 3D density volumes at a specific resolution.
