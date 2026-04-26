@@ -2,7 +2,7 @@
 Vectorized geometry operations for high-performance batch processing.
 """
 
-from typing import Tuple, cast
+from typing import cast
 
 import numpy as np
 
@@ -19,7 +19,8 @@ import numpy as np
 # 3. Efficiency: By avoiding the Python interpreter loop for each structure, we
 #    reach throughput levels required for "Foundation Model" training in proteomics.
 
-def superimpose_batch(sources: np.ndarray, targets: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+
+def superimpose_batch(sources: np.ndarray, targets: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Vectorized Kabsch algorithm to find the optimal rotation and translation
     that aligns a batch of source point sets to target point sets.
 

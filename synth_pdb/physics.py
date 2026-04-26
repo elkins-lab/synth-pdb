@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 try:
     import openmm as mm
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # Global cache for ForceField objects to prevent memory leaks and speed up initialization.
 # Loading XML forcefield files repeatedly is expensive and can accumulate memory.
-_FORCEFIELD_CACHE: Dict[Tuple[str, ...], "app.ForceField"] = {}
+_FORCEFIELD_CACHE: dict[tuple[str, ...], "app.ForceField"] = {}
 
 
 class EnergyMinimizer:
@@ -189,8 +189,8 @@ class EnergyMinimizer:
         max_iterations: int = 0,
         tolerance: float = 10.0,
         cyclic: bool = False,
-        disulfides: Optional[List] = None,
-        coordination: Optional[List] = None,
+        disulfides: list | None = None,
+        coordination: list | None = None,
     ) -> bool:
         """Run energy minimization to regularize geometry and resolve clashes.
 
@@ -268,8 +268,8 @@ class EnergyMinimizer:
         output_path: str,
         steps: int = 1000,
         cyclic: bool = False,
-        disulfides: Optional[List] = None,
-        coordination: Optional[List] = None,
+        disulfides: list | None = None,
+        coordination: list | None = None,
     ) -> bool:
         """Run Thermal Equilibration (MD) at 300K.
 
@@ -320,8 +320,8 @@ class EnergyMinimizer:
         max_iterations: int = 0,
         tolerance: float = 10.0,
         cyclic: bool = False,
-        disulfides: Optional[List] = None,
-        coordination: Optional[List] = None,
+        disulfides: list | None = None,
+        coordination: list | None = None,
     ) -> bool:
         """Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
 
@@ -364,9 +364,7 @@ class EnergyMinimizer:
         )
         return res is not None
 
-    def calculate_energy(
-        self, input_data: Union[str, Any], cyclic: bool = False
-    ) -> Optional[float]:
+    def calculate_energy(self, input_data: str | Any, cyclic: bool = False) -> float | None:
         """Calculates the potential energy of a structure.
 
         Args:
@@ -422,8 +420,8 @@ class EnergyMinimizer:
                     pass
 
     def _create_system_robust(
-        self, topology: Any, constraints: Any, modeller: Optional[Any] = None
-    ) -> Tuple[Any, Any, Any]:
+        self, topology: Any, constraints: Any, modeller: Any | None = None
+    ) -> tuple[Any, Any, Any]:
         """Creates an OpenMM system, with robust fallbacks for template mismatches
         and incompatible forcefield arguments. Returns (system, topology, positions).
         """
@@ -456,7 +454,7 @@ class EnergyMinimizer:
                             )
                             self._suppressed_args.add(arg)
                             del kwargs[arg]
-                            return cast(Tuple[Any, Any, Any], _try_create(topo, **kwargs))
+                            return cast(tuple[Any, Any, Any], _try_create(topo, **kwargs))
 
                 # Fallback 2: Template mismatch (Hydrogen issues)
                 if "No template found" in msg and modeller is not None:
@@ -475,14 +473,14 @@ class EnergyMinimizer:
                         modeller.addHydrogens(self.forcefield)
                         current_topo = modeller.topology
                         current_pos = modeller.positions
-                        return cast(Tuple[Any, Any, Any], _try_create(current_topo, **kwargs))
+                        return cast(tuple[Any, Any, Any], _try_create(current_topo, **kwargs))
                     except Exception as repair_e:
                         logger.warning(f"Repair failed: {repair_e}")
 
                 raise e
 
         try:
-            return cast(Tuple[Any, Any, Any], _try_create(current_topo, **sys_kwargs))
+            return cast(tuple[Any, Any, Any], _try_create(current_topo, **sys_kwargs))
         except Exception as final_e:
             logger.warning(
                 f"Robust system creation failed, final fallback to no constraints: {final_e}"
@@ -493,8 +491,8 @@ class EnergyMinimizer:
             return (sys, current_topo, current_pos)
 
     def _preprocess_pdb_for_simulation(
-        self, input_path: str, cyclic: bool, disulfides_param: Optional[List]
-    ) -> Tuple[Any, Any, List[str], Dict[Any, Any]]:
+        self, input_path: str, cyclic: bool, disulfides_param: list | None
+    ) -> tuple[Any, Any, list[str], dict[Any, Any]]:
         """Load and sanitize the input PDB for OpenMM; return OpenMM topology/positions.
 
         Performs PTM residue renaming (SEP→SER, etc.), HETATM ion stripping,
@@ -709,9 +707,9 @@ class EnergyMinimizer:
         positions: Any,
         add_hydrogens: bool,
         cyclic: bool,
-        coordination_param: Optional[List],
-        atom_list: List[Any],
-    ) -> Tuple[Any, List, List, List, List[Any]]:
+        coordination_param: list | None,
+        atom_list: list[Any],
+    ) -> tuple[Any, list, list, list, list[Any]]:
         """Build the OpenMM Modeller, apply H handling, detect disulfides and salt bridges.
 
         Steps:
@@ -1029,12 +1027,12 @@ class EnergyMinimizer:
         self,
         modeller: Any,
         cyclic: bool,
-        added_bonds: List,
-        salt_bridge_restraints: List,
-        coordination_restraints: List,
-        atom_list: List[Any],
-        positions: Optional[Any] = None,
-    ) -> Tuple[Any, Any, Any, int, int, Any, Any]:
+        added_bonds: list,
+        salt_bridge_restraints: list,
+        coordination_restraints: list,
+        atom_list: list[Any],
+        positions: Any | None = None,
+    ) -> tuple[Any, Any, Any, int, int, Any, Any]:
         """Create OpenMM System + Simulation, apply forces, return context objects.
 
         Wraps system creation (implicit/explicit solvent), cyclic terminal
@@ -1379,12 +1377,12 @@ class EnergyMinimizer:
         output_path: str,
         simulation: Any,
         cyclic: bool,
-        added_bonds: List,
-        coordination_restraints: List,
-        hetatm_lines: List[str],
-        original_metadata: Dict[Any, Any],
-        atom_list: List[Any],
-    ) -> Optional[bool]:
+        added_bonds: list,
+        coordination_restraints: list,
+        hetatm_lines: list[str],
+        original_metadata: dict[Any, Any],
+        atom_list: list[Any],
+    ) -> bool | None:
         """Write the post-simulation structure to *output_path*.
 
         Handles macrocycle terminal-atom cleanup, restores original residue
@@ -1592,9 +1590,9 @@ class EnergyMinimizer:
         add_hydrogens: bool = True,
         equilibration_steps: int = 0,
         cyclic: bool = False,
-        disulfides: Optional[List] = None,
-        coordination: Optional[List] = None,
-    ) -> Optional[float]:
+        disulfides: list | None = None,
+        coordination: list | None = None,
+    ) -> float | None:
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
 
@@ -1844,7 +1842,7 @@ def simulate_trajectory(
     temperature_kelvin: float = 300.0,
     steps: int = 1000,
     report_interval: int = 20,
-) -> List[str]:
+) -> list[str]:
     """Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
 
     Args:

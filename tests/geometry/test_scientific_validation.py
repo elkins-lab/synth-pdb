@@ -17,6 +17,7 @@ def random_coords():
     np.random.seed(42)
     return np.random.rand(10, 3).astype(np.float64)
 
+
 @pytest.fixture
 def random_transformation():
     """Generate a random rotation and translation."""
@@ -28,6 +29,7 @@ def random_transformation():
         rotation[:, 0] *= -1
     translation = np.random.rand(3)
     return rotation, translation
+
 
 def test_dihedral_scientific_agreement(random_coords):
     """Verify dihedral calculation matches Biotite's implementation."""
@@ -44,6 +46,7 @@ def test_dihedral_scientific_agreement(random_coords):
     # Numerical differences are around 1e-5, which is negligible for protein geometry.
     assert pytest.approx(diff, abs=1e-4) == 0.0
 
+
 def test_rmsd_scientific_agreement(random_coords, random_transformation):
     """Verify RMSD calculation matches Biotite's implementation."""
     rot, trans = random_transformation
@@ -55,9 +58,10 @@ def test_rmsd_scientific_agreement(random_coords, random_transformation):
     # Biotite
     # Biotite's rmsd function expects AtomArray or AtomArrayStack
     # We use the raw formula for validation since Biotite's rmsd is a wrapper
-    biotite_rmsd = np.sqrt(np.mean(np.sum((random_coords - coords2)**2, axis=1)))
+    biotite_rmsd = np.sqrt(np.mean(np.sum((random_coords - coords2) ** 2, axis=1)))
 
     assert pytest.approx(our_rmsd, abs=1e-10) == biotite_rmsd
+
 
 def test_superposition_scientific_agreement(random_coords, random_transformation):
     """Verify optimal superposition matches Biotite's Kabsch implementation."""
@@ -85,14 +89,15 @@ def test_superposition_scientific_agreement(random_coords, random_transformation
     # The actual value might be 1e-7 vs 1e-16 depending on numerical details
     # but both represent a "perfect" fit for structural biology purposes.
     assert rmsd_our < 1e-10
-    assert rmsd_biotite < 1e-6 # Biotite's default might be slightly less precise
+    assert rmsd_biotite < 1e-6  # Biotite's default might be slightly less precise
+
 
 def test_kabsch_reflection_correction():
     """Verify reflection correction logic prevents improper rotations."""
     # A set of points and its mirror image
     P = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 1]])
     Q = P.copy()
-    Q[:, 2] *= -1 # Reflection across Z-plane
+    Q[:, 2] *= -1  # Reflection across Z-plane
 
     R, t = kabsch_superposition(P, Q)
 

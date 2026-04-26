@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -35,13 +35,13 @@ class PDBValidator:
     and Ramachandran angles.
     """
 
-    atoms: List[Dict[str, Any]]
-    grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]]
-    sequences_by_chain: Dict[str, List[str]]
-    violations: List[str]
+    atoms: list[dict[str, Any]]
+    grouped_atoms: dict[str, dict[int, dict[str, dict[str, Any]]]]
+    sequences_by_chain: dict[str, list[str]]
+    violations: list[str]
 
     def __init__(
-        self, pdb_content: Optional[str] = None, parsed_atoms: Optional[List[Dict[str, Any]]] = None
+        self, pdb_content: str | None = None, parsed_atoms: list[dict[str, Any]] | None = None
     ) -> None:
         if pdb_content:
             self.pdb_content = pdb_content
@@ -63,7 +63,7 @@ class PDBValidator:
         self.violations = []  # Stores detected violations
 
     @staticmethod
-    def _parse_pdb_atoms(pdb_content: str) -> List[Dict[str, Any]]:
+    def _parse_pdb_atoms(pdb_content: str) -> list[dict[str, Any]]:
         """Parses the PDB content and extracts atom information, specifically coordinates.
 
         EDUCATIONAL NOTE - Physics of the Ramachandran Plot:
@@ -127,18 +127,18 @@ class PDBValidator:
                     logger.warning(f"Could not parse PDB ATOM/HETATM line: {line.strip()} - {e}")
         return parsed_atoms
 
-    def get_atoms(self) -> List[Dict[str, Any]]:
+    def get_atoms(self) -> list[dict[str, Any]]:
         """Returns a deep copy of the parsed atom data."""
         # Return a deep copy to allow external modification without affecting internal state directly
         return [atom.copy() for atom in self.atoms]
 
-    def set_atoms(self, atoms: List[Dict[str, Any]]) -> None:
+    def set_atoms(self, atoms: list[dict[str, Any]]) -> None:
         """Updates the internal atom list and refreshes all derived state."""
         self.atoms = atoms
         self.refresh_content()
 
     @staticmethod
-    def atoms_to_pdb_line(atom_data: Dict[str, Any]) -> str:
+    def atoms_to_pdb_line(atom_data: dict[str, Any]) -> str:
         """Converts a single atom dictionary back into a PDB ATOM line."""
         x, y, z = atom_data["coords"]
         record_name = atom_data.get("record_name", "ATOM")
@@ -151,13 +151,13 @@ class PDBValidator:
         )
 
     @staticmethod
-    def atoms_to_pdb_content(atom_list: List[Dict[str, Any]]) -> str:
+    def atoms_to_pdb_content(atom_list: list[dict[str, Any]]) -> str:
         """Converts a list of atom dictionaries into a PDB content string, with TER records after each chain."""
         if not atom_list:
             return ""
 
         # Group atoms by chain ID, preserving order
-        chains: Dict[str, List[Dict[str, Any]]] = {}
+        chains: dict[str, list[dict[str, Any]]] = {}
         for atom in atom_list:
             chain_id = atom.get("chain_id", "A")  # Default to 'A' if no chain_id
             if chain_id not in chains:
@@ -192,11 +192,11 @@ class PDBValidator:
 
         return "\n".join(pdb_lines) + "\n"
 
-    def _group_atoms_by_residue(self) -> Dict[str, Dict[int, Dict[str, Dict[str, Any]]]]:
+    def _group_atoms_by_residue(self) -> dict[str, dict[int, dict[str, dict[str, Any]]]]:
         """Groups parsed atoms by chain ID, then by residue number, then by atom name.
         Structure: {chain_id: {residue_number: {atom_name: atom_data}}}.
         """
-        grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]] = {}
+        grouped_atoms: dict[str, dict[int, dict[str, dict[str, Any]]]] = {}
         for atom in self.atoms:
             chain_id = atom["chain_id"]
             residue_number = atom["residue_number"]
@@ -210,7 +210,7 @@ class PDBValidator:
             grouped_atoms[chain_id][residue_number][atom_name] = atom
         return grouped_atoms
 
-    def get_ramachandran_statistics(self) -> Dict[str, float]:
+    def get_ramachandran_statistics(self) -> dict[str, float]:
         """Calculates the percentage of residues in Favored and Allowed regions.
 
         SCIENTIFIC BASIS:
@@ -278,7 +278,7 @@ class PDBValidator:
         # Also refresh grouped atoms to ensure consistency
         self.grouped_atoms = self._group_atoms_by_residue()
 
-    def calculate_residue_sasa(self) -> Dict[str, Any]:
+    def calculate_residue_sasa(self) -> dict[str, Any]:
         """Calculates Solvent Accessible Surface Area (SASA) for each residue.
 
         EDUCATIONAL NOTE - The Shrake-Rupley Algorithm:
@@ -401,7 +401,7 @@ class PDBValidator:
             logger.error(f"Energy calculation failed: {e}")
             return float("inf")
 
-    def get_geometric_z_scores(self) -> Dict[str, float]:
+    def get_geometric_z_scores(self) -> dict[str, float]:
         """Calculates Z-scores for backbone geometry using Engh & Huber (1991) standards.
 
         SCIENTIFIC BASIS:
@@ -454,7 +454,7 @@ class PDBValidator:
         mean_z = float(np.mean(z_scores)) if z_scores else 0.0
         return {"mean_bond_zscore": mean_z}
 
-    def get_rotamer_quality_report(self) -> Dict[str, Any]:
+    def get_rotamer_quality_report(self) -> dict[str, Any]:
         """Calculates sidechain quality based on Dunbrack Rotamer Library probabilities.
 
         SCIENTIFIC BASIS:
@@ -476,7 +476,7 @@ class PDBValidator:
 
         return {"favored_rotamers_pct": favored_pct, "outlier_count": len(outliers)}
 
-    def get_chirality_statistics(self) -> Dict[str, Any]:
+    def get_chirality_statistics(self) -> dict[str, Any]:
         """Summary of protein handedness (L vs D amino acids).
 
         SCIENTIFIC BASIS:
@@ -501,8 +501,8 @@ class PDBValidator:
         }
 
     def get_quality_report(
-        self, include_ml: bool = False, nmr_restraints: Optional[List[Dict[str, Any]]] = None
-    ) -> Dict[str, Any]:
+        self, include_ml: bool = False, nmr_restraints: list[dict[str, Any]] | None = None
+    ) -> dict[str, Any]:
         """Generates a comprehensive, evidence-based quality assessment.
 
         SCIENTIFIC BASIS:
@@ -542,7 +542,7 @@ class PDBValidator:
             }
 
         # 7. ML Classifier (if requested)
-        ml_stats: Dict[str, Any] = {}
+        ml_stats: dict[str, Any] = {}
         if include_ml:
             from .quality.classifier import ProteinQualityClassifier
 
@@ -605,7 +605,7 @@ class PDBValidator:
 
         return report
 
-    def _get_sequences_by_chain(self) -> Dict[str, List[str]]:
+    def _get_sequences_by_chain(self) -> dict[str, list[str]]:
         """Extracts the amino acid sequences (list of 3-letter codes) for each chain."""
         sequences = {}
         for chain_id, residues_in_chain in self.grouped_atoms.items():  # noqa: B007
@@ -647,7 +647,7 @@ class PDBValidator:
         """
         return float(calculate_dihedral(p1, p2, p3, p4))
 
-    def get_violations(self) -> List[str]:
+    def get_violations(self) -> list[str]:
         """Returns a list of detected violations."""
         return self.violations
 
@@ -805,7 +805,7 @@ class PDBValidator:
 
     @staticmethod
     def _is_point_in_polygon(
-        point: Tuple[float, float], polygon: List[Tuple[float, float]]
+        point: tuple[float, float], polygon: list[tuple[float, float]]
     ) -> bool:
         """Ray-casting algorithm to check if a point is inside a polygon.
         Polygon is defined by a list of (x, y) tuples.
@@ -826,7 +826,7 @@ class PDBValidator:
             p1x, p1y = p2x, p2y
         return inside
 
-    def calculate_all_phi_psi(self) -> Dict[int, Tuple[float, float]]:
+    def calculate_all_phi_psi(self) -> dict[int, tuple[float, float]]:
         """Calculates (Phi, Psi) pairs for all residues where both are defined.
 
         Returns:
@@ -1025,7 +1025,7 @@ class PDBValidator:
 
             bond_array = bonds.as_array()  # Shape (M, 2) or (M, 3) depending on version/args
 
-            adj_list: Dict[int, List[int]] = {}  # for finding 1-3
+            adj_list: dict[int, list[int]] = {}  # for finding 1-3
 
             for row in bond_array:
                 # Handle potential 3rd column (bond type)
@@ -1382,11 +1382,11 @@ class PDBValidator:
 
     @staticmethod
     def _apply_steric_clash_tweak(
-        parsed_atoms: List[Dict[str, Any]],
+        parsed_atoms: list[dict[str, Any]],
         push_distance: float = 0.1,
         min_atom_distance: float = 2.0,
         vdw_overlap_factor: float = 0.8,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Applies a simple heuristic to alleviate steric clashes by pushing clashing atoms apart.
         Modifies a copy of the input parsed_atoms list.
         """
@@ -1398,7 +1398,7 @@ class PDBValidator:
 
         # Reconstruct bonded_pairs for this iteration (simplified, as in validate_steric_clashes)
         # This is a bit inefficient but avoids deep refactoring for now.
-        temp_grouped_atoms: Dict[str, Dict[int, Dict[str, Dict[str, Any]]]] = {}
+        temp_grouped_atoms: dict[str, dict[int, dict[str, dict[str, Any]]]] = {}
         for atom in modified_atoms:
             chain_id = atom["chain_id"]
             residue_number = atom["residue_number"]
@@ -1727,7 +1727,7 @@ class PDBValidator:
                     )
 
     def validate_distance_restraints(
-        self, restraints: List[Dict[str, Any]], tolerance: float = 0.5
+        self, restraints: list[dict[str, Any]], tolerance: float = 0.5
     ) -> None:
         """Validates the structure against NMR distance restraints (NOEs).
 
@@ -1760,7 +1760,7 @@ class PDBValidator:
             "QZ": ["HZ1", "HZ2", "HZ3"],
         }
 
-        def get_atoms_in_residue(res_id: int, atom_pattern: str) -> List[np.ndarray]:
+        def get_atoms_in_residue(res_id: int, atom_pattern: str) -> list[np.ndarray]:
             # Get chain 'A' (assume single chain for BMRB comparison unless specified)
             chain_id = next(iter(self.grouped_atoms.keys()))
             if res_id not in self.grouped_atoms[chain_id]:
@@ -1825,7 +1825,7 @@ class PDBValidator:
                     f"(+{tolerance}Å tolerance)."
                 )
 
-    def calculate_interface_metrics(self) -> Dict[str, Any]:
+    def calculate_interface_metrics(self) -> dict[str, Any]:
         """Calculates biophysical metrics for protein-protein interfaces.
 
         EDUCATIONAL NOTE - The Structural Interactome:
@@ -1960,7 +1960,7 @@ class PDBValidator:
             "is_interface_physically_plausible": len(inter_chain_clashes) == 0,
         }
 
-    def calculate_dihedrals(self, input_data: Optional[str] = None) -> Dict[str, List[float]]:
+    def calculate_dihedrals(self, input_data: str | None = None) -> dict[str, list[float]]:
         """Calculates backbone dihedral angles (Phi, Psi, Omega) for all residues.
 
         Args:

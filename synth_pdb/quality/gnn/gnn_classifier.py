@@ -65,7 +65,7 @@ The PyTorch approach is more portable across Python / PyTorch versions.
 
 import logging
 import os
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -111,7 +111,7 @@ class GNNQualityClassifier:
     ────────────────────────────────────────────────────────────────────────
     """
 
-    def __init__(self, model_path: Optional[str] = None):
+    def __init__(self, model_path: str | None = None):
         """Args:
         model_path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
                     If None, looks for the default bundled checkpoint.
@@ -119,8 +119,8 @@ class GNNQualityClassifier:
                     (useful for testing graph construction without training).
 
         """
-        self.model: Optional[Any] = None
-        self._model_path: Optional[str] = None
+        self.model: Any | None = None
+        self._model_path: str | None = None
 
         if model_path:
             self.load(model_path)
@@ -145,7 +145,7 @@ class GNNQualityClassifier:
     # Public API
     # ------------------------------------------------------------------
 
-    def predict(self, pdb_content: str) -> Tuple[bool, float, Dict[str, float]]:
+    def predict(self, pdb_content: str) -> tuple[bool, float, dict[str, float]]:
         """Predict the quality of a PDB structure.
 
         ── What happens inside ──────────────────────────────────────────

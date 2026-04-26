@@ -1,6 +1,5 @@
 import os
 import unittest
-from typing import List
 
 """
 Enforce the philosophy that the code is the textbook by checking for educational note comments.
@@ -50,7 +49,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             self.base_dir, "synth_pdb", "geometry", "vectorized.py"
         )
 
-    def _check_file_contains(self, filepath: str, substrings: List[str]) -> None:
+    def _check_file_contains(self, filepath: str, substrings: list[str]) -> None:
         """Helper to assert file contains list of substrings."""
 
         with open(filepath, encoding="utf-8") as f:

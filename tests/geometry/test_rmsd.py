@@ -83,12 +83,8 @@ class TestCalculateRMSD:
 
     def test_multiple_atoms(self):
         """Should calculate RMSD for multiple atoms."""
-        coords1 = np.array(
-            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-        )
-        coords2 = np.array(
-            [[0.1, 0.0, 0.0], [1.1, 0.0, 0.0], [0.1, 1.0, 0.0], [0.1, 0.0, 1.0]]
-        )
+        coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+        coords2 = np.array([[0.1, 0.0, 0.0], [1.1, 0.0, 0.0], [0.1, 1.0, 0.0], [0.1, 0.0, 1.0]])
 
         rmsd = calculate_rmsd(coords1, coords2)
 

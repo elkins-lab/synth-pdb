@@ -32,6 +32,7 @@ def test_position_atoms_batch_basic():
     expected = np.array([[0.0, 1.0, 0.0]])
     assert np.allclose(p4, expected)
 
+
 def test_superimpose_batch_reflection():
     """Test superimpose_batch with a reflection."""
     sources = np.array([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]])
@@ -41,11 +42,12 @@ def test_superimpose_batch_reflection():
     trans, rot = superimpose_batch(sources, targets)
     assert np.allclose(np.linalg.det(rot), 1.0)
 
+
 def test_batched_angle():
     """Test the batched_angle utility."""
     p1 = np.array([[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
     p2 = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-    p3 = np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0]]) # 90 deg and 0 deg
+    p3 = np.array([[0.0, 1.0, 0.0], [1.0, 0.0, 0.0]])  # 90 deg and 0 deg
 
     angles = batched_angle(p1, p2, p3)
     # The second one might be slightly off due to epsilon in batched_angle

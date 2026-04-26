@@ -25,7 +25,7 @@ calculate_hn_ha_coupling = _j.calculate_hn_ha_coupling_from_phi
 
 def predict_couplings_from_structure(
     structure: typing.Any,
-) -> typing.Dict[str, typing.Dict[int, float]]:
+) -> dict[str, dict[int, float]]:
     """Predict 3J_HNHa coupling constants from a Biotite AtomArray.
 
     This function wraps the synth-nmr engine and provides biophysical enhancements:
@@ -79,7 +79,7 @@ def predict_couplings_from_structure(
     # The engine uses a highly optimized C++ backend or Numba-jitted array ops
     # to evaluate the Karplus equation for all residues simultaneously.
     raw_couplings = _j.calculate_hn_ha_coupling(structure)
-    filtered_couplings: typing.Dict[str, typing.Dict[int, float]] = {}
+    filtered_couplings: dict[str, dict[int, float]] = {}
 
     # ── 2. BIOPHYSICAL FILTER DEFINITIONS ────────────────────────────────────
     # Proline-like residues do not have an amide proton when in a peptide bond.
@@ -121,7 +121,7 @@ def predict_couplings_from_structure(
     # Build a rapid-lookup dictionary for phi angles keyed by (chain_id, res_id).
     # We explicitly cast res_id to int to ensure type-matching with raw_couplings.
     phi_map = {}
-    for c, r, p in zip(chain_ids, res_ids, phi):
+    for c, r, p in zip(chain_ids, res_ids, phi, strict=False):
         phi_map[(c, int(r))] = np.degrees(p)
 
     # ── 4. ITERATIVE FILTERING & CORRECTION ──────────────────────────────────

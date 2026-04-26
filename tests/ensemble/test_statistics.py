@@ -20,6 +20,7 @@ from synth_pdb.ensemble.statistics import EnsembleStatistics, QualityAssessment
 # Fixtures
 # ===========================================================================
 
+
 @pytest.fixture()
 def minimal_stats() -> EnsembleStatistics:
     """Minimum required fields only, all optional fields at defaults."""
@@ -69,6 +70,7 @@ def moderate_quality_stats() -> EnsembleStatistics:
 # TestEnsembleStatisticsFields
 # ===========================================================================
 
+
 class TestEnsembleStatisticsFields:
     """Test field defaults and required-field behaviour."""
 
@@ -117,6 +119,7 @@ class TestEnsembleStatisticsFields:
 # TestEnsembleStatisticsBooleanProperties
 # ===========================================================================
 
+
 class TestEnsembleStatisticsBooleanProperties:
     """Test is_single_model and is_ensemble properties."""
 
@@ -140,12 +143,11 @@ class TestEnsembleStatisticsBooleanProperties:
 # TestEnsembleStatisticsPrecision
 # ===========================================================================
 
+
 class TestEnsembleStatisticsPrecision:
     """Test precision property across all three tiers and boundary values."""
 
-    def test_high_precision_below_threshold(
-        self, high_quality_stats: EnsembleStatistics
-    ) -> None:
+    def test_high_precision_below_threshold(self, high_quality_stats: EnsembleStatistics) -> None:
         assert high_quality_stats.precision == "HIGH"
 
     def test_good_precision_between_thresholds(
@@ -181,6 +183,7 @@ class TestEnsembleStatisticsPrecision:
 # TestEnsembleStatisticsOverallQuality
 # ===========================================================================
 
+
 class TestEnsembleStatisticsOverallQuality:
     """Test overall_quality property covers all four outcome strings."""
 
@@ -200,7 +203,7 @@ class TestEnsembleStatisticsOverallQuality:
         stats = EnsembleStatistics(
             n_models=10,
             n_residues=100,
-            rmsd_to_mean=0.5,   # HIGH precision
+            rmsd_to_mean=0.5,  # HIGH precision
             pct_well_defined=40.0,  # < 80% → not "Excellent"
         )
         # precision="HIGH" but pct_well_defined <= 60 → "may need refinement"
@@ -211,7 +214,7 @@ class TestEnsembleStatisticsOverallQuality:
         stats = EnsembleStatistics(
             n_models=10,
             n_residues=100,
-            rmsd_to_mean=2.5,   # MODERATE precision
+            rmsd_to_mean=2.5,  # MODERATE precision
             pct_well_defined=65.0,  # > 60 → Acceptable
         )
         assert stats.overall_quality == "Acceptable quality NMR ensemble"
@@ -221,35 +224,37 @@ class TestEnsembleStatisticsOverallQuality:
 # TestEnsembleStatisticsSerialisation
 # ===========================================================================
 
+
 class TestEnsembleStatisticsSerialisation:
     """Test to_dict() and from_dict() round-trips."""
 
-    def test_to_dict_contains_all_fields(
-        self, high_quality_stats: EnsembleStatistics
-    ) -> None:
+    def test_to_dict_contains_all_fields(self, high_quality_stats: EnsembleStatistics) -> None:
         d = high_quality_stats.to_dict()
         expected_keys = {
-            "n_models", "n_residues",
-            "mean_pairwise_rmsd", "median_pairwise_rmsd",
-            "std_pairwise_rmsd", "min_pairwise_rmsd", "max_pairwise_rmsd",
-            "medoid_index", "medoid_mean_rmsd",
+            "n_models",
+            "n_residues",
+            "mean_pairwise_rmsd",
+            "median_pairwise_rmsd",
+            "std_pairwise_rmsd",
+            "min_pairwise_rmsd",
+            "max_pairwise_rmsd",
+            "medoid_index",
+            "medoid_mean_rmsd",
             "rmsd_to_mean",
-            "mean_rmsf", "max_rmsf",
-            "well_defined_residues", "pct_well_defined",
+            "mean_rmsf",
+            "max_rmsf",
+            "well_defined_residues",
+            "pct_well_defined",
         }
         assert set(d.keys()) == expected_keys
 
-    def test_to_dict_values_match_fields(
-        self, high_quality_stats: EnsembleStatistics
-    ) -> None:
+    def test_to_dict_values_match_fields(self, high_quality_stats: EnsembleStatistics) -> None:
         d = high_quality_stats.to_dict()
         assert d["n_models"] == 20
         assert d["rmsd_to_mean"] == pytest.approx(0.72)
         assert d["pct_well_defined"] == pytest.approx(88.0)
 
-    def test_from_dict_round_trip_equality(
-        self, high_quality_stats: EnsembleStatistics
-    ) -> None:
+    def test_from_dict_round_trip_equality(self, high_quality_stats: EnsembleStatistics) -> None:
         reconstructed = EnsembleStatistics.from_dict(high_quality_stats.to_dict())
         assert reconstructed == high_quality_stats
 
@@ -292,6 +297,7 @@ class TestEnsembleStatisticsSerialisation:
 # TestEnsembleStatisticsStr
 # ===========================================================================
 
+
 class TestEnsembleStatisticsStr:
     """Test __str__ output contains expected content."""
 
@@ -319,6 +325,7 @@ class TestEnsembleStatisticsStr:
 # ===========================================================================
 # TestQualityAssessment
 # ===========================================================================
+
 
 class TestQualityAssessment:
     """Tests for QualityAssessment dataclass."""
@@ -353,6 +360,7 @@ class TestQualityAssessment:
 # TestStatisticsImports
 # ===========================================================================
 
+
 class TestStatisticsImports:
     """Smoke tests verifying the public API is accessible."""
 
@@ -361,6 +369,7 @@ class TestStatisticsImports:
             EnsembleStatistics,
             QualityAssessment,
         )
+
         assert EnsembleStatistics is not None
         assert QualityAssessment is not None
 
@@ -369,13 +378,16 @@ class TestStatisticsImports:
             EnsembleStatistics,
             QualityAssessment,
         )
+
         assert EnsembleStatistics is not None
         assert QualityAssessment is not None
 
     def test_ensemble_statistics_is_dataclass(self) -> None:
         import dataclasses
+
         assert dataclasses.is_dataclass(EnsembleStatistics)
 
     def test_quality_assessment_is_dataclass(self) -> None:
         import dataclasses
+
         assert dataclasses.is_dataclass(QualityAssessment)

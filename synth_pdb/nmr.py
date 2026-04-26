@@ -145,7 +145,7 @@ BIBLIOGRAPHY AND FURTHER READING:
 
 import logging
 import os
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import biotite.structure as struc
 import numpy as np
@@ -173,11 +173,10 @@ logger = logging.getLogger(__name__)
 # 4. Map the resulting indices back to residue and atom identifiers.
 calculate_synthetic_noes = _nmr.calculate_synthetic_noes
 
+
 def calculate_rpf_score(
-    structure: struc.AtomArray,
-    restraints: List[Dict[str, Any]],
-    distance_threshold: float = 5.0
-) -> Dict[str, float]:
+    structure: struc.AtomArray, restraints: list[dict[str, Any]], distance_threshold: float = 5.0
+) -> dict[str, float]:
     """Calculates Recall, Precision, and F-measure (RPF) scores for an NMR structure.
 
     This function implements a simplified version of the RPF scores developed by
@@ -294,15 +293,15 @@ def calculate_rpf_score(
         # Format A: index_1, atom_name_1, etc. (standard engine format)
         # Format B: res_i, atom_i, etc. (convenience/user format)
         # This normalization ensures the function is backward compatible.
-        res_i = res.get('index_1') or res.get('res_i')
-        atom_i = res.get('atom_name_1') or res.get('atom_i')
-        res_j = res.get('index_2') or res.get('res_j')
-        atom_j = res.get('atom_name_2') or res.get('atom_j')
+        res_i = res.get("index_1") or res.get("res_i")
+        atom_i = res.get("atom_name_1") or res.get("atom_i")
+        res_j = res.get("index_2") or res.get("res_j")
+        atom_j = res.get("atom_name_2") or res.get("atom_j")
 
         # Upper bound distance limit (default to 5.0 Å if not specified).
         # This is the "target" distance derived from the NOE spectrum.
         # A model atom pair must be closer than this to satisfy the data.
-        upper_bound = res.get('upper_limit') or res.get('upper_bound') or 5.0
+        upper_bound = res.get("upper_limit") or res.get("upper_bound") or 5.0
 
         # ── CREATE MASKS ─────────────────────────────────────────────────────
         # We create Boolean masks to isolate the specific atoms i and j in the
@@ -407,10 +406,10 @@ def calculate_rpf_score(
         for r in restraints:
             # Normalize keys for lookup optimization to handle different formats.
             # This logic must be identical to the Recall normalization above.
-            ri = r.get('index_1') or r.get('res_i')
-            ai = r.get('atom_name_1') or r.get('atom_i')
-            rj = r.get('index_2') or r.get('res_j')
-            aj = r.get('atom_name_2') or r.get('atom_j')
+            ri = r.get("index_1") or r.get("res_i")
+            ai = r.get("atom_name_1") or r.get("atom_i")
+            rj = r.get("index_2") or r.get("res_j")
+            aj = r.get("atom_name_2") or r.get("atom_j")
 
             # Create a unique, hashable identifier for each atom in the pair.
             # Using a tuple of (res, atom) allows for precise matching.
@@ -426,7 +425,7 @@ def calculate_rpf_score(
         # Iterate over all "short" pairs identified in our structural model.
         # np.where returns the indices (i, j) of all True values in the mask.
         indices = np.where(short_distances_mask)
-        for idx_i, idx_j in zip(indices[0], indices[1]):
+        for idx_i, idx_j in zip(indices[0], indices[1], strict=False):
             # Get the actual atoms from the filtered proton array.
             p1 = protons[idx_i]
             p2 = protons[idx_j]
@@ -465,13 +464,10 @@ def calculate_rpf_score(
     # Return the composite metrics as a dictionary for further analysis.
     # These values can be plotted or used as objective functions for refinement.
     # A successful NMR structure determination typically targets F > 0.8.
-    return {
-        "recall": recall,
-        "precision": precision,
-        "f_measure": f_measure
-    }
+    return {"recall": recall, "precision": precision, "f_measure": f_measure}
 
-def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
+
+def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
     """Reads NOE restraints from a file.
 
     SCIENTIFIC RELEVANCE:
@@ -518,7 +514,8 @@ def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
         # Lazy import of NEF logic to minimize startup time for non-NMR tasks.
         # This reduces the overhead for basic generator users.
         from .nef_io import read_nef_restraints
-        return cast(List[Dict[str, Any]], read_nef_restraints(file_path))
+
+        return cast(list[dict[str, Any]], read_nef_restraints(file_path))
 
     # ── SIMPLE WHITESPACE PARSER ─────────────────────────────────────────────
     # For non-standard or simplified files, we use a robust line-by-line parser.
@@ -547,13 +544,15 @@ def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
                     # standard keys for immediate compatibility with
                     # calculate_rpf_score.
                     # We convert numeric strings to integers and floats here.
-                    restraints.append({
-                        "index_1": int(parts[0]),
-                        "atom_name_1": parts[1],
-                        "index_2": int(parts[2]),
-                        "atom_name_2": parts[3],
-                        "upper_limit": float(parts[4])
-                    })
+                    restraints.append(
+                        {
+                            "index_1": int(parts[0]),
+                            "atom_name_1": parts[1],
+                            "index_2": int(parts[2]),
+                            "atom_name_2": parts[3],
+                            "upper_limit": float(parts[4]),
+                        }
+                    )
 
         # Log the success for educational transparency.
         # This helps researchers verify that their files were read correctly.
@@ -567,6 +566,7 @@ def read_restraint_file(file_path: str) -> List[Dict[str, Any]]:
         # identify syntax errors in their restraint files.
         # Descriptive errors are a hallmark of high-quality scientific software.
         raise ValueError(f"Failed to parse restraint file {file_path}: {e}") from e
+
 
 # ── MODULE EXPORTS ───────────────────────────────────────────────────────────
 # We define __all__ to explicitly control the public API of this module.

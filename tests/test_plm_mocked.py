@@ -12,11 +12,13 @@ def get_mocks():
     mock_torch.device.side_effect = lambda x: x
     return mock_torch, mock_transformers
 
+
 @pytest.fixture
 def mocked_plm_deps():
     mock_torch, mock_transformers = get_mocks()
     with patch.dict("sys.modules", {"torch": mock_torch, "transformers": mock_transformers}):
         yield mock_torch, mock_transformers
+
 
 # We can import it at top level because it doesn't have top-level torch/transformers imports
 from synth_pdb.plm import ESM2Embedder
@@ -34,6 +36,7 @@ def test_esm2_embedder_lazy_loading(mocked_plm_deps):
             embedder.embed("ACDEF")
             mock_load.assert_called_once()
 
+
 def test_esm2_embedder_embedding_dim_property(mocked_plm_deps):
     """Verify that embedding_dim returns known defaults or triggers load."""
     embedder = ESM2Embedder(model_name="facebook/esm2_t6_8M_UR50D")
@@ -42,20 +45,19 @@ def test_esm2_embedder_embedding_dim_property(mocked_plm_deps):
     embedder_large = ESM2Embedder(model_name="facebook/esm2_t12_35M_UR50D")
     assert embedder_large.embedding_dim == 480
 
+
 def test_mean_embed(mocked_plm_deps):
     """Verify mean pooling logic (L, D) -> (D,)."""
     embedder = ESM2Embedder()
     # Mock embed to return a known matrix
-    mock_emb = np.array([
-        [1.0, 2.0],
-        [3.0, 4.0]
-    ], dtype=np.float32)
+    mock_emb = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32)
 
     with patch.object(embedder, "embed", return_value=mock_emb):
         mean = embedder.mean_embed("AA")
         # (1+3)/2 = 2.0, (2+4)/2 = 3.0
         np.testing.assert_array_almost_equal(mean, [2.0, 3.0])
         assert mean.shape == (2,)
+
 
 def test_sequence_similarity(mocked_plm_deps):
     """Verify cosine similarity calculation."""
@@ -73,18 +75,20 @@ def test_sequence_similarity(mocked_plm_deps):
         sim = embedder.sequence_similarity("A", "A")
         assert pytest.approx(sim) == 1.0
 
+
 def test_embed_structure_integration(mocked_plm_deps):
     """Verify that embed_structure correctly extracts sequence from Biotite AtomArray."""
     import biotite.structure as struc
 
-    atom1 = struc.Atom([0,0,0], res_id=1, res_name="ALA", atom_name="CA", element="C")
-    atom2 = struc.Atom([0,0,0], res_id=2, res_name="GLY", atom_name="CA", element="C")
+    atom1 = struc.Atom([0, 0, 0], res_id=1, res_name="ALA", atom_name="CA", element="C")
+    atom2 = struc.Atom([0, 0, 0], res_id=2, res_name="GLY", atom_name="CA", element="C")
     structure = struc.array([atom1, atom2])
 
     embedder = ESM2Embedder()
     with patch.object(embedder, "embed", return_value=np.zeros((2, 320))) as mock_embed:
         embedder.embed_structure(structure)
         mock_embed.assert_called_once_with("AG")
+
 
 def test_run_model_internal_logic(mocked_plm_deps):
     """Verify the internal _run_model correctly interacts with mocked torch/transformers."""

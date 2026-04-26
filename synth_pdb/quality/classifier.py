@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Optional, Tuple
 
 from .features import extract_quality_features, get_feature_names
 
@@ -22,7 +21,7 @@ class ProteinQualityClassifier:
     - Negative samples: Raw unminimized structures, decoys, and random perturbations
     """
 
-    def __init__(self, model_path: Optional[str] = None) -> None:
+    def __init__(self, model_path: str | None = None) -> None:
         self.model = None
         self.feature_names = get_feature_names()
 
@@ -56,7 +55,7 @@ class ProteinQualityClassifier:
             logger.error(f"Failed to load quality classifier model: {e}")
             self.model = None
 
-    def predict(self, pdb_content: str) -> Tuple[bool, float, dict]:
+    def predict(self, pdb_content: str) -> tuple[bool, float, dict]:
         """Predicts quality of a PDB structure.
 
         Returns:
@@ -77,6 +76,6 @@ class ProteinQualityClassifier:
         is_good = prob > 0.5
 
         # Create feature dict for debugging/logging
-        feature_dict = dict(zip(self.feature_names, features_vec))
+        feature_dict = dict(zip(self.feature_names, features_vec, strict=False))
 
         return is_good, prob, feature_dict

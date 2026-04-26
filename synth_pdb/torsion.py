@@ -1,7 +1,7 @@
 import csv
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import biotite.structure as struc
 import numpy as np
@@ -9,7 +9,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]]:
+def calculate_torsion_angles(atom_array: struc.AtomArray) -> list[dict[str, Any]]:
     """Calculate backbone torsion angles (phi, psi, omega) for a given structure.
 
     Args:
@@ -70,7 +70,7 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> List[Dict[str, Any]
     return results
 
 
-def export_torsion_angles(data: List[Dict[str, Any]], output_file: str, fmt: str = "csv") -> None:
+def export_torsion_angles(data: list[dict[str, Any]], output_file: str, fmt: str = "csv") -> None:
     """Export calculated torsion angles to a file.
 
     Args:

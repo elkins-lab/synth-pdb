@@ -1,6 +1,5 @@
 import io
 import logging
-from typing import List, Optional, Tuple
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -29,10 +28,10 @@ class DecoyGenerator:
         minimize: bool = False,
         forcefield: str = "amber14-all.xml",
         hard_mode: bool = False,
-        template_sequence: Optional[str] = None,
+        template_sequence: str | None = None,
         shuffle_sequence: bool = False,
         drift: float = 0.0,
-        seed: Optional[int] = None,
+        seed: int | None = None,
     ) -> list[str]:
         """Generates N unique decoys for a given sequence within a target RMSD range.
 
@@ -100,7 +99,7 @@ class DecoyGenerator:
 
         os.makedirs(out_dir, exist_ok=True)
 
-        generated_decoys: List[str] = []
+        generated_decoys: list[str] = []
         reference_structure = None
 
         attempts = 0
@@ -118,9 +117,9 @@ class DecoyGenerator:
             try:
                 # 1. Determine local generation parameters
                 gen_sequence = sequence
-                phi_list: Optional[List[float]] = None
-                psi_list: Optional[List[float]] = None
-                omega_list: Optional[List[float]] = None
+                phi_list: list[float] | None = None
+                psi_list: list[float] | None = None
+                omega_list: list[float] | None = None
 
                 # Handling Threading (Hard Decoy)
                 if hard_mode and template_sequence:
@@ -202,7 +201,7 @@ class DecoyGenerator:
 
     def _extract_backbone_dihedrals(
         self, pdb_content: str
-    ) -> Tuple[List[float], List[float], List[float]]:
+    ) -> tuple[list[float], list[float], list[float]]:
         """Extracts phi, psi, omega lists from PDB content."""
         pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
@@ -236,7 +235,7 @@ class DecoyGenerator:
         random.shuffle(shuffled_names)
 
         # Map back
-        name_map = dict(zip(res_ids, shuffled_names))
+        name_map = dict(zip(res_ids, shuffled_names, strict=False))
         for i in range(len(structure)):
             structure.res_name[i] = name_map[structure.res_id[i]]
 

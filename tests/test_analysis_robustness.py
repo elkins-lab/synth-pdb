@@ -18,7 +18,9 @@ def test_compare_pdbs():
             f.write(content1)
 
         # Ref: Alpha-helix with some drift
-        content2 = generate_pdb_content(sequence_str="AAAAA", conformation="alpha", seed=42, drift=2.0)
+        content2 = generate_pdb_content(
+            sequence_str="AAAAA", conformation="alpha", seed=42, drift=2.0
+        )
         with open(pdb2_path, "w") as f:
             f.write(content2)
 
@@ -31,6 +33,7 @@ def test_compare_pdbs():
         assert result["rmsd"] > 0.0  # Drift should lead to some RMSD
         assert result["rotation"].shape == (3, 3)
         assert result["translation"].shape == (3,)
+
 
 def test_analyze_ensemble_pdbs():
     """Test batch analysis using a list of PDB paths."""
@@ -52,6 +55,7 @@ def test_analyze_ensemble_pdbs():
         assert 0 <= result["medoid_index"] < 3
         assert result["medoid_path"] in paths
 
+
 def test_calculate_residue_strain():
     """Test detection of non-planar peptide bonds (Omega outliers)."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -69,9 +73,7 @@ def test_calculate_residue_strain():
 
         # Check if generate_pdb_content accepts omega_list (from generator.py view it does)
         strained_content = generate_pdb_content(
-            sequence_str="AAAAA",
-            conformation="alpha",
-            omega_list=[0.0, 180.0, 180.0, 180.0, 180.0]
+            sequence_str="AAAAA", conformation="alpha", omega_list=[0.0, 180.0, 180.0, 180.0, 180.0]
         )
 
         with open(path, "w") as f:
@@ -83,4 +85,4 @@ def test_calculate_residue_strain():
         # Residue 1 omega should be near 0, so deviation = |0 - 180| = 180.
         # res_ids are usually 1, 2, 3...
         assert 1 in strain_map
-        assert strain_map[1] > 170.0 # High strain for the forced cis-bond
+        assert strain_map[1] > 170.0  # High strain for the forced cis-bond

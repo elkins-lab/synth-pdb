@@ -1,5 +1,4 @@
 import os
-from typing import Dict, Tuple
 
 import biotite.sequence as seq
 import biotite.structure.io.pdb as pdb_io
@@ -13,7 +12,7 @@ from synth_pdb.chemical_shifts import calculate_shift_metrics, predict_chemical_
 pytest.importorskip("pynmrstar")
 
 
-def fetch_bmrb_shifts(bmrb_id: str) -> Tuple[Dict[int, Dict[str, float]], str]:
+def fetch_bmrb_shifts(bmrb_id: str) -> tuple[dict[int, dict[str, float]], str]:
     """Fetch experimental shifts from BMRB and return as nested dict and sequence."""
     try:
         entry = pynmrstar.Entry.from_database(bmrb_id)
@@ -33,8 +32,8 @@ def fetch_bmrb_shifts(bmrb_id: str) -> Tuple[Dict[int, Dict[str, float]], str]:
     idx_val = tag_to_idx.get("val")
     idx_comp = tag_to_idx.get("comp_id")
 
-    shifts: Dict[int, Dict[str, float]] = {}
-    sequence_map: Dict[int, str] = {}
+    shifts: dict[int, dict[str, float]] = {}
+    sequence_map: dict[int, str] = {}
     for row in loop.data:
         try:
             res_id = int(row[idx_res])

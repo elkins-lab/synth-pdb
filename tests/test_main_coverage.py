@@ -47,9 +47,10 @@ def test_build_command_string_complex():
 
 def test_main_structure_inference_failure():
     """Test main() failure when structure cannot be parsed for length."""
-    with patch("sys.argv", ["synth-pdb", "--structure", "invalid-format"]), patch(
-        "sys.exit"
-    ) as mock_exit:
+    with (
+        patch("sys.argv", ["synth-pdb", "--structure", "invalid-format"]),
+        patch("sys.exit") as mock_exit,
+    ):
         main()
         mock_exit.assert_called_with(1)
 
@@ -61,9 +62,10 @@ def test_main_negative_length():
     # Wait, the current logic in main.py has a bug:
     # 508: elif args.length <= 0: is unreachable because 480: if args.length <= 0: catches it.
     # Let's just trigger one of the exit(1) paths.
-    with patch("sys.argv", ["synth-pdb", "--structure", "invalid-no-colons"]), patch(
-        "sys.exit"
-    ) as mock_exit:
+    with (
+        patch("sys.argv", ["synth-pdb", "--structure", "invalid-no-colons"]),
+        patch("sys.exit") as mock_exit,
+    ):
         main()
         mock_exit.assert_called_with(1)
 
@@ -71,8 +73,9 @@ def test_main_negative_length():
 def test_main_docking_missing_input():
     """Test docking mode without input-pdb dispatch."""
     # Patch the source module to be extra safe
-    with patch("sys.argv", ["synth-pdb", "--mode", "docking", "--log-level", "ERROR"]), patch(
-        "synth_pdb.docking.DockingPrep"
+    with (
+        patch("sys.argv", ["synth-pdb", "--mode", "docking", "--log-level", "ERROR"]),
+        patch("synth_pdb.docking.DockingPrep"),
     ):
         with patch("sys.exit") as mock_exit:
             main()
@@ -81,51 +84,49 @@ def test_main_docking_missing_input():
 
 def test_main_pymol_missing_args():
     """Test pymol mode without required args."""
-    with patch(
-        "sys.argv",
-        ["synth-pdb", "--mode", "pymol", "--output-pml", "test.pml", "--log-level", "ERROR"],
-    ), patch("sys.exit") as mock_exit:
+    with (
+        patch(
+            "sys.argv",
+            ["synth-pdb", "--mode", "pymol", "--output-pml", "test.pml", "--log-level", "ERROR"],
+        ),
+        patch("sys.exit") as mock_exit,
+    ):
         main()
         mock_exit.assert_called_with(1)
 
 
 def test_main_decoys_missing_sequence_length():
     """Test decoys mode without sequence or length."""
-    with patch(
-        "sys.argv",
-        [
-            "synth-pdb",
-            "--mode",
-            "decoys",
-            "--length",
-            "0",
-            "--structure",
-            "in:valid",
-            "--log-level",
-            "ERROR",
-        ],
-    ), patch("sys.exit") as mock_exit:
+    with (
+        patch(
+            "sys.argv",
+            [
+                "synth-pdb",
+                "--mode",
+                "decoys",
+                "--length",
+                "0",
+                "--structure",
+                "in:valid",
+                "--log-level",
+                "ERROR",
+            ],
+        ),
+        patch("sys.exit") as mock_exit,
+    ):
         main()
         mock_exit.assert_called_with(1)
 
 
-def test_main_docking_missing_input():
-    """Test docking mode without input-pdb dispatch."""
-    # Targeting the name in main.py namespace
-    with patch("sys.argv", ["synth-pdb", "--mode", "docking", "--log-level", "ERROR"]), patch(
-        "synth_pdb.main.DockingPrep"
-    ):
-        with patch("sys.exit") as mock_exit:
-            main()
-            mock_exit.assert_called_with(1)
-
-
 def test_main_dataset_mode_coverage():
     """Test dataset mode entry point."""
-    with patch(
-        "sys.argv",
-        ["synth-pdb", "--mode", "dataset", "--num-samples", "2", "--output", "tmp_dataset"],
-    ), patch("synth_pdb.dataset.DatasetGenerator.generate") as mock_gen:
+    with (
+        patch(
+            "sys.argv",
+            ["synth-pdb", "--mode", "dataset", "--num-samples", "2", "--output", "tmp_dataset"],
+        ),
+        patch("synth_pdb.dataset.DatasetGenerator.generate") as mock_gen,
+    ):
         main()
         mock_gen.assert_called_once()
 
@@ -149,20 +150,29 @@ def test_main_refine_clashes_logic_coverage():
     }
     # Mock generator to return a clashing structure first
     # IMPORTANT: Patch the function where it is USED (synth_pdb.main)
-    with patch(
-        "sys.argv",
-        ["synth-pdb", "--sequence", "A", "--refine-clashes", "1", "--output", "test_refine.pdb"],
-    ), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N\nATOM      2  CA  ALA A   1       0.000   0.000   0.100  1.00 20.00           C\nTER\nEND\n",
-    ), patch(
-        "synth_pdb.validator.PDBValidator.validate_all"
-    ), patch(
-        "synth_pdb.validator.PDBValidator.get_violations", side_effect=[["Clash"], []]
-    ), patch(
-        "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
-    ), patch(
-        "synth_pdb.main.assemble_pdb_content", return_value="DUMMY PDB"
+    with (
+        patch(
+            "sys.argv",
+            [
+                "synth-pdb",
+                "--sequence",
+                "A",
+                "--refine-clashes",
+                "1",
+                "--output",
+                "test_refine.pdb",
+            ],
+        ),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N\nATOM      2  CA  ALA A   1       0.000   0.000   0.100  1.00 20.00           C\nTER\nEND\n",
+        ),
+        patch("synth_pdb.validator.PDBValidator.validate_all"),
+        patch("synth_pdb.validator.PDBValidator.get_violations", side_effect=[["Clash"], []]),
+        patch(
+            "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
+        ),
+        patch("synth_pdb.main.assemble_pdb_content", return_value="DUMMY PDB"),
     ):
         # We still need to mock open to avoid real file writes, but now it's safe
         with patch("builtins.open", MagicMock()) as mock_open:
@@ -172,22 +182,26 @@ def test_main_refine_clashes_logic_coverage():
 
 def test_main_invalid_log_level():
     """Test main() with invalid log level handling."""
-    with patch("sys.argv", ["synth-pdb"]), patch(
-        "argparse.ArgumentParser.parse_args"
-    ) as mock_parse, pytest.raises(ValueError, match="Invalid log level"):
+    with (
+        patch("sys.argv", ["synth-pdb"]),
+        patch("argparse.ArgumentParser.parse_args") as mock_parse,
+        pytest.raises(ValueError, match="Invalid log level"),
+    ):
         mock_parse.return_value = argparse.Namespace(log_level="INVALID")
         main()
 
 
 def test_main_cyclic_logic_coverage():
     """Trigger cyclic flag side effects."""
-    with patch(
-        "sys.argv", ["synth-pdb", "--sequence", "AA", "--cyclic", "--output", "test_cyclic.pdb"]
-    ), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
-    ), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch(
+            "sys.argv", ["synth-pdb", "--sequence", "AA", "--cyclic", "--output", "test_cyclic.pdb"]
+        ),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+        ),
+        patch("builtins.open", MagicMock()),
     ):
         # We don't verify full execution, just that line 474-476 were hit
         main()
@@ -195,41 +209,48 @@ def test_main_cyclic_logic_coverage():
 
 def test_main_decoys_frequencies_coverage():
     """Test decoys mode with plausible frequencies."""
-    with patch(
-        "sys.argv",
-        [
-            "synth-pdb",
-            "--mode",
-            "decoys",
-            "--length",
-            "5",
-            "--plausible-frequencies",
-            "--output",
-            "tmp_decoys",
-        ],
-    ), patch("synth_pdb.main.DecoyGenerator.generate_ensemble") as mock_gen:
+    with (
+        patch(
+            "sys.argv",
+            [
+                "synth-pdb",
+                "--mode",
+                "decoys",
+                "--length",
+                "5",
+                "--plausible-frequencies",
+                "--output",
+                "tmp_decoys",
+            ],
+        ),
+        patch("synth_pdb.main.DecoyGenerator.generate_ensemble") as mock_gen,
+    ):
         main()
         mock_gen.assert_called_once()
 
 
 def test_main_rmsd_range_invalid():
     """Test invalid RMSD range in decoys mode."""
-    with patch(
-        "sys.argv", ["synth-pdb", "--mode", "decoys", "--length", "2", "--rmsd-range", "invalid"]
-    ), patch("synth_pdb.main.DecoyGenerator.generate_ensemble"):
+    with (
+        patch(
+            "sys.argv",
+            ["synth-pdb", "--mode", "decoys", "--length", "2", "--rmsd-range", "invalid"],
+        ),
+        patch("synth_pdb.main.DecoyGenerator.generate_ensemble"),
+    ):
         main()
 
 
 def test_main_structure_highlight_failure():
     """Trigger structure highlight parsing failure."""
     # This hits line 721
-    with patch(
-        "sys.argv", ["synth-pdb", "--sequence", "AA", "--structure", "1-2:alpha:extra"]
-    ), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
-    ), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch("sys.argv", ["synth-pdb", "--sequence", "AA", "--structure", "1-2:alpha:extra"]),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+        ),
+        patch("builtins.open", MagicMock()),
     ):
         main()
 
@@ -237,9 +258,10 @@ def test_main_structure_highlight_failure():
 def test_main_inferred_length_none_coverage():
     """Test path where length remains None after inference attempts."""
     # Hits 499-500
-    with patch("sys.argv", ["synth-pdb", "--structure", "no-range:alpha"]), patch(
-        "sys.exit"
-    ) as mock_exit:
+    with (
+        patch("sys.argv", ["synth-pdb", "--structure", "no-range:alpha"]),
+        patch("sys.exit") as mock_exit,
+    ):
         main()
         mock_exit.assert_called_with(1)
 
@@ -258,10 +280,14 @@ def test_main_positive_length_failure():
 
 def test_main_inferred_length_success():
     """Test successful length inference from structure."""
-    with patch("sys.argv", ["synth-pdb", "--structure", "1-5:alpha,6-12:beta"]), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
-    ), patch("builtins.open", MagicMock()):
+    with (
+        patch("sys.argv", ["synth-pdb", "--structure", "1-5:alpha,6-12:beta"]),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+        ),
+        patch("builtins.open", MagicMock()),
+    ):
         main()
 
 
@@ -282,17 +308,19 @@ def test_main_refine_violations_no_change_coverage():
         "element": "N",
         "charge": "",
     }
-    with patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
-    ), patch("synth_pdb.validator.PDBValidator.validate_all"), patch(
-        "synth_pdb.validator.PDBValidator.get_violations", return_value=["V1"]
-    ), patch(
-        "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
-    ), patch(
-        "synth_pdb.main.assemble_pdb_content", return_value="DUMMY"
-    ), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+        ),
+        patch("synth_pdb.validator.PDBValidator.validate_all"),
+        patch("synth_pdb.validator.PDBValidator.get_violations", return_value=["V1"]),
+        patch(
+            "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
+        ),
+        patch("synth_pdb.main.assemble_pdb_content", return_value="DUMMY"),
+        patch("builtins.open", MagicMock()),
     ):
         main()
 
@@ -314,16 +342,20 @@ def test_main_refine_violations_increase_warning():
         "element": "N",
         "charge": "",
     }
-    with patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]), patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
-    ), patch("synth_pdb.validator.PDBValidator.validate_all"), patch(
-        "synth_pdb.validator.PDBValidator.get_violations", side_effect=[["V1"], ["V1", "V2"]]
-    ), patch(
-        "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
-    ), patch(
-        "synth_pdb.main.assemble_pdb_content", return_value="DUMMY"
-    ), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]),
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+        ),
+        patch("synth_pdb.validator.PDBValidator.validate_all"),
+        patch(
+            "synth_pdb.validator.PDBValidator.get_violations", side_effect=[["V1"], ["V1", "V2"]]
+        ),
+        patch(
+            "synth_pdb.validator.PDBValidator._apply_steric_clash_tweak", return_value=[mock_atom]
+        ),
+        patch("synth_pdb.main.assemble_pdb_content", return_value="DUMMY"),
+        patch("builtins.open", MagicMock()),
     ):
         main()

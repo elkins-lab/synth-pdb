@@ -4,7 +4,6 @@ Verifies that generated structures satisfy fundamental physical and chemical rul
 """
 
 import io
-from typing import Optional
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -19,7 +18,7 @@ from synth_pdb.geometry.nerf import position_atom_3d_from_internal_coords
 def get_peptide_structure(
     sequence: str = "ACDEFGHIKLMNPQRSTVWY",
     conformation: str = "alpha",
-    length: Optional[int] = None,
+    length: int | None = None,
     seed: int = 42,
 ) -> struc.AtomArray:
     """Helper to generate a standard peptide AtomArray."""

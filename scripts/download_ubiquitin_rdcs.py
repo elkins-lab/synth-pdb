@@ -14,5 +14,6 @@ def download_bmrb_rdcs(bmrb_id: str, output_path: str) -> None:
     entry.write_to_file(output_path)
     print(f"Successfully downloaded to {output_path}!")
 
+
 if __name__ == "__main__":
     download_bmrb_rdcs("6457", "bmrb_6457.str")

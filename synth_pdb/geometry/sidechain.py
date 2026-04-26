@@ -3,7 +3,6 @@ Sidechain reconstruction and rotation utilities.
 """
 
 import logging
-from typing import Dict, List, Optional, Union
 
 import biotite.structure as struc
 import numpy as np
@@ -11,6 +10,7 @@ import numpy as np
 from synth_pdb.geometry._numba import njit
 
 logger = logging.getLogger(__name__)
+
 
 @njit
 def rotate_points(
@@ -50,8 +50,8 @@ def rotate_points(
 def reconstruct_sidechain(
     peptide: struc.AtomArray,
     res_id: int,
-    rotamer: Dict[str, Union[float, List[float]]],
-    res_name: Optional[str] = None,
+    rotamer: dict[str, float | list[float]],
+    res_name: str | None = None,
 ) -> None:
     """Reconstructs the sidechain of a specific residue in the peptide using the provided rotamer angles.
     Updates the coordinates in place.
@@ -122,9 +122,7 @@ def reconstruct_sidechain(
                 g_atom = gamma_atoms[0]
                 n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
 
-                curr_chi1 = struc.dihedral(
-                    n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
-                )
+                curr_chi1 = struc.dihedral(n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord)
                 curr_chi1_deg = np.rad2deg(curr_chi1)
 
                 _chi1_val_r = rotamer["chi1"]

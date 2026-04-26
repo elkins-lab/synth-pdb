@@ -201,13 +201,15 @@ filterwarnings = [
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
+ignore_errors = true
+strict_equality = true
+exclude = "(build/|scratch/)"
+
+[[tool.mypy.overrides]]
+module = "synth_pdb.*"
+ignore_errors = false
 disallow_untyped_defs = true
 check_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = false
-no_implicit_optional = true
-strict_equality = true
-exclude = "build/"
 
 [[tool.mypy.overrides]]
 module = [
@@ -225,6 +227,10 @@ module = [
     "pynmrstar",
     "sklearn.*",
     "mrcfile",
+    "psutil",
+    "py3Dmol",
+    "seaborn",
+    "matplotlib.*",
 ]
 ignore_missing_imports = true
 

@@ -54,7 +54,7 @@ GRAPH STRUCTURE
 
 import logging
 import math
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -248,7 +248,7 @@ def build_protein_graph(pdb_content: str, ca_distance_threshold: float = 8.0) ->
 # ---------------------------------------------------------------------------
 
 
-def _parse_backbone(pdb_content: str) -> List[Dict]:
+def _parse_backbone(pdb_content: str) -> list[dict]:
     """Extract per-residue Cα coordinates, B-factors, and backbone dihedrals
     from a raw PDB string.
 
@@ -268,8 +268,8 @@ def _parse_backbone(pdb_content: str) -> List[Dict]:
     ─────────────────────────────────────────────────────────────────────
     """
     # Collect raw ATOM records keyed by (chain, res_num)
-    atom_records: Dict[Tuple[str, int], Dict[str, np.ndarray]] = {}
-    b_records: Dict[Tuple[str, int], float] = {}
+    atom_records: dict[tuple[str, int], dict[str, np.ndarray]] = {}
+    b_records: dict[tuple[str, int], float] = {}
 
     for line in pdb_content.splitlines():
         if not line.startswith("ATOM"):

@@ -32,15 +32,15 @@ def test_main_pymol_missing_args():
 
 def test_main_relax_logic():
     """Cover relaxation logic paths."""
-    with patch(
-        "synth_pdb.main.generate_pdb_content",
-        return_value="ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N\nATOM      2  H   ALA A   1       0.000   0.000   1.000  1.00 20.00           H\n",
-    ), patch("synth_pdb.relaxation.calculate_relaxation_rates", return_value={}), patch(
-        "synth_pdb.nef_io.write_nef_relaxation"
-    ), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N\nATOM      2  H   ALA A   1       0.000   0.000   1.000  1.00 20.00           H\n",
+        ),
+        patch("synth_pdb.relaxation.calculate_relaxation_rates", return_value={}),
+        patch("synth_pdb.nef_io.write_nef_relaxation"),
+        patch("builtins.open", MagicMock()),
     ):
-
         with patch(
             "sys.argv", ["synth-pdb", "--sequence", "A", "--gen-relax", "--tumbling-time", "8.0"]
         ):
@@ -52,8 +52,9 @@ def test_main_relax_logic():
 
 def test_main_visualize_highlight_structure_failure():
     """Cover line 745: could not parse structure for highlighting."""
-    with patch("synth_pdb.main.generate_pdb_content", return_value="ATOM..."), patch(
-        "builtins.open", MagicMock()
+    with (
+        patch("synth_pdb.main.generate_pdb_content", return_value="ATOM..."),
+        patch("builtins.open", MagicMock()),
     ):
         # Invalid structure format (triggers exception in parsing)
         with patch("sys.argv", ["synth-pdb", "--sequence", "A", "--structure", "None:None:None"]):

@@ -4,7 +4,7 @@ import io
 import logging
 import random
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import biotite.structure.io.pdb as pdb
 import numpy as np
@@ -25,7 +25,7 @@ from .generator import generate_pdb_content
 logger = logging.getLogger(__name__)
 
 
-def _generate_single_sample_task(args: tuple) -> Dict[str, Any]:
+def _generate_single_sample_task(args: tuple) -> dict[str, Any]:
     """Helper function to generate a single sample.
     Arguments are passed as a tuple to be compatible with map/submit if needed,
     but we'll use unpacking for clarity.
@@ -132,8 +132,8 @@ class DatasetGenerator:
         min_length: int = 10,
         max_length: int = 50,
         train_ratio: float = 0.8,
-        seed: Optional[int] = None,
-        max_workers: Optional[int] = None,
+        seed: int | None = None,
+        max_workers: int | None = None,
         dataset_format: str = "pdb",
     ):
         self.output_dir = Path(output_dir).absolute()
@@ -266,7 +266,7 @@ class DatasetGenerator:
         )
 
 
-def _generate_single_sample_npz_task(args: tuple) -> Dict[str, Any]:
+def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
     """Generate a single sample in NPZ format (AI-Ready).
     Does NOT write intermediate PDB files.
     """

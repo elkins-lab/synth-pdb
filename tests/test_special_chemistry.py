@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 import biotite.structure as struc
 import numpy as np
@@ -6,7 +6,7 @@ import numpy as np
 from synth_pdb.special_chemistry import find_gfp_chromophore_motif, form_gfp_chromophore
 
 
-def create_mock_structure(res_names: List[str]) -> struc.AtomArray:
+def create_mock_structure(res_names: list[str]) -> struc.AtomArray:
     """Helper to create a simple AtomArray for testing."""
     n_residues = len(res_names)
     structure = struc.AtomArray(n_residues)

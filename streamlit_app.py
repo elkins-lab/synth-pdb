@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -35,7 +35,7 @@ if "quality_report" not in st.session_state:
 def run_forge(
     sequence: str,
     conformation: str,
-    structure: Optional[str] = None,
+    structure: str | None = None,
     cyclic: bool = False,
     drift: float = 0.0,
     minimize: bool = False,
@@ -179,7 +179,7 @@ with tab_pathology:
     st.subheader("💀 The Hall of Pathological Perversions")
     st.markdown("Quick-load pathological presets to test boundary conditions.")
 
-    perversions: Dict[str, Dict[str, Any]] = {
+    perversions: dict[str, dict[str, Any]] = {
         "Mobius Loop": {"seq": "AAAAAAAAAAAAAAAAAAAA", "cyclic": True, "drift": 10},
         "Trp Singularity": {"seq": "WWWWWWWWWWWWWWWWWWWW", "conf": "alpha", "drift": 180},
         "Mirror Nightmare": {

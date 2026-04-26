@@ -1,6 +1,6 @@
 import random
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import biotite.structure as struc
 import numpy as np
@@ -70,10 +70,10 @@ class BatchedPeptide:
     def __init__(
         self,
         coords: np.ndarray,
-        sequence: List[str],
-        atom_names: List[str],
-        residue_indices: List[int],
-        atom_chain_ids: Optional[List[str]] = None,
+        sequence: list[str],
+        atom_names: list[str],
+        residue_indices: list[int],
+        atom_chain_ids: list[str] | None = None,
     ):
         """Initialize the container.
 
@@ -222,7 +222,7 @@ class BatchedPeptide:
         lines.append("END")
         return "\n".join(lines)
 
-    def get_6d_orientations(self) -> Dict[str, np.ndarray]:
+    def get_6d_orientations(self) -> dict[str, np.ndarray]:
         """Computes 6D inter-residue orientations (trRosetta style).
 
         Returns:
@@ -240,7 +240,7 @@ class BatchedPeptide:
             self.coords, self.atom_names, self.residue_indices, self.n_residues
         )
 
-    def analyze_ensemble(self, superimpose: bool = True) -> Dict[str, Any]:
+    def analyze_ensemble(self, superimpose: bool = True) -> dict[str, Any]:
         """Performs NMR-style ensemble analysis on the batch.
 
         Calculates the average structure, the average RMSD to that structure
@@ -389,7 +389,7 @@ class BatchedGenerator:
         self.template_atom_names = []
 
     def generate_batch(
-        self, seed: Optional[int] = None, conformation: str = "alpha", drift: float = 0.0
+        self, seed: int | None = None, conformation: str = "alpha", drift: float = 0.0
     ) -> BatchedPeptide:
         """Generates B structures in parallel using vectorized NeRF kernels.
 

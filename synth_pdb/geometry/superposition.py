@@ -9,7 +9,6 @@ For overall fold alignment, C-alpha (CA) only is often used.
 """
 
 import logging
-from typing import List
 
 import numpy as np
 import numpy.typing as npt
@@ -158,7 +157,7 @@ def superimpose_structures(
     return apply_transformation(mobile, R, t)
 
 
-def find_medoid(coords_list: List[npt.NDArray[np.float64]], superimpose: bool = True) -> int:
+def find_medoid(coords_list: list[npt.NDArray[np.float64]], superimpose: bool = True) -> int:
     """
     Find medoid structure (most representative) from ensemble.
 

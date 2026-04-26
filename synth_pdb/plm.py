@@ -109,7 +109,7 @@ BENCHMARK (measured 2026-02-19, CPU, esm2_t6_8M_UR50D)
 """
 
 import logging
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 
@@ -170,13 +170,13 @@ class ESM2Embedder:
     def __init__(
         self,
         model_name: str = _DEFAULT_MODEL,
-        device: Optional[str] = None,
+        device: str | None = None,
     ):
         self.model_name = model_name
         self._device_str = device  # resolved lazily
         self._model = None  # EsmModel — loaded on first embed()
         self._tokenizer = None  # EsmTokenizer — loaded on first embed()
-        self._embedding_dim: Optional[int] = None
+        self._embedding_dim: int | None = None
 
     # ──────────────────────────────────────────────────────────────────────
     # Public API
@@ -352,8 +352,6 @@ class ESM2Embedder:
                 "transformers is required for ESM2Embedder. "
                 "Install with: pip install synth-pdb[plm]"
             ) from exc
-
-        import torch
 
         # ── Device selection ──────────────────────────────────────────────
         # Priority: explicit override > MPS (Apple Silicon) > CUDA > CPU

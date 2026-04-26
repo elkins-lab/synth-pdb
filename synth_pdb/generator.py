@@ -31,7 +31,7 @@ import logging
 import os
 import random
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -95,7 +95,7 @@ def _calculate_bfactor(
     total_residues: int,
     residue_name: str,
     s2: float = 0.85,
-    rng: Optional[random.Random] = None,
+    rng: random.Random | None = None,
 ) -> float:
     r"""Calculate realistic B-factor (temperature factor) derived from Order Parameter (S2).
 
@@ -197,7 +197,7 @@ def _calculate_occupancy(
     total_residues: int,
     residue_name: str,
     bfactor: float,
-    rng: Optional[random.Random] = None,
+    rng: random.Random | None = None,
 ) -> float:
     """Calculate realistic occupancy for an atom (0.85-1.00)."""
     backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
@@ -287,8 +287,8 @@ def _place_atom_with_dihedral(
 
 
 def _generate_random_amino_acid_sequence(
-    length: int, use_plausible_frequencies: bool = False, rng: Optional[random.Random] = None
-) -> List[str]:
+    length: int, use_plausible_frequencies: bool = False, rng: random.Random | None = None
+) -> list[str]:
     """Generate a random amino acid sequence of a given length.
 
     If `use_plausible_frequencies` is True, uses frequencies from AMINO_ACID_FREQUENCIES.
@@ -321,7 +321,7 @@ def _generate_random_amino_acid_sequence(
     if use_plausible_frequencies:
         amino_acids = list(AMINO_ACID_FREQUENCIES.keys())
         weights = list(AMINO_ACID_FREQUENCIES.values())
-        return cast(List[str], _rng.choices(amino_acids, weights=weights, k=length))
+        return cast(list[str], _rng.choices(amino_acids, weights=weights, k=length))
     else:
         return [str(_rng.choice(STANDARD_AMINO_ACIDS)) for _ in range(length)]
 
@@ -363,7 +363,7 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
         [(3, 8), (12, 20)]  # CYS 3-8 and CYS 12-20 are bonded
 
     """
-    disulfides: List[Tuple[int, int]] = []
+    disulfides: list[tuple[int, int]] = []
 
     # Find all CYS/CYX residues
     cys_residues = peptide[(peptide.res_name == "CYS") | (peptide.res_name == "CYX")]
@@ -451,11 +451,11 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = "A") -> str:
 
 
 def _resolve_sequence(
-    length: Optional[int],
-    user_sequence_str: Optional[str] = None,
+    length: int | None,
+    user_sequence_str: str | None = None,
     use_plausible_frequencies: bool = False,
-    rng: Optional[random.Random] = None,
-) -> List[str]:
+    rng: random.Random | None = None,
+) -> list[str]:
     """Resolve the amino acid sequence from user input or random generation.
 
     Args:
@@ -521,8 +521,8 @@ def _resolve_sequence(
 
 
 def _sample_ramachandran_angles(
-    res_name: str, next_res_name: Optional[str] = None, rng: Optional[random.Random] = None
-) -> Tuple[float, float]:
+    res_name: str, next_res_name: str | None = None, rng: random.Random | None = None
+) -> tuple[float, float]:
     """Sample phi/psi angles from Ramachandran probability distribution.
 
     Uses residue-specific distributions for GLY and PRO, general distribution
@@ -576,7 +576,7 @@ def _sample_ramachandran_angles(
     return phi, psi
 
 
-def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[int, str]:
+def _parse_structure_regions(structure_str: str, sequence_length: int) -> dict[int, str]:
     """Parse structure region specification into per-residue conformations.
 
     This function enables users to specify different secondary structure conformations
@@ -742,10 +742,10 @@ def _parse_structure_regions(structure_str: str, sequence_length: int) -> Dict[i
 
 
 def _resolve_conformation_map(
-    sequence: List[str],
+    sequence: list[str],
     conformation: str,
-    structure: Optional[str],
-) -> Dict[int, str]:
+    structure: str | None,
+) -> dict[int, str]:
     """Build per-residue conformation map from default and optional structure spec.
 
     Validates the default conformation, expands the optional per-region structure
@@ -796,15 +796,15 @@ def _resolve_conformation_map(
 
 
 def _build_peptide_chains(
-    chain_sequences: List[List[str]],
+    chain_sequences: list[list[str]],
     conformation: str,
-    structure: Optional[str],
+    structure: str | None,
     cyclic: bool,
     cis_proline_frequency: float,
     drift: float,
-    phi_list: Optional[List[float]],
-    psi_list: Optional[List[float]],
-    omega_list: Optional[List[float]],
+    phi_list: list[float] | None,
+    psi_list: list[float] | None,
+    omega_list: list[float] | None,
     rng: random.Random,
 ) -> struc.AtomArray:
     """Construct coordinates for one or more polypeptide chains using NeRF geometry.
@@ -844,7 +844,7 @@ def _build_peptide_chains(
         residue_conformations = _resolve_conformation_map(sequence, conformation, structure)
 
         current_chain_array = struc.AtomArray(0)
-        residue_coordinates: Dict[int, Dict[str, np.ndarray]] = {}
+        residue_coordinates: dict[int, dict[str, np.ndarray]] = {}
 
         for i, full_res_name in enumerate(sequence):
             res_id = i + 1
@@ -1209,8 +1209,8 @@ def _apply_biophysical_mods(
     cyclic: bool,
     ph: float,
     metal_ions: str,
-    rng: Optional[random.Random] = None,
-) -> Tuple[struc.AtomArray, List[Dict]]:
+    rng: random.Random | None = None,
+) -> tuple[struc.AtomArray, list[dict]]:
     """Apply post-construction biophysical modifications in-place on a copy.
 
     Order of application matches the original generator logic:
@@ -1254,7 +1254,7 @@ def _apply_biophysical_mods(
     # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.
-    sites: List[Dict] = []
+    sites: list[dict] = []
     if metal_ions == "auto":
         from .cofactors import add_metal_ion, find_metal_binding_sites
 
@@ -1267,7 +1267,7 @@ def _apply_biophysical_mods(
 
 def _do_energy_minimization(
     peptide: struc.AtomArray,
-    sequence: List[str],
+    sequence: list[str],
     forcefield: str,
     minimization_k: float,
     minimization_max_iter: int,
@@ -1277,8 +1277,8 @@ def _do_energy_minimization(
     solvent_model: str,
     solvent_padding: float,
     keep_solvent: bool,
-    coordination: Optional[List[Dict]] = None,
-) -> Tuple[Optional[str], struc.AtomArray]:
+    coordination: list[dict] | None = None,
+) -> tuple[str | None, struc.AtomArray]:
     """Run OpenMM energy minimization (or MD equilibration) and return results.
 
     Writes a temporary PDB, invokes :class:`.EnergyMinimizer`, and reads the
@@ -1442,10 +1442,10 @@ def _do_energy_minimization(
 
 def _assemble_pdb_output(
     peptide: struc.AtomArray,
-    atomic_and_ter_content: Optional[str],
+    atomic_and_ter_content: str | None,
     sequence_length: int,
     cyclic: bool,
-    rng: Optional[random.Random] = None,
+    rng: random.Random | None = None,
 ) -> str:
     """Assemble the final PDB string with realistic B-factors, occupancy, and records.
 
@@ -1498,10 +1498,10 @@ def _assemble_pdb_output(
     processed_lines = []
     n_term_serial = None
     c_term_serial = None
-    sg_serials: Dict[int, int] = {}
+    sg_serials: dict[int, int] = {}
     serial = 0  # tracks last serial of any ATOM/HETATM line
     last_atom_serial = 0  # tracks last serial of ATOM (polymer) lines only
-    last_protein_atom_line: Optional[str] = None  # last ATOM line text
+    last_protein_atom_line: str | None = None  # last ATOM line text
 
     # ── Step 2: Line-by-Line Refinement ────────────────────────────────────
     # We iterate over every ATOM line to apply biophysical metadata.
@@ -1617,18 +1617,18 @@ def _assemble_pdb_output(
 
 
 def generate_pdb_content(
-    length: Optional[int] = None,
-    sequence_str: Optional[str] = None,
+    length: int | None = None,
+    sequence_str: str | None = None,
     use_plausible_frequencies: bool = False,
     conformation: str = "alpha",
-    structure: Optional[str] = None,
+    structure: str | None = None,
     optimize_sidechains: bool = False,
     minimize_energy: bool = False,
     forcefield: str = "amber14-all.xml",
     solvent_model: str = "obc2",
     solvent_padding: float = 1.0,
     keep_solvent: bool = False,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     ph: float = 7.4,
     cap_termini: bool = False,
     equilibrate: bool = False,
@@ -1640,9 +1640,9 @@ def generate_pdb_content(
     phosphorylation_rate: float = 0.0,  # Probability of S/T/Y phosphorylation
     cyclic: bool = False,  # Head-to-Tail cyclization
     drift: float = 0.0,  # Torsion angle perturbation in degrees
-    phi_list: Optional[List[float]] = None,  # Explicit Phi angles
-    psi_list: Optional[List[float]] = None,  # Explicit Psi angles
-    omega_list: Optional[List[float]] = None,  # Explicit Omega angles
+    phi_list: list[float] | None = None,  # Explicit Phi angles
+    psi_list: list[float] | None = None,  # Explicit Psi angles
+    omega_list: list[float] | None = None,  # Explicit Omega angles
 ) -> str:
     r"""Generates PDB content for a linear or cyclic peptide chain.
 
@@ -1815,7 +1815,7 @@ def generate_pdb_content(
     )
 
     # Optional energy minimization / MD equilibration via OpenMM
-    atomic_and_ter_content: Optional[str] = None
+    atomic_and_ter_content: str | None = None
     if minimize_energy:
         # We pass a flattened sequence for energy minimization (topology)
         flat_sequence = []
@@ -1860,7 +1860,7 @@ class PeptideGenerator:
         """Initialize the generator with a target sequence and config."""
         self.sequence = sequence
         self.config = kwargs
-        self._last_result: Optional[PeptideResult] = None
+        self._last_result: PeptideResult | None = None
 
     def generate(self, **overrides: Any) -> "PeptideResult":
         """Generates the protein structure and returns a Result object.

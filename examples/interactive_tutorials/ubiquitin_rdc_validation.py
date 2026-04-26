@@ -162,7 +162,7 @@ B = []
 D = []
 
 valid_res = []
-for idx, row in df_rdc.iterrows():
+for _idx, row in df_rdc.iterrows():
     res_id = int(row["res_index"])
     if res_id in nh_vectors:
         v = nh_vectors[res_id]
@@ -268,7 +268,7 @@ plt.xlabel("Experimental RDC $D_{HN}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated RDC $D_{HN}$ (Hz)", fontsize=12)
 
 # Annotate stats
-bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
+bbox_props = {"boxstyle": "round,pad=0.5", "fc": "white", "ec": "gray", "alpha": 0.9}
 plt.text(
     min_val + 2,
     max_val - 5,

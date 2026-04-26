@@ -81,7 +81,6 @@ def test_msa_mutual_information_recovery():
     )
 
 
-
 def test_sasa_selective_pressure():
     """Verify that buried residues strongly avoid polar/charged amino acids."""
     base_sequence = "G" * 10
@@ -95,7 +94,12 @@ def test_sasa_selective_pressure():
 
     # Generate deep MSA
     msa_sequences = generate_msa(
-        base_sequence, cmap, num_sequences=500, temperature=1.0, steps_between_samples=50, rel_sasa=rel_sasa
+        base_sequence,
+        cmap,
+        num_sequences=500,
+        temperature=1.0,
+        steps_between_samples=50,
+        rel_sasa=rel_sasa,
     )
 
     polar_charged = {"R", "K", "D", "E", "Q", "N", "H", "S", "T", "Y"}

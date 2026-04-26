@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from synth_pdb.bmrb_api import BMRBAPI
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator

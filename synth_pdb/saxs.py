@@ -23,7 +23,7 @@
 """
 
 import logging
-from typing import Any, Dict, Tuple, Union, cast
+from typing import Any, cast
 
 import biotite.structure as struc
 import numpy as np
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Atomic Form Factor Coefficients (Waasmaier & Kirfel, 1995)
 # f(s) = sum_{i=1}^4 a_i * exp(-b_i * s^2) + c, where s = q / (4 * pi)
-FORM_FACTOR_COEFFS: Dict[str, Dict[str, Any]] = {
+FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
     "H": {
         "a": [0.489918, 0.262477, 0.196767, 0.050479],
         "b": [20.6593, 7.74039, 49.5519, 2.20159],
@@ -100,7 +100,7 @@ def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
     s2 = s**2
 
     f = np.full_like(q, coeffs["c"])
-    for a, b in zip(coeffs["a"], coeffs["b"]):
+    for a, b in zip(coeffs["a"], coeffs["b"], strict=False):
         f += a * np.exp(-b * s2)
 
     return f
@@ -113,7 +113,7 @@ def calculate_saxs_profile(
     n_points: int = 51,
     include_solvent: bool = True,
     solvent_density: float = 0.334,  # e/A^3 (Water)
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the SAXS profile I(q) for a protein structure.
 
     This implements the Debye formula, which is O(N^2) relative to the number
@@ -192,7 +192,7 @@ class SaxsSimulator:
         self.n_points = n_points
         self.include_solvent = include_solvent
 
-    def simulate(self, structure: Union[struc.AtomArray, struc.AtomArrayStack]) -> np.ndarray:
+    def simulate(self, structure: struc.AtomArray | struc.AtomArrayStack) -> np.ndarray:
         """Computes the averaged SAXS profile for a structure or ensemble."""
         if isinstance(structure, struc.AtomArray):
             _, intensity = calculate_saxs_profile(

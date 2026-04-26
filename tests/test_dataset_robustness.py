@@ -1,7 +1,8 @@
 import shutil
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator, Tuple
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -35,7 +36,7 @@ def test_generate_single_sample_npz_task_invalid_aa(temp_output_dir: str) -> Non
     )
 
     with patch("synth_pdb.dataset.generate_pdb_content", return_value=mock_pdb):
-        args: Tuple[Any, ...] = ("test_id", 1, "alpha", "train", temp_output_dir, "npz")
+        args: tuple[Any, ...] = ("test_id", 1, "alpha", "train", temp_output_dir, "npz")
         result = _generate_single_sample_npz_task(args)
 
         assert result["success"] is True
@@ -54,7 +55,7 @@ def test_generate_single_sample_task_failure(temp_output_dir: str) -> None:
     with patch(
         "synth_pdb.dataset.generate_pdb_content", side_effect=Exception("Simulated Failure")
     ):
-        args: Tuple[Any, ...] = ("test_id", 10, "alpha", "train", temp_output_dir, "pdb")
+        args: tuple[Any, ...] = ("test_id", 10, "alpha", "train", temp_output_dir, "pdb")
         result = _generate_single_sample_task(args)
 
         assert result["success"] is False
@@ -126,7 +127,7 @@ def test_npz_task_missing_cb(temp_output_dir: str) -> None:
     )
 
     with patch("synth_pdb.dataset.generate_pdb_content", return_value=mock_pdb):
-        args: Tuple[Any, ...] = ("test_gly", 1, "alpha", "train", temp_output_dir, "npz")
+        args: tuple[Any, ...] = ("test_gly", 1, "alpha", "train", temp_output_dir, "npz")
         result = _generate_single_sample_npz_task(args)
 
         assert result["success"] is True

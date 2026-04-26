@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -15,11 +15,12 @@ from .geometry import (
 
 logger = logging.getLogger(__name__)
 
+
 class GeometryAnalyzer:
     """High-level analysis suite for protein geometry and ensembles."""
 
     @staticmethod
-    def compare_pdbs(pdb_path1: str, pdb_path2: str, ca_only: bool = True) -> Dict[str, Any]:
+    def compare_pdbs(pdb_path1: str, pdb_path2: str, ca_only: bool = True) -> dict[str, Any]:
         """Compare two PDB files and calculate RMSD and optimal transformation.
 
         Args:
@@ -58,7 +59,7 @@ class GeometryAnalyzer:
         }
 
     @staticmethod
-    def analyze_ensemble_pdbs(pdb_paths: List[str]) -> Dict[str, Any]:
+    def analyze_ensemble_pdbs(pdb_paths: list[str]) -> dict[str, Any]:
         """Analyze a list of PDB files as an NMR-style ensemble.
 
         Args:
@@ -83,7 +84,7 @@ class GeometryAnalyzer:
         }
 
     @staticmethod
-    def calculate_residue_strain(pdb_path: str) -> Dict[int, float]:
+    def calculate_residue_strain(pdb_path: str) -> dict[int, float]:
         """Calculates 'geometric strain' per residue.
 
         Currently defined as the deviation of the peptide bond omega angle
@@ -95,7 +96,7 @@ class GeometryAnalyzer:
 
         for i in range(len(res_ids) - 1):
             rid1 = res_ids[i]
-            rid2 = res_ids[i+1]
+            rid2 = res_ids[i + 1]
 
             # Omega: CA(i) - C(i) - N(i+1) - CA(i+1)
             ca1 = s[(s.res_id == rid1) & (s.atom_name == "CA")]

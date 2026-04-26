@@ -35,10 +35,13 @@ def test_reconstruct_sidechain_basic():
     sg_coord = peptide[(peptide.res_id == res_id) & (peptide.atom_name == "SG")].coord[0]
 
     calc_chi1 = np.rad2deg(struc.dihedral(n_coord, ca_coord, cb_coord, sg_coord))
-    if calc_chi1 < 0: calc_chi1 += 360
-    if target_chi1 < 0: target_chi1 += 360
+    if calc_chi1 < 0:
+        calc_chi1 += 360
+    if target_chi1 < 0:
+        target_chi1 += 360
 
     assert pytest.approx(calc_chi1, abs=0.5) == target_chi1
+
 
 def test_reconstruct_sidechain_branched_val():
     """Test sidechain reconstruction for branched residue (VAL)."""
@@ -58,10 +61,13 @@ def test_reconstruct_sidechain_branched_val():
     cg1_coord = peptide[(peptide.res_id == res_id) & (peptide.atom_name == "CG1")].coord[0]
 
     calc_chi1 = np.rad2deg(struc.dihedral(n_coord, ca_coord, cb_coord, cg1_coord))
-    if calc_chi1 < 0: calc_chi1 += 360
-    if target_chi1 < 0: target_chi1 += 360
+    if calc_chi1 < 0:
+        calc_chi1 += 360
+    if target_chi1 < 0:
+        target_chi1 += 360
 
     assert pytest.approx(calc_chi1, abs=0.5) == target_chi1
+
 
 def test_reconstruct_sidechain_invalid_residue():
     """Test error handling for non-existent residue."""
@@ -71,6 +77,7 @@ def test_reconstruct_sidechain_invalid_residue():
 
     with pytest.raises(ValueError):
         reconstruct_sidechain(peptide, 999, {"chi1": [60.0]})
+
 
 def test_reconstruct_sidechain_missing_backbone():
     """Test graceful failure when backbone atoms are missing."""
@@ -101,7 +108,7 @@ def test_reconstruct_sidechain_missing_template_atoms(mocker):
     """Test handling of templates missing essential backbone atoms (hitting Miss 96-97)."""
     # Use VAL for mock to avoid affecting ALA setup in generate_pdb_content
     bad_template = struc.AtomArray(1)
-    bad_template[0] = struc.Atom(res_id=1, res_name="VAL", atom_name="N", coord=[0,0,0])
+    bad_template[0] = struc.Atom(res_id=1, res_name="VAL", atom_name="N", coord=[0, 0, 0])
 
     pdb_content = generate_pdb_content(sequence_str="V", conformation="alpha")
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))

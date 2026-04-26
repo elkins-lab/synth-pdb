@@ -1,5 +1,4 @@
 import io
-from typing import Dict
 
 import biotite.structure.io.pdb as pdb
 
@@ -73,7 +72,7 @@ class TestNMRNonStandardMotifs:
         l_pdb = generate_pdb_content(sequence_str="ALA-ALA-ALA", minimize_energy=False)
         d_pdb = generate_pdb_content(sequence_str="ALA-D-ALA-ALA", minimize_energy=False)
 
-        def get_shifts(pdb_str: str) -> Dict[int, Dict[str, float]]:
+        def get_shifts(pdb_str: str) -> dict[int, dict[str, float]]:
             f = io.StringIO(pdb_str)
             s = pdb.PDBFile.read(f).get_structure(model=1)
             return predict_chemical_shifts(s, use_shiftx2=False)["A"]
@@ -95,7 +94,7 @@ class TestNMRNonStandardMotifs:
         ser_pdb = generate_pdb_content(sequence_str="ALA-SER-ALA", minimize_energy=False)
         sep_pdb = generate_pdb_content(sequence_str="ALA-SEP-ALA", minimize_energy=False)
 
-        def get_shifts(pdb_str: str) -> Dict[int, Dict[str, float]]:
+        def get_shifts(pdb_str: str) -> dict[int, dict[str, float]]:
             f = io.StringIO(pdb_str)
             s = pdb.PDBFile.read(f).get_structure(model=1)
             return predict_chemical_shifts(s, use_shiftx2=False)["A"]

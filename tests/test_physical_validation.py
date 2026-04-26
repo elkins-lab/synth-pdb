@@ -6,6 +6,7 @@ def test_physical_energy_validation_tdd(tmp_path):
     """TDD: Verify that PDBValidator can distinguish between low-energy and high-energy structures."""
     # 1. Generate a "Good" structure
     from synth_pdb.physics import EnergyMinimizer
+
     pdb_raw = generate_pdb_content(sequence_str="AAAAA")
 
     in_pdb = tmp_path / "in.pdb"
@@ -45,7 +46,8 @@ def test_physical_energy_validation_tdd(tmp_path):
     print(f"Bad Energy: {energy_bad:.2f} kJ/mol")
 
     assert energy_good < 0
-    assert energy_bad > 1e6 or energy_bad == float('inf')
+    assert energy_bad > 1e6 or energy_bad == float("inf")
+
 
 def test_quality_score_integration():
     """TDD: Verify that energy is integrated into a multi-metric quality score."""

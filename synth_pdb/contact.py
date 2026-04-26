@@ -1,10 +1,10 @@
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 import numpy as np
 
 
 def compute_contact_map(
-    structure: Any, method: str = "ca", threshold: float = 8.0, power: Optional[float] = None
+    structure: Any, method: str = "ca", threshold: float = 8.0, power: float | None = None
 ) -> np.ndarray:
     """Computes a residue-residue contact map.
 

@@ -6,7 +6,7 @@ import platform
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import psutil
 
@@ -20,7 +20,7 @@ from synth_pdb.batch_generator import BatchedGenerator  # noqa: E402
 from synth_pdb.generator import generate_pdb_content  # noqa: E402
 
 
-def get_hardware_info() -> Dict[str, Any]:
+def get_hardware_info() -> dict[str, Any]:
     """Gathers detailed hardware and platform information."""
     return {
         "platform": platform.system(),

@@ -9,7 +9,7 @@ comparison, C-alpha (CA) only is often used.
 """
 
 import logging
-from typing import List, cast
+from typing import cast
 
 import numpy as np
 import numpy.typing as npt
@@ -61,7 +61,7 @@ def calculate_rmsd(P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]) -> fl
 
 
 def calculate_pairwise_rmsd(
-    coords_list: List[npt.NDArray[np.float64]], superimpose: bool = False
+    coords_list: list[npt.NDArray[np.float64]], superimpose: bool = False
 ) -> npt.NDArray[np.float64]:
     """
     Calculate pairwise RMSD matrix for multiple structures.
@@ -104,7 +104,7 @@ def calculate_pairwise_rmsd(
 
 
 def calculate_average_coords(
-    coords_list: List[npt.NDArray[np.float64]],
+    coords_list: list[npt.NDArray[np.float64]],
 ) -> npt.NDArray[np.float64]:
     """
     Calculate average (centroid) coordinates from ensemble.
@@ -137,7 +137,7 @@ def calculate_average_coords(
 
 
 def calculate_rmsd_to_average(
-    coords_list: List[npt.NDArray[np.float64]],
+    coords_list: list[npt.NDArray[np.float64]],
 ) -> tuple[float, npt.NDArray[np.float64]]:
     """
     Calculate RMSD of each structure to the average structure.

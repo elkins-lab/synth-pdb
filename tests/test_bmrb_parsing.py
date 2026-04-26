@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 from synth_pdb.bmrb_api import BMRBAPI, PDBValidationAPI
@@ -121,7 +121,7 @@ def test_pdbe_validation_summary() -> None:
 
 def test_pdbe_validation_outliers() -> None:
     """Test PDBValidationAPI outliers fetching."""
-    mock_data: Dict[str, Any] = {"1ubq": {"outliers": []}}
+    mock_data: dict[str, Any] = {"1ubq": {"outliers": []}}
     with patch("requests.get") as mock_get:
         mock_resp = MagicMock()
         mock_resp.status_code = 200

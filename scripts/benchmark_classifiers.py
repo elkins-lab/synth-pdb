@@ -200,7 +200,7 @@ def benchmark_gnn(pdbs_train, y_train, pdbs_test, y_test, epochs: int = 50, hidd
 
     def _build_graphs(pdbs, ys, split_name):
         graphs, skipped = [], 0
-        for i, (pdb, label) in enumerate(zip(pdbs, ys)):
+        for i, (pdb, label) in enumerate(zip(pdbs, ys, strict=False)):
             try:
                 g = build_protein_graph(pdb)
                 g.y = torch.tensor([int(label)], dtype=torch.long)

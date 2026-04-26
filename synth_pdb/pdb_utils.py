@@ -5,7 +5,6 @@ to avoid code duplication across the codebase.
 """
 
 from datetime import datetime
-from typing import Optional
 
 
 def get_current_date_pdb_format() -> str:
@@ -39,8 +38,8 @@ def extract_atomic_content(full_pdb_content: str) -> str:
 
 def create_pdb_header(
     sequence_length: int,
-    date: Optional[str] = None,
-    command_args: Optional[str] = None,
+    date: str | None = None,
+    command_args: str | None = None,
 ) -> str:
     """Creates standardized PDB header records.
 
@@ -131,10 +130,10 @@ def extract_header_records(full_pdb_content: str, record_type: str = "SSBOND") -
 def assemble_pdb_content(
     atomic_content: str,
     sequence_length: int,
-    date: Optional[str] = None,
-    command_args: Optional[str] = None,
-    extra_records: Optional[str] = None,
-    conect_records: Optional[str] = None,
+    date: str | None = None,
+    command_args: str | None = None,
+    extra_records: str | None = None,
+    conect_records: str | None = None,
 ) -> str:
     """Assembles complete PDB file content from atomic coordinates and metadata.
 

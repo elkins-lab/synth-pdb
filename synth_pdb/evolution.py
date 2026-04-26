@@ -14,7 +14,6 @@ Theoretical Basis:
 
 import logging
 import random  # We use random for stochastic mutation
-from typing import List
 
 import biotite.structure as struc
 import numpy as np
@@ -121,7 +120,7 @@ def generate_msa_sequences(
     n_seqs: int = 100,
     mutation_rate: float = 0.1,
     conservation_threshold: float = 0.2,
-) -> List[str]:
+) -> list[str]:
     """Generate synthetic homologs via simulated neutral drift.
 
     Args:
@@ -175,7 +174,7 @@ def generate_msa_sequences(
     return msa
 
 
-def write_msa(sequences: List[str], filename: str) -> None:
+def write_msa(sequences: list[str], filename: str) -> None:
     """Write MSA in FASTA format."""
     with open(filename, "w") as f:
         for i, seq in enumerate(sequences):

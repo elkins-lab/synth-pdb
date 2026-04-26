@@ -17,6 +17,7 @@ def test_ensemble_analysis_medoid():
     assert analysis["avg_coords"].shape == (batch.n_atoms, 3)
     assert analysis["avg_rmsd"] >= 0.0
 
+
 def test_ensemble_analysis_identical():
     """Test that identical structures yield 0 RMSD."""
     bg = BatchedGenerator("AAAAA", n_batch=2)
@@ -28,6 +29,7 @@ def test_ensemble_analysis_identical():
     # Due to floating point precision and superimposition, it might not be EXACTLY 0,
     # but it should be very close.
     assert analysis["avg_rmsd"] < 1e-5
+
 
 def test_ensemble_analysis_different_drift():
     """Test that higher drift leads to higher average RMSD."""

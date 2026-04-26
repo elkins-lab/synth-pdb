@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any
 
 """
 This module contains data definitions for the synth_pdb package, starting
@@ -7,7 +7,7 @@ with the 20 standard amino acids and their atomic configurations.
 
 # The 20 standard amino acids represented by their 3-letter codes.
 # This list is used to randomly select amino acids for the sequence.
-STANDARD_AMINO_ACIDS: List[str] = [
+STANDARD_AMINO_ACIDS: list[str] = [
     "ALA",
     "ARG",
     "ASN",
@@ -66,7 +66,7 @@ STANDARD_AMINO_ACIDS: List[str] = [
 #    that is energetically impossible for L-Proline.
 #
 # These 3-letter codes are standardized in the PDB (e.g., DAL for D-Alanine).
-L_TO_D_MAPPING: Dict[str, str] = {
+L_TO_D_MAPPING: dict[str, str] = {
     "ALA": "DAL",
     "ARG": "DAR",
     "ASN": "DAN",
@@ -87,10 +87,10 @@ L_TO_D_MAPPING: Dict[str, str] = {
     "TYR": "DTY",
     "VAL": "DVA",
 }
-D_AMINO_ACIDS: List[str] = list(L_TO_D_MAPPING.values())
+D_AMINO_ACIDS: list[str] = list(L_TO_D_MAPPING.values())
 
 # Post-Translational Modifications
-MODIFIED_AMINO_ACIDS: List[str] = [
+MODIFIED_AMINO_ACIDS: list[str] = [
     "SEP",  # Phosphoserine
     "TPO",  # Phosphothreonine
     "PTR",  # Phosphotyrosine
@@ -102,20 +102,20 @@ MODIFIED_AMINO_ACIDS: List[str] = [
 # D-amino acids are currently generated without OpenMM (no AMBER parameters),
 # so the D-name entries have no runtime effect today — but they future-proof
 # the restoration logic if D-amino acid forcefield support is added later.
-NON_STANDARD_RESIDUES: Set[str] = (
+NON_STANDARD_RESIDUES: set[str] = (
     set(MODIFIED_AMINO_ACIDS)
     | {"HIE", "HID", "HIP"}  # Histidine tautomers
     | set(D_AMINO_ACIDS)  # DAL, DCY, DLE, ... (mirror image residues)
 )
 
-ALL_VALID_AMINO_ACIDS: List[str] = (
+ALL_VALID_AMINO_ACIDS: list[str] = (
     STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS + ["HIE", "HID", "HIP"]
 )
 
 # --- Amino Acid Frequencies (Approximate percentages in proteins) ---
 # Source: Based on general protein composition data (e.g., from D. M. Smith, The Encyclopedia of Life Sciences, 2001)
 # These are normalized to sum to 1.0
-AMINO_ACID_FREQUENCIES: Dict[str, float] = {
+AMINO_ACID_FREQUENCIES: dict[str, float] = {
     "ALA": 0.081,  # Alanine
     "ARG": 0.051,  # Arginine
     "ASN": 0.038,  # Asparagine
@@ -140,7 +140,7 @@ AMINO_ACID_FREQUENCIES: Dict[str, float] = {
 
 # Mapping for 1-letter to 3-letter amino acid codes
 # Standard IUPAC codes
-ONE_TO_THREE_LETTER_CODE: Dict[str, str] = {
+ONE_TO_THREE_LETTER_CODE: dict[str, str] = {
     "A": "ALA",
     "R": "ARG",
     "N": "ASN",
@@ -170,7 +170,7 @@ ONE_TO_THREE_LETTER_CODE: Dict[str, str] = {
 #   - Ramachandran et al. (1963) J. Mol. Biol.
 #   - Lovell et al. (2003) Proteins: Structure, Function, and Bioinformatics
 
-RAMACHANDRAN_PRESETS: Dict[str, Dict[str, float]] = {
+RAMACHANDRAN_PRESETS: dict[str, dict[str, float]] = {
     "alpha": {
         "phi": -57.0,  # Alpha helix (right-handed)
         "psi": -47.0,
@@ -218,7 +218,7 @@ RAMACHANDRAN_PRESETS: Dict[str, Dict[str, float]] = {
 # Based on Lovell et al. (2003) Proteins: Structure, Function and Bioinformatics
 # Used for realistic random conformation sampling
 
-RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
+RAMACHANDRAN_REGIONS: dict[str, dict[str, Any]] = {
     "general": {
         "favored": [
             {"name": "alpha", "phi": -60.0, "psi": -45.0, "std": 10.0, "weight": 0.70},
@@ -284,7 +284,7 @@ RAMACHANDRAN_REGIONS: Dict[str, Dict[str, Any]] = {
 #
 # These regions remain the "Gold Standard" for validating de novo protein models.
 
-RAMACHANDRAN_POLYGONS: Dict[str, Dict[str, List[List[Tuple[float, float]]]]] = {
+RAMACHANDRAN_POLYGONS: dict[str, dict[str, list[list[tuple[float, float]]]]] = {
     "General": {
         "Favored": [
             # Alpha-Helical Region (Core)
@@ -408,7 +408,7 @@ BOND_LENGTH_N_H: float = 1.01  # N-H (typical)
 # Source: Wikipedia, various chemistry texts.
 # These are simplified values for common protein atoms.
 
-VAN_DER_WAALS_RADII: Dict[str, float] = {
+VAN_DER_WAALS_RADII: dict[str, float] = {
     "H": 1.20,  # Hydrogen
     "C": 1.70,  # Carbon
     "N": 1.55,  # Nitrogen
@@ -418,18 +418,18 @@ VAN_DER_WAALS_RADII: Dict[str, float] = {
 }
 
 # Amino acid properties for sequence improbability checks
-CHARGED_AMINO_ACIDS: Set[str] = {
+CHARGED_AMINO_ACIDS: set[str] = {
     "ARG",
     "HIS",
     "LYS",
     "ASP",
     "GLU",
 }  # K, R, H (positive); D, E (negative)
-POSITIVE_AMINO_ACIDS: Set[str] = {"ARG", "HIS", "LYS"}
-NEGATIVE_AMINO_ACIDS: Set[str] = {"ASP", "GLU"}
+POSITIVE_AMINO_ACIDS: set[str] = {"ARG", "HIS", "LYS"}
+NEGATIVE_AMINO_ACIDS: set[str] = {"ASP", "GLU"}
 
-HYDROPHOBIC_AMINO_ACIDS: Set[str] = {"ALA", "VAL", "ILE", "LEU", "MET", "PHE", "TRP", "TYR"}
-HYDROPHILIC_AMINO_ACIDS: Set[str] = {
+HYDROPHOBIC_AMINO_ACIDS: set[str] = {"ALA", "VAL", "ILE", "LEU", "MET", "PHE", "TRP", "TYR"}
+HYDROPHILIC_AMINO_ACIDS: set[str] = {
     "ARG",
     "ASN",
     "ASP",
@@ -440,7 +440,7 @@ HYDROPHILIC_AMINO_ACIDS: Set[str] = {
     "SER",
     "THR",
 }  # Contains charged ones too
-POLAR_UNCHARGED_AMINO_ACIDS: Set[str] = {
+POLAR_UNCHARGED_AMINO_ACIDS: set[str] = {
     "ASN",
     "GLN",
     "SER",
@@ -461,7 +461,7 @@ POLAR_UNCHARGED_AMINO_ACIDS: Set[str] = {
 # Format: {'name': 'ATOM_NAME', 'element': 'ELEMENT_SYMBOL', 'coords': [x, y, z]}
 # For simplicity, coords are relative to CA, assuming CA is at (0,0,0) for side chain placement.
 
-AMINO_ACID_ATOMS: Dict[str, List[Dict[str, Any]]] = {
+AMINO_ACID_ATOMS: dict[str, list[dict[str, Any]]] = {
     "ALA": [
         # Backbone (N, CA, C, O handled by generator)
         {"name": "CB", "element": "C", "coords": [1.4, 0.0, 0.0]},  # Placeholder for CB
@@ -608,9 +608,9 @@ AMINO_ACID_ATOMS: Dict[str, List[Dict[str, Any]]] = {
 
 # A single rotamer entry maps angle names (e.g. 'chi1', 'chi2') to a list of
 # degree values, and 'prob' to a scalar probability weight.
-RotamerEntry = Dict[str, Union[float, List[float]]]
+RotamerEntry = dict[str, float | list[float]]
 
-ROTAMER_LIBRARY: Dict[str, List[RotamerEntry]] = {
+ROTAMER_LIBRARY: dict[str, list[RotamerEntry]] = {
     # Aliphatic amino acids
     "ALA": [],  # No side-chain dihedrals
     "VAL": [
@@ -714,7 +714,7 @@ ROTAMER_LIBRARY: Dict[str, List[RotamerEntry]] = {
 #
 # This simplified library maps secondary structure types ('alpha', 'beta', etc.)
 # to specific rotamer probability distributions.
-BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[RotamerEntry]]] = {
+BACKBONE_DEPENDENT_ROTAMER_LIBRARY: dict[str, dict[str, list[RotamerEntry]]] = {
     "VAL": {
         "alpha": [
             # In Helix: g- is dominant, trans is rare
@@ -954,7 +954,7 @@ BACKBONE_DEPENDENT_ROTAMER_LIBRARY: Dict[str, Dict[str, List[RotamerEntry]]] = {
 #
 # Format: "Type": [(Phi_i+1, Psi_i+1), (Phi_i+2, Psi_i+2)]
 # Values in degrees.
-BETA_TURN_TYPES: Dict[str, List[Tuple[float, float]]] = {
+BETA_TURN_TYPES: dict[str, list[tuple[float, float]]] = {
     "typeI": [(-60.0, -30.0), (-90.0, 0.0)],
     "typeII": [(-60.0, 120.0), (80.0, 0.0)],  # Classic Type II (Res 3 often Gly)
     "typeI'": [(60.0, 30.0), (90.0, 0.0)],  # Inverse Type I (Goldenberg)
@@ -969,7 +969,7 @@ BETA_TURN_TYPES: Dict[str, List[Tuple[float, float]]] = {
 # CA-CB-G-D  (Chi2)
 # CB-G-D-E   (Chi3)
 # G-D-E-Z    (Chi4)
-AMINO_ACID_CHI_DEFINITIONS: Dict[str, List[Dict[str, Union[str, List[str]]]]] = {
+AMINO_ACID_CHI_DEFINITIONS: dict[str, list[dict[str, str | list[str]]]] = {
     "VAL": [{"name": "chi1", "atoms": ["N", "CA", "CB", "CG1"]}],
     "THR": [{"name": "chi1", "atoms": ["N", "CA", "CB", "OG1"]}],
     "ILE": [

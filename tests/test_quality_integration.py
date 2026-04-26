@@ -136,10 +136,11 @@ class TestQualityIntegration:
         validator = PDBValidator(pdb_content=clashing_pdb)
 
         # Patch energy and z-scores to ensure it passes individual checks but fails on interface
-        with patch.object(
-            PDBValidator, "calculate_potential_energy", return_value=0.0
-        ), patch.object(
-            PDBValidator, "get_geometric_z_scores", return_value={"mean_bond_zscore": 0.0}
+        with (
+            patch.object(PDBValidator, "calculate_potential_energy", return_value=0.0),
+            patch.object(
+                PDBValidator, "get_geometric_z_scores", return_value={"mean_bond_zscore": 0.0}
+            ),
         ):
             report = validator.get_quality_report()
 
@@ -162,19 +163,24 @@ class TestQualityIntegration:
         ]
 
         # Patch all physics judges to return perfect scores for the mock PDB
-        with patch.object(
-            PDBValidator, "calculate_potential_energy", return_value=0.0
-        ), patch.object(
-            PDBValidator, "get_geometric_z_scores", return_value={"mean_bond_zscore": 0.0}
-        ), patch.object(
-            PDBValidator, "get_ramachandran_statistics", return_value={"outlier_pct": 0.0}
-        ), patch.object(
-            PDBValidator, "get_rotamer_quality_report", return_value={"favored_rotamers_pct": 100.0}
-        ), patch.object(
-            PDBValidator, "calculate_residue_sasa", return_value={"burial_ratio": 1.0}
-        ), patch(
-            "synth_pdb.quality.classifier.ProteinQualityClassifier"
-        ) as mock_clf_class:
+        with (
+            patch.object(PDBValidator, "calculate_potential_energy", return_value=0.0),
+            patch.object(
+                PDBValidator, "get_geometric_z_scores", return_value={"mean_bond_zscore": 0.0}
+            ),
+            patch.object(
+                PDBValidator, "get_ramachandran_statistics", return_value={"outlier_pct": 0.0}
+            ),
+            patch.object(
+                PDBValidator,
+                "get_rotamer_quality_report",
+                return_value={"favored_rotamers_pct": 100.0},
+            ),
+            patch.object(
+                PDBValidator, "calculate_residue_sasa", return_value={"burial_ratio": 1.0}
+            ),
+            patch("synth_pdb.quality.classifier.ProteinQualityClassifier") as mock_clf_class,
+        ):
             mock_clf = mock_clf_class.return_value
             mock_clf.model = MagicMock()
             mock_clf.predict.return_value = (True, 0.99, {})
@@ -190,12 +196,12 @@ class TestQualityIntegration:
         """Verify that report handles cases where the ML model/joblib is missing."""
         # Use real structure for physics but mock ML failure
         pdb_content = generate_pdb_content(length=10, seed=42)
-        with patch(
-            "synth_pdb.quality.classifier.ProteinQualityClassifier"
-        ) as mock_clf_class, patch.object(
-            PDBValidator, "calculate_potential_energy", return_value=0.0
-        ), patch.object(
-            PDBValidator, "calculate_residue_sasa", return_value={"burial_ratio": 1.0}
+        with (
+            patch("synth_pdb.quality.classifier.ProteinQualityClassifier") as mock_clf_class,
+            patch.object(PDBValidator, "calculate_potential_energy", return_value=0.0),
+            patch.object(
+                PDBValidator, "calculate_residue_sasa", return_value={"burial_ratio": 1.0}
+            ),
         ):
             mock_clf = mock_clf_class.return_value
             mock_clf.model = None  # Simulates load failure

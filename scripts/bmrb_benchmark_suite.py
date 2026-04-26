@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import List, Tuple
 
 import biotite.structure.io.pdb as pdb_io
 import numpy as np
@@ -34,7 +33,7 @@ def run_large_scale_benchmark(cache_dir: str = "artifacts/benchmark_cache") -> N
     print(f"{'BMRB ID':<10} | {'PDB ID':<8} | {'Protein':<25} | {'CA Corr':<8} | {'CA RMSD':<8}")
     print("-" * 80)
 
-    summary_results: List[Tuple[float, float]] = []
+    summary_results: list[tuple[float, float]] = []
 
     for bmrb_id, pdb_id, name in BENCHMARK_PAIRS:
         pdb_path = os.path.join(cache_dir, f"{pdb_id}.pdb")

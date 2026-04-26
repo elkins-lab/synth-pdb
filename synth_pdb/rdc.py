@@ -156,7 +156,7 @@ alignment parameters. Future versions may include automated tensor search.
 
 import logging
 import os
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import numpy as np
 import synth_nmr.rdc as _rdc
@@ -216,7 +216,7 @@ logger = logging.getLogger(__name__)
 # 13. Future-proofing: Simplifies integration with future PTM-aware forcefields.
 # 14. Performance: Uses high-performance dictionary lookup for re-mapping.
 # 15. Science: This mapping is a standard first-order approximation in NMR.
-_PARENT_MAP: Dict[str, str] = {
+_PARENT_MAP: dict[str, str] = {
     # D-Amino Acids (Mapping L-parent for vector isotopes/lookup)
     "DAL": "ALA",
     "DAR": "ARG",
@@ -248,7 +248,7 @@ _PARENT_MAP: Dict[str, str] = {
 }
 
 
-def calculate_rdcs(structure: Any, da: float, r: float) -> Dict[int, float]:
+def calculate_rdcs(structure: Any, da: float, r: float) -> dict[int, float]:
     """
     Predict Residual Dipolar Couplings (RDCs) for a protein structure.
 
@@ -305,7 +305,7 @@ def calculate_rdcs(structure: Any, da: float, r: float) -> Dict[int, float]:
     # theta is the angle between thePas(Z) axis and the bond vector.
     # phi is the angle in the XY plane of the PAS.
     # Orientation of the tensor principal axes is assumed to match the PDB frame.
-    return cast(Dict[int, float], _rdc.calculate_rdcs(working_struc, da, r))
+    return cast(dict[int, float], _rdc.calculate_rdcs(working_struc, da, r))
 
 
 def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> float:
@@ -393,7 +393,7 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
     return float(q)
 
 
-def read_rdc_file(file_path: str) -> List[Dict[str, Any]]:
+def read_rdc_file(file_path: str) -> list[dict[str, Any]]:
     """Reads RDC values from a whitespace-separated file.
 
     SCIENTIFIC RELEVANCE:

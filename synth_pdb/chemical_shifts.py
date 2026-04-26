@@ -165,7 +165,7 @@ import os
 
 # Type hinting for static analysis and IDE support.
 # Dict, List, and Any are used extensively for spectroscopic data structures.
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 # NumPy provides vectorized numerical operations for RMSD calculations.
 # High-performance array math for spectroscopic ensembles.
@@ -333,7 +333,7 @@ _get_aromatic_rings = _cs._get_aromatic_rings
 #    Proper tautomer normalization prevents 'Residue NotFound' errors.
 #    Mapping is applied before the core engine is called.
 #    All 20 standard D-amino acid forms are included in this lookup.
-_PARENT_MAP: Dict[str, str] = {
+_PARENT_MAP: dict[str, str] = {
     # D-Amino Acids (Mapping L-parent for calculation engine compatibility)
     "DAL": "ALA",
     "DAR": "ARG",
@@ -389,7 +389,7 @@ _D_AMINO_ACIDS = {
 
 def predict_chemical_shifts(
     structure: Any, use_shiftx2: bool = True
-) -> Dict[str, Dict[int, Dict[str, float]]]:
+) -> dict[str, dict[int, dict[str, float]]]:
     """
     Predict chemical shifts for a protein structure from Cartesian coordinates.
 
@@ -480,17 +480,17 @@ def predict_chemical_shifts(
                 has_d_amino_acids = True
 
     # Inner helper to dispatch to the correct synth-nmr engine
-    def _dispatch_predictor(struc_to_predict: Any) -> Dict[str, Dict[int, Dict[str, float]]]:
+    def _dispatch_predictor(struc_to_predict: Any) -> dict[str, dict[int, dict[str, float]]]:
         if not use_shiftx2:
             logger.debug("Dispatching to empirical shift predictor.")
             return cast(
-                Dict[str, Dict[int, Dict[str, float]]],
+                dict[str, dict[int, dict[str, float]]],
                 _cs.predict_empirical_shifts(struc_to_predict),
             )
         try:
             logger.debug("Dispatching to SHIFTX2-aware prediction engine.")
             return cast(
-                Dict[str, Dict[int, Dict[str, float]]],
+                dict[str, dict[int, dict[str, float]]],
                 _cs.predict_chemical_shifts(struc_to_predict, use_shiftx2=use_shiftx2),
             )
         except TypeError:
@@ -498,7 +498,7 @@ def predict_chemical_shifts(
                 "Underlying engine does not support use_shiftx2; falling back to default."
             )
             return cast(
-                Dict[str, Dict[int, Dict[str, float]]],
+                dict[str, dict[int, dict[str, float]]],
                 _cs.predict_chemical_shifts(struc_to_predict),
             )
 
@@ -564,14 +564,14 @@ def predict_chemical_shifts(
     # ── 4. MERGE RESULTS ─────────────────────────────────────────────────────
     # We selectively pull the predicted shifts for D-residues from the inverted
     # pass, and L-residues from the standard pass, returning a unified dictionary.
-    merged_shifts: Dict[str, Dict[int, Dict[str, float]]] = {}
+    merged_shifts: dict[str, dict[int, dict[str, float]]] = {}
 
     # Use synth-nmr's get_residue_info to safely iterate the original structure
     from synth_nmr.structure_utils import get_residue_info
 
     chain_ids, res_ids, res_names, _ = get_residue_info(structure)
 
-    for c_id, r_id_str, r_name in zip(chain_ids, res_ids, res_names):
+    for c_id, r_id_str, r_name in zip(chain_ids, res_ids, res_names, strict=False):
         r_id = int(r_id_str)
         if c_id not in merged_shifts:
             merged_shifts[c_id] = {}
@@ -587,8 +587,8 @@ def predict_chemical_shifts(
 
 
 def calculate_csi(
-    shifts: Dict[str, Dict[int, Dict[str, float]]], structure: Any
-) -> Dict[str, Dict[int, float]]:
+    shifts: dict[str, dict[int, dict[str, float]]], structure: Any
+) -> dict[str, dict[int, float]]:
     """
     Calculate the Chemical Shift Index (CSI) for a protein structure.
 
@@ -647,12 +647,12 @@ def calculate_csi(
             logger.debug(f"Mapping {res_name} -> {parent_name} for CSI calculation.")
             working_struc.res_name[mask] = parent_name
 
-    return cast(Dict[str, Dict[int, float]], _calculate_csi(shifts, working_struc))
+    return cast(dict[str, dict[int, float]], _calculate_csi(shifts, working_struc))
 
 
 def get_secondary_structure(
-    shifts: Dict[str, Dict[int, Dict[str, float]]], structure: Any
-) -> List[str]:
+    shifts: dict[str, dict[int, dict[str, float]]], structure: Any
+) -> list[str]:
     """
     Infers categorical secondary structure (H, E, C) from chemical shifts.
 
@@ -745,13 +745,13 @@ def get_secondary_structure(
 
     # Latest synth-nmr might require structure for residue count consistency
     try:
-        return cast(List[str], _get_secondary_structure(working_struc))
+        return cast(list[str], _get_secondary_structure(working_struc))
     except TypeError:
         # Fallback for older versions that might only take shifts
-        return cast(List[str], _get_secondary_structure(shifts))
+        return cast(list[str], _get_secondary_structure(shifts))
 
 
-def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> Dict[str, float]:
+def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dict[str, float]:
     """Calculates RMSD and Correlation between observed and predicted shifts.
 
     SCIENTIFIC RATIONALE:
@@ -874,7 +874,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> Dic
     return {"rmsd": float(cast(Any, rmsd)), "correlation": float(cast(Any, r))}
 
 
-def read_shift_file(file_path: str) -> List[Dict[str, Any]]:
+def read_shift_file(file_path: str) -> list[dict[str, Any]]:
     """Reads chemical shifts from a whitespace-separated file.
 
     SCIENTIFIC RELEVANCE:

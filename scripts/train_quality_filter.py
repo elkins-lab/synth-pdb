@@ -243,7 +243,9 @@ def train_model(output_path, n_samples=200):
     feature_names = get_feature_names()
     importances = clf.feature_importances_
     logger.info("\nFeature Importance:")
-    for name, imp in sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True):
+    for name, imp in sorted(
+        zip(feature_names, importances, strict=False), key=lambda x: x[1], reverse=True
+    ):
         logger.info("  %-35s %.4f", name, imp)
 
     # ------------------------------------------------------------------

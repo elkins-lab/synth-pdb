@@ -48,7 +48,7 @@ class TestGraphBuilder(unittest.TestCase):
     def test_edges_are_bidirectional(self):
         """For every directed edge (i→j), the reverse edge (j→i) must also exist."""
         edge_index = self.data.edge_index  # shape [2, E]
-        edges = set(zip(edge_index[0].tolist(), edge_index[1].tolist()))
+        edges = set(zip(edge_index[0].tolist(), edge_index[1].tolist(), strict=False))
         for src, dst in list(edges):
             self.assertIn(
                 (dst, src),
@@ -61,7 +61,7 @@ class TestGraphBuilder(unittest.TestCase):
         """No residue should have an edge to itself."""
         edge_index = self.data.edge_index
         src, dst = edge_index[0].tolist(), edge_index[1].tolist()
-        self_loops = [(s, d) for s, d in zip(src, dst) if s == d]
+        self_loops = [(s, d) for s, d in zip(src, dst, strict=False) if s == d]
         self.assertEqual(
             len(self_loops), 0, msg=f"Found {len(self_loops)} self-loop(s): {self_loops[:5]}"
         )

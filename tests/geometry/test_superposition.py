@@ -436,9 +436,7 @@ class TestSuperpositionIntegration:
             ensemble.append(coords)
 
         # Align all to reference
-        aligned_ensemble = [
-            superimpose_structures(coords, reference) for coords in ensemble
-        ]
+        aligned_ensemble = [superimpose_structures(coords, reference) for coords in ensemble]
 
         # All should have low RMSD to reference
         for aligned in aligned_ensemble:

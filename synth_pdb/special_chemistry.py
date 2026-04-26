@@ -6,7 +6,6 @@ are critical for the function of certain proteins.
 """
 
 import logging
-from typing import Optional
 
 import biotite.structure as struc
 import numpy as np
@@ -35,7 +34,7 @@ logger = logging.getLogger(__name__)
 # covalent modification in synthetic structures.
 
 
-def find_gfp_chromophore_motif(structure: struc.AtomArray) -> Optional[dict]:
+def find_gfp_chromophore_motif(structure: struc.AtomArray) -> dict | None:
     """Scans the structure for the Ser-Tyr-Gly motif that forms the GFP chromophore.
 
     The chromophore is formed by the cyclization of residues Ser-Tyr-Gly.

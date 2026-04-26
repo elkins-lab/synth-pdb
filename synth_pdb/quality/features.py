@@ -1,5 +1,4 @@
 import logging
-from typing import List, Tuple
 
 import numpy as np
 
@@ -12,7 +11,7 @@ logger = logging.getLogger(__name__)
 __all__ = ["compute_6d_orientations", "extract_quality_features", "get_feature_names"]
 
 
-def get_feature_names() -> List[str]:
+def get_feature_names() -> list[str]:
     """Returns the list of feature names in the order they appear in the feature vector."""
     return [
         "ramachandran_favored_pct",
@@ -119,7 +118,7 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
         raise
 
 
-def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
+def _get_dihedrals(validator: PDBValidator) -> tuple[list[float], list[float]]:
     """Extracts Phi/Psi angles from the validator's parsed atoms."""
     phi_list = []
     psi_list = []
@@ -171,8 +170,8 @@ def _get_dihedrals(validator: PDBValidator) -> Tuple[List[float], List[float]]:
 
 
 def _analyze_ramachandran(
-    phi_list: List[float], psi_list: List[float], validator: PDBValidator
-) -> Tuple[int, int]:
+    phi_list: list[float], psi_list: list[float], validator: PDBValidator
+) -> tuple[int, int]:
     """Counts favored and outlier residues."""
     favored = 0
     outliers = 0
@@ -181,7 +180,7 @@ def _analyze_ramachandran(
     # This keeps the model robust and noise-tolerant
     polygons = RAMACHANDRAN_POLYGONS["General"]
 
-    for phi, psi in zip(phi_list, psi_list):
+    for phi, psi in zip(phi_list, psi_list, strict=False):
         is_favored = False
         for poly in polygons["Favored"]:
             if validator._is_point_in_polygon((phi, psi), poly):

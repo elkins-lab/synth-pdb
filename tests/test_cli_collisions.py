@@ -1,12 +1,11 @@
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Tuple
 
 import pytest
 
 
-def run_cli(args: List[str]) -> Tuple[int, str, str]:
+def run_cli(args: list[str]) -> tuple[int, str, str]:
     """Helper to run the CLI and return returncode, stdout, stderr."""
     cmd = [sys.executable, "-m", "synth_pdb.main"] + args
     result = subprocess.run(cmd, capture_output=True, text=True)

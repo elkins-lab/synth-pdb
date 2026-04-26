@@ -16,7 +16,7 @@ Biological function depends on pH. The most sensitive residue near physiological
 
 import logging
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import biotite.structure as struc
 import numpy as np
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def apply_ph_titration(
-    structure: struc.AtomArray, ph: float = 7.4, rng: Optional[random.Random] = None
+    structure: struc.AtomArray, ph: float = 7.4, rng: random.Random | None = None
 ) -> struc.AtomArray:
     """Apply global pH settings to titratable residues (mainly Histidine).
 
@@ -357,7 +357,7 @@ ACIDIC_ATOMS = ["OD1", "OD2", "OE1", "OE2"]
 BASIC_ATOMS = ["NZ", "NH1", "NH2", "ND1", "NE2"]
 
 
-def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[Dict[str, Any]]:
+def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> list[dict[str, Any]]:
     """Automatically detects potential salt bridges in a protein structure.
 
     A salt bridge is defined here as a pair of acidic and basic residues
@@ -407,9 +407,9 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> List[D
     # Find pairs within cutoff (typically 4.0 - 5.0 Angstroms)
     indices = np.where(dists < cutoff)
 
-    found_pairs: Dict[Tuple[int, int], Dict[str, Any]] = {}  # (res_ia, res_ib) -> bridge_dict
+    found_pairs: dict[tuple[int, int], dict[str, Any]] = {}  # (res_ia, res_ib) -> bridge_dict
 
-    for acid_idx, base_idx in zip(*indices):
+    for acid_idx, base_idx in zip(*indices, strict=False):
         a_atom = acids[acid_idx]
         b_atom = bases[base_idx]
 

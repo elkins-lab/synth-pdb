@@ -8,7 +8,6 @@ Python). Run this as a smoke test for the full tutorial pipeline.
 import io
 import os
 import sys
-from typing import List
 
 import biotite.structure.io.pdb as bpdb
 import matplotlib
@@ -59,7 +58,7 @@ print(f"✅ Simulation complete! Captured {len(trajectory_pdbs)} trajectory fram
 # ── Step 3: Kabsch-aligned RMSF ───────────────────────────────────────────────
 
 
-def calculate_ca_rmsf_aligned(trajectory_list: List[str]) -> npt.NDArray[np.float64]:
+def calculate_ca_rmsf_aligned(trajectory_list: list[str]) -> npt.NDArray[np.float64]:
     """Per-residue Cα RMSF with Kabsch alignment of every frame.
 
     Algorithm:

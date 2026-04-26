@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, cast
+from typing import Any, cast
 
 import requests
 
@@ -21,7 +21,7 @@ class BMRBAPI:
     BASE_URL = "https://api.bmrb.io/v2"
 
     @staticmethod
-    def get_entry_metadata(bmrb_id: str) -> Dict[str, Any]:
+    def get_entry_metadata(bmrb_id: str) -> dict[str, Any]:
         """Fetch metadata for a BMRB entry.
 
         Args:
@@ -31,10 +31,10 @@ class BMRBAPI:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        return cast(Dict[str, Any], data.get(bmrb_id, {}))
+        return cast(dict[str, Any], data.get(bmrb_id, {}))
 
     @staticmethod
-    def search_entries_with_restraints(search_term: str = "ubiquitin") -> List[str]:
+    def search_entries_with_restraints(search_term: str = "ubiquitin") -> list[str]:
         """Search for BMRB entries that likely have restraint data."""
         url = f"{BMRBAPI.BASE_URL}/search/entry?q={search_term}&field=nmr_star_loop_category&value=_Gen_dist_constraint"
         try:
@@ -46,7 +46,7 @@ class BMRBAPI:
         return []
 
     @staticmethod
-    def fetch_restraints(bmrb_id: str) -> List[Dict[str, Any]]:
+    def fetch_restraints(bmrb_id: str) -> list[dict[str, Any]]:
         """Fetch distance restraints from BMRB.
 
         SCIENTIFIC BASIS:
@@ -91,9 +91,11 @@ class BMRBAPI:
                                     "atom_name_1": row[idx_atom1],
                                     "index_2": int(row[idx_res2]),
                                     "atom_name_2": row[idx_atom2],
-                                    "upper_limit": float(row[idx_upper])
-                                    if idx_upper and row[idx_upper]
-                                    else 5.0,
+                                    "upper_limit": (
+                                        float(row[idx_upper])
+                                        if idx_upper and row[idx_upper]
+                                        else 5.0
+                                    ),
                                 }
                             )
                     if restraints:
@@ -105,7 +107,7 @@ class BMRBAPI:
         return []
 
     @staticmethod
-    def fetch_chemical_shifts(bmrb_id: str) -> Dict[int, Dict[str, float]]:
+    def fetch_chemical_shifts(bmrb_id: str) -> dict[int, dict[str, float]]:
         """Fetch chemical shifts from BMRB using pynmrstar.
 
         Returns:
@@ -130,7 +132,7 @@ class BMRBAPI:
             idx_atom = tag_to_idx.get("atom_id")
             idx_val = tag_to_idx.get("val")
 
-            shifts: Dict[int, Dict[str, float]] = {}
+            shifts: dict[int, dict[str, float]] = {}
             for row in loop.data:
                 try:
                     if idx_res is None or idx_atom is None or idx_val is None:
@@ -181,25 +183,25 @@ class PDBValidationAPI:
     BASE_URL = "https://www.ebi.ac.uk/pdbe/api/validation"
 
     @staticmethod
-    def get_validation_summary(pdb_id: str) -> Dict[str, Any]:
+    def get_validation_summary(pdb_id: str) -> dict[str, Any]:
         """Fetch validation summary for an existing PDB entry."""
         url = f"{PDBValidationAPI.BASE_URL}/summary/entry/{pdb_id.lower()}"
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return cast(Dict[str, Any], response.json().get(pdb_id.lower(), {}))
+            return cast(dict[str, Any], response.json().get(pdb_id.lower(), {}))
         except Exception as e:
             logger.error(f"Failed to fetch PDBe summary for {pdb_id}: {e}")
             return {}
 
     @staticmethod
-    def get_validation_outliers(pdb_id: str) -> Dict[str, Any]:
+    def get_validation_outliers(pdb_id: str) -> dict[str, Any]:
         """Fetch detailed geometric outliers (Ramachandran, etc.) for a PDB entry."""
         url = f"{PDBValidationAPI.BASE_URL}/outliers/entry/{pdb_id.lower()}"
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return cast(Dict[str, Any], response.json().get(pdb_id.lower(), {}))
+            return cast(dict[str, Any], response.json().get(pdb_id.lower(), {}))
         except Exception as e:
             logger.error(f"Failed to fetch PDBe outliers for {pdb_id}: {e}")
             return {}

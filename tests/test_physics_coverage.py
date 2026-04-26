@@ -201,23 +201,25 @@ class TestPhysicsCoverage:
         mock_simulation.topology = mock_topology
 
         # Patch sys.modules
-        with patch.dict(
-            sys.modules,
-            {
-                "biotite": mock_biotite,
-                "biotite.structure": mock_biotite_structure,
-                "biotite.structure.io": MagicMock(),
-                "biotite.structure.io.pdb": mock_biotite_pdb_module,
-                "synth_pdb.cofactors": mock_cofactors,
-                "synth_pdb.biophysics": mock_biophysics,
-            },
-        ), patch(
-            "builtins.open",
-            mock_open(
-                read_data="ATOM      1  N   ALA A   1       0.000   0.000   0.000\nHETATM    2 ZN    ZN A   2       5.000   5.000   5.000  1.00 20.00          ZN\n"
+        with (
+            patch.dict(
+                sys.modules,
+                {
+                    "biotite": mock_biotite,
+                    "biotite.structure": mock_biotite_structure,
+                    "biotite.structure.io": MagicMock(),
+                    "biotite.structure.io.pdb": mock_biotite_pdb_module,
+                    "synth_pdb.cofactors": mock_cofactors,
+                    "synth_pdb.biophysics": mock_biophysics,
+                },
             ),
-        ), patch(
-            "os.path.exists", return_value=True
+            patch(
+                "builtins.open",
+                mock_open(
+                    read_data="ATOM      1  N   ALA A   1       0.000   0.000   0.000\nHETATM    2 ZN    ZN A   2       5.000   5.000   5.000  1.00 20.00          ZN\n"
+                ),
+            ),
+            patch("os.path.exists", return_value=True),
         ):
             # Run internal simulation method
             minimizer._run_simulation("dummy.pdb", "out.pdb", add_hydrogens=True)

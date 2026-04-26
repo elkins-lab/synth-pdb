@@ -3,7 +3,6 @@ Advanced Cryo-EM Density Map Generation for Synthetic Ensembles.
 """
 
 import logging
-from typing import Tuple, Union
 
 import biotite.structure as struc
 
@@ -37,11 +36,11 @@ logger = logging.getLogger(__name__)
 
 
 def generate_density_map(
-    structure: Union[struc.AtomArray, struc.AtomArrayStack],
+    structure: struc.AtomArray | struc.AtomArrayStack,
     resolution: float = 3.0,
     grid_spacing: float = 1.0,
     buffer: float = 5.0,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """Generates a 3D density map from an AtomArray or AtomArrayStack.
 
     Args:
@@ -173,7 +172,7 @@ class CryoEMSimulator:
         self.resolution = resolution
         self.spacing = spacing
 
-    def simulate(self, structure: Union[struc.AtomArray, struc.AtomArrayStack]) -> np.ndarray:
+    def simulate(self, structure: struc.AtomArray | struc.AtomArrayStack) -> np.ndarray:
         """Generates a density map for the provided structure."""
         density, _ = generate_density_map(
             structure, resolution=self.resolution, grid_spacing=self.spacing

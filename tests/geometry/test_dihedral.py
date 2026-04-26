@@ -57,6 +57,7 @@ def test_calculate_dihedral_negative_90_degrees():
 def test_calculate_angle():
     """Test the calculate_angle utility."""
     from synth_pdb.geometry.dihedral import calculate_angle
+
     p1 = np.array([1.0, 0.0, 0.0])
     p2 = np.array([0.0, 0.0, 0.0])
     p3 = np.array([0.0, 1.0, 0.0])

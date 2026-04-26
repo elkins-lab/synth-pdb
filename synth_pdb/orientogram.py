@@ -1,5 +1,3 @@
-from typing import Dict
-
 import numpy as np
 
 from .geometry import batched_angle, batched_dihedral, position_atoms_batch
@@ -7,7 +5,7 @@ from .geometry import batched_angle, batched_dihedral, position_atoms_batch
 
 def compute_6d_orientations(
     coords: np.ndarray, atom_names: list, residue_indices: list, n_residues: int
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """Computes 6D inter-residue orientations for all pairs of residues.
     This follows the trRosetta convention: (dist, omega, theta, phi).
 

@@ -11,7 +11,6 @@ import datetime
 import logging
 import os
 import sys
-from typing import List, Optional
 
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
@@ -1002,8 +1001,8 @@ def main() -> None:
 
     length_for_generator = args.length if args.sequence is None else None
 
-    final_pdb_content: Optional[str] = None
-    final_violations: List[str] = []
+    final_pdb_content: str | None = None
+    final_violations: list[str] = []
     min_violations_count = float("inf")
 
     generation_attempts = (

@@ -12,7 +12,7 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure local synth_pdb is prioritized
 current_path = Path(__file__).resolve().parent
@@ -109,7 +109,7 @@ def main() -> None:
         pdb_path = dirs["pdb"] / f"{sample_id}.pdb"
         batch.save_pdb(str(pdb_path), index=i)
 
-        row: Dict[str, Any] = {"id": sample_id, "pdb_path": str(pdb_path)}
+        row: dict[str, Any] = {"id": sample_id, "pdb_path": str(pdb_path)}
 
         # B. Cryo-EM (Individual Map per sample)
         if not args.skip_mrc:

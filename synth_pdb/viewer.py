@@ -9,7 +9,7 @@ import logging
 import tempfile
 import traceback
 import webbrowser
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import biotite.structure.hbond as hbond
 import biotite.structure.io.pdb as pdb
@@ -23,8 +23,8 @@ def view_structure_in_browser(
     filename: str = "structure.pdb",
     style: str = "cartoon",
     color: str = "spectrum",
-    restraints: Optional[List[Any]] = None,
-    highlights: Optional[List[Any]] = None,
+    restraints: list[Any] | None = None,
+    highlights: list[Any] | None = None,
     show_hbonds: bool = True,
 ) -> None:
     """Open 3D structure viewer in browser.
@@ -74,8 +74,8 @@ def _create_3dmol_html(
     filename: str,
     style: str,
     color: str,
-    restraints: Optional[List[Any]] = None,
-    highlights: Optional[List[Any]] = None,
+    restraints: list[Any] | None = None,
+    highlights: list[Any] | None = None,
     show_hbonds: bool = False,
 ) -> str:
     """Generate HTML with embedded 3Dmol.js viewer.
@@ -820,7 +820,7 @@ def _find_hbonds(pdb_content: str) -> list:
             except Exception:
                 pass  # Fallback
 
-        hbonds: List[Dict[str, Any]] = []
+        hbonds: list[dict[str, Any]] = []
 
         if len(triplets) > 0:
             # Strict mode worked, but we still apply sequence separation filter
@@ -857,7 +857,7 @@ def _find_hbonds(pdb_content: str) -> list:
                 # Find pairs < 4.5 Angstrom (relaxed for visualization)
                 n_indices, o_indices = np.where(dists < 4.5)
 
-                for i, j in zip(n_indices, o_indices):
+                for i, j in zip(n_indices, o_indices, strict=False):
                     n_atom = ns[i]
                     o_atom = os_atoms[j]
 

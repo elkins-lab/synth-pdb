@@ -151,8 +151,8 @@ calc_vals = []
 for res_id in df_j["res_index"]:
     val = np.nan
     res_id_int = int(res_id)
-    if res_id_int in theoretical_couplings.get('A', {}):
-        val = theoretical_couplings.get('A', {}).get(res_id_int, np.nan)
+    if res_id_int in theoretical_couplings.get("A", {}):
+        val = theoretical_couplings.get("A", {}).get(res_id_int, np.nan)
     calc_vals.append(val)
 
 df_j["J_calc"] = calc_vals
@@ -191,7 +191,7 @@ plt.title(
 plt.xlabel("Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 
-bbox_props = dict(boxstyle="round,pad=0.5", fc="white", ec="gray", alpha=0.9)
+bbox_props = {"boxstyle": "round,pad=0.5", "fc": "white", "ec": "gray", "alpha": 0.9}
 plt.text(
     min_val + 0.5,
     max_val - 1.5,

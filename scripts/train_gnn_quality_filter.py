@@ -39,7 +39,7 @@ def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
 
     graphs = []
     failures = 0
-    for i, (pdb_content, label) in enumerate(zip(pdb_list, y)):
+    for i, (pdb_content, label) in enumerate(zip(pdb_list, y, strict=False)):
         try:
             g = build_protein_graph(pdb_content)
             g.y = torch.tensor([int(label)], dtype=torch.long)

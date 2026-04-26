@@ -38,6 +38,7 @@ def test_synthetic_ubiquitin_pipeline_with_mocked_bmrb():
         assert "recall" in scores
         assert "precision" in scores
 
+
 @pytest.mark.network
 def test_pdbe_geometric_validation():
     """Evidence-based validation: Fetch peer-reviewed quality metrics from PDBe.
@@ -48,12 +49,11 @@ def test_pdbe_geometric_validation():
     """
     pdb_id = "1UBQ"
     # Mocking since the external API is unstable/unreachable in this environment
-    mock_summary = {
-        "ramachandran_outliers": 0.0,
-        "percentilerank_ramachandran_outliers": 95.0
-    }
+    mock_summary = {"ramachandran_outliers": 0.0, "percentilerank_ramachandran_outliers": 95.0}
 
-    with patch("synth_pdb.bmrb_api.PDBValidationAPI.get_validation_summary", return_value=mock_summary):
+    with patch(
+        "synth_pdb.bmrb_api.PDBValidationAPI.get_validation_summary", return_value=mock_summary
+    ):
         summary = PDBValidationAPI.get_validation_summary(pdb_id)
 
         assert "ramachandran_outliers" in summary
@@ -62,6 +62,7 @@ def test_pdbe_geometric_validation():
         # Peer-reviewed high-quality structures like 1UBQ should have high percentiles
         percentile = summary["percentilerank_ramachandran_outliers"]
         assert percentile > 50.0
+
 
 def test_statistical_ramachandran_validation():
     """Validate that generated models follow peer-reviewed backbone distributions.
@@ -84,5 +85,5 @@ def test_statistical_ramachandran_validation():
 
     # Aggressive validation: A scientifically sound generator should rarely produce
     # more than 10% outliers even without refinement.
-    assert stats["favored_pct"] > 50.0 # Reasonable threshold for raw generator
-    assert stats["outlier_pct"] < 20.0 # Should not be a 'black hole' of geometry
+    assert stats["favored_pct"] > 50.0  # Reasonable threshold for raw generator
+    assert stats["outlier_pct"] < 20.0  # Should not be a 'black hole' of geometry

@@ -17,6 +17,7 @@ from synth_pdb.ensemble.daop import DAOPCalculator
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_ordered_angles(n_models: int, center: float, sigma: float = 0.0) -> np.ndarray:
     """Return a 1-D array of n_models angles near center (radians)."""
     rng = np.random.default_rng(seed=42)
@@ -28,6 +29,7 @@ def _make_ordered_angles(n_models: int, center: float, sigma: float = 0.0) -> np
 # ===========================================================================
 # TestCalculateOrderParameter
 # ===========================================================================
+
 
 class TestCalculateOrderParameter:
     """Unit tests for calculate_order_parameter."""
@@ -47,9 +49,9 @@ class TestCalculateOrderParameter:
         for angle in [0.0, np.pi / 3, -np.pi / 2, np.pi]:
             angles = np.full(50, angle)
             result = DAOPCalculator.calculate_order_parameter(angles)
-            assert result == pytest.approx(1.0, abs=1e-10), (
-                f"Expected S=1.0 for uniform angle {angle:.3f}, got {result:.6f}"
-            )
+            assert result == pytest.approx(
+                1.0, abs=1e-10
+            ), f"Expected S=1.0 for uniform angle {angle:.3f}, got {result:.6f}"
 
     def test_opposite_angles_returns_zero(self) -> None:
         """Two angles exactly 180° apart cancel each other → S ≈ 0."""
@@ -109,6 +111,7 @@ class TestCalculateOrderParameter:
 # TestFindWellDefinedResidues
 # ===========================================================================
 
+
 class TestFindWellDefinedResidues:
     """Unit tests for find_well_defined_residues."""
 
@@ -117,7 +120,7 @@ class TestFindWellDefinedResidues:
         rng = np.random.default_rng(42)
         n_res, n_models = 10, 20
         phi = rng.normal(-np.pi / 3, np.radians(10), (n_res, n_models))
-        psi = rng.normal( np.pi / 3, np.radians(10), (n_res, n_models))
+        psi = rng.normal(np.pi / 3, np.radians(10), (n_res, n_models))
         result = DAOPCalculator.find_well_defined_residues(phi, psi)
         assert result.shape == (n_res,)
         assert result.all(), "Expected all residues well-defined for tight angle distribution"
@@ -142,7 +145,7 @@ class TestFindWellDefinedResidues:
 
         # Ordered residues
         phi[:n_ordered] = rng.normal(-np.pi / 3, np.radians(8), (n_ordered, n_models))
-        psi[:n_ordered] = rng.normal( np.pi / 3, np.radians(8), (n_ordered, n_models))
+        psi[:n_ordered] = rng.normal(np.pi / 3, np.radians(8), (n_ordered, n_models))
 
         # Disordered residues
         phi[n_ordered:] = rng.uniform(-np.pi, np.pi, (n_disordered, n_models))
@@ -158,7 +161,7 @@ class TestFindWellDefinedResidues:
         n_res, n_models = 5, 50
         # Moderate spread: S≈0.8 each → sum≈1.6; above 1.4 but below 1.8
         phi = rng.normal(-np.pi / 3, np.radians(30), (n_res, n_models))
-        psi = rng.normal( np.pi / 3, np.radians(30), (n_res, n_models))
+        psi = rng.normal(np.pi / 3, np.radians(30), (n_res, n_models))
 
         strict = DAOPCalculator.find_well_defined_residues(phi, psi, threshold=1.8)
         lenient = DAOPCalculator.find_well_defined_residues(phi, psi, threshold=1.4)
@@ -168,14 +171,14 @@ class TestFindWellDefinedResidues:
     def test_output_dtype_is_bool(self) -> None:
         """Return dtype must be boolean."""
         phi = np.full((3, 10), -np.pi / 3)
-        psi = np.full((3, 10),  np.pi / 3)
+        psi = np.full((3, 10), np.pi / 3)
         result = DAOPCalculator.find_well_defined_residues(phi, psi)
         assert result.dtype == np.bool_
 
     def test_single_residue(self) -> None:
         """Should handle single-residue (n_residues=1) ensemble."""
         phi = np.full((1, 20), -np.pi / 3)
-        psi = np.full((1, 20),  np.pi / 3)
+        psi = np.full((1, 20), np.pi / 3)
         result = DAOPCalculator.find_well_defined_residues(phi, psi)
         assert result.shape == (1,)
         assert result[0]
@@ -184,6 +187,7 @@ class TestFindWellDefinedResidues:
 # ===========================================================================
 # TestCalculateBackboneDaop
 # ===========================================================================
+
 
 class TestCalculateBackboneDaop:
     """Unit tests for calculate_backbone_daop."""
@@ -201,7 +205,7 @@ class TestCalculateBackboneDaop:
         """Tightly clustered angles → S ≥ 0.9 for all residues."""
         n_res, n_models = 5, 30
         phi = np.full((n_res, n_models), -np.pi / 3)
-        psi = np.full((n_res, n_models),  np.pi / 3)
+        psi = np.full((n_res, n_models), np.pi / 3)
         s_phi, s_psi = DAOPCalculator.calculate_backbone_daop(phi, psi)
         assert (s_phi >= 0.9).all()
         assert (s_psi >= 0.9).all()
@@ -220,7 +224,7 @@ class TestCalculateBackboneDaop:
         rng = np.random.default_rng(5)
         n_res, n_models = 4, 20
         phi = rng.normal(-np.pi / 3, 0.3, (n_res, n_models))
-        psi = rng.normal( np.pi / 3, 0.3, (n_res, n_models))
+        psi = rng.normal(np.pi / 3, 0.3, (n_res, n_models))
 
         s_phi_batch, s_psi_batch = DAOPCalculator.calculate_backbone_daop(phi, psi)
 
@@ -247,17 +251,20 @@ class TestCalculateBackboneDaop:
 # TestDAOPImports
 # ===========================================================================
 
+
 class TestDAOPImports:
     """Smoke tests verifying the public API is accessible."""
 
     def test_import_from_submodule(self) -> None:
         """Direct submodule import should work."""
         from synth_pdb.ensemble.daop import DAOPCalculator  # noqa: F401
+
         assert callable(DAOPCalculator.calculate_order_parameter)
 
     def test_import_from_ensemble_package(self) -> None:
         """Package-level import should work."""
         from synth_pdb.ensemble import DAOPCalculator  # noqa: F401
+
         assert callable(DAOPCalculator.calculate_order_parameter)
 
     def test_all_methods_present(self) -> None:
@@ -270,6 +277,7 @@ class TestDAOPImports:
 # ===========================================================================
 # TestDAOPScientificValidation — Hyberts (1992) formula correctness
 # ===========================================================================
+
 
 class TestDAOPScientificValidation:
     """
@@ -314,9 +322,7 @@ class TestDAOPScientificValidation:
         angles = rng.vonmises(0.0, kappa, 10_000)
         result = DAOPCalculator.calculate_order_parameter(angles)
         # Allow ±0.05 tolerance due to finite sample
-        assert 0.85 <= result <= 0.95, (
-            f"Expected S≈0.9 for κ={kappa} (σ≈24°), got {result:.4f}"
-        )
+        assert 0.85 <= result <= 0.95, f"Expected S≈0.9 for κ={kappa} (σ≈24°), got {result:.4f}"
 
     def test_sum_phi_psi_criterion_matches_pdbstat_convention(self) -> None:
         """
@@ -327,15 +333,11 @@ class TestDAOPScientificValidation:
         rng = np.random.default_rng(42)
         n_res, n_models = 20, 100
         phi = rng.normal(-np.pi / 3, np.radians(15), (n_res, n_models))
-        psi = rng.normal( np.pi / 3, np.radians(15), (n_res, n_models))
+        psi = rng.normal(np.pi / 3, np.radians(15), (n_res, n_models))
 
         # Manual computation
-        s_phi = np.array(
-            [DAOPCalculator.calculate_order_parameter(phi[i]) for i in range(n_res)]
-        )
-        s_psi = np.array(
-            [DAOPCalculator.calculate_order_parameter(psi[i]) for i in range(n_res)]
-        )
+        s_phi = np.array([DAOPCalculator.calculate_order_parameter(phi[i]) for i in range(n_res)])
+        s_psi = np.array([DAOPCalculator.calculate_order_parameter(psi[i]) for i in range(n_res)])
         manual_mask = (s_phi + s_psi) >= 1.8
 
         # Method result

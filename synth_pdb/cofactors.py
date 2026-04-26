@@ -17,7 +17,6 @@ This module automatically detects these motifs and inserts the appropriate ions.
 """
 
 import logging
-from typing import Dict, List
 
 import biotite.structure as struc
 import numpy as np
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 def find_metal_binding_sites(
     structure: struc.AtomArray, distance_threshold: float = 20.0
-) -> List[Dict]:
+) -> list[dict]:
     """Scans the structure for clusters of residues that could coordinate a metal ion.
 
     Args:
@@ -130,7 +129,7 @@ def find_metal_binding_sites(
     return sites
 
 
-def add_metal_ion(structure: struc.AtomArray, site: Dict) -> struc.AtomArray:
+def add_metal_ion(structure: struc.AtomArray, site: dict) -> struc.AtomArray:
     """Adds a metal ion (HETATM) to the structure at the centroid of its ligands.
 
     Args:

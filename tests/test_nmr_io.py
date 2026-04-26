@@ -10,6 +10,7 @@ def test_read_restraint_file_not_found():
     with pytest.raises(FileNotFoundError, match="Restraint file not found"):
         read_restraint_file("non_existent_file.txt")
 
+
 def test_read_restraint_file_whitespace_format(tmp_path):
     """Test parsing of a simple whitespace-separated restraint file.
 
@@ -24,7 +25,7 @@ def test_read_restraint_file_whitespace_format(tmp_path):
         "# This is a comment\n"
         "1 HN 5 HA 3.5\n"
         "2 HB 3 HB 5.0\n"
-        "\n" # Empty line
+        "\n"  # Empty line
         "10 CA 12 CA 6.0 # Inline comment\n"
     )
     restraint_file.write_text(content)
@@ -33,12 +34,15 @@ def test_read_restraint_file_whitespace_format(tmp_path):
 
     assert len(restraints) == 3
     assert restraints[0] == {
-        "index_1": 1, "atom_name_1": "HN",
-        "index_2": 5, "atom_name_2": "HA",
-        "upper_limit": 3.5
+        "index_1": 1,
+        "atom_name_1": "HN",
+        "index_2": 5,
+        "atom_name_2": "HA",
+        "upper_limit": 3.5,
     }
     assert restraints[1]["upper_limit"] == 5.0
     assert restraints[2]["index_1"] == 10
+
 
 def test_read_restraint_file_malformed(tmp_path):
     """Test that a ValueError is raised for malformed restraint files."""
@@ -48,6 +52,7 @@ def test_read_restraint_file_malformed(tmp_path):
     with pytest.raises(ValueError, match="Failed to parse restraint file"):
         read_restraint_file(str(restraint_file))
 
+
 @patch("synth_pdb.nmr.os.path.exists", return_value=True)
 @patch("synth_pdb.nef_io.read_nef_restraints")
 def test_read_restraint_file_nef_delegation(mock_read_nef, mock_exists):
@@ -56,7 +61,9 @@ def test_read_restraint_file_nef_delegation(mock_read_nef, mock_exists):
     SCIENTIFIC BASIS:
     NEF (NMR Exchange Format) is the modern standard (IUPAC) for NMR data.
     """
-    mock_read_nef.return_value = [{"res_i": 1, "atom_i": "H", "res_j": 2, "atom_j": "H", "upper_bound": 5.0}]
+    mock_read_nef.return_value = [
+        {"res_i": 1, "atom_i": "H", "res_j": 2, "atom_j": "H", "upper_bound": 5.0}
+    ]
 
     restraints = read_restraint_file("test.nef")
 

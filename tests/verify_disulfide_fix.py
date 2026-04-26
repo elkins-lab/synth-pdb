@@ -40,16 +40,14 @@ def test_disulfide_detection_uses_minimized_structure():
     mock_pdb_instance = MagicMock()
     mock_pdb_instance.get_structure.return_value = minimized_structure
 
-    with patch("synth_pdb.generator.EnergyMinimizer", return_value=mock_minimizer), patch(
-        "synth_pdb.generator.pdb.PDBFile"
-    ) as mock_pdb_cls, patch("tempfile.TemporaryDirectory") as mock_tmp, patch(
-        "builtins.open", side_effect=open_side_effect
-    ), patch(
-        "synth_pdb.generator.biophysics"
-    ) as mock_biophysics, patch(
-        "synth_pdb.generator.predict_order_parameters", return_value={}
+    with (
+        patch("synth_pdb.generator.EnergyMinimizer", return_value=mock_minimizer),
+        patch("synth_pdb.generator.pdb.PDBFile") as mock_pdb_cls,
+        patch("tempfile.TemporaryDirectory") as mock_tmp,
+        patch("builtins.open", side_effect=open_side_effect),
+        patch("synth_pdb.generator.biophysics") as mock_biophysics,
+        patch("synth_pdb.generator.predict_order_parameters", return_value={}),
     ):
-
         # Setup PDBFile mock
         # Both constructor and read() return our instance
         mock_pdb_cls.return_value = mock_pdb_instance
@@ -96,16 +94,14 @@ def test_disulfide_detection_fails_if_far():
     mock_pdb_instance = MagicMock()
     mock_pdb_instance.get_structure.return_value = far_structure
 
-    with patch("synth_pdb.generator.EnergyMinimizer", return_value=mock_minimizer), patch(
-        "synth_pdb.generator.pdb.PDBFile"
-    ) as mock_pdb_cls, patch("tempfile.TemporaryDirectory") as mock_tmp, patch(
-        "builtins.open", side_effect=open_side_effect
-    ), patch(
-        "synth_pdb.generator.biophysics"
-    ) as mock_biophysics, patch(
-        "synth_pdb.generator.predict_order_parameters", return_value={}
+    with (
+        patch("synth_pdb.generator.EnergyMinimizer", return_value=mock_minimizer),
+        patch("synth_pdb.generator.pdb.PDBFile") as mock_pdb_cls,
+        patch("tempfile.TemporaryDirectory") as mock_tmp,
+        patch("builtins.open", side_effect=open_side_effect),
+        patch("synth_pdb.generator.biophysics") as mock_biophysics,
+        patch("synth_pdb.generator.predict_order_parameters", return_value={}),
     ):
-
         mock_pdb_cls.return_value = mock_pdb_instance
         mock_pdb_cls.read.return_value = mock_pdb_instance
 

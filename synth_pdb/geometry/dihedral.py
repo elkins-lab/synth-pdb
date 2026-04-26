@@ -22,6 +22,7 @@ from synth_pdb.geometry._numba import njit
 # 4. Phase Wrapping: In structure generation, "Drift" must be applied carefully
 #    to avoid discontinuities at the -180/180 boundary.
 
+
 @njit
 def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) -> float:
     """Calculates the angle (in degrees) formed by three coordinates, with coord2 as the vertex."""
@@ -42,10 +43,9 @@ def calculate_angle(coord1: np.ndarray, coord2: np.ndarray, coord3: np.ndarray) 
     angle_rad = np.arccos(cosine_angle)
     return float(np.degrees(angle_rad))
 
+
 @njit
-def calculate_dihedral(
-    p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray
-) -> float:
+def calculate_dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) -> float:
     """Calculates the dihedral angle (in degrees) defined by four points (p1, p2, p3, p4).
     Uses the robust Praxeolitic formula for numerical stability and IUPAC convention.
     """
@@ -71,6 +71,7 @@ def calculate_dihedral(
     y = np.sum(np.cross(b1, v) * w)
 
     return float(np.degrees(np.arctan2(y, x)))
+
 
 # Alias for backward compatibility
 calculate_dihedral_angle = calculate_dihedral

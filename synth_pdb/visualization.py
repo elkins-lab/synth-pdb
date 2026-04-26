@@ -3,12 +3,11 @@ Generates scripts for external molecular viewers (PyMOL, ChimeraX).
 """
 
 import logging
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
 
-def generate_pymol_script(pdb_file: str, restraints: List[Dict], output_pml: str) -> None:
+def generate_pymol_script(pdb_file: str, restraints: list[dict], output_pml: str) -> None:
     """Generate a PyMOL script (.pml) to visualize NEF restraints on a PDB structure.
 
     Args:
