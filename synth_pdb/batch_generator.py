@@ -332,7 +332,8 @@ class BatchedGenerator:
         self.atom_names = []
         self.residue_indices = []
         self.atom_chain_ids = []
-        self.templates = []
+        self.template_coords = []
+        self.template_atom_names = []
         self.template_backbones = []
         self.offsets = []
         self.chain_start_indices = []  # Residue global indices where chains begin
@@ -352,17 +353,20 @@ class BatchedGenerator:
 
                 if full_atom:
                     # Fetch sidechain templates for Kabsch superimposition
-                    template = struc.info.residue(res_name).copy()
+                    template = struc.info.residue(res_name)
                     # Prune terminal capping atoms not used in internal peptide bonds
                     mask = ~np.isin(template.atom_name, ["OXT", "H2", "H3", "HXT"])
                     template = template[mask]
                     names = template.atom_name.tolist()
                     n_atoms = len(names)
 
-                    self.templates.append(template)
+                    # Store raw data instead of full Biotite object
+                    self.template_coords.append(template.coord.copy())
+                    self.template_atom_names.append(names)
+
                     # Pre-calculate template backbone coordinates (N, CA, C)
                     n_idx, ca_idx, c_idx = names.index("N"), names.index("CA"), names.index("C")
-                    self.template_backbones.append(template.coord[[n_idx, ca_idx, c_idx]])
+                    self.template_backbones.append(template.coord[[n_idx, ca_idx, c_idx]].copy())
                 else:
                     # Backbone-only mode: N, CA, C, O
                     names = ["N", "CA", "C", "O"]
@@ -377,6 +381,12 @@ class BatchedGenerator:
 
         self.total_atoms = current_atom_offset
         self.n_res = current_res_global_idx
+
+    def clear_cache(self) -> None:
+        """Explicitly clear template caches to free memory."""
+        self.template_coords = []
+        self.template_backbones = []
+        self.template_atom_names = []
 
     def generate_batch(
         self, seed: Optional[int] = None, conformation: str = "alpha", drift: float = 0.0
@@ -541,7 +551,7 @@ class BatchedGenerator:
                 trans, rot = superimpose_batch(source_bb, target_bb)
 
                 # Apply rotation and translation to all sidechain atoms
-                template_coords = self.templates[i].coord
+                template_coords = self.template_coords[i]
                 rotated = np.matmul(rot, template_coords.T).transpose(0, 2, 1)
                 aligned = rotated + trans[:, np.newaxis, :]
 
@@ -557,7 +567,7 @@ class BatchedGenerator:
 
                     # Mirror everything except backbone core to flip stereocenter
                     backbone_names = {"N", "CA", "C", "O", "H", "HA"}
-                    for atom_idx, name in enumerate(self.templates[i].atom_name):
+                    for atom_idx, name in enumerate(self.template_atom_names[i]):
                         if name not in backbone_names:
                             p = aligned[:, atom_idx, :]
                             dist = np.sum((p - ca) * normal, axis=-1, keepdims=True)
@@ -569,7 +579,7 @@ class BatchedGenerator:
 
                 # Rigorous Parity: Ensure Oxygen matches the idealized NeRF coordinate exactly
                 target_o = backbone_coords[:, i * 4 + 3]
-                res_atom_names = list(self.templates[i].atom_name)
+                res_atom_names = self.template_atom_names[i]
                 if "O" in res_atom_names:
                     fa_coords[:, offset + res_atom_names.index("O")] = target_o
 

@@ -12,6 +12,7 @@ except ImportError:
     app = None
     mm = None
     unit = None
+import gc
 import os
 
 import numpy as np
@@ -1595,11 +1596,16 @@ class EnergyMinimizer:
         coordination: Optional[List] = None,
     ) -> Optional[float]:
         """Internal engine. Returns final_energy if successful, else None."""
-        """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
 
-        # ── Stage 1: PDB preprocessing ──────────────────────────────────────
+        # Initialize OpenMM objects to None for reliable cleanup in 'finally' block
+        modeller = None
+        system = None
+        integrator = None
+        simulation = None
+
         try:
+            # ── Stage 1: PDB preprocessing ──────────────────────────────────────
             (
                 topology,
                 positions,
@@ -1607,12 +1613,8 @@ class EnergyMinimizer:
                 original_metadata,
             ) = self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
             atom_list = list(topology.atoms())
-        except Exception as e:
-            logger.error(f"PDB Pre-processing failed: {e}")
-            return None
 
-        # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
-        try:
+            # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
             coordination_param = coordination if coordination is not None else []
             (
                 modeller,
@@ -1630,9 +1632,6 @@ class EnergyMinimizer:
             )
 
             # ── Stage 3: System + forces + Simulation context ───────────────
-            simulation: Any
-            system: Any
-            integrator: Any
             n_idx: int
             c_idx: int
 
@@ -1656,8 +1655,6 @@ class EnergyMinimizer:
             # Health check
             if len(list(topology.atoms())) == 0:
                 logger.error("Health Check Failed: Topology has 0 atoms!")
-                if len(positions) == 0:
-                    logger.error("OpenMM returned empty positions! Topology might be corrupted.")
                 return None
 
             # Single-point energy calculation (bypass minimization)
@@ -1771,7 +1768,7 @@ class EnergyMinimizer:
             final_energy = final_state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole)
 
             try:
-                final_pos = simulation.context.getState(getPositions=True).getPositions()
+                final_pos = final_state.getPositions()
                 if hasattr(final_pos, "value_in_unit"):
                     check_pos = np.array(final_pos.value_in_unit(unit.nanometers))
                     if check_pos.size > 0 and np.any(np.isnan(check_pos)):
@@ -1798,7 +1795,6 @@ class EnergyMinimizer:
             # Minimization only finds a "Static Minimum" (0 Kelvin).
             # Real proteins are dynamic. Running MD steps (Langevin Dynamics)
             # resolves clashes and satisfies entropy-driven structural preferences.
-            # Equilibration steps
             if equilibration_steps > 0:
                 simulation.step(equilibration_steps)
 
@@ -1816,25 +1812,31 @@ class EnergyMinimizer:
             if write_ok is False:
                 return None
 
-            res_energy = float(final_energy)
-
-            # Explicitly clean up OpenMM objects to prevent memory leaks.
-            # Python's GC sometimes fails to reclaim OpenMM's C++ resources
-            # unless the context is explicitly destroyed.
-            try:
-                del simulation.context
-                del simulation
-                del system
-                del integrator
-                del modeller
-            except Exception as cleanup_err:
-                logger.debug(f"OpenMM cleanup failed (non-critical): {cleanup_err}")
-
-            return res_energy
+            return float(final_energy)
 
         except Exception as e:
             logger.error(f"Simulation failed: {e}", exc_info=True)
             return None
+
+        finally:
+            # Explicitly clean up OpenMM objects to prevent memory leaks.
+            # Python's GC sometimes fails to reclaim OpenMM's C++ resources
+            # unless the context is explicitly destroyed.
+            try:
+                if simulation is not None:
+                    if hasattr(simulation, "context"):
+                        del simulation.context
+                    del simulation
+                if system is not None:
+                    del system
+                if integrator is not None:
+                    del integrator
+                if modeller is not None:
+                    del modeller
+                # Trigger collection to help free C++ backed memory
+                gc.collect()
+            except Exception as cleanup_err:
+                logger.debug(f"OpenMM cleanup failed (non-critical): {cleanup_err}")
 
 
 def simulate_trajectory(

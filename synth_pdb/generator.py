@@ -1899,12 +1899,24 @@ class PeptideGenerator:
         batch = bg.generate_batch(seed=seed, conformation=conformation, drift=drift)
 
         if as_stack:
-            return batch.to_stack()
+            stack = batch.to_stack()
+            # Explicitly clear templates to free memory
+            bg.clear_cache()
+            import gc
+
+            gc.collect()
+            return stack
 
         # Fallback to list of results for backward compatibility or unique formatting
         results = []
         for i in range(n_models):
             results.append(PeptideResult(batch.to_pdb(i)))
+
+        # Explicitly clear templates to free memory
+        bg.clear_cache()
+        import gc
+
+        gc.collect()
         return results
 
 
