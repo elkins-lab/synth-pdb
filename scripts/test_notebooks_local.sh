@@ -24,6 +24,7 @@ echo "------------------------------------------------"
 
 # List of directories containing notebooks to test
 NOTEBOOK_DIRS=(
+    "docs/tutorials"
     "examples/interactive_tutorials"
     "examples/ml_integration"
     "examples/ml_loading"
@@ -41,6 +42,11 @@ for dir in "${NOTEBOOK_DIRS[@]}"; do
         for nb in "$dir"/*.ipynb; do
             # Skip if no notebooks found (glob returns pattern if no match)
             [ -e "$nb" ] || continue
+            
+            # Skip symbolic links (duplicates in docs/tutorials)
+            if [ -L "$nb" ]; then
+                continue
+            fi
             
             nb_name=$(basename "$nb")
             echo -n "  Testing $nb_name... "
