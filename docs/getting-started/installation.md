@@ -2,8 +2,8 @@
 
 ## Requirements
 
-- **Python**: 3.8 or higher
-- **Operating System**: macOS, Linux, or Windows
+- **Python**: 3.10 or higher
+- **Operating System**: macOS or Linux
 - **Dependencies**: NumPy, Biotite, OpenMM (optional), Numba (optional)
 
 ## Installation Methods
