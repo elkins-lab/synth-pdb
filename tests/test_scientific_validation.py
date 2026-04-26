@@ -1,8 +1,10 @@
+from typing import Any, Dict, Tuple
 import os
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 import pytest
+import numpy as np
 
 from synth_pdb.geometry.rmsd import calculate_rmsd
 from synth_pdb.geometry.superposition import find_medoid, superimpose_structures
@@ -46,7 +48,10 @@ from synth_pdb.geometry.superposition import find_medoid, superimpose_structures
 #     converge to high accuracy (< 1.2 Å) when high-quality NMR data is used.
 # =============================================================================
 
-def get_best_window_rmsd(nmr_model, xray_struct, window_size=30):
+
+def get_best_window_rmsd(
+    nmr_model: struc.AtomArray, xray_struct: struc.AtomArray, window_size: int = 30
+) -> float:
     """
     Finds the structurally best-matching window between two models.
 
@@ -55,7 +60,8 @@ def get_best_window_rmsd(nmr_model, xray_struct, window_size=30):
     It ensures that a small conformational change (like a hinge movement)
     doesn't obscure the high accuracy of the individual domain representations.
     """
-    def get_bk(m):
+
+    def get_bk(m: struc.AtomArray) -> Tuple[struc.AtomArray, np.ndarray]:
         # Filter for standard amino acids and backbone atoms (N, CA, C)
         # We exclude Oxygens as they are more sensitive to refinement noise.
         m = m[struc.filter_amino_acids(m)]
@@ -63,22 +69,24 @@ def get_best_window_rmsd(nmr_model, xray_struct, window_size=30):
         return bk, struc.get_residue_starts(bk)
 
     n_bk, n_starts = get_bk(nmr_model)
-    best_overall_rmsd = float('inf')
+    best_overall_rmsd = float("inf")
 
     # Iterate through all chains in the X-ray structure (handling oligomers)
     for chain_id in struc.get_chains(xray_struct):
         x_bk, x_starts = get_bk(xray_struct[xray_struct.chain_id == chain_id])
-        if len(x_starts) < window_size: continue
+        if len(x_starts) < window_size:
+            continue
 
         # Sliding window structural comparison
         for i in range(len(n_starts) - window_size):
-            n_slice = n_bk[n_starts[i] : n_starts[i+window_size]]
+            n_slice = n_bk[n_starts[i] : n_starts[i + window_size]]
             cn = n_slice.coord
 
             for j in range(len(x_starts) - window_size):
-                x_slice = x_bk[x_starts[j] : x_starts[j+window_size]]
+                x_slice = x_bk[x_starts[j] : x_starts[j + window_size]]
                 # Ensure we are comparing equal-length segments
-                if len(x_slice) != len(n_slice): continue
+                if len(x_slice) != len(n_slice):
+                    continue
 
                 cx = x_slice.coord
                 # Calculate the minimal RMSD via Kabsch superposition
@@ -90,36 +98,40 @@ def get_best_window_rmsd(nmr_model, xray_struct, window_size=30):
 
     return best_overall_rmsd
 
-@pytest.mark.parametrize("pair", [
-    {
-        "name": "Ubiquitin (Bax et al.)",
-        "nmr": "1D3Z.pdb",
-        "xray": "1UBQ.pdb",
-        "target": 0.6,
-        "win": 50,
-        "citation": "JACS 1998, 120:6836",
-        "description": "Gold-standard comparison for small proteins."
-    },
-    {
-        "name": "BPTI (Wuthrich et al.)",
-        "nmr": "1PIT.pdb",
-        "xray": "5PTI.pdb",
-        "target": 1.2,
-        "win": 50,
-        "citation": "JACS 1989, 111:1871",
-        "description": "Canonical benchmark for NMR/X-ray differences in loops."
-    },
-    {
-        "name": "NESG CtR107 (Montelione et al.)",
-        "nmr": "2KCU.pdb",
-        "xray": "3E0H.pdb",
-        "target": 1.5,
-        "win": 30,
-        "citation": "J. Biol. NMR 2009, 45:13",
-        "description": "NESG demonstration of structural convergence for a 160-res domain."
-    },
-])
-def test_scientific_validation_benchmarks(pair):
+
+@pytest.mark.parametrize(
+    "pair",
+    [
+        {
+            "name": "Ubiquitin (Bax et al.)",
+            "nmr": "1D3Z.pdb",
+            "xray": "1UBQ.pdb",
+            "target": 0.6,
+            "win": 50,
+            "citation": "JACS 1998, 120:6836",
+            "description": "Gold-standard comparison for small proteins.",
+        },
+        {
+            "name": "BPTI (Wuthrich et al.)",
+            "nmr": "1PIT.pdb",
+            "xray": "5PTI.pdb",
+            "target": 1.2,
+            "win": 50,
+            "citation": "JACS 1989, 111:1871",
+            "description": "Canonical benchmark for NMR/X-ray differences in loops.",
+        },
+        {
+            "name": "NESG CtR107 (Montelione et al.)",
+            "nmr": "2KCU.pdb",
+            "xray": "3E0H.pdb",
+            "target": 1.5,
+            "win": 30,
+            "citation": "J. Biol. NMR 2009, 45:13",
+            "description": "NESG demonstration of structural convergence for a 160-res domain.",
+        },
+    ],
+)
+def test_scientific_validation_benchmarks(pair: Dict[str, Any]) -> None:
     """
     Validate geometry module against canonical structural biology targets.
 
@@ -133,7 +145,8 @@ def test_scientific_validation_benchmarks(pair):
     nmr_path = os.path.join(examples_dir, pair["nmr"])
     xr_path = os.path.join(examples_dir, pair["xray"])
 
-    if not os.path.exists(nmr_path): pytest.skip(f"File {pair['nmr']} not found in examples/")
+    if not os.path.exists(nmr_path):
+        pytest.skip(f"File {pair['nmr']} not found in examples/")
     nmr_stk = pdb.get_structure(pdb.PDBFile.read(nmr_path))
     xr_struct = pdb.get_structure(pdb.PDBFile.read(xr_path), model=1)
 

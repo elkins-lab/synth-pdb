@@ -151,6 +151,25 @@ select = [
 ]
 ignore = [
     "E501",  # line too long (handled by black)
+    "N806",  # Uppercase variable names (common in scientific formulas)
+    "N802",  # Uppercase function names (OpenMM/C++ style)
+    "N803",  # Uppercase argument names
+    "E741",  # Ambiguous variable names like 'l'
+    "E402",  # Module level import not at top (common in notebooks)
+    "I001",  # Import sorting (notebooks)
+    "UP035", # Deprecated typing imports
+    "UP006", # Deprecated typing generic aliases
+    "B905",  # zip() without strict=
+    "B007",  # Loop control variable not used
+    "E701",  # Multiple statements on one line (colon)
+    "E702",  # Multiple statements on one line (semicolon)
+    "F401",  # Unused imports (common in tutorials/init)
+    "E722",  # Bare except (sometimes needed in notebook mocks)
+    "N816",  # MixedCase variable names in global scope
+    "F821",  # Undefined names (ipython globals)
+    "N812",  # Lowercase functional imported as F (torch idiom)
+    "B904",  # raise from (not critical for tests)
+    "B017",  # blind exception raises
 ]
 
 [tool.ruff.lint.per-file-ignores]

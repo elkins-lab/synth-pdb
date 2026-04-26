@@ -2,6 +2,7 @@
 Following TDD methodology - these tests should fail initially.
 """
 
+import random
 import numpy as np
 import pytest
 
@@ -13,21 +14,21 @@ from synth_pdb.validator import PDBValidator
 class TestConformationalDiversity:
     """Test suite for conformational diversity feature."""
 
-    def test_ramachandran_presets_exist(self):
+    def test_ramachandran_presets_exist(self) -> None:
         """Test that RAMACHANDRAN_PRESETS dictionary exists in data.py."""
         assert "alpha" in RAMACHANDRAN_PRESETS
         assert "beta" in RAMACHANDRAN_PRESETS
         assert "extended" in RAMACHANDRAN_PRESETS
         assert "ppii" in RAMACHANDRAN_PRESETS
 
-    def test_ramachandran_preset_structure(self):
+    def test_ramachandran_preset_structure(self) -> None:
         """Test that each preset has correct keys."""
         for conformation, angles in RAMACHANDRAN_PRESETS.items():
             # Check for standard presets (phi/psi)
             if "phi" in angles:
                 assert "psi" in angles, f"{conformation} missing psi"
-                assert isinstance(angles["phi"], (int, float))
-                assert isinstance(angles["psi"], (int, float))
+                assert isinstance(angles["phi"], int | float)
+                assert isinstance(angles["psi"], int | float)
             # Check for residue-specific presets (mean/std)
             elif "phi_mean" in angles:
                 assert "phi_std" in angles
@@ -39,19 +40,19 @@ class TestConformationalDiversity:
             else:
                 pytest.fail(f"Unknown preset format for {conformation}: {angles.keys()}")
 
-    def test_alpha_helix_angles(self):
+    def test_alpha_helix_angles(self) -> None:
         """Test alpha helix preset has correct angles."""
         alpha = RAMACHANDRAN_PRESETS["alpha"]
         assert alpha["phi"] == pytest.approx(-57.0, abs=1.0)
         assert alpha["psi"] == pytest.approx(-47.0, abs=1.0)
 
-    def test_beta_sheet_angles(self):
+    def test_beta_sheet_angles(self) -> None:
         """Test beta sheet preset has correct angles."""
         beta = RAMACHANDRAN_PRESETS["beta"]
         assert beta["phi"] == pytest.approx(-135.0, abs=5.0)
         assert beta["psi"] == pytest.approx(135.0, abs=5.0)
 
-    def test_default_conformation_is_alpha(self):
+    def test_default_conformation_is_alpha(self) -> None:
         """Test that default conformation is alpha helix."""
         # Use a fixed seed for reproducibility
         random.seed(42)
@@ -62,10 +63,10 @@ class TestConformationalDiversity:
         # Verify basic structure
         lines = generated_pdb.splitlines()
         assert lines[0].startswith("HEADER")
-        assert len([l for l in lines if l.startswith("ATOM")]) > 0
+        assert len([line for line in lines if line.startswith("ATOM")]) > 0
         assert lines[-1].strip() == "END"
 
-    def test_generate_with_beta_conformation(self):
+    def test_generate_with_beta_conformation(self) -> None:
         """Test generating PDB with beta sheet conformation."""
         pdb_content = generate_pdb_content(length=5, sequence_str="AAAAA", conformation="beta")
 
@@ -78,7 +79,7 @@ class TestConformationalDiversity:
         atoms = validator._parse_pdb_atoms(pdb_content)
         assert len(atoms) > 0
 
-    def test_generate_with_extended_conformation(self):
+    def test_generate_with_extended_conformation(self) -> None:
         """Test generating PDB with extended conformation."""
         pdb_content = generate_pdb_content(length=5, sequence_str="AAAAA", conformation="extended")
 
@@ -86,7 +87,7 @@ class TestConformationalDiversity:
         assert "ATOM" in pdb_content
         assert "END" in pdb_content
 
-    def test_generate_with_ppii_conformation(self):
+    def test_generate_with_ppii_conformation(self) -> None:
         """Test generating PDB with polyproline II conformation."""
         pdb_content = generate_pdb_content(length=5, sequence_str="PPPPP", conformation="ppii")
 
@@ -94,7 +95,7 @@ class TestConformationalDiversity:
         assert "ATOM" in pdb_content
         assert "END" in pdb_content
 
-    def test_generate_with_random_conformation(self):
+    def test_generate_with_random_conformation(self) -> None:
         """Test generating PDB with random conformation sampling."""
         # Generate two structures with random conformations
         pdb1 = generate_pdb_content(length=10, conformation="random")
@@ -109,21 +110,12 @@ class TestConformationalDiversity:
         # random structures is vanishingly small
         assert pdb1 != pdb2, "Random conformations should produce different structures"
 
-    def test_default_conformation_is_alpha(self):
-        """Test that default conformation (when not specified) is alpha helix."""
-        pdb_default = generate_pdb_content(length=5, sequence_str="AAAAA")
-
-        # Verify it generates valid PDB content
-        assert "ATOM" in pdb_default
-        assert "HEADER" in pdb_default
-        assert "END" in pdb_default
-
-    def test_invalid_conformation_raises_error(self):
+    def test_invalid_conformation_raises_error(self) -> None:
         """Test that invalid conformation name raises ValueError."""
         with pytest.raises(ValueError, match="Invalid conformation"):
             generate_pdb_content(length=5, conformation="invalid_name")
 
-    def test_conformation_affects_backbone_geometry(self):
+    def test_conformation_affects_backbone_geometry(self) -> None:
         """Test that different conformations produce different backbone geometries."""
         alpha_pdb = generate_pdb_content(length=10, sequence_str="A" * 10, conformation="alpha")
         beta_pdb = generate_pdb_content(length=10, sequence_str="A" * 10, conformation="beta")
