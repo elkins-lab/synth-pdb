@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.33.0] - 2026-04-26
+
+### Added
+- **Comprehensive API Documentation**: 11 new modules fully documented including `cryo_em`, `saxs`, `docking`, `cofactors`, and `special_chemistry`.
+- **New Interactive Tutorials**:
+    - `cryo_em_saxs_lab`: Visualizing resolution and conformational heterogeneity.
+    - `bmrb_validation`: Programmatic validation against experimental NMR data.
+- **Multimodal Science Guide**: New guide explaining integrated scientific workflows.
+- **Enhanced Ensemble Support**: Added `PeptideGenerator.generate_ensemble()` for high-performance vectorized generation.
+
+### Fixed
+- **Memory Leaks**: Resolved critical memory leaks in OpenMM physics engine and `BatchedGenerator` template caching.
+- **Tutorial Modernization**: Updated `gfp_molecular_forge` and `neural_nmr_pipeline` to use the latest APIs.
+- **Test Integrity**: Standardized documentation integrity tests and added coverage for new features.
+
 ## [1.32.0] - 2026-04-24
 
 ### Added
