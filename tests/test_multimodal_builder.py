@@ -5,7 +5,9 @@ import subprocess
 
 def test_multimodal_dataset_builder_cli() -> None:
     """Verify that the multimodal dataset builder script runs without errors."""
-    output_dir = "tests/test_multimodal_out"
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    script_path = os.path.join(project_root, "scripts", "build_multimodal_dataset.py")
+    output_dir = os.path.join(project_root, "tests", "test_multimodal_out")
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
 
@@ -13,7 +15,7 @@ def test_multimodal_dataset_builder_cli() -> None:
         # Run script for 2 samples
         cmd = [
             "python3",
-            "scripts/build_multimodal_dataset.py",
+            script_path,
             "--n",
             "2",
             "--output-dir",

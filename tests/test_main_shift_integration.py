@@ -1,18 +1,18 @@
 import os
+import pathlib
 import subprocess
 import sys
-
-import pathlib
+from typing import Any
 
 # Save the absolute path to the project root at the module level
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
-def test_main_shift_validation_cli(tmp_path: pathlib.Path) -> None:
+def test_main_shift_validation_cli(tmp_path: pathlib.Path, monkeypatch: Any) -> None:
     """
     TDD Test: CLI Integration of Chemical Shift Validation.
     """
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
 
     # 1. Create a mock shift file
     # Format: res_id atom_name value

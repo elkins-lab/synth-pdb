@@ -2,16 +2,17 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 # Save the absolute path to the project root at the module level
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
-def test_main_rdc_validation_cli(tmp_path: Path) -> None:
+def test_main_rdc_validation_cli(tmp_path: Path, monkeypatch: Any) -> None:
     """
     TDD Test: CLI Integration of RDC Q-factor.
     """
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
 
     # 1. Create a mock RDC file
     # Format: res_1 atom_1 res_2 atom_2 value

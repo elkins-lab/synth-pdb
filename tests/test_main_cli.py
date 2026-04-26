@@ -890,43 +890,42 @@ class TestMainCLI:
         mock_exit.assert_not_called()
 
     def test_custom_filename_generation_no_output_flag(
-        self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
+        self,
+        mocker: Any,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: Any,
     ) -> None:
         """Test that custom filename is generated when --output is not provided."""
-        import os
 
         caplog.set_level(logging.INFO)
 
         # Change to tmp_path directory so generated file goes there
-        original_cwd = os.getcwd()
-        os.chdir(tmp_path)
+        monkeypatch.chdir(tmp_path)
 
-        try:
-            # Simple valid PDB
-            valid_pdb = "HEADER    test\n" + create_atom_line(
-                1, "CA", "GLY", "A", 1, 0.0, 0.0, 0.0, "C"
-            )
-            mocker.patch("synth_pdb.main.generate_pdb_content", return_value=valid_pdb)
+        # Simple valid PDB
+        valid_pdb = "HEADER    test\n" + create_atom_line(
+            1, "CA", "GLY", "A", 1, 0.0, 0.0, 0.0, "C"
+        )
+        mocker.patch("synth_pdb.main.generate_pdb_content", return_value=valid_pdb)
 
-            # Mock sys.argv WITHOUT --output flag
-            test_args = ["synth_pdb", "--length", "5"]
-            mocker.patch("sys.argv", test_args)
-            mock_exit = mocker.patch("sys.exit")
+        # Mock sys.argv WITHOUT --output flag
+        test_args = ["synth_pdb", "--length", "5"]
+        mocker.patch("sys.argv", test_args)
+        mock_exit = mocker.patch("sys.exit")
 
-            main.main()
+        main.main()
 
-            # Verify a file matching the pattern was created
-            files = list(tmp_path.glob("random_linear_peptide_5_*.pdb"))
-            assert len(files) == 1, "Should generate exactly one PDB file with timestamp"
+        # Verify a file matching the pattern was created
+        files = list(tmp_path.glob("random_linear_peptide_5_*.pdb"))
+        assert len(files) == 1, "Should generate exactly one PDB file with timestamp"
 
-            # Verify filename contains timestamp pattern (YYYYMMDD_HHMMSS)
-            filename = files[0].name
-            assert "random_linear_peptide_5_" in filename
-            assert filename.endswith(".pdb")
+        # Verify filename contains timestamp pattern (YYYYMMDD_HHMMSS)
+        filename = files[0].name
+        assert "random_linear_peptide_5_" in filename
+        assert filename.endswith(".pdb")
 
-            mock_exit.assert_not_called()
-        finally:
-            os.chdir(original_cwd)
+        mock_exit.assert_not_called()
 
     def test_file_write_error(self, mocker: Any, caplog: pytest.LogCaptureFixture) -> None:
         """Test handling when file write fails."""
