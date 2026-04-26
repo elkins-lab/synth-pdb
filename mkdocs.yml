@@ -88,6 +88,7 @@ nav:
       - Defensibility Dashboard: tutorials/structure_defensibility_dashboard.ipynb
   - Examples:
     - Gallery: examples/gallery.md
+    - Dark Proteome & Pathologies: examples/dark_proteome.md
     - Biologically-Inspired: examples/biological.md
     - Visualization Examples: examples/visualization.md
     - Advanced Features: examples/advanced.md
