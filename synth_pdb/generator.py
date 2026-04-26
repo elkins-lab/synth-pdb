@@ -38,6 +38,7 @@ import biotite.structure.io.pdb as pdb
 import numpy as np
 
 from . import biophysics  # New Module
+from .batch_generator import BatchedGenerator
 from .data import (
     ALL_VALID_AMINO_ACIDS,
     AMINO_ACID_FREQUENCIES,
@@ -1875,6 +1876,36 @@ class PeptideGenerator:
         # Package into a Result object for easy access to structures
         self._last_result = PeptideResult(pdb_content)
         return self._last_result
+
+    def generate_ensemble(self, n_models: int = 10, as_stack: bool = True, **overrides: Any) -> Any:
+        """Generates a structural ensemble using the high-performance BatchedGenerator.
+
+        Args:
+            n_models: Number of models to generate.
+            as_stack: If True, returns a Biotite AtomArrayStack. If False,
+                      returns a list of PeptideResult objects.
+            **overrides: On-the-fly configuration overrides.
+
+        Returns:
+            biotite.structure.AtomArrayStack or List[PeptideResult].
+        """
+        config = {**self.config, **overrides}
+        conformation = config.get("conformation", "alpha")
+        drift = config.get("drift", 0.0)
+        seed = config.get("seed")
+
+        # BatchedGenerator is 10-100x faster for ensembles than looping generate()
+        bg = BatchedGenerator(self.sequence, n_batch=n_models, full_atom=True)
+        batch = bg.generate_batch(seed=seed, conformation=conformation, drift=drift)
+
+        if as_stack:
+            return batch.to_stack()
+
+        # Fallback to list of results for backward compatibility or unique formatting
+        results = []
+        for i in range(n_models):
+            results.append(PeptideResult(batch.to_pdb(i)))
+        return results
 
 
 class PeptideResult:
