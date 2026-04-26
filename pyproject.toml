@@ -97,6 +97,9 @@ plm = [
     "torch>=2.0.0",
     "transformers>=4.30.0",  # HuggingFace Transformers for ESM-2 model
 ]
+gui = [
+    "streamlit>=1.30.0",
+]
 
 [project.scripts]
 synth-pdb = "synth_pdb.main:main"
