@@ -279,6 +279,13 @@ def main() -> None:
         type=str,
         help="Optional: Output .dat filename for synthetic SAXS profiles.",
     )
+    parser.add_argument(
+        "--plot-type",
+        type=str,
+        default="standard",
+        choices=["standard", "kratky", "guinier", "all"],
+        help="Type of SAXS plot to generate with --visualize. Options: 'standard', 'kratky', 'guinier', 'all'.",
+    )
 
     # Phase 3: Research Utilities Arguments
     # Using 'mode' argument to distinguish workflows without breaking BC (default is 'generate')
@@ -948,7 +955,7 @@ def main() -> None:
         import numpy as np
 
         from .batch_generator import BatchedGenerator
-        from .saxs import calculate_saxs_profile, export_saxs_profile
+        from .saxs import calculate_radius_of_gyration, calculate_saxs_profile, export_saxs_profile
 
         if not args.sequence and (args.length is None or args.length <= 0):
             logger.error("SAXS simulation requires --sequence or a positive --length.")
@@ -993,6 +1000,34 @@ def main() -> None:
             out_file = args.saxs_output or "synthetic_saxs.dat"
             export_saxs_profile(q_vals, avg_intensity, out_file)
             logger.info(f"SAXS simulation complete. Profile saved to {out_file}")
+
+            # 3. Optional Visualization
+            if args.visualize:
+                from .visualization_saxs import plot_saxs_results
+
+                # Calculate average Rg for annotation if visualizing
+                all_rg = [calculate_radius_of_gyration(stack[i]) for i in range(len(stack))]
+                avg_rg = float(np.mean(all_rg))
+
+                plot_file = out_file.replace(".dat", ".png")
+                plot_saxs_results(
+                    q_vals,
+                    avg_intensity,
+                    title=f"Synthetic SAXS ({target_sequence})",
+                    output_path=plot_file,
+                    plot_type=args.plot_type,
+                    rg=avg_rg,
+                )
+
+                # Try to show the plot if in an interactive environment
+                try:
+                    import matplotlib.pyplot as plt
+
+                    if plt.get_backend() != "agg":
+                        plt.show()
+                except Exception:
+                    pass
+
         except Exception as e:
             logger.error(f"SAXS simulation failed: {e}")
             sys.exit(1)

@@ -63,6 +63,13 @@ $$f_{\text{effective}}(q) = f_{\text{vacuum}}(q) - \rho_{\text{sol}} \cdot V_a \
 
 where $\rho_{\text{sol}}$ is the electron density of water ($0.334 e/\text{\AA}^3$) and $V_a$ is the atomic volume.
 
+### Visualizing SAXS Data
+
+Synthetic scattering curves are often easier to interpret when transformed:
+
+1.  **Kratky Plot ($q^2 \cdot I(q)$ vs $q$):** Highlights protein compactness. A bell-shaped curve indicates a folded, globular protein. A curve that continues to rise at high $q$ indicates a disordered or flexible ensemble.
+2.  **Guinier Plot ($\ln I(q)$ vs $q^2$):** Used to estimate the **Radius of Gyration ($R_g$)**. The slope of the linear fit at low $q$ is directly related to $R_g^2/3$.
+
 ### Why SAXS is Powerful for Ensembles
 
 SAXS is uniquely capable of characterizing **Intrinsically Disordered Proteins (IDPs)** and large complexes. Because the scattering curve is an ensemble average:

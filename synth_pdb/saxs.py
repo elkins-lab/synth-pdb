@@ -106,6 +106,18 @@ def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
     return f
 
 
+def calculate_radius_of_gyration(structure: struc.AtomArray) -> float:
+    """Calculate the Radius of Gyration (Rg) of a structure.
+
+    Args:
+        structure: Biotite AtomArray.
+
+    Returns:
+        float: Radius of gyration in Angstroms.
+    """
+    return float(struc.gyration_radius(structure))
+
+
 def calculate_saxs_profile(
     structure: struc.AtomArray,
     q_min: float = 0.0,

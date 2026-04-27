@@ -39,6 +39,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.main_path = os.path.join(self.base_dir, "synth_pdb", "main.py")
         self.cryo_em_path = os.path.join(self.base_dir, "synth_pdb", "cryo_em.py")
         self.saxs_path = os.path.join(self.base_dir, "synth_pdb", "saxs.py")
+        self.visualization_saxs_path = os.path.join(
+            self.base_dir, "synth_pdb", "visualization_saxs.py"
+        )
 
         # Modular Geometry Paths
         self.geometry_nerf_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "nerf.py")
@@ -351,3 +354,13 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Solvent Contrast:",
         ]
         self._check_file_contains(self.saxs_path, required_notes)
+
+    def test_visualization_saxs_educational_notes(self) -> None:
+        """Ensure visualization_saxs.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL RATIONALE:",
+            "EDUCATIONAL NOTE - The Kratky Plot:",
+            "EDUCATIONAL NOTE - The Guinier Approximation:",
+            "slope of this line is -Rg^2 / 3",
+        ]
+        self._check_file_contains(self.visualization_saxs_path, required_notes)

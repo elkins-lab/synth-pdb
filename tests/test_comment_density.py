@@ -115,6 +115,7 @@ def calculate_comment_ratio(file_path: str) -> float:
         ("synth_pdb/validator.py", 0.48),
         ("synth_pdb/viewer.py", 0.65),
         ("synth_pdb/visualization.py", 0.95),
+        ("synth_pdb/visualization_saxs.py", 0.80),
     ],
 )
 def test_library_documentation_density(file_path: str, min_ratio: float) -> None:

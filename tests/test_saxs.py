@@ -89,3 +89,22 @@ def test_export_saxs(tmp_path: Any) -> None:
     data = np.loadtxt(path)
     assert data.shape == (10, 3)
     assert np.allclose(data[:, 0], q)
+
+
+def test_saxs_visualization(tmp_path: Any) -> None:
+    """Verify that SAXS plots can be generated."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    from synth_pdb.visualization_saxs import plot_saxs_results
+
+    q = np.linspace(0, 0.5, 50)
+    intensity = np.exp(-(q**2) * 10)
+
+    output_path = str(tmp_path / "saxs_plot.png")
+    fig = plot_saxs_results(q, intensity, output_path=output_path, plot_type="all", rg=15.0)
+
+    assert fig is not None
+    assert os.path.exists(output_path)

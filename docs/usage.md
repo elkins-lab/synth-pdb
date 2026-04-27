@@ -51,6 +51,9 @@ synth-pdb --sequence "MQIFVKTLTGK" --mode cryo-em --n-decoys 50 --resolution 3.5
 
 # Generate SAXS profile for a flexible ensemble (high drift)
 synth-pdb --length 30 --mode saxs --n-decoys 100 --drift 8.0 --saxs-output ensemble.dat
+
+# Generate and visualize SAXS plots (Kratky/Guinier)
+synth-pdb --sequence "LKELEKELE" --mode saxs --visualize --plot-type all
 ```
 
 ### Complex Assemblies (Multichain)
