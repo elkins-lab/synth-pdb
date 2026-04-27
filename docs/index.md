@@ -1,6 +1,6 @@
 # synth-pdb
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/virtual_nmr_spectrometer.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb)
 [![PyPI version](https://img.shields.io/pypi/v/synth-pdb.svg?label=pypi%20package&color=brightgreen)](https://pypi.org/project/synth-pdb/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -47,12 +47,12 @@ In the fields of structural biology and bioinformatics, researchers frequently r
 - `--minimize`: Relax structures using OpenMM (Implicit Solvent / AMBER forcefield)
 
 📚 **Interactive Tutorials**
-- [Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb): A complete end-to-end NMR simulation.
-- [Cryo-EM & SAXS Lab](tutorials/cryo_em_saxs_lab.ipynb): Visualizing resolution and conformational heterogeneity.
-- [BMRB Validation Pipeline](tutorials/bmrb_validation.ipynb): Programmatic validation against experimental data.
-- [IDP Ensemble Validation](tutorials/idp_ensemble_validation.ipynb): Analyzing flexible protein ensembles.
-- [GFP Molecular Forge](tutorials/gfp_molecular_forge.ipynb): Modeling post-translational modifications.
-- [Dataset Factory](tutorials/dataset_factory.ipynb): Building large-scale AI training sets.
+- [Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb)
+- [Cryo-EM & SAXS Lab](tutorials/cryo_em_saxs_lab.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb)
+- [BMRB Validation Pipeline](tutorials/bmrb_validation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb)
+- [IDP Ensemble Validation](tutorials/idp_ensemble_validation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb)
+- [GFP Molecular Forge](tutorials/gfp_molecular_forge.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb)
+- [Dataset Factory](tutorials/dataset_factory.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb)
 
 ## Quick Visual Demo
 
