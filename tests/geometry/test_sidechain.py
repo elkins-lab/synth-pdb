@@ -116,3 +116,40 @@ def test_reconstruct_sidechain_missing_template_atoms(mocker):
 
     mocker.patch("biotite.structure.info.residue", return_value=bad_template)
     assert reconstruct_sidechain(peptide, 1, {"chi1": [60.0]}) is None
+
+
+def test_rotate_points():
+    """Test the low-level rotate_points JIT function."""
+    from synth_pdb.geometry.sidechain import rotate_points
+
+    # Points on the Y axis
+    points = np.array([[0.0, 1.0, 0.0], [0.0, 2.0, 0.0]])
+    # Axis is the Z axis (0,0,0 to 0,0,1)
+    axis_p1 = np.array([0.0, 0.0, 0.0])
+    axis_p2 = np.array([0.0, 0.0, 1.0])
+
+    # Rotate 90 degrees around Z: Y becomes -X
+    rotated = rotate_points(points, axis_p1, axis_p2, 90.0)
+
+    expected = np.array([[-1.0, 0.0, 0.0], [-2.0, 0.0, 0.0]])
+    assert np.allclose(rotated, expected, atol=1e-5)
+
+
+def test_reconstruct_sidechain_no_chi1():
+    """Test path where chi1 is missing from rotamer dict."""
+    pdb_content = generate_pdb_content(sequence_str="A", conformation="alpha")
+    pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
+    peptide = pdb_file.get_structure(model=1)
+    # Should return early
+    assert reconstruct_sidechain(peptide, 1, {"prob": 0.5}) is None
+
+
+def test_reconstruct_sidechain_missing_gamma():
+    """Test path where gamma atom is missing in template (e.g. ALA)."""
+    # ALA doesn't have gamma, so chi1 doesn't apply
+    pdb_content = generate_pdb_content(sequence_str="A", conformation="alpha")
+    pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
+    peptide = pdb_file.get_structure(model=1)
+    # Reconstruct chi1 on ALA (which has no CG/OG/SG)
+    reconstruct_sidechain(peptide, 1, {"chi1": 60.0})
+    # Should not crash and should complete

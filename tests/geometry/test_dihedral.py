@@ -63,3 +63,26 @@ def test_calculate_angle():
     p3 = np.array([0.0, 1.0, 0.0])
     angle = calculate_angle(p1, p2, p3)
     assert np.isclose(angle, 90.0)
+
+
+def test_calculate_angle_collinear():
+    """Test calculate_angle with collinear points (180 degrees)."""
+    from synth_pdb.geometry.dihedral import calculate_angle
+
+    p1 = np.array([1.0, 0.0, 0.0])
+    p2 = np.array([0.0, 0.0, 0.0])
+    p3 = np.array([-1.0, 0.0, 0.0])
+    angle = calculate_angle(p1, p2, p3)
+    assert np.isclose(angle, 180.0)
+
+
+def test_calculate_angle_zero_vector():
+    """Test calculate_angle with overlapping points (zero vector)."""
+    from synth_pdb.geometry.dihedral import calculate_angle
+
+    p1 = np.array([0.0, 0.0, 0.0])
+    p2 = np.array([0.0, 0.0, 0.0])
+    p3 = np.array([0.0, 1.0, 0.0])
+    angle = calculate_angle(p1, p2, p3)
+    # Should return 0.0 as per implementation for denominator == 0
+    assert angle == 0.0
