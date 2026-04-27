@@ -3,6 +3,7 @@ from typing import Any
 
 import biotite.structure as struc
 import numpy as np
+import pytest
 
 from synth_pdb.saxs import SaxsSimulator, calculate_saxs_profile, export_saxs_profile
 

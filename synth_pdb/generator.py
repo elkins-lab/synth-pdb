@@ -485,30 +485,47 @@ def _resolve_sequence(
                 if skip_next:
                     skip_next = False
                     continue
-                if part == "D" and j + 1 < len(raw_splits):
-                    next_p = raw_splits[j + 1]
+
+                # Normalize part
+                p = part.upper()
+
+                if p == "D" and j + 1 < len(raw_splits):
+                    next_p = raw_splits[j + 1].upper()
                     if len(next_p) == 1:
                         next_p = ONE_TO_THREE_LETTER_CODE.get(next_p, next_p)
                     amino_acids.append(f"D-{next_p}")
                     skip_next = True
-                elif len(part) == 4 and part.startswith("D"):
-                    # Handle shorthand like 'DALA' -> 'D-ALA'
-                    base = part[1:]
+                elif p.startswith("D") and len(p) == 4:
+                    # Handle shorthand like 'DALA' or 'dALA' -> 'D-ALA'
+                    base = p[1:]
                     if base in ALL_VALID_AMINO_ACIDS:
                         amino_acids.append(f"D-{base}")
                     else:
-                        amino_acids.append(part)
+                        amino_acids.append(p)
+                elif p.startswith("D-"):
+                    # Handle 'D-ALA'
+                    amino_acids.append(p)
                 else:
-                    if len(part) == 1:
-                        amino_acids.append(ONE_TO_THREE_LETTER_CODE.get(part, part))
+                    if len(p) == 1:
+                        amino_acids.append(ONE_TO_THREE_LETTER_CODE.get(p, p))
                     else:
-                        amino_acids.append(part)
+                        amino_acids.append(p)
 
+            # Final validation and cleanup
+            final_sequence = []
             for aa in amino_acids:
+                # Normalize D- moieties to 'D-ALA' format
+                if aa.startswith("D") and not aa.startswith("D-") and len(aa) == 4:
+                    base_aa = aa[1:]
+                    if base_aa in ALL_VALID_AMINO_ACIDS:
+                        aa = f"D-{base_aa}"
+
                 base_aa = aa[2:] if aa.startswith("D-") else aa
                 if base_aa not in ALL_VALID_AMINO_ACIDS:
                     raise ValueError(f"Invalid 3-letter amino acid code: {aa}")
-            return amino_acids
+                final_sequence.append(aa)
+
+            return final_sequence
         elif len(user_sequence_str_upper) == 3 and user_sequence_str_upper in ALL_VALID_AMINO_ACIDS:
             # It's a single 3-letter amino acid code
             return [user_sequence_str_upper]

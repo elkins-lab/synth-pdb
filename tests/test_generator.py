@@ -739,3 +739,21 @@ class TestGenerator(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_d_amino_acid_robust_parsing() -> None:
+    """Ensure the generator handles various D-amino acid shorthand formats robustly."""
+    from synth_pdb.generator import _resolve_sequence
+
+    # 1. User reported sequence (mixed d/D and shorthands)
+    seq = "ALA-dALA-GLY-dGLY-SER-dSER"
+    resolved = _resolve_sequence(None, seq)
+    assert resolved == ["ALA", "D-ALA", "GLY", "D-GLY", "SER", "D-SER"]
+
+    # 3. Explicit D- moieties in dashes
+    seq3 = "D-ALA-ALA-D-SER"
+    resolved3 = _resolve_sequence(None, seq3)
+    assert resolved3 == ["D-ALA", "ALA", "D-SER"]
+
+    # 4. Mixed 1-letter and 3-letter (not officially supported but let's see)
+    # Actually _resolve_sequence doesn't support mixing unless they are all 3-letter or all 1-letter.

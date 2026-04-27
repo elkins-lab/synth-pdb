@@ -18,10 +18,10 @@ class TestGalleryExamples:
     @pytest.fixture(autouse=True)
     def mock_visualize(self):
         """Mock browser visualization and SAXS plotting to avoid opening windows."""
-        with patch("synth_pdb.viewer.view_structure_in_browser") as mock_view, patch(
-            "synth_pdb.visualization_saxs.plot_saxs_results"
-        ) as mock_saxs_plot:
-            yield mock_view, mock_saxs_plot
+        with patch("webbrowser.open") as mock_web, patch(
+            "synth_pdb.viewer.view_structure_in_browser"
+        ) as mock_view, patch("synth_pdb.visualization_saxs.plot_saxs_results") as mock_saxs_plot:
+            yield mock_web, mock_view, mock_saxs_plot
 
     # --- Basic Gallery Examples ---
 

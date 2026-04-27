@@ -8,6 +8,8 @@ Browse inspiring examples and copy-paste commands to get started quickly.
 
 The most common secondary structure in proteins.
 
+![Alpha Helix Example](../images/gallery/alpha_helix.png)
+
 ```bash
 synth-pdb --length 20 --conformation alpha --visualize
 ```
@@ -23,6 +25,8 @@ synth-pdb --length 20 --conformation alpha --visualize
 
 Extended conformation with characteristic pleated structure.
 
+![Beta Sheet Example](../images/gallery/beta_sheet.png)
+
 ```bash
 synth-pdb --length 20 --conformation beta --visualize
 ```
@@ -37,6 +41,8 @@ synth-pdb --length 20 --conformation beta --visualize
 ### Random Coil
 
 Disordered structure with diverse conformations.
+
+![Random Coil Example](../images/gallery/random_coil.png)
 
 ```bash
 synth-pdb --length 20 --conformation random --visualize
@@ -54,6 +60,8 @@ synth-pdb --length 20 --conformation random --visualize
 ### Leucine Zipper
 
 Classic coiled-coil motif with hydrophobic interface.
+
+![Leucine Zipper Example](../images/gallery/leucine_zipper.png)
 
 ```bash
 synth-pdb --sequence "LKELEKELEKELEKELEKELEKEL" \
@@ -73,6 +81,8 @@ synth-pdb --sequence "LKELEKELEKELEKELEKELEKEL" \
 
 DNA-binding motif coordinating Zn²⁺ ion.
 
+![Zinc Finger Example](../images/gallery/zinc_finger.png)
+
 ```bash
 synth-pdb --sequence "CPHCGKSFSQKSDLVKHQRT" \
     --structure "1-10:beta,11-20:alpha" \
@@ -91,6 +101,8 @@ synth-pdb --sequence "CPHCGKSFSQKSDLVKHQRT" \
 ### Collagen Triple Helix
 
 Unique left-handed helix with Gly-X-Y repeats.
+
+![Collagen Example](../images/gallery/collagen.png)
 
 ```bash
 synth-pdb --sequence "GPPGPPGPPGPPGPPGPPGPP" \
@@ -297,6 +309,8 @@ Simulate integrated data from multiple structural biology techniques. For a hand
 
 Generate 3D density volumes at a specific resolution.
 
+![Cryo-EM Map Example](../images/gallery/cryo_em.png)
+
 ```bash
 synth-pdb --mode cryo-em \
     --sequence "MEELQK" \
@@ -314,6 +328,8 @@ synth-pdb --mode cryo-em \
 ### SAXS Profiles
 
 Simulate Small-Angle X-ray Scattering solution data.
+
+![SAXS Profile Example](../images/gallery/saxs_profile.png)
 
 ```bash
 synth-pdb --mode saxs \
