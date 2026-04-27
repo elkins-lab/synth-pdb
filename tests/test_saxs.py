@@ -52,6 +52,30 @@ def test_saxs_simulator_ensemble() -> None:
     assert np.all(intensity >= 0)
 
 
+def test_saxs_simulator_single_structure() -> None:
+    """Verify SAXS simulator works with a single AtomArray."""
+    atoms = struc.AtomArray(1)
+    atoms.coord = np.array([[0, 0, 0]])
+    atoms.element = ["C"]
+
+    sim = SaxsSimulator(n_points=5)
+    intensity = sim.simulate(atoms)
+
+    assert len(intensity) == 5
+    assert np.all(intensity > 0)
+
+
+def test_get_form_factor_fallback() -> None:
+    """Verify that get_form_factor falls back to Carbon for unknown elements."""
+    from synth_pdb.saxs import get_form_factor
+
+    q = np.array([0.1])
+    f_carbon = get_form_factor("C", q)
+    f_unknown = get_form_factor("UnknownElement", q)
+
+    assert np.allclose(f_carbon, f_unknown)
+
+
 def test_export_saxs(tmp_path: Any) -> None:
     """Verify SAXS data export."""
     path = str(tmp_path / "test.dat")

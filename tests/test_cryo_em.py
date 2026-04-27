@@ -82,3 +82,12 @@ def test_cryo_em_simulator_wrapper() -> None:
     # With 2A spacing and 5A buffer, box is roughly [-5, 5] -> 10A -> 5 voxels
     assert len(density.shape) == 3
     assert np.max(density) > 0
+
+
+def test_save_mrc_file_no_mrcfile(monkeypatch: Any) -> None:
+    """Verify that save_mrc_file raises ImportError if mrcfile is missing."""
+    import synth_pdb.cryo_em as cryo_em
+
+    monkeypatch.setattr(cryo_em, "HAS_MRCFILE", False)
+    with pytest.raises(ImportError, match="mrcfile is not installed"):
+        cryo_em.save_mrc_file("test.mrc", np.zeros((10, 10, 10)), np.zeros(3))

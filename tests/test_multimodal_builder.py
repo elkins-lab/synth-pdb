@@ -33,6 +33,13 @@ def test_multimodal_dataset_builder_cli() -> None:
         assert len(os.listdir(os.path.join(output_dir, "saxs"))) == 2
         assert len(os.listdir(os.path.join(output_dir, "nmr"))) == 2
 
+        # Verify NMR RDC file content
+        nmr_file = os.path.join(output_dir, "nmr", "sample_0000_rdc.csv")
+        with open(nmr_file) as f:
+            lines = f.readlines()
+            assert "residue,rdc_hz" in lines[0]
+            assert len(lines) > 1
+
     finally:
         if os.path.exists(output_dir):
             shutil.rmtree(output_dir)

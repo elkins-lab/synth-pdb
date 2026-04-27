@@ -23,7 +23,7 @@
 """
 
 import logging
-from typing import Any, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import biotite.structure as struc
 import numpy as np
@@ -194,29 +194,30 @@ class SaxsSimulator:
 
     def simulate(self, structure: struc.AtomArray | struc.AtomArrayStack) -> np.ndarray:
         """Computes the averaged SAXS profile for a structure or ensemble."""
-        if isinstance(structure, struc.AtomArray):
-            _, intensity = calculate_saxs_profile(
-                structure,
-                q_min=self.q_min,
-                q_max=self.q_max,
-                n_points=self.n_points,
-                include_solvent=self.include_solvent,
-            )
-            return intensity
+        if hasattr(structure, "stack_depth") and structure.stack_depth() > 0:
+            # For ensembles, average the intensities
+            all_intensities = []
+            for i in range(structure.stack_depth()):
+                _, intensity = calculate_saxs_profile(
+                    structure[i],
+                    q_min=self.q_min,
+                    q_max=self.q_max,
+                    n_points=self.n_points,
+                    include_solvent=self.include_solvent,
+                )
+                all_intensities.append(intensity)
 
-        # For ensembles, average the intensities
-        all_intensities = []
-        for i in range(structure.stack_depth()):
-            _, intensity = calculate_saxs_profile(
-                structure[i],
-                q_min=self.q_min,
-                q_max=self.q_max,
-                n_points=self.n_points,
-                include_solvent=self.include_solvent,
-            )
-            all_intensities.append(intensity)
+            return cast(np.ndarray, np.mean(all_intensities, axis=0))
 
-        return cast(np.ndarray, np.mean(all_intensities, axis=0))
+        # Single structure
+        _, intensity = calculate_saxs_profile(
+            structure,  # type: ignore[arg-type]
+            q_min=self.q_min,
+            q_max=self.q_max,
+            n_points=self.n_points,
+            include_solvent=self.include_solvent,
+        )
+        return intensity
 
 
 def export_saxs_profile(q: np.ndarray, intensity: np.ndarray, output_file: str) -> None:
