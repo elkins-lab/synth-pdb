@@ -95,6 +95,16 @@ class TestConformationalDiversity:
         assert "ATOM" in pdb_content
         assert "END" in pdb_content
 
+    def test_generate_with_polyproline_alias(self) -> None:
+        """Test generating PDB with 'polyproline' alias for PPII."""
+        pdb_content = generate_pdb_content(
+            length=5, sequence_str="PPPPP", conformation="polyproline"
+        )
+
+        # Should generate valid PDB
+        assert "ATOM" in pdb_content
+        assert "END" in pdb_content
+
     def test_generate_with_random_conformation(self) -> None:
         """Test generating PDB with random conformation sampling."""
         # Generate two structures with random conformations

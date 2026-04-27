@@ -491,6 +491,13 @@ def _resolve_sequence(
                         next_p = ONE_TO_THREE_LETTER_CODE.get(next_p, next_p)
                     amino_acids.append(f"D-{next_p}")
                     skip_next = True
+                elif len(part) == 4 and part.startswith("D"):
+                    # Handle shorthand like 'DALA' -> 'D-ALA'
+                    base = part[1:]
+                    if base in ALL_VALID_AMINO_ACIDS:
+                        amino_acids.append(f"D-{base}")
+                    else:
+                        amino_acids.append(part)
                 else:
                     if len(part) == 1:
                         amino_acids.append(ONE_TO_THREE_LETTER_CODE.get(part, part))

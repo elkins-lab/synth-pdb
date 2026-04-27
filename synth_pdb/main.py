@@ -167,8 +167,8 @@ def main() -> None:
         "--conformation",
         type=str,
         default="alpha",
-        choices=["alpha", "beta", "ppii", "extended", "random"],
-        help="Secondary structure conformation to generate. Options: alpha (default, alpha helix), beta (beta sheet), ppii (polyproline II), extended (stretched), random (random sampling).",
+        choices=["alpha", "beta", "ppii", "polyproline", "extended", "random"],
+        help="Secondary structure conformation to generate. Options: alpha (default, alpha helix), beta (beta sheet), ppii (polyproline II), polyproline (alias for ppii), extended (stretched), random (random sampling).",
     )
     parser.add_argument(
         "--metal-ions",
@@ -753,18 +753,21 @@ def main() -> None:
 
     # Dispatch to specific modes if not generating a new structure
     if args.mode == "docking":
-        if not args.input_pdb:
-            logger.error("Docking mode requires --input-pdb.")
+        if args.input_pdb:
+            prep = DockingPrep(args.forcefield)
+            pqr_file = args.output if args.output else "docking_prep.pqr"
+            success = prep.write_pqr(args.input_pdb, pqr_file)
+            if success:
+                logger.info(f"Docking preparation complete. PQR file: {pqr_file}")
+            else:
+                logger.error("Docking preparation failed.")
+                sys.exit(1)
+            return
+        elif not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("Docking mode requires either --input-pdb or a target sequence/length.")
             sys.exit(1)
-        prep = DockingPrep(args.forcefield)
-        pqr_file = args.output if args.output else "docking_prep.pqr"
-        success = prep.write_pqr(args.input_pdb, pqr_file)
-        if success:
-            logger.info(f"Docking preparation complete. PQR file: {pqr_file}")
         else:
-            logger.error("Docking preparation failed.")
-            sys.exit(1)
-        return
+            logger.info("Docking mode: No input PDB provided. Generating new structure first...")
 
     if args.mode == "pymol":
         if not args.input_pdb or not args.input_nef or not args.output_pml:
@@ -1881,6 +1884,28 @@ def main() -> None:
                                 logger.info(
                                     f"Distogram exported to: {os.path.abspath(args.export_distogram)}"
                                 )
+
+                # 8. Docking Post-Processing (PQR generation)
+                if args.mode == "docking":
+                    logger.info("Generating PQR file for docking...")
+                    try:
+                        prep = DockingPrep(args.forcefield)
+                        # We use the newly generated PDB file as input
+                        pqr_file = (
+                            args.output if args.output else output_filename.replace(".pdb", ".pqr")
+                        )
+                        if not pqr_file.endswith(".pqr"):
+                            pqr_file += ".pqr"
+
+                        success = prep.write_pqr(output_filename, pqr_file)
+                        if success:
+                            logger.info(
+                                f"Docking preparation complete. PQR file: {os.path.abspath(pqr_file)}"
+                            )
+                        else:
+                            logger.error("Docking preparation failed.")
+                    except Exception as e:
+                        logger.error(f"Failed to generate PQR: {e}")
 
                 # Open 3D viewer if requested (MOVED AFTER NMR calc to access generated_restraints)
                 if args.visualize:

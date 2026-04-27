@@ -28,6 +28,7 @@ STANDARD_AMINO_ACIDS: list[str] = [
     "THR",
     "TRP",
     "TYR",
+    "SEC",  # Selenocysteine
 ]
 
 # EDUCATIONAL NOTE - Proline Sterics (The "Proline Effect"):
@@ -158,9 +159,10 @@ ONE_TO_THREE_LETTER_CODE: dict[str, str] = {
     "P": "PRO",
     "S": "SER",
     "T": "THR",
+    "U": "SEC",
+    "V": "VAL",
     "W": "TRP",
     "Y": "TYR",
-    "V": "VAL",
 }
 
 # --- Ramachandran Angle Presets for Different Secondary Structures ---
@@ -181,6 +183,10 @@ RAMACHANDRAN_PRESETS: dict[str, dict[str, float]] = {
     },
     "ppii": {
         "phi": -75.0,  # Polyproline II helix (left-handed)
+        "psi": 145.0,
+    },
+    "polyproline": {
+        "phi": -75.0,  # Alias for PPII
         "psi": 145.0,
     },
     "extended": {
