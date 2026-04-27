@@ -65,8 +65,12 @@ class TestDatasetNPZ(unittest.TestCase):
         sequence = data["sequence"]
         cmap = data["contact_map"]
 
+        from synth_pdb.data import ONE_TO_THREE_LETTER_CODE
+
+        n_aas = len(set(ONE_TO_THREE_LETTER_CODE.values()))
+
         self.assertEqual(coords.shape, (L, 5, 3), "Coords should be (L, 5, 3) -> [N, CA, C, O, CB]")
-        self.assertEqual(sequence.shape, (L, 20), "Sequence should be one-hot (L, 20)")
+        self.assertEqual(sequence.shape, (L, n_aas), f"Sequence should be one-hot (L, {n_aas})")
         self.assertEqual(cmap.shape, (L, L), "Contact map should be (L, L)")
 
         # Check Values (Basic sanity)

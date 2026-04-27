@@ -54,6 +54,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 random_linear_peptide_*.pdb
+random_linear_peptide_*.pqr
 custom_peptide_*.pdb
 custom_peptide_*.fasta
 test_*.pdb
@@ -62,6 +63,8 @@ fix_*.py
 decoys/
 bmr6457.json
 1d3z_mr.str
+1UBQ.pdb
+tmp/
 
 # Translations
 *.mo

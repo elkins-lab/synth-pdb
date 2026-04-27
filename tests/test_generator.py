@@ -580,12 +580,20 @@ class TestGenerator(unittest.TestCase):
                             f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
                         )
                     elif len(atom_data["atom_name"]) == 2:
-                        # For two-char atom names, expect " CA "
-                        self.assertEqual(
-                            line[12:16],
-                            " " + atom_data["atom_name"] + " ",
-                            f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
-                        )
+                        # For two-char atom names, expect " CA " (leading space)
+                        # UNLESS it is a 2-character element like "SE"
+                        if atom_data["atom_name"] == "SE":
+                            self.assertEqual(
+                                line[12:16],
+                                atom_data["atom_name"] + "  ",
+                                f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                            )
+                        else:
+                            self.assertEqual(
+                                line[12:16],
+                                " " + atom_data["atom_name"] + " ",
+                                f"Atom name '{atom_data['atom_name']}' padding incorrect: '{line[12:16]}'",
+                            )
                     elif len(atom_data["atom_name"]) == 3:
                         # For three-char atom names, expect " CD1" (space, CD1)
                         self.assertEqual(

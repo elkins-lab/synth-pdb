@@ -34,7 +34,7 @@ def test_main_rpf_validation_cli(tmp_path: Any, monkeypatch: Any) -> None:
         str(restraints_path),
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env, encoding="utf-8")
 
     if result.returncode != 0:
         print(f"STDOUT: {result.stdout}")
@@ -92,7 +92,7 @@ def test_main_rpf_validation_nef_cli(tmp_path: Any, monkeypatch: Any) -> None:
         truth_nef,
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env, encoding="utf-8")
 
     # 3. Verify Output
     assert (

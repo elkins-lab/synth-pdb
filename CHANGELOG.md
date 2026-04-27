@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.34.0] - 2026-04-27
+
+### Added
+- **High-Fidelity SAXS Visualization**: Integrated Standard, Kratky, and Guinier plots into the CLI and core library for biophysical assessment of protein folding and dimensions.
+- **Scientific Rigor Suite**: New automated validation against peer-reviewed benchmarks (Waasmaier & Kirfel 1995 for form factors; Kratky & Porod 1949 for folding signatures).
+- **Multi-Modal Dataset Factory**: New `scripts/build_multimodal_dataset.py` for high-throughput generation of synchronized PDB, MRC, SAXS, and NMR data for AI training.
+- **Robust Sequence Parsing**: Support for 4-letter D-amino acid shorthands (DALA, dALA) and Selenocysteine (SEC/U).
+- **Interactive Cryo-EM & SAXS Lab**: New tutorial showcasing ensemble-averaged density and scattering simulation.
+- **Embedded Gallery Visuals**: Added snapshots for all major structural types in the examples documentation.
+
+### Fixed
+- **CLI Robustness**: Fixed `docking` mode to support on-the-fly generation from sequence strings.
+- **PDB Compliance**: Updated atom formatting for 2-character elements (like Selenium) to meet rigorous PDB standards.
+- **Browser Automation**: Mocked `webbrowser` in test suites to prevent unintended popup windows during CI runs.
+
 ## [1.33.0] - 2026-04-26
 
 ### Added

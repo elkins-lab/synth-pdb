@@ -23,7 +23,7 @@ def test_multimodal_dataset_builder_cli() -> None:
             "--sequence",
             "AGS",
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
 
         assert result.returncode == 0
         assert os.path.exists(output_dir)

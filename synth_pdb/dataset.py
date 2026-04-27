@@ -293,8 +293,9 @@ def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
 
         # Standard AA mapping (alphabetical usually, or fixed order)
         # We need a robust mapping.
-        aa_list = sorted(ONE_TO_THREE_LETTER_CODE.values())  # 'ALA', 'ARG', ...
+        aa_list = sorted(set(ONE_TO_THREE_LETTER_CODE.values()))  # 'ALA', 'ARG', ...
         aa_to_idx = {aa: i for i, aa in enumerate(aa_list)}
+        n_aas = len(aa_list)
 
         # Mapping for variants
         variant_map = {
@@ -306,9 +307,28 @@ def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
             "GLH": "GLU",
             "ASH": "ASP",
             "LYN": "LYS",
+            "DAL": "ALA",
+            "DAR": "ARG",
+            "DAN": "ASN",
+            "DAS": "ASP",
+            "DCY": "CYS",
+            "DGL": "GLU",
+            "DGN": "GLN",
+            "DHI": "HIS",
+            "DIL": "ILE",
+            "DLE": "LEU",
+            "DLY": "LYS",
+            "DME": "MET",
+            "DPH": "PHE",
+            "DPR": "PRO",
+            "DSE": "SER",
+            "DTH": "THR",
+            "DTR": "TRP",
+            "DTY": "TYR",
+            "DVA": "VAL",
         }
 
-        sequence_one_hot = np.zeros((length, 20), dtype=np.float32)
+        sequence_one_hot = np.zeros((length, n_aas), dtype=np.float32)
         for i, res_name in enumerate(ca.res_name):
             # Normalize variant
             canon_name = variant_map.get(res_name, res_name)

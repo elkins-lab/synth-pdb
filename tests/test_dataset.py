@@ -38,7 +38,6 @@ class SynchronousExecutor(concurrent.futures.Executor):
 
 
 class TestDatasetGenerator:
-
     @pytest.fixture
     def output_dir(self):
         """Fixture for a temporary output directory."""
@@ -99,7 +98,6 @@ class TestDatasetGenerator:
         """Test the main generation loop using SynchronousExecutor."""
         # We replace ProcessPoolExecutor with our SynchronousExecutor
         with patch("concurrent.futures.ProcessPoolExecutor", side_effect=SynchronousExecutor):
-
             # Now we can treat mocks as usual because everything runs in main thread
             with patch("synth_pdb.dataset.generate_pdb_content", return_value="PDB") as mock_gen:
                 with patch("synth_pdb.dataset.export_constraints", return_value="MAP"):
@@ -193,6 +191,10 @@ class TestDatasetGenerator:
         assert npz_path.exists()
 
         # Load and verify content
+        from synth_pdb.data import ONE_TO_THREE_LETTER_CODE
+
+        n_aas = len(set(ONE_TO_THREE_LETTER_CODE.values()))
+
         data = np.load(npz_path)
         assert "coords" in data
         assert "sequence" in data
@@ -200,7 +202,7 @@ class TestDatasetGenerator:
 
         # L=15
         assert data["coords"].shape == (15, 5, 3)
-        assert data["sequence"].shape == (15, 20)
+        assert data["sequence"].shape == (15, n_aas)
         assert data["contact_map"].shape == (15, 15)
 
         # Verify one-hot (each row sums to 1.0)

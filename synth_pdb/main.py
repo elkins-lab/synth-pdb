@@ -718,36 +718,8 @@ def main() -> None:
         args.cap_termini = False
 
     # Validate length only if no sequence is provided
-    if args.sequence is None:
-        if args.length is None:
-            # Check if we can infer length from structure parameter
-            if args.structure:
-                # Parse structure to find maximum residue number
-                try:
-                    max_residue = 0
-                    for region in args.structure.split(","):
-                        region = region.strip()
-                        if ":" in region:
-                            range_part = region.split(":", 1)[0]
-                            if "-" in range_part:
-                                _, end_str = range_part.split("-", 1)
-                                end = int(end_str)
-                                max_residue = max(max_residue, end)
-
-                    if max_residue > 0:
-                        args.length = max_residue
-                        logger.info(f"Inferred length={max_residue} from --structure parameter")
-                    else:
-                        logger.error("Could not infer length from --structure parameter")
-                        sys.exit(1)
-                except Exception as e:
-                    logger.error(f"Failed to parse --structure parameter: {e}")
-                    sys.exit(1)
-            else:
-                # No structure parameter, use default length of 10
-                args.length = 10
-                logger.debug("Using default length=10")
-        elif args.length <= 0:
+    if args.sequence is None and args.length is not None:
+        if args.length <= 0:
             logger.error("Length must be a positive integer.")
             sys.exit(1)
 
@@ -763,11 +735,41 @@ def main() -> None:
                 logger.error("Docking preparation failed.")
                 sys.exit(1)
             return
-        elif not args.sequence and (args.length is None or args.length <= 0):
-            logger.error("Docking mode requires either --input-pdb or a target sequence/length.")
+        elif not args.sequence and args.length is None and not args.structure:
+            logger.error("Docking mode requires --input-pdb.")
             sys.exit(1)
         else:
             logger.info("Docking mode: No input PDB provided. Generating new structure first...")
+
+    # Set default length if not provided and no sequence
+    if args.sequence is None and args.length is None:
+        # Check if we can infer length from structure parameter
+        if args.structure:
+            # Parse structure to find maximum residue number
+            try:
+                max_residue = 0
+                for region in args.structure.split(","):
+                    region = region.strip()
+                    if ":" in region:
+                        range_part = region.split(":", 1)[0]
+                        if "-" in range_part:
+                            _, end_str = range_part.split("-", 1)
+                            end = int(end_str)
+                            max_residue = max(max_residue, end)
+
+                if max_residue > 0:
+                    args.length = max_residue
+                    logger.info(f"Inferred length={max_residue} from --structure parameter")
+                else:
+                    logger.error("Could not infer length from --structure parameter")
+                    sys.exit(1)
+            except Exception as e:
+                logger.error(f"Failed to parse --structure parameter: {e}")
+                sys.exit(1)
+        else:
+            # No structure parameter, use default length of 10
+            args.length = 10
+            logger.debug("Using default length=10")
 
     if args.mode == "pymol":
         if not args.input_pdb or not args.input_nef or not args.output_pml:
