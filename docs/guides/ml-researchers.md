@@ -196,6 +196,32 @@ class NPZDataset(Dataset):
 dataset = NPZDataset("training_data/train")
 ```
 
+## Multi-Modal Dataset Factory
+
+Modern protein AI models (like RoseTTAFold-All-Atom or CryoCloud) often require more than just coordinates. They need synchronized experimental observables.
+
+`synth-pdb` includes a master factory script that generates synchronized datasets across four modalities:
+
+```bash
+# Generate 500 samples with PDBs, Cryo-EM maps, SAXS profiles, and NMR tables
+python3 scripts/build_multimodal_dataset.py \
+    --n 500 \
+    --output-dir multimodal_training_set \
+    --resolution 3.5 \
+    --drift 5.0
+```
+
+### Generated Modalities
+
+| Modality | Format | Scientific Information |
+|---|---|---|
+| **Structure** | `.pdb` | Ground-truth atomic coordinates |
+| **Cryo-EM** | `.mrc` | Simulated 3D electron density volume |
+| **SAXS** | `.dat` | Simulated 1D scattering curve ($I(q)$ vs $q$) |
+| **NMR** | `.csv` | Back-calculated Residual Dipolar Couplings (RDCs) |
+
+This factory linking 3D space, reciprocal space (SAXS), and global alignment (RDC) is unique among synthetic generators and essential for benchmarking **Integrative Modeling** AI.
+
 ## Use Cases
 
 ### 1. Structure Prediction (AlphaFold-style)

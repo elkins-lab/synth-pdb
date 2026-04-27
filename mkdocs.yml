@@ -113,6 +113,8 @@ nav:
       - viewer: api/viewer.md
       - dataset: api/dataset.md
   - Scientific Background:
+    - Multimodal Overview: science/multimodal.md
+    - Multi-Modal Observables: science/multi-modal-observables.md
     - Biophysics Fundamentals: science/biophysics.md
     - Intrinsically Disordered Proteins: science/idp-dynamics.md
     - NMR Ensemble Analysis: science/ensemble-analysis.md

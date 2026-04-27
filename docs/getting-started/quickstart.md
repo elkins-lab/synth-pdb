@@ -113,6 +113,17 @@ synth-pdb --structure "1-10:alpha,11-20:beta" --visualize
 synth-pdb --length 30 --gen-nef --gen-relax --output nmr_test.pdb
 ```
 
+## Synthetic Data Factories
+
+For high-throughput AI training, `synth-pdb` includes a dedicated builder for multi-modal datasets:
+
+```bash
+# Generate 500 synchronized PDB, Cryo-EM, SAXS, and NMR samples
+python3 scripts/build_multimodal_dataset.py --n 500 --output-dir my_ai_dataset
+```
+
+This factory leverages the **900x faster vectorized walker** to produce labeled training data in minutes.
+
 ## Getting Help
 
 !!! question "Need help?"
