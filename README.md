@@ -25,24 +25,28 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 
 | Tutorial | Difficulty | Time | Action |
 | :--- | :---: | :---: | :--- |
+| **🔬 Cryo-EM & SAXS Lab** | ⭐ Beginner | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
 | **🤖 AI Protein Data Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/ml_handover_demo.ipynb) |
 | **🏭 Bulk Dataset Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb) |
 | **🔗 Framework Handover** | ⭐ Beginner | 10 min | [View JAX/PyTorch/MLX Examples](https://github.com/elkins/synth-pdb/tree/master/examples/ml_loading) |
+| **🧪 BMRB Validation Pipeline** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb) |
 | **⭕ Macrocycle Design Lab** | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/macrocycle_lab.ipynb) |
 | **💊 Bio-Active Hormone Lab** | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hormone_lab.ipynb) |
 | **🔍 Protein Quality Assessment** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/protein_quality_assessment.ipynb) |
 | **🔬 The Virtual NMR Spectrometer** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
 | **🧲 RDC Alignment Tensor Explorer** | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
-| **📊 RPF Score Validation** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/nmr_validation_rpf.ipynb) |
-| **🛢️ The Oil Drop Model: Hydrophobic Burial** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/sasa_hydrophobic_burial.ipynb) |
+| **📊 RPF Score Validation** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nmr_validation_rpf.ipynb) |
+| **🛢️ The Oil Drop Model: Hydrophobic Burial** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/sasa_hydrophobic_burial.ipynb) |
 | **📡 Neural NMR Pipeline** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/neural_nmr_pipeline.ipynb) |
 | **🔗 The NeRF Geometry Lab** | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nerf_geometry_lab.ipynb) |
-| **📏 Geometry Tools Reference** | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/geometry_tools_reference.ipynb) |
+| **📏 Geometry Tools Reference** | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/geometry_tools_reference.ipynb) |
 | **🧪 The GFP Molecular Forge** | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
 | **🧬 PLM Embeddings (ESM-2)** | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/plm_embeddings.ipynb) |
+| **📊 Ubiquitin Validation Suite** | ⭐⭐⭐ Advanced | 45 min | [CS](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) / [J-Coupling](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_j_coupling_validation.ipynb) / [RDC](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_rdc_validation.ipynb) |
 | **📐 6D Orientogram Lab** | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/orientogram_lab.ipynb) |
 | **🎯 The Hard Decoy Challenge** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hard_decoy_challenge.ipynb) |
-| **🔬 Structure Defensibility Dashboard** | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/structure_defensibility_dashboard.ipynb) |
+| **🔬 Structure Defensibility Dashboard** | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/structure_defensibility_dashboard.ipynb) |
+| **🧬 Co-evolution Factory** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/coevolution_msa_factory.ipynb) |
 | **🗺️ Contact Map Fingerprinting** | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/contact_map_fingerprinting.ipynb) |
 | **🧬 Co-evolutionary Fitness Landscape** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/fitness_landscape_explorer.ipynb) |
 | **💊 Drug Discovery Pipeline** | ⭐⭐⭐ Advanced | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/drug_discovery_pipeline.ipynb) |
@@ -64,6 +68,7 @@ Choose a path based on your background and goals:
 4. **🎯 Hard Decoy Challenge** (35 min) - Create negative samples for robust training
 5. **🧬 PLM Embeddings (ESM-2)** (30 min) - Add evolutionary context as per-residue node features
 6. **📐 6D Orientogram Lab** (30 min) - Work with rotation-invariant representations
+7. **🧬 Co-evolution Factory** (35 min) - Simulate sequence evolution kernels
 
 #### 🔬 **For Biophysicists**
 *Understand structure, dynamics, and spectroscopy*
@@ -79,6 +84,8 @@ Choose a path based on your background and goals:
 9. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
 10. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
 11. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
+12. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
+13. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*
@@ -89,6 +96,7 @@ Choose a path based on your background and goals:
 4. **🎯 Hard Decoy Challenge** (35 min) - Generate decoys for docking validation
 5. **🌌 AI Latent Space Explorer** (35 min) - Navigate chemical space with ML
 6. **🔬 Virtual NMR Spectrometer** (25 min) - Predict experimental observables
+7. **🔬 Cryo-EM & SAXS Lab** (20 min) - Multi-modal verification of peptide folds
 
 
 ## Table of Contents
@@ -1294,7 +1302,7 @@ synth-pdb/
 │   │   ├── nerf.py          # NeRF backbone construction kernels
 │   │   ├── sidechain.py     # Side-chain geometry helpers
 │   │   └── vectorized.py    # NumPy-vectorized / Numba-JIT geometry kernels
-│   ├── ensemble/            # NMR ensemble analysis subpackage (v1.34.0+)
+│   ├── ensemble/            # NMR ensemble analysis subpackage (v1.34.1+)
 │   │   ├── daop.py          # DAOPCalculator (Hyberts 1992 dihedral order parameters)
 │   │   └── statistics.py    # EnsembleStatistics, QualityAssessment dataclasses
 │   └── quality/             # Structure quality scoring (v1.18+)
