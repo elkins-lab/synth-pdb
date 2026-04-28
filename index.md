@@ -1,0 +1,69 @@
+# synth-pdb
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb)
+[![PyPI version](https://img.shields.io/pypi/v/synth-pdb.svg?label=pypi%20package&color=brightgreen)](https://pypi.org/project/synth-pdb/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education, and tool development.**
+
+> ⚠️ **Important**: The generated structures use idealized geometries and may contain violations of standard structural constraints. These files are intended for **testing computational tools** and **educational demonstrations**, not for simulation or experimental validation.
+
+---
+
+## Why synth-pdb?
+
+In the fields of structural biology and bioinformatics, researchers frequently require datasets of protein structures to test algorithms, train machine learning models, or validatate analytical pipelines. While the Protein Data Bank (PDB) contains over 200,000 experimental structures, relying solely on experimental data has limitations:
+
+1.  **Bias**: PDB data is biased toward crystallizable or stable proteins.
+2.  **Complexity**: Experimental files often contain artifacts, missing atoms, or non-standard residues that complicate initial testing.
+3.  **Lack of Ground Truth**: When developing algorithms for NMR assignment or structure calculation, "perfect" synthetic data is essential for unit testing.
+
+``synth-pdb`` fills this gap by providing a lightweight, deterministic generator that produces chemically valid, full-atom PDB files with user-defined secondary structures (helices, sheets) in seconds.
+
+## Educational Philosophy: Code as Textbook 🎓
+
+`synth-pdb` is built on the core principle that scientific software should be readable and educational.
+
+*   **Code as Textbook**: We reject "black box" algorithms. Our source code (e.g., `generator.py`, `physics.py`) is heavily annotated with the *biophysical reasons* behind the implementation—explaining concepts like Boltzmann weighting, order parameters ($S^2$), and NOE distance dependence ($r^{-6}$).
+*   **Visual Learning**: With the new `--visualize` flag, students can instantly see how abstract concepts (like steric clashes or helical packing) manifest in 3D, bridging the gap between equations and biology.
+*   **Integrity**: We employ specific tests to ensure these educational notes remain in the codebase, preventing refactoring from stripping away the scientific context.
+
+## Key Features
+
+✨ **Structure Generation**
+- Full atomic representation with backbone and side-chain heavy atoms + hydrogens
+- Customizable sequence (1-letter or 3-letter amino acid codes)
+- **Conformational diversity**: Generate alpha helices, beta sheets, extended chains, or random conformations
+- **Rotamer-based side-chain placement** for all 20 standard amino acids (Dunbrack library)
+
+🔬 **Validation Suite**
+- Bond length & angle validation
+- Ramachandran angle checking
+- Steric clash detection & refinement
+- Sequence improbability detection
+
+⚙️ **Quality Control**
+- `--best-of-N`: Generate multiple structures and select the one with fewest violations
+- `--minimize`: Relax structures using OpenMM (Implicit Solvent / AMBER forcefield)
+
+📚 **Interactive Tutorials**
+- [Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb)
+- [Cryo-EM & SAXS Lab](tutorials/cryo_em_saxs_lab.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb)
+- [BMRB Validation Pipeline](tutorials/bmrb_validation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb)
+- [IDP Ensemble Validation](tutorials/idp_ensemble_validation.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb)
+- [GFP Molecular Forge](tutorials/gfp_molecular_forge.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb)
+- [Dataset Factory](tutorials/dataset_factory.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb)
+
+## Quick Visual Demo
+
+Want to see the **Physics + Visualization** capabilities in action?
+
+Run this command to generate a **Leucine Zipper** (classic alpha helix), **minimize** its energy using OpenMM, and immediately **visualize** it in your browser:
+
+```bash
+synth-pdb --sequence "LKELEKELEKELEKELEKELEKEL" --conformation alpha --minimize --visualize
+```
+
+## Citation
+
+If you use `synth-pdb` in your research, please cite it using the metadata in the `CITATION.cff` file in the repository.
