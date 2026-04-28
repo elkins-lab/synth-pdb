@@ -180,16 +180,37 @@ class PDBValidationAPI:
     Provides peer-reviewed geometric quality metrics compared to the entire PDB.
     """
 
-    BASE_URL = "https://www.ebi.ac.uk/pdbe/api/validation"
+    # PDBe has unified their API to v2
+    BASE_URL = "https://www.ebi.ac.uk/pdbe/api/v2/validation"
 
     @staticmethod
     def get_validation_summary(pdb_id: str) -> dict[str, Any]:
-        """Fetch validation summary for an existing PDB entry."""
-        url = f"{PDBValidationAPI.BASE_URL}/summary/entry/{pdb_id.lower()}"
+        """Fetch validation summary for an existing PDB entry.
+
+        COMPATIBILITY NOTE:
+        The PDBe v2 API has changed the response structure. This method
+        provides a shim to return keys expected by legacy synth-pdb code.
+        """
+        pid = pdb_id.lower()
+        url = f"{PDBValidationAPI.BASE_URL}/global-percentiles/entry/{pid}"
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return cast(dict[str, Any], response.json().get(pdb_id.lower(), {}))
+            data = response.json().get(pid, {})
+
+            # Shim for legacy keys used in tutorials
+            shim = {
+                "absolute_percentile_clashscore": data.get("clashscore", {}).get("absolute"),
+                "absolute_percentile_ramachandran": data.get("percent-rama-outliers", {}).get(
+                    "absolute"
+                ),
+                "absolute_percentile_sidechain_outliers": data.get("percent-rota-outliers", {}).get(
+                    "absolute"
+                ),
+            }
+            # Return as a list containing a dict to match old API response structure
+            # (which was a list of analysis entries)
+            return cast(dict[str, Any], [shim])
         except Exception as e:
             logger.error(f"Failed to fetch PDBe summary for {pdb_id}: {e}")
             return {}
@@ -197,11 +218,12 @@ class PDBValidationAPI:
     @staticmethod
     def get_validation_outliers(pdb_id: str) -> dict[str, Any]:
         """Fetch detailed geometric outliers (Ramachandran, etc.) for a PDB entry."""
-        url = f"{PDBValidationAPI.BASE_URL}/outliers/entry/{pdb_id.lower()}"
+        pid = pdb_id.lower()
+        url = f"{PDBValidationAPI.BASE_URL}/residuewise_outlier_summary/entry/{pid}"
         try:
             response = requests.get(url)
             response.raise_for_status()
-            return cast(dict[str, Any], response.json().get(pdb_id.lower(), {}))
+            return cast(dict[str, Any], response.json().get(pid, {}))
         except Exception as e:
             logger.error(f"Failed to fetch PDBe outliers for {pdb_id}: {e}")
             return {}

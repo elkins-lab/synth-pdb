@@ -106,21 +106,33 @@ def test_search_entries_with_restraints() -> None:
 
 
 def test_pdbe_validation_summary() -> None:
-    """Test PDBValidationAPI summary fetching."""
-    mock_data = {"1ubq": {"summary_metric": 0.95}}
+    """Test PDBValidationAPI summary fetching (v2 with shim)."""
+    mock_data = {
+        "1ubq": {
+            "clashscore": {"absolute": 0.95},
+            "percent-rama-outliers": {"absolute": 0.98},
+            "percent-rota-outliers": {"absolute": 0.99},
+        }
+    }
     with patch("requests.get") as mock_get:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.json.return_value = mock_data
         mock_get.return_value = mock_resp
 
-        summary = PDBValidationAPI.get_validation_summary("1UBQ")
-        assert summary["summary_metric"] == 0.95
-        mock_get.assert_called_with("https://www.ebi.ac.uk/pdbe/api/validation/summary/entry/1ubq")
+        # Method returns a list with a single shimmed dict
+        summary_list = PDBValidationAPI.get_validation_summary("1UBQ")
+        summary = summary_list[0]
+        assert summary["absolute_percentile_clashscore"] == 0.95
+        assert summary["absolute_percentile_ramachandran"] == 0.98
+        assert summary["absolute_percentile_sidechain_outliers"] == 0.99
+        mock_get.assert_called_with(
+            "https://www.ebi.ac.uk/pdbe/api/v2/validation/global-percentiles/entry/1ubq"
+        )
 
 
 def test_pdbe_validation_outliers() -> None:
-    """Test PDBValidationAPI outliers fetching."""
+    """Test PDBValidationAPI outliers fetching (v2)."""
     mock_data: dict[str, Any] = {"1ubq": {"outliers": []}}
     with patch("requests.get") as mock_get:
         mock_resp = MagicMock()
@@ -130,7 +142,9 @@ def test_pdbe_validation_outliers() -> None:
 
         outliers = PDBValidationAPI.get_validation_outliers("1UBQ")
         assert "outliers" in outliers
-        mock_get.assert_called_with("https://www.ebi.ac.uk/pdbe/api/validation/outliers/entry/1ubq")
+        mock_get.assert_called_with(
+            "https://www.ebi.ac.uk/pdbe/api/v2/validation/residuewise_outlier_summary/entry/1ubq"
+        )
 
 
 def test_api_error_handling(caplog: Any) -> None:

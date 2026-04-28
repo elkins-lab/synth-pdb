@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.34.2] - 2026-04-28
+
+### Fixed
+- **BMRB Validation Pipeline**: Updated `PDBValidationAPI` to use the unified PDBe v2 API, resolving 404 errors during metadata retrieval. Added a compatibility shim to maintain support for legacy field names in existing tutorials.
+
 ## [1.34.1] - 2026-04-27
 
 ### Added

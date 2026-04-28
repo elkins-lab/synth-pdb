@@ -7,7 +7,7 @@ from synth_pdb.ensemble import DAOPCalculator, EnsembleStatistics
 ```
 
 > [!NOTE]
-> Added in **v1.34.0**. These tools mirror the analysis performed by **PDBStat** (Tejero et al. 2013) and are validated against the published NMR benchmarks in the `tests/test_scientific_validation.py` suite.
+> These tools mirror the analysis performed by **PDBStat** (Tejero et al. 2013) and are validated against the published NMR benchmarks in the `tests/test_scientific_validation.py` suite.
 
 ---
 
