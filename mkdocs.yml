@@ -54,6 +54,7 @@ nav:
     - For AI/ML Researchers: guides/ml-researchers.md
     - For NMR Spectroscopists: guides/nmr-spectroscopists.md
     - Command-Line Reference: guides/cli-reference.md
+    - Publication Figures: guides/publication-figures.md
     - Visualization: visualization.md
     - Physics Engine: physics.md
     - NMR Observables: nmr.md
@@ -116,6 +117,7 @@ nav:
       - viewer: api/viewer.md
       - dataset: api/dataset.md
   - Scientific Background:
+    - Scientific Benchmarking: science/benchmarking.md
     - Multimodal Overview: science/multimodal.md
     - Multi-Modal Observables: science/multi-modal-observables.md
     - Biophysics Fundamentals: science/biophysics.md
