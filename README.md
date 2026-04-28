@@ -1294,7 +1294,7 @@ synth-pdb/
 │   │   ├── nerf.py          # NeRF backbone construction kernels
 │   │   ├── sidechain.py     # Side-chain geometry helpers
 │   │   └── vectorized.py    # NumPy-vectorized / Numba-JIT geometry kernels
-│   ├── ensemble/            # NMR ensemble analysis subpackage (v1.28+)
+│   ├── ensemble/            # NMR ensemble analysis subpackage (v1.34.0+)
 │   │   ├── daop.py          # DAOPCalculator (Hyberts 1992 dihedral order parameters)
 │   │   └── statistics.py    # EnsembleStatistics, QualityAssessment dataclasses
 │   └── quality/             # Structure quality scoring (v1.18+)

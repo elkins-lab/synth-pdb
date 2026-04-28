@@ -6,6 +6,9 @@ site_description: High-Performance Protein Structure Generator for AI/ML and Edu
 site_author: George Elkins
 copyright: Copyright &copy; 2026 George Elkins
 
+extra:
+  version: v1.34.0
+
 theme:
   name: material
   features:

@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.34.0] - 2026-04-27
+
+### Added
+- **High-Fidelity SAXS Visualization**: Integrated Standard, Kratky, and Guinier plots into the CLI and core library for biophysical assessment of protein folding and dimensions.
+- **Scientific Rigor Suite**: New automated validation against peer-reviewed benchmarks (Waasmaier & Kirfel 1995 for form factors; Kratky & Porod 1949 for folding signatures).
+- **Multi-Modal Dataset Factory**: New `scripts/build_multimodal_dataset.py` for high-throughput generation of synchronized PDB, MRC, SAXS, and NMR data for AI training.
+- **Robust Sequence Parsing**: Support for 4-letter D-amino acid shorthands (DALA, dALA) and Selenocysteine (SEC/U).
+- **Interactive Cryo-EM & SAXS Lab**: New tutorial showcasing ensemble-averaged density and scattering simulation.
+- **Embedded Gallery Visuals**: Added snapshots for all major structural types in the examples documentation.
+
+### Fixed
+- **CLI Robustness**: Fixed `docking` mode to support on-the-fly generation from sequence strings.
+- **PDB Compliance**: Updated atom formatting for 2-character elements (like Selenium) to meet rigorous PDB standards.
+- **Browser Automation**: Mocked `webbrowser` in test suites to prevent unintended popup windows during CI runs.
+
+## [1.33.0] - 2026-04-26
+
+### Added
+- **Comprehensive API Documentation**: 11 new modules fully documented including `cryo_em`, `saxs`, `docking`, `cofactors`, and `special_chemistry`.
+- **New Interactive Tutorials**:
+    - `cryo_em_saxs_lab`: Visualizing resolution and conformational heterogeneity.
+    - `bmrb_validation`: Programmatic validation against experimental NMR data.
+- **Multimodal Science Guide**: New guide explaining integrated scientific workflows.
+- **Enhanced Ensemble Support**: Added `PeptideGenerator.generate_ensemble()` for high-performance vectorized generation.
+
+### Fixed
+- **Memory Leaks**: Resolved critical memory leaks in OpenMM physics engine and `BatchedGenerator` template caching.
+- **Tutorial Modernization**: Updated `gfp_molecular_forge` and `neural_nmr_pipeline` to use the latest APIs.
+- **Test Integrity**: Standardized documentation integrity tests and added coverage for new features.
+
+## [1.32.0] - 2026-04-24
+
+### Added
+- **AI Mode: Structure Clustering**: Implemented RMSD-based clustering for protein conformational ensembles.
+    - New CLI flag: `--mode ai --ai-op cluster`
+    - Supports `--input-pattern` (glob) and `--n-clusters`.
+    - Automatically superimposes structures to a reference before clustering.
+    - Exports representative "medoid" structures for each cluster to a user-defined directory.
+- **Improved Testing**: Added `tests/test_clustering.py` for full-workflow CLI validation.
+
+## [1.31.0] - 2026-04-24
+
+### Added
+- **GNN Quality Filter Calibration**: New sensitivity suite in `tests/test_gnn_calibration.py` validating that the GNN model correctly responds to coordinate noise, steric clashes and backbone distortions.
+- **Comprehensive Testing Suite**: Added massive coverage expansion for evolution kernels, packing algorithms, scoring functions and geometric edge cases (RMSD/superposition).
+- **Non-Standard Residue Support**: Enhanced chemical shift and RDC predictors to gracefully handle non-standard residues (PTMs, D-amino acids) while maintaining pedagogical documentation density.
+- **Local Notebook Validation**: Added scripts and environment setups (`scripts/setup_colab_venv.sh`, `test_notebooks_local.sh`) to verify tutorial notebooks in a production-like local environment.
+
+### Fixed
+- **D-Amino Acid Stereochemistry**: Corrected critical bugs in D-amino acid generation, ensuring biophysically accurate backbone mirroring and side-chain placement.
+- **Chiral NMR Inversion**: Implemented a dual-pass coordinate inversion strategy for D-amino acid chemical shifts, ensuring predicted values respect chiral symmetry.
+- **Physics Engine Stability**: Resolved memory leaks and ensured consistent implicit solvent behavior across the `EnergyMinimizer` pipeline.
+- **Generator Parity**: Guaranteed 1:1 structural parity between `BatchedGenerator` and the standard `PeptideGenerator`.
+- **CLI Robustness**: Strengthened argument validation in `main.py` and added regression tests for CLI flag collisions.
+- **PTM Template Mismatch**: Fixed an issue where PTM residue templates (SEP/TPO/PTR) were incorrectly handled during physics preprocessing.
+
+### Changed
+- **Documentation Density**: Significantly increased inline "Educational Notes" in `coupling.py`, `msa.py` and `physics.py`.
+- **CI Modernization**: Added Numpy 2.3.5 to the automated test matrix; refactored the J-Coupling shim for structural TDD.
+
 ## [1.30.0] - 2026-04-22
 
 ### Added
