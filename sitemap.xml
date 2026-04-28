@@ -2,314 +2,382 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://elkins.github.io/synth-pdb/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/nmr/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/physics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/technical_notes/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/usage/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/visualization/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/about/changelog/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/about/citation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/about/license/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/about/roadmap/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/analysis/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/batch_generator/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/biophysics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/bmrb_api/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/chemical_shifts/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/cofactors/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/cryo_em/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/dataset/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/docking/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/ensemble/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/export/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/generator/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/geometry/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/msa/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/nmr/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/overview/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/packing/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/physics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/plm/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/rdc/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/relaxation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/saxs/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/scoring/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/special_chemistry/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/torsion/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/validator/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/viewer/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/development/architecture/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/development/contributing/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/development/release/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/development/testing/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/examples/advanced/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/examples/biological/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/examples/dark_proteome/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/examples/gallery/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/examples/visualization/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/getting-started/first-structure/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/getting-started/installation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/getting-started/quickstart/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/guides/beginners/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/guides/cli-reference/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/guides/ml-researchers/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/guides/nmr-spectroscopists/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/biophysics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/coevolution/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/energy-minimization/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/ensemble-analysis/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/idp-dynamics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/science/multi-modal-observables/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/science/multimodal/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/nerf-geometry/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/nmr-theory/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/plm/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/ramachandran/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/science/rotamers/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/alphafold_vs_nmr_dynamics/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/bmrb_validation/</loc>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/bmrb_validation/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/coevolution_msa_factory/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/tutorials/cryo_em_saxs_lab/</loc>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/dataset_factory/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/drug_discovery_pipeline/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/executed_msa/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/folding_landscape/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/geometry_tools_reference/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/gfp_molecular_forge/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/hard_decoy_challenge/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/hormone_lab/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/idp_ensemble_validation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/latent_space_explorer/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/macrocycle_lab/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/ml_handover_demo/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/nerf_geometry_lab/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/neural_nmr_pipeline/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/nmr_validation_rpf/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/orientogram_lab/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/plm_embeddings/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/protein_quality_assessment/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/rdc_alignment_explorer/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/sasa_hydrophobic_burial/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/structure_defensibility_dashboard/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/ubiquitin_chemical_shift_validation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/ubiquitin_j_coupling_validation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/ubiquitin_rdc_validation/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/tutorials/virtual_nmr_spectrometer/</loc>
-         <lastmod>2026-04-24</lastmod>
+         <lastmod>2026-04-28</lastmod>
     </url>
 </urlset>

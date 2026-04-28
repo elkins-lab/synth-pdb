@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../science/biophysics/" class="md-tabs__link">
+        <a href="../science/multimodal/" class="md-tabs__link">
           
   
   
@@ -742,6 +742,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#multi-modal-simulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Modal Simulation
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -771,10 +782,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#complex-topologies" class="md-nav__link">
+  <a href="#multi-modal-ensembles" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Complex Topologies
+        Multi-Modal Ensembles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-assemblies-multichain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complex Assemblies (Multichain)
       
     </span>
   </a>
@@ -783,6 +805,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#high-throughput-dataset-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High-Throughput Dataset Factory
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2179,6 +2212,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../examples/dark_proteome/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dark Proteome & Pathologies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../examples/biological/" class="md-nav__link">
         
   
@@ -3019,6 +3080,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../science/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../science/multi-modal-observables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Modal Observables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../science/biophysics/" class="md-nav__link">
         
   
@@ -3716,6 +3833,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#multi-modal-simulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Modal Simulation
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3745,10 +3873,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#complex-topologies" class="md-nav__link">
+  <a href="#multi-modal-ensembles" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Complex Topologies
+        Multi-Modal Ensembles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complex-assemblies-multichain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complex Assemblies (Multichain)
       
     </span>
   </a>
@@ -3757,6 +3896,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#high-throughput-dataset-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High-Throughput Dataset Factory
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3801,6 +3951,16 @@
 <li><code>--gen-shifts</code>: Predict chemical shifts (SPARTA-lite)</li>
 <li><code>--gen-relax</code>: Generate relaxation data (<span class="arithmatex">\(R_1, R_2, NOE\)</span>)</li>
 </ul>
+<h3 id="multi-modal-simulation">Multi-Modal Simulation</h3>
+<ul>
+<li><code>--mode &lt;MODE&gt;</code>: <code>generate</code> (default), <code>cryo-em</code>, <code>saxs</code>, <code>decoys</code>, <code>dataset</code>, <code>ai</code></li>
+<li><code>--n-decoys &lt;N&gt;</code>: Number of models for ensembles/simulations (Default: 10)</li>
+<li><code>--drift &lt;DEG&gt;</code>: Conformational drift for ensembles (Default: 3.0°)</li>
+<li><code>--resolution &lt;Å&gt;</code>: Target resolution for Cryo-EM maps (Default: 3.0Å)</li>
+<li><code>--mrc-output &lt;FILE&gt;</code>: Filename for simulated Cryo-EM map</li>
+<li><code>--q-max &lt;q&gt;</code>: Max scattering vector for SAXS profiles (Default: 0.5 Å⁻¹)</li>
+<li><code>--saxs-output &lt;FILE&gt;</code>: Filename for simulated SAXS profile (.dat)</li>
+</ul>
 <h2 id="examples">Examples</h2>
 <h3 id="basic-peptides">Basic Peptides</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Alpha helix</span>
@@ -3809,9 +3969,24 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Beta sheet</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>synth-pdb<span class="w"> </span>--length<span class="w"> </span><span class="m">20</span><span class="w"> </span>--conformation<span class="w"> </span>beta<span class="w"> </span>--output<span class="w"> </span>sheet.pdb
 </span></code></pre></div>
-<h3 id="complex-topologies">Complex Topologies</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Helix-Turn-Helix</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>synth-pdb<span class="w"> </span>--structure<span class="w"> </span><span class="s2">&quot;1-10:alpha,11-15:random,16-25:alpha&quot;</span><span class="w"> </span>--minimize
+<h3 id="multi-modal-ensembles">Multi-Modal Ensembles</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Generate Cryo-EM density map (3.5A res) for a 50-model ensemble</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;MQIFVKTLTGK&quot;</span><span class="w"> </span>--mode<span class="w"> </span>cryo-em<span class="w"> </span>--n-decoys<span class="w"> </span><span class="m">50</span><span class="w"> </span>--resolution<span class="w"> </span><span class="m">3</span>.5<span class="w"> </span>--mrc-output<span class="w"> </span>ubiquitin.mrc
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Generate SAXS profile for a flexible ensemble (high drift)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>synth-pdb<span class="w"> </span>--length<span class="w"> </span><span class="m">30</span><span class="w"> </span>--mode<span class="w"> </span>saxs<span class="w"> </span>--n-decoys<span class="w"> </span><span class="m">100</span><span class="w"> </span>--drift<span class="w"> </span><span class="m">8</span>.0<span class="w"> </span>--saxs-output<span class="w"> </span>ensemble.dat
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Generate and visualize SAXS plots (Kratky/Guinier)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;LKELEKELE&quot;</span><span class="w"> </span>--mode<span class="w"> </span>saxs<span class="w"> </span>--visualize<span class="w"> </span>--plot-type<span class="w"> </span>all
+</span></code></pre></div>
+<h3 id="complex-assemblies-multichain">Complex Assemblies (Multichain)</h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate a heterodimer with Chain A (Alpha) and Chain B (Beta)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;ALA-GLY-SER:VAL-THR-LEU&quot;</span><span class="w"> </span>--structure<span class="w"> </span><span class="s2">&quot;1-3:alpha,4-6:beta&quot;</span><span class="w"> </span>--minimize
+</span></code></pre></div>
+<h2 id="high-throughput-dataset-factory">High-Throughput Dataset Factory</h2>
+<p>For large-scale AI training, use the dedicated builder script:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Build a synchronized dataset of 1,000 multi-modal samples</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>scripts/build_multimodal_dataset.py<span class="w"> </span>--n<span class="w"> </span><span class="m">1000</span><span class="w"> </span>--output-dir<span class="w"> </span>my_dataset
 </span></code></pre></div>
 
 

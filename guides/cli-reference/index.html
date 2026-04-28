@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../science/biophysics/" class="md-tabs__link">
+        <a href="../../science/multimodal/" class="md-tabs__link">
           
   
   
@@ -961,6 +961,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Advanced Modes (--mode)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cryo-em-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cryo-EM Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saxs-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SAXS Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2195,6 +2234,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/dark_proteome/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dark Proteome & Pathologies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/biological/" class="md-nav__link">
         
   
@@ -3035,6 +3102,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../science/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../science/multi-modal-observables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Modal Observables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../science/biophysics/" class="md-nav__link">
         
   
@@ -3779,6 +3902,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Advanced Modes (--mode)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cryo-em-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cryo-EM Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#saxs-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SAXS Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai-mode-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI Mode Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3993,11 +4155,109 @@
 <ul>
 <li><code>generate</code>: (Default) Generate a single structure.</li>
 <li><code>decoys</code>: Generate an ensemble of structures (decoys).</li>
-<li><code>docking</code>: Prepare structures for docking (PQR format).</li>
+<li><code>cryo-em</code>: Generate 3D density maps (MRC format) from structures or ensembles.</li>
+<li><code>saxs</code>: Simulate Small-Angle X-ray Scattering (SAXS) profiles.</li>
+<li><code>docking</code>: Prepare structures for docking (PQR format, charge assignment).</li>
 <li><code>pymol</code>: Generate PyMOL scripts for visualization.</li>
 <li><code>dataset</code>: Bulk generation for machine learning datasets.</li>
 <li><code>ai</code>: Structure interpolation and clustering.</li>
 </ul>
+<h3 id="cryo-em-mode-options">Cryo-EM Mode Options</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>--resolution</code></td>
+<td style="text-align: left;">Target resolution in Angstroms (Å).</td>
+<td style="text-align: left;">3.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--grid-spacing</code></td>
+<td style="text-align: left;">Voxel size in Angstroms (Å).</td>
+<td style="text-align: left;">1.0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--mrc-output</code></td>
+<td style="text-align: left;">Filename for the output density map.</td>
+<td style="text-align: left;"><code>synthetic_map.mrc</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="saxs-mode-options">SAXS Mode Options</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>--q-max</code></td>
+<td style="text-align: left;">Maximum scattering vector <span class="arithmatex">\(q\)</span> (Å⁻¹).</td>
+<td style="text-align: left;">0.5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--saxs-points</code></td>
+<td style="text-align: left;">Number of points in the <span class="arithmatex">\(I(q)\)</span> curve.</td>
+<td style="text-align: left;">51</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--saxs-output</code></td>
+<td style="text-align: left;">Filename for the output <code>.dat</code> file.</td>
+<td style="text-align: left;"><code>synthetic_saxs.dat</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="ai-mode-options">AI Mode Options</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>--ai-op</code></td>
+<td style="text-align: left;">AI operation: <code>interpolate</code> or <code>cluster</code>.</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--start-pdb</code></td>
+<td style="text-align: left;">Start PDB file for <code>interpolate</code>.</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--end-pdb</code></td>
+<td style="text-align: left;">End PDB file for <code>interpolate</code>.</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--steps</code></td>
+<td style="text-align: left;">Number of steps for <code>interpolate</code>.</td>
+<td style="text-align: left;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--input-pattern</code></td>
+<td style="text-align: left;">Glob pattern for input PDB files for <code>cluster</code> (e.g., 'decoys/*.pdb').</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--n-clusters</code></td>
+<td style="text-align: left;">Number of clusters to form for <code>cluster</code>.</td>
+<td style="text-align: left;">5</td>
+</tr>
+</tbody>
+</table>
 <h2 id="visualization">Visualization</h2>
 <p>Use the <code>--visualize</code> flag to open the generated structure in a browser-based 3D viewer (powered by 3Dmol.js).</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;MEELQK&quot;</span><span class="w"> </span>--visualize

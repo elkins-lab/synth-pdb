@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../science/biophysics/" class="md-tabs__link">
+        <a href="../../science/multimodal/" class="md-tabs__link">
           
   
   
@@ -922,6 +922,34 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-modal-dataset-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Modal Dataset Factory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-Modal Dataset Factory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generated-modalities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Modalities
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2367,6 +2395,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/dark_proteome/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dark Proteome & Pathologies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/biological/" class="md-nav__link">
         
   
@@ -3207,6 +3263,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../science/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../science/multi-modal-observables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Modal Observables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../science/biophysics/" class="md-nav__link">
         
   
@@ -3971,6 +4083,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multi-modal-dataset-factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Modal Dataset Factory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-Modal Dataset Factory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generated-modalities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Modalities
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4316,39 +4456,82 @@
 </span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
 </span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="n">dataset</span> <span class="o">=</span> <span class="n">NPZDataset</span><span class="p">(</span><span class="s2">&quot;training_data/train&quot;</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="multi-modal-dataset-factory">Multi-Modal Dataset Factory</h2>
+<p>Modern protein AI models (like RoseTTAFold-All-Atom or CryoCloud) often require more than just coordinates. They need synchronized experimental observables.</p>
+<p><code>synth-pdb</code> includes a master factory script that generates synchronized datasets across four modalities:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Generate 500 samples with PDBs, Cryo-EM maps, SAXS profiles, and NMR tables</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>python3<span class="w"> </span>scripts/build_multimodal_dataset.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span>--n<span class="w"> </span><span class="m">500</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span>--output-dir<span class="w"> </span>multimodal_training_set<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span>--resolution<span class="w"> </span><span class="m">3</span>.5<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span>--drift<span class="w"> </span><span class="m">5</span>.0
+</span></code></pre></div>
+<h3 id="generated-modalities">Generated Modalities</h3>
+<table>
+<thead>
+<tr>
+<th>Modality</th>
+<th>Format</th>
+<th>Scientific Information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Structure</strong></td>
+<td><code>.pdb</code></td>
+<td>Ground-truth atomic coordinates</td>
+</tr>
+<tr>
+<td><strong>Cryo-EM</strong></td>
+<td><code>.mrc</code></td>
+<td>Simulated 3D electron density volume</td>
+</tr>
+<tr>
+<td><strong>SAXS</strong></td>
+<td><code>.dat</code></td>
+<td>Simulated 1D scattering curve (<span class="arithmatex">\(I(q)\)</span> vs <span class="arithmatex">\(q\)</span>)</td>
+</tr>
+<tr>
+<td><strong>NMR</strong></td>
+<td><code>.csv</code></td>
+<td>Back-calculated Residual Dipolar Couplings (RDCs)</td>
+</tr>
+</tbody>
+</table>
+<p>This factory linking 3D space, reciprocal space (SAXS), and global alignment (RDC) is unique among synthetic generators and essential for benchmarking <strong>Integrative Modeling</strong> AI.</p>
 <h2 id="use-cases">Use Cases</h2>
 <h3 id="1-structure-prediction-alphafold-style">1. Structure Prediction (AlphaFold-style)</h3>
 <p>Train a model to predict 3D coordinates from sequence:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Generate training data</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">sequences</span> <span class="o">=</span> <span class="n">generate_random_sequences</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">length_range</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">:</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">peptide</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="c1"># Save (sequence, coords) pairs</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Generate training data</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">sequences</span> <span class="o">=</span> <span class="n">generate_random_sequences</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">length_range</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">:</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">peptide</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">)</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="c1"># Save (sequence, coords) pairs</span>
 </span></code></pre></div>
 <h3 id="2-protein-design-inverse-folding">2. Protein Design (Inverse Folding)</h3>
 <p>Train a model to predict sequence from structure:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Generate (structure, sequence) pairs</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">()</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1"># Train model: coords → sequence</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Generate (structure, sequence) pairs</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">()</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1"># Train model: coords → sequence</span>
 </span></code></pre></div>
 <h3 id="3-contact-prediction">3. Contact Prediction</h3>
 <p>Train a model to predict residue-residue contacts:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_contact_map</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1"># Generate training data</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">peptide</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">coords</span> <span class="o">=</span> <span class="n">peptide</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">coord</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">contact_map</span> <span class="o">=</span> <span class="n">calculate_contact_map</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># Train model: sequence → contact_map</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_contact_map</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># Generate training data</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">peptide</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">coords</span> <span class="o">=</span> <span class="n">peptide</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">coord</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">contact_map</span> <span class="o">=</span> <span class="n">calculate_contact_map</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Train model: sequence → contact_map</span>
 </span></code></pre></div>
 <h3 id="4-dynamics-prediction">4. Dynamics Prediction</h3>
 <p>Train a model to predict NMR relaxation rates:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Generate structure + dynamics data</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="o">--</span><span class="n">length</span> <span class="mi">30</span> <span class="o">--</span><span class="n">gen</span><span class="o">-</span><span class="n">relax</span> <span class="o">--</span><span class="n">output</span> <span class="n">structure</span><span class="o">.</span><span class="n">pdb</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Parse NEF file for R1, R2, NOE values</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># Train model: structure → dynamics</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Generate structure + dynamics data</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="o">--</span><span class="n">length</span> <span class="mi">30</span> <span class="o">--</span><span class="n">gen</span><span class="o">-</span><span class="n">relax</span> <span class="o">--</span><span class="n">output</span> <span class="n">structure</span><span class="o">.</span><span class="n">pdb</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># Parse NEF file for R1, R2, NOE values</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Train model: structure → dynamics</span>
 </span></code></pre></div>
 <h2 id="tutorials">Tutorials</h2>
 <p>Explore these interactive notebooks:</p>
@@ -4381,41 +4564,41 @@
 — learned from 250 million proteins, with no training required on your part.</p>
 <div class="admonition note">
 <p class="admonition-title">Installation</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pip<span class="w"> </span>install<span class="w"> </span>synth-pdb<span class="o">[</span>plm<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>pip<span class="w"> </span>install<span class="w"> </span>synth-pdb<span class="o">[</span>plm<span class="o">]</span>
 </span></code></pre></div>
 </div>
 <h3 id="what-you-get">What you get</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.plm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESM2Embedder</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">embedder</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">()</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="c1"># Per-residue embeddings — shape (L, 320), dtype float32</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">emb</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;MQIFVKTLTGKTITLEVEPS&quot;</span><span class="p">)</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">emb</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>   <span class="c1"># (20, 320)</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="c1"># Directly from a structure</span>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="n">emb</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed_structure</span><span class="p">(</span><span class="n">atom_array</span><span class="p">)</span>   <span class="c1"># (n_residues, 320)</span>
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
-</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="c1"># Sequence-level cosine similarity (mean-pooled)</span>
-</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="n">sim</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">sequence_similarity</span><span class="p">(</span><span class="s2">&quot;ACDEF&quot;</span><span class="p">,</span> <span class="s2">&quot;VWLYG&quot;</span><span class="p">)</span>   <span class="c1"># float in [-1, 1]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.plm</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESM2Embedder</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">embedder</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">()</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Per-residue embeddings — shape (L, 320), dtype float32</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">emb</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="s2">&quot;MQIFVKTLTGKTITLEVEPS&quot;</span><span class="p">)</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">emb</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>   <span class="c1"># (20, 320)</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="c1"># Directly from a structure</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="n">emb</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">embed_structure</span><span class="p">(</span><span class="n">atom_array</span><span class="p">)</span>   <span class="c1"># (n_residues, 320)</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="c1"># Sequence-level cosine similarity (mean-pooled)</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="n">sim</span> <span class="o">=</span> <span class="n">embedder</span><span class="o">.</span><span class="n">sequence_similarity</span><span class="p">(</span><span class="s2">&quot;ACDEF&quot;</span><span class="p">,</span> <span class="s2">&quot;VWLYG&quot;</span><span class="p">)</span>   <span class="c1"># float in [-1, 1]</span>
 </span></code></pre></div>
 <h3 id="use-as-gnn-node-features">Use as GNN node features</h3>
 <p>Drop-in enrichment for the quality GNN:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">plm</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">()</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">plm_feats</span> <span class="o">=</span> <span class="n">plm</span><span class="o">.</span><span class="n">embed_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>        <span class="c1"># (L, 320)</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">node_feats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">geom_feats</span><span class="p">,</span> <span class="n">plm_feats</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">plm</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">()</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">plm_feats</span> <span class="o">=</span> <span class="n">plm</span><span class="o">.</span><span class="n">embed_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>        <span class="c1"># (L, 320)</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">node_feats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">geom_feats</span><span class="p">,</span> <span class="n">plm_feats</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="linear-probe-for-secondary-structure">Linear probe for secondary structure</h3>
 <p>A single linear layer on PLM embeddings achieves near-SOTA secondary structure prediction — no 3D coordinates needed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">probe</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>   <span class="c1"># Helix / Strand / Coil</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">logits</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">emb</span><span class="p">))</span>   <span class="c1"># (L, 3)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">probe</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>   <span class="c1"># Helix / Strand / Coil</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">logits</span> <span class="o">=</span> <span class="n">probe</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">emb</span><span class="p">))</span>   <span class="c1"># (L, 3)</span>
 </span></code></pre></div>
 <h3 id="upgrading-to-a-more-powerful-model">Upgrading to a more powerful model</h3>
 <p>The API is identical regardless of model size:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># 35M params, 480-dim — better accuracy, same code</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">embedder</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;facebook/esm2_t12_35M_UR50D&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># 35M params, 480-dim — better accuracy, same code</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">embedder</span> <span class="o">=</span> <span class="n">ESM2Embedder</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;facebook/esm2_t12_35M_UR50D&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>For the full scientific background see <a href="../../science/plm/">Protein Language Models</a>.
 For the API reference see <a href="../../api/plm/">api/plm</a>.</p>

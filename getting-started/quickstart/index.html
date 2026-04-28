@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../science/biophysics/" class="md-tabs__link">
+        <a href="../../science/multimodal/" class="md-tabs__link">
           
   
   
@@ -743,6 +743,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#synthetic-data-factories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Synthetic Data Factories
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2206,6 +2217,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../examples/dark_proteome/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dark Proteome & Pathologies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../examples/biological/" class="md-nav__link">
         
   
@@ -3046,6 +3085,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../science/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../science/multi-modal-observables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Modal Observables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../science/biophysics/" class="md-nav__link">
         
   
@@ -3804,6 +3899,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#synthetic-data-factories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Synthetic Data Factories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#getting-help" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3913,6 +4019,12 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Generate structure with synthetic NMR observables</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>synth-pdb<span class="w"> </span>--length<span class="w"> </span><span class="m">30</span><span class="w"> </span>--gen-nef<span class="w"> </span>--gen-relax<span class="w"> </span>--output<span class="w"> </span>nmr_test.pdb
 </span></code></pre></div>
+<h2 id="synthetic-data-factories">Synthetic Data Factories</h2>
+<p>For high-throughput AI training, <code>synth-pdb</code> includes a dedicated builder for multi-modal datasets:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Generate 500 synchronized PDB, Cryo-EM, SAXS, and NMR samples</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>python3<span class="w"> </span>scripts/build_multimodal_dataset.py<span class="w"> </span>--n<span class="w"> </span><span class="m">500</span><span class="w"> </span>--output-dir<span class="w"> </span>my_ai_dataset
+</span></code></pre></div>
+<p>This factory leverages the <strong>900x faster vectorized walker</strong> to produce labeled training data in minutes.</p>
 <h2 id="getting-help">Getting Help</h2>
 <div class="admonition question">
 <p class="admonition-title">Need help?</p>
