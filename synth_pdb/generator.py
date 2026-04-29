@@ -1507,14 +1507,32 @@ def _assemble_pdb_output(
     # EDUCATIONAL NOTE - Adding Realistic Occupancy:
     # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
     # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
-    protein_res_ids = peptide.res_id[~peptide.hetero]
+    # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
+    is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
+    protein_res_ids = peptide.res_id[is_protein]
     protein_res_ids_set = set(protein_res_ids)
     max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
     total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
 
     # Predict Order Parameters (S2) to derive B-factors from geometric flexibility.
+    # SEC fix: Temporarily rename SEC to CYS and SE to SG for SASA/Order Parameter calculation
+    sec_mask = peptide.res_name == "SEC"
+    se_mask = (peptide.atom_name == "SE") & sec_mask
+
+    if sec_mask.any():
+        peptide.res_name[sec_mask] = "CYS"
+        if se_mask.any():
+            peptide.atom_name[se_mask] = "SG"
+            peptide.element[se_mask] = "S"
 
     s2_map = predict_order_parameters(peptide)
+
+    # Restore SEC names
+    if sec_mask.any():
+        peptide.res_name[sec_mask] = "SEC"
+        if se_mask.any():
+            peptide.atom_name[se_mask] = "SE"
+            peptide.element[se_mask] = "SE"
 
     # Sanitize: Extract only atomic content to avoid header duplication
     atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
@@ -1531,7 +1549,18 @@ def _assemble_pdb_output(
     # We iterate over every ATOM line to apply biophysical metadata.
     for line in atomic_and_ter_content.splitlines():
         if line.startswith("ATOM") or line.startswith("HETATM"):
-            res_num = int(line[22:26].strip())
+            try:
+                res_num = int(line[22:26].strip())
+            except ValueError:
+                # Handle alphanumeric residue IDs from large solvent boxes (e.g., A000)
+                # We use the raw string to ensure we don't crash, though S2 mapping
+                # might be limited for these residues.
+                res_num_str = line[22:26].strip()
+                # Try to extract numeric part if possible, otherwise use a dummy
+                import re
+
+                match = re.search(r"\d+", res_num_str)
+                res_num = int(match.group()) if match else 9999
 
             # EDUCATIONAL NOTE - HETATM vs ATOM:
             # OpenMM's PDB writer may output non-standard amino acids (like PTMs)

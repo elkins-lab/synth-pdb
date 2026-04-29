@@ -28,7 +28,6 @@ STANDARD_AMINO_ACIDS: list[str] = [
     "THR",
     "TRP",
     "TYR",
-    "SEC",  # Selenocysteine
 ]
 
 # EDUCATIONAL NOTE - Proline Sterics (The "Proline Effect"):
@@ -105,12 +104,12 @@ MODIFIED_AMINO_ACIDS: list[str] = [
 # the restoration logic if D-amino acid forcefield support is added later.
 NON_STANDARD_RESIDUES: set[str] = (
     set(MODIFIED_AMINO_ACIDS)
-    | {"HIE", "HID", "HIP"}  # Histidine tautomers
+    | {"HIE", "HID", "HIP", "SEC"}  # Histidine tautomers and Selenocysteine
     | set(D_AMINO_ACIDS)  # DAL, DCY, DLE, ... (mirror image residues)
 )
 
 ALL_VALID_AMINO_ACIDS: list[str] = (
-    STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS + ["HIE", "HID", "HIP"]
+    STANDARD_AMINO_ACIDS + MODIFIED_AMINO_ACIDS + D_AMINO_ACIDS + ["HIE", "HID", "HIP", "SEC"]
 )
 
 # --- Amino Acid Frequencies (Approximate percentages in proteins) ---

@@ -533,6 +533,7 @@ class EnergyMinimizer:
             "SEP": "SER",
             "TPO": "THR",
             "PTR": "TYR",
+            "SEC": "CYS",
             "HIE": "HIS",
             "HID": "HIS",
             "HIP": "HIS",
@@ -621,10 +622,11 @@ class EnergyMinimizer:
                         hetatm_lines.append(line)
                         logger.info(f"Restoring lost HETATM: {res_name_upper}")
                         continue
-
                     if res_name in ptm_map:
                         new_name = ptm_map[res_name]
                         line = line[:17] + f"{new_name: >3}" + line[20:]
+                        if res_name == "SEC" and atom_name == "SE":
+                            line = line[:12] + " SG " + line[16:76] + " S" + line[77:]
                         if res_name in ["SEP", "TPO", "PTR"] and len(line) >= 16:
                             if atom_name in ptm_atom_names:
                                 continue
@@ -1509,6 +1511,14 @@ class EnergyMinimizer:
                 if res_key in original_metadata:
                     res.name = original_metadata[res_key]["name"]
                     res.id = original_metadata[res_key]["id"]
+
+                    # Restoration fix for Selenocysteine (SEC)
+                    if res.name == "SEC":
+                        for atom in res.atoms():
+                            if atom.name == "SG":
+                                atom.name = "SE"
+                                if atom.element is not None:
+                                    atom.element = app.element.selenium
 
             # EDUCATIONAL NOTE - Disulfide Mapping:
             # -------------------------------------
