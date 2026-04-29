@@ -51,8 +51,9 @@ def test_optimization_improves_score():
     initial_score = calculate_clash_score(peptide)
     logger.info(f"Initial Score: {initial_score}")
 
-    # Run optimizer
-    optimized_peptide = optimize_sidechains(peptide, steps=200)
+    # Run optimizer with more steps to ensure convergence and avoid intermittent CI failures.
+    # 200 steps is sometimes not enough to find an improving move for small peptides.
+    optimized_peptide = optimize_sidechains(peptide, steps=1000)
     final_score = calculate_clash_score(optimized_peptide)
     logger.info(f"Final Score: {final_score}")
 
