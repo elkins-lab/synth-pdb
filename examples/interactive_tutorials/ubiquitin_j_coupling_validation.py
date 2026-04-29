@@ -188,8 +188,8 @@ plt.plot([min_val, max_val], [min_val, max_val], "k--", alpha=0.5, label="Perfec
 plt.title(
     "synth-pdb Validation: Synthetic vs Experimental J-Couplings", fontsize=14, fontweight="bold"
 )
-plt.xlabel("Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
-plt.ylabel("synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
+plt.xlabel(r"Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
+plt.ylabel(r"synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 
 bbox_props = {"boxstyle": "round,pad=0.5", "fc": "white", "ec": "gray", "alpha": 0.9}
 plt.text(
