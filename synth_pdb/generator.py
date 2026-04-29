@@ -1215,6 +1215,15 @@ def _build_peptide_chains(
             else:
                 current_chain_array += transformed_res
 
+        # Center the chain at its own origin before applying offset
+        # This ensures offset_step correctly separates the mass centers.
+        # Only do this if the chain itself is large enough to risk overflow.
+        if current_chain_array.array_length() > 0:
+            if np.any(np.abs(current_chain_array.coord) > 500.0):
+                logger.info(f"Chain {chain_id} coordinates approach PDB limits. Centering.")
+                chain_centroid = np.mean(current_chain_array.coord, axis=0)
+                current_chain_array.coord -= chain_centroid
+
         # Apply spatial offset to the whole chain
         current_chain_array.coord += chain_idx * offset_step
 
