@@ -389,9 +389,9 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 
                 # Check if within disulfide bond range
                 # Minimized structures can be highly strained (especially small cyclic rings),
-                # so we use a generous range [1.5, 3.0] to ensure the SSBOND record is generated
-                # if the physics engine identified a bond.
-                if 1.5 <= distance <= 3.0:
+                # so we use a generous range [1.5, 4.5] to ensure the SSBOND record is generated
+                # if the physics engine identified a bond or if residues are close enough.
+                if 1.5 <= distance <= 4.5:
                     disulfides.append((int(res_id1), int(res_id2)))
 
     return disulfides

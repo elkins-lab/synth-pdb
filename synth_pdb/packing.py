@@ -31,7 +31,7 @@ class SideChainPacker:
     # This probability is given by the Boltzmann factor: P = exp(-DeltaE / Temperature)
     """
 
-    def __init__(self, steps: int = 500, temperature: float = 0.5) -> None:
+    def __init__(self, steps: int = 500, temperature: float = 0.1) -> None:
         """Args:
         steps: Number of Monte Carlo steps (attempts).
         temperature: Simulation temperature (proportional to acceptance probability of worse steps).

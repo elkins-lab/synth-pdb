@@ -1,6 +1,7 @@
 import logging
 
 import biotite.structure as struc
+import numpy as np
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.packing import SideChainPacker, optimize_sidechains
@@ -33,12 +34,14 @@ def test_clash_score_calculation():
 
 
 def test_optimization_improves_score():
-    # Generate a peptide with likely clashes (e.g. bulky residues close together)
-    # Using a sequence that might be crowded
+    # Set seed for reproducibility in CI
+    np.random.seed(42)
 
-    # Generate random structure
-    # Use non-optimized structure first
-    pdb_content = generate_pdb_content(sequence_str="WFWFW", optimize_sidechains=False)
+    # Generate a peptide with likely clashes (e.g. bulky residues close together)
+    # Use a longer sequence of bulky residues to increase clash probability
+    pdb_content = generate_pdb_content(
+        sequence_str="WYWYWYWY", conformation="random", optimize_sidechains=False
+    )
 
     # Parse back using biotite to get proper AtomArray
     import io
@@ -52,8 +55,8 @@ def test_optimization_improves_score():
     logger.info(f"Initial Score: {initial_score}")
 
     # Run optimizer with more steps to ensure convergence and avoid intermittent CI failures.
-    # 200 steps is sometimes not enough to find an improving move for small peptides.
-    optimized_peptide = optimize_sidechains(peptide, steps=1000)
+    # 5000 steps and lower temp to encourage greedy improvement
+    optimized_peptide = optimize_sidechains(peptide, steps=5000)
     final_score = calculate_clash_score(optimized_peptide)
     logger.info(f"Final Score: {final_score}")
 

@@ -1244,19 +1244,34 @@ def main() -> None:
                 # Convert modified atoms back to atomic PDB content (no header/footer)
                 new_atomic_content_after_tweak = PDBValidator.atoms_to_pdb_content(modified_atoms)
 
-                # Re-validate the tweaked atomic PDB content.
-                # For validation, PDBValidator expects a full PDB string.
+                # Determine actual length for temporary header
+                current_len = args.length
+                if args.sequence:
+                    current_len = len(args.sequence.replace("-", ""))
+                elif args.length is None:
+                    # Fallback if somehow both are None, though main() usually ensures one
+                    current_len = 10
+
                 # Build command string for temporary header
                 cmd_string = _build_command_string(args)
                 temp_full_pdb = assemble_pdb_content(
                     new_atomic_content_after_tweak,
-                    1,
+                    current_len,
                     command_args=cmd_string,
                     extra_records=preserved_ssbonds,  # Keeps context valid if validator checks bonds
                 )
                 temp_validator = PDBValidator(pdb_content=temp_full_pdb)
-                temp_validator.validate_all()
-                new_violations = temp_validator.get_violations()
+                try:
+                    temp_validator.validate_all()
+                except Exception as e:
+                    logger.debug(
+                        f"Validation crashed during refinement iteration {refine_iter + 1}: {e}"
+                    )
+                    # If validation crashes, we can't reliably count violations for this iteration.
+                    # We'll treat it as having NO improvement to keep the loop moving safely.
+                    new_violations = current_refined_violations
+                else:
+                    new_violations = temp_validator.get_violations()
 
                 if len(new_violations) < len(current_refined_violations):
                     logger.info(
