@@ -28,7 +28,6 @@ def get_hardware_info() -> dict[str, Any]:
         "platform_version": platform.version(),
         "architecture": platform.machine(),
         "processor": platform.processor(),
-        "cpu_brand": platform.processor(),  # Fallback, specific brand might need other methods
         "cpu_cores": psutil.cpu_count(logical=False),
         "cpu_threads": psutil.cpu_count(logical=True),
         "ram_total_gb": round(psutil.virtual_memory().total / (1024**3), 2),

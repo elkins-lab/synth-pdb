@@ -116,6 +116,8 @@ nav:
       - batch_generator: api/batch_generator.md
       - viewer: api/viewer.md
       - dataset: api/dataset.md
+      - quality: api/quality.md
+      - coupling: api/coupling.md
   - Scientific Background:
     - Scientific Benchmarking: science/benchmarking.md
     - Multimodal Overview: science/multimodal.md
