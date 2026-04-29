@@ -65,6 +65,10 @@
          <lastmod>2026-04-29</lastmod>
     </url>
     <url>
+         <loc>https://elkins.github.io/synth-pdb/api/coupling/</loc>
+         <lastmod>2026-04-29</lastmod>
+    </url>
+    <url>
          <loc>https://elkins.github.io/synth-pdb/api/cryo_em/</loc>
          <lastmod>2026-04-29</lastmod>
     </url>
@@ -114,6 +118,10 @@
     </url>
     <url>
          <loc>https://elkins.github.io/synth-pdb/api/plm/</loc>
+         <lastmod>2026-04-29</lastmod>
+    </url>
+    <url>
+         <loc>https://elkins.github.io/synth-pdb/api/quality/</loc>
          <lastmod>2026-04-29</lastmod>
     </url>
     <url>
