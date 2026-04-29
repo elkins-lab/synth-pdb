@@ -583,9 +583,30 @@ class BatchedGenerator:
                 if "O" in res_atom_names:
                     fa_coords[:, offset + res_atom_names.index("O")] = target_o
 
+            # Center structures that approach PDB coordinate limits (>500A)
+            # (Protects against PDB coordinate field overflow for large ensembles)
+            #
+            # CRITICAL MAINTENANCE NOTE:
+            # -------------------------
+            # Only center if absolutely necessary (overflow risk). Many tests (parity,
+            # structural invariants) rely on the structure starting at [0,0,0].
+            # DO NOT center all structures by default; this ensures that small
+            # structures remain origin-aligned and match the serial generator.
+            any_overflow = np.any(np.abs(fa_coords) > 500.0, axis=(1, 2))
+            if np.any(any_overflow):
+                centroids = np.mean(fa_coords[any_overflow], axis=1, keepdims=True)
+                fa_coords[any_overflow] -= centroids
+
             return BatchedPeptide(
                 fa_coords, self.sequence, self.atom_names, self.residue_indices, self.atom_chain_ids
             )
+
+        # Center backbone structures that approach PDB coordinate limits (>500A)
+        # CRITICAL: See maintenance note above regarding parity.
+        any_overflow = np.any(np.abs(backbone_coords) > 500.0, axis=(1, 2))
+        if np.any(any_overflow):
+            centroids = np.mean(backbone_coords[any_overflow], axis=1, keepdims=True)
+            backbone_coords[any_overflow] -= centroids
 
         # Return the backbone-only ensemble
         return BatchedPeptide(

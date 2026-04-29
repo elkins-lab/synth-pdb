@@ -1223,6 +1223,24 @@ def _build_peptide_chains(
         else:
             complex_array += current_chain_array
 
+    # EDUCATIONAL NOTE - PDB Coordinate Range Limits:
+    # Standard PDB format uses F8.3 for coordinates, which means they must fit
+    # within (-1000.0, 9999.9). For very large structures (e.g., 1000+ residues),
+    # accumulated geometry can easily exceed -1000.0. We center the structure
+    # at the origin if it approaches these limits (>500.0A in any dimension).
+    #
+    # CRITICAL MAINTENANCE NOTE:
+    # -------------------------
+    # Only center if absolutely necessary (overflow risk). Many tests (parity,
+    # structural invariants) rely on the structure starting at [0,0,0].
+    # DO NOT remove the conditional check or center by default, as this will
+    # break the internal consistency between serial and batched generators.
+    if complex_array.array_length() > 0:
+        if np.any(np.abs(complex_array.coord) > 500.0):
+            logger.info("Structure coordinates approach PDB limits (>500A). Centering at origin.")
+            centroid = np.mean(complex_array.coord, axis=0)
+            complex_array.coord -= centroid
+
     return complex_array
 
 
