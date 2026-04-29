@@ -196,3 +196,12 @@ This document serves as a roadmap and brainstorming space for experimental, high
 2.  **Define the Gap**: Why can't traditional tools do this easily?
 3.  **Code a Prototype**: Add a script in a subfolder within `/incubator/`.
 4.  **Validate & Graduate**: If the idea proves stable and useful, it "graduates" to the core `examples/` directory.
+
+---
+
+## 🧬 18. NCAA Support: Expanding the Chemical Alphabet
+**The Vision:** Extend `synth-pdb` beyond the 20 standard L-amino acids to support Non-Canonical Amino Acids (NCAAs) for peptidomimetics and drug discovery.
+
+*   **The Scientific Gap:** Most therapeutic peptides and many biological systems (post-translational modifications, expanded genetic codes) use residues that aren't in the standard 20. Current tools often require complex manual setup for each new residue.
+*   **The `synth-pdb` Angle:** By generalizing the NeRF backbone logic and implementing a custom residue template loader, we can generate structures with arbitrary chemistry at high speed.
+*   **Current Status:** 💡 Concept Stage (See `incubator/ncaa_roadmap.md`).

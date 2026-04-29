@@ -32,7 +32,7 @@ def test_pdbe_summary_failure() -> None:
     with patch("requests.get") as mock_get:
         mock_get.side_effect = Exception("API down")
         summary = PDBValidationAPI.get_validation_summary("1D3Z")
-        assert summary == {}
+        assert summary == []  # Returns empty list (not dict) on error
 
 
 def test_pdbe_outliers_failure() -> None:

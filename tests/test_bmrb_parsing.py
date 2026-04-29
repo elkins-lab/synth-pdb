@@ -153,8 +153,8 @@ def test_api_error_handling(caplog: Any) -> None:
         # BMRB search returns empty list on error
         assert BMRBAPI.search_entries_with_restraints("any") == []
 
-        # PDBValidation returns empty dict on error
-        assert PDBValidationAPI.get_validation_summary("1UBQ") == {}
+        # PDBValidation returns empty list on error (consistent with list[dict] return type)
+        assert PDBValidationAPI.get_validation_summary("1UBQ") == []
         assert PDBValidationAPI.get_validation_outliers("1UBQ") == {}
 
         # fetch_restraints returns empty list

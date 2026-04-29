@@ -14,7 +14,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-# Optional Matplotlib Dependency
+# Optional Matplotlib dependency
 try:
     import matplotlib as mpl
     import matplotlib.pyplot as plt
@@ -22,6 +22,14 @@ try:
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
+
+# Optional SciPy dependency (used for Pearson r in correlation plots)
+try:
+    from scipy.stats import pearsonr as _pearsonr
+
+    HAS_SCIPY = True
+except ImportError:
+    HAS_SCIPY = False
 
 
 def apply_publication_style() -> None:
@@ -32,7 +40,10 @@ def apply_publication_style() -> None:
     # Use a clean, professional style as a base
     plt.style.use("seaborn-v0_8-whitegrid")
 
-    # Customize for academic journals
+    # Customize for academic journals.
+    # NOTE: savefig.format is intentionally NOT set here; doing so would change
+    # the default save format for every figure in the caller's process.  The
+    # format is instead passed explicitly in save_publication_figure().
     params = {
         "font.family": "sans-serif",
         "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
@@ -45,19 +56,25 @@ def apply_publication_style() -> None:
         "axes.linewidth": 1.0,
         "grid.alpha": 0.3,
         "savefig.dpi": 300,
-        "savefig.format": "pdf",
         "savefig.bbox": "tight",
     }
     mpl.rcParams.update(params)
 
 
 def save_publication_figure(fig: Any, path: str, transparent: bool = False) -> None:
-    """Save a figure with journal-standard defaults."""
-    ext = os.path.splitext(path)[1].lower()
+    """Save a figure with journal-standard defaults.
+
+    The output format is derived from the file extension (defaults to PDF
+    when the path has no extension).  The format is passed explicitly to
+    ``fig.savefig`` so that this function never relies on — or mutates —
+    the global ``savefig.format`` rcParam.
+    """
+    ext = os.path.splitext(path)[1].lower().lstrip(".")
     if not ext:
         path += ".pdf"
+        ext = "pdf"
 
-    fig.savefig(path, dpi=300, transparent=transparent, bbox_inches="tight")
+    fig.savefig(path, format=ext, dpi=300, transparent=transparent, bbox_inches="tight")
     logger.info(f"Publication figure saved to {path}")
 
 
@@ -90,10 +107,12 @@ def plot_chemical_shift_correlation(
         logger.warning(f"Insufficient data for {atom_type} correlation plot.")
         return None
 
-    # Calculate statistics
-    from scipy.stats import pearsonr
+    # Calculate statistics (requires scipy, checked at import time)
+    if not HAS_SCIPY:
+        logger.error("scipy is required for correlation plots but is not installed.")
+        return None
 
-    r_val, _ = pearsonr(x, y)
+    r_val, _ = _pearsonr(x, y)
     rmsd = np.sqrt(np.mean((x - y) ** 2))
 
     fig, ax = plt.subplots(figsize=(4.5, 4))
@@ -101,11 +120,11 @@ def plot_chemical_shift_correlation(
     # Use a professional color (Teal for synth-pdb)
     ax.scatter(x, y, s=25, alpha=0.6, edgecolors="none", color="#008080", label=f"n={len(x)}")
 
-    # Diagonal line
+    # Diagonal line — build axis limits as a tuple (required by matplotlib's type signature)
     all_data = np.concatenate([x, y])
     padding = (float(all_data.max()) - float(all_data.min())) * 0.05
-    lims = [float(all_data.min()) - padding, float(all_data.max()) + padding]
-    ax.plot(lims, lims, "k--", alpha=0.4, linewidth=1, zorder=0)
+    lims: tuple[float, float] = (float(all_data.min()) - padding, float(all_data.max()) + padding)
+    ax.plot(list(lims), list(lims), "k--", alpha=0.4, linewidth=1, zorder=0)
 
     ax.set_aspect("equal")
     ax.set_xlim(lims)
@@ -151,13 +170,16 @@ def plot_ramachandran_publication(
     apply_publication_style()
     fig, ax = plt.subplots(figsize=(4.5, 4.5))
 
-    # Professional shaded background for favored regions
-    # (Approximate regions for general protein backbone)
-    # Alpha region
+    # Approximate favored-region shading for general (non-Gly, non-Pro) residues.
+    # IMPORTANT: These rectangles are simplified heuristic boundaries, NOT the
+    # probability-density contours from MolProbity or the Richardson Top8000 dataset.
+    # They are suitable for quick visual reference but should not be cited as
+    # quantitative Ramachandran statistics in a publication.
+    # Alpha-helical region (approximate)
     ax.add_patch(plt.Rectangle((-180, -120), 150, 180, color="blue", alpha=0.08, zorder=0))
-    # Beta region
+    # Beta-strand region (approximate)
     ax.add_patch(plt.Rectangle((-180, 60), 135, 120, color="red", alpha=0.08, zorder=0))
-    # Wraparound for beta
+    # Beta wraparound (lower-left quadrant)
     ax.add_patch(plt.Rectangle((-180, -180), 135, 40, color="red", alpha=0.08, zorder=0))
 
     # Scatter points
@@ -204,7 +226,7 @@ def plot_saxs_publication(
     ax.set_ylabel(r"$\log I(q)$")
     ax.set_title("Scattering Profile")
 
-    if rg:
+    if rg is not None:
         ax.text(
             0.95,
             0.95,

@@ -19,12 +19,15 @@ import sys
 import argparse
 import json
 import logging
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import biotite.structure.io.pdb as pdb_io
 
-# Add parent directory to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure the repo root is on sys.path regardless of the working directory
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from synth_pdb.bmrb_api import BMRBAPI
 from synth_pdb.chemical_shifts import predict_chemical_shifts, calculate_shift_metrics
@@ -57,7 +60,9 @@ def run_single_benchmark(pdb_id, bmrb_id, name, output_dir, use_shiftx2=True):
     print(f" BENCHMARK: {name} ({pdb_id} vs BMRB {bmrb_id})")
     print("=" * 60)
 
-    pdb_path = f"examples/{pdb_id}.pdb"
+    # Resolve the PDB path relative to the repo root so the script works
+    # correctly regardless of which directory it is invoked from.
+    pdb_path = str(_REPO_ROOT / "examples" / f"{pdb_id}.pdb")
     if not os.path.exists(pdb_path):
         print(f"   [DOWNLOAD] Fetching {pdb_id} from RCSB...")
         BMRBAPI.download_pdb(pdb_id, pdb_path)

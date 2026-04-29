@@ -71,12 +71,19 @@ class BMRBAPI:
                     # Map tags to indices
                     tag_to_idx = {tag.lower(): i for i, tag in enumerate(tags)}
 
-                    # Required tags (handle variations in naming)
-                    idx_id = tag_to_idx.get("id") or 0
-                    idx_res1 = tag_to_idx.get("auth_seq_id_1") or tag_to_idx.get("res_id_1")
-                    idx_atom1 = tag_to_idx.get("atom_id_1") or tag_to_idx.get("atom_name_1")
-                    idx_res2 = tag_to_idx.get("auth_seq_id_2") or tag_to_idx.get("res_id_2")
-                    idx_atom2 = tag_to_idx.get("atom_id_2") or tag_to_idx.get("atom_name_2")
+                    # Required tags (handle variations in naming).
+                    # Use explicit `is not None` so that index 0 is never treated as
+                    # falsy and we don't silently fall through to the wrong key.
+                    _id_raw = tag_to_idx.get("id")
+                    idx_id = _id_raw if _id_raw is not None else 0
+                    _r1 = tag_to_idx.get("auth_seq_id_1")
+                    idx_res1 = _r1 if _r1 is not None else tag_to_idx.get("res_id_1")
+                    _a1 = tag_to_idx.get("atom_id_1")
+                    idx_atom1 = _a1 if _a1 is not None else tag_to_idx.get("atom_name_1")
+                    _r2 = tag_to_idx.get("auth_seq_id_2")
+                    idx_res2 = _r2 if _r2 is not None else tag_to_idx.get("res_id_2")
+                    _a2 = tag_to_idx.get("atom_id_2")
+                    idx_atom2 = _a2 if _a2 is not None else tag_to_idx.get("atom_name_2")
                     idx_upper = tag_to_idx.get("distance_upper_bound_val")
 
                     restraints = []
@@ -184,12 +191,17 @@ class PDBValidationAPI:
     BASE_URL = "https://www.ebi.ac.uk/pdbe/api/v2/validation"
 
     @staticmethod
-    def get_validation_summary(pdb_id: str) -> dict[str, Any]:
+    def get_validation_summary(pdb_id: str) -> list[dict[str, Any]]:
         """Fetch validation summary for an existing PDB entry.
 
+        Returns:
+            A list containing a single dict of shimmed percentile keys, matching
+            the legacy synth-pdb response contract.  Returns an empty list on
+            error so callers can always iterate safely.
+
         COMPATIBILITY NOTE:
-        The PDBe v2 API has changed the response structure. This method
-        provides a shim to return keys expected by legacy synth-pdb code.
+            The PDBe v2 API has changed the response structure. This method
+            provides a shim to return keys expected by legacy synth-pdb code.
         """
         pid = pdb_id.lower()
         url = f"{PDBValidationAPI.BASE_URL}/global-percentiles/entry/{pid}"
@@ -198,8 +210,8 @@ class PDBValidationAPI:
             response.raise_for_status()
             data = response.json().get(pid, {})
 
-            # Shim for legacy keys used in tutorials
-            shim = {
+            # Shim for legacy keys used in tutorials.
+            shim: dict[str, Any] = {
                 "absolute_percentile_clashscore": data.get("clashscore", {}).get("absolute"),
                 "absolute_percentile_ramachandran": data.get("percent-rama-outliers", {}).get(
                     "absolute"
@@ -208,12 +220,12 @@ class PDBValidationAPI:
                     "absolute"
                 ),
             }
-            # Return as a list containing a dict to match old API response structure
-            # (which was a list of analysis entries)
-            return cast(dict[str, Any], [shim])
+            # Return as a list containing a dict to match the legacy API contract
+            # (the old PDBe v1 endpoint returned a list of analysis entries).
+            return [shim]
         except Exception as e:
             logger.error(f"Failed to fetch PDBe summary for {pdb_id}: {e}")
-            return {}
+            return []
 
     @staticmethod
     def get_validation_outliers(pdb_id: str) -> dict[str, Any]:
