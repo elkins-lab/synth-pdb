@@ -112,3 +112,13 @@ class TestClustering:
         # Should only have 1 medoid
         medoids = list(clusters_dir.glob("cluster_*_medoid.pdb"))
         assert len(medoids) == 1
+
+    def test_clustering_no_sklearn(self, caplog):
+        """Verify graceful failure when scikit-learn is missing."""
+        from synth_pdb.quality.cluster import cluster_structures
+        import logging
+
+        with patch.dict("sys.modules", {"sklearn": None, "sklearn.cluster": None}):
+            with caplog.at_level(logging.ERROR):
+                cluster_structures("dummy/*.pdb", 3, "out")
+                assert any("scikit-learn" in r.message for r in caplog.records)
