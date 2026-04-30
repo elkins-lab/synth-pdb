@@ -135,8 +135,15 @@ class SideChainPacker:
             delta = new_score - current_score
 
             accept = False
+            # PROACTIVE IMPROVEMENT: If we have zero accepted moves and we are in the first few steps,
+            # be more aggressive in accepting any change to escape a "bad" initial state.
             if delta < 0:
                 # Improvement
+                accept = True
+            elif accepted_moves == 0 and _step < (self.steps // 10) and new_score > 0:
+                # If we haven't accepted anything yet, and it's early, accept even if worse
+                # but only if it's not a complete disaster (we use a high threshold or just accept)
+                # This helps escape cases where the 'default' structure is a local peak.
                 accept = True
             else:
                 # Worsening - check probability

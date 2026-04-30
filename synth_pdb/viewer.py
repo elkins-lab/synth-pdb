@@ -839,30 +839,31 @@ def _find_hbonds(pdb_content: str) -> list:
                         }
                     )
 
-        # If strict mode found nothing valid, or was skipped, use Geometric Fallback
-        if len(hbonds) == 0:
-            # Fallback: Geometric distance check (O...N < 4.5 A)
-            # This is "good enough" for visualization and handles synthetic drift
-            ns = structure[structure.atom_name == "N"]
-            os_atoms = structure[structure.atom_name == "O"]
+        # Always supplement with Geometric Fallback to handle synthetic drift
+        # This is "good enough" for visualization
+        ns = structure[structure.atom_name == "N"]
+        os_atoms = structure[structure.atom_name == "O"]
 
-            if len(ns) > 0 and len(os_atoms) > 0:
-                n_coords = ns.coord
-                o_coords = os_atoms.coord
+        if len(ns) > 0 and len(os_atoms) > 0:
+            n_coords = ns.coord
+            o_coords = os_atoms.coord
 
-                # Brute force distance matrix (N_n x N_o)
-                diff = n_coords[:, np.newaxis, :] - o_coords[np.newaxis, :, :]
-                dists = np.linalg.norm(diff, axis=2)
+            # Brute force distance matrix (N_n x N_o)
+            diff = n_coords[:, np.newaxis, :] - o_coords[np.newaxis, :, :]
+            dists = np.linalg.norm(diff, axis=2)
 
-                # Find pairs < 4.5 Angstrom (relaxed for visualization)
-                n_indices, o_indices = np.where(dists < 4.5)
+            # Find pairs < 4.5 Angstrom (relaxed for visualization)
+            n_indices, o_indices = np.where(dists < 4.5)
 
-                for i, j in zip(n_indices, o_indices, strict=False):
-                    n_atom = ns[i]
-                    o_atom = os_atoms[j]
+            for i, j in zip(n_indices, o_indices, strict=False):
+                n_atom = ns[i]
+                o_atom = os_atoms[j]
 
-                    # Check sequence separation (k >= 3)
-                    if abs(int(n_atom.res_id) - int(o_atom.res_id)) >= 3:
+                # Check sequence separation (k >= 3)
+                if abs(int(n_atom.res_id) - int(o_atom.res_id)) >= 3:
+                    res_pair = (int(o_atom.res_id), int(n_atom.res_id))
+                    # Avoid duplicates
+                    if res_pair not in [(hb["start_resi"], hb["end_resi"]) for hb in hbonds]:
                         hbonds.append(
                             {
                                 "start_resi": int(o_atom.res_id),

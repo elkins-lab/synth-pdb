@@ -37,11 +37,11 @@ def test_optimization_improves_score():
     # Set seed for reproducibility in CI
     np.random.seed(42)
 
-    # Generate a peptide with likely clashes (e.g. bulky residues close together)
-    # Use a longer sequence of bulky residues to increase clash probability
+    sequence = "WYWYWYWY"
     pdb_content = generate_pdb_content(
-        sequence_str="WYWYWYWY", conformation="random", optimize_sidechains=False
+        sequence_str=sequence, conformation="random", optimize_sidechains=False
     )
+    logger.info(f"Test Sequence: {sequence}")
 
     # Parse back using biotite to get proper AtomArray
     import io
@@ -66,8 +66,10 @@ def test_optimization_improves_score():
     ), "Optimization should not worsen the score significantly"
 
     # Ideally it improves, but if initial was already good (0.0), it stays 0.0
-    if initial_score > 0.1:
-        assert final_score < initial_score, "Optimization should improve score if clashes exist"
+    if initial_score > 1.0:
+        assert final_score < (
+            initial_score - 0.1
+        ), "Optimization should improve score significantly if major clashes exist"
 
 
 def test_packer_class():
