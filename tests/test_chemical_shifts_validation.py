@@ -10,8 +10,8 @@ def test_calculate_shift_metrics_perfect_correlation() -> None:
     calc = np.array([1.0, 2.0, 3.0, 4.0])
 
     metrics = calculate_shift_metrics(obs, calc)
-    assert metrics["rmsd"] == 0.0
-    assert metrics["correlation"] == 1.0
+    assert metrics["rmsd"] == pytest.approx(0.0)
+    assert metrics["correlation"] == pytest.approx(1.0)
 
 
 def test_calculate_shift_metrics_offset() -> None:
@@ -20,8 +20,8 @@ def test_calculate_shift_metrics_offset() -> None:
     calc = obs + 1.0  # Constant offset
 
     metrics = calculate_shift_metrics(obs, calc)
-    assert metrics["rmsd"] == 1.0
-    assert metrics["correlation"] == 1.0
+    assert metrics["rmsd"] == pytest.approx(1.0)
+    assert metrics["correlation"] == pytest.approx(1.0)
 
 
 def test_calculate_shift_metrics_anti_correlated() -> None:
@@ -30,7 +30,7 @@ def test_calculate_shift_metrics_anti_correlated() -> None:
     calc = np.array([4.0, 3.0, 2.0, 1.0])
 
     metrics = calculate_shift_metrics(obs, calc)
-    assert metrics["correlation"] == -1.0
+    assert metrics["correlation"] == pytest.approx(-1.0)
 
 
 def test_calculate_shift_metrics_mismatch_length() -> None:
@@ -42,8 +42,8 @@ def test_calculate_shift_metrics_mismatch_length() -> None:
 def test_calculate_shift_metrics_empty() -> None:
     """Verify handling of empty arrays."""
     metrics = calculate_shift_metrics(np.array([]), np.array([]))
-    assert metrics["rmsd"] == 0.0
-    assert metrics["correlation"] == 0.0
+    assert metrics["rmsd"] == pytest.approx(0.0)
+    assert metrics["correlation"] == pytest.approx(0.0)
 
 
 def test_calculate_shift_metrics_zero_variance() -> None:
@@ -52,7 +52,7 @@ def test_calculate_shift_metrics_zero_variance() -> None:
     calc = np.array([5.0, 5.0, 5.0])  # Constant
 
     metrics = calculate_shift_metrics(obs, calc)
-    assert metrics["correlation"] == 0.0
+    assert metrics["correlation"] == pytest.approx(0.0)
     # RMSD should still be calculated
     expected_rmsd = np.sqrt(np.mean((obs - calc) ** 2))
     assert np.allclose(metrics["rmsd"], expected_rmsd)
@@ -61,5 +61,5 @@ def test_calculate_shift_metrics_zero_variance() -> None:
 def test_calculate_shift_metrics_single_point() -> None:
     """Verify correlation is 0.0 for single point datasets."""
     metrics = calculate_shift_metrics(np.array([1.0]), np.array([1.1]))
-    assert metrics["correlation"] == 0.0
+    assert metrics["correlation"] == pytest.approx(0.0)
     assert np.allclose(metrics["rmsd"], 0.1)

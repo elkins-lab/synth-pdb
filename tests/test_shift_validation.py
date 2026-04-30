@@ -10,8 +10,8 @@ def test_shift_metrics_perfect_fit() -> None:
     calc = np.array([4.5, 4.8, 5.2])
 
     metrics = calculate_shift_metrics(obs, calc)
-    assert metrics["rmsd"] == 0.0
-    assert metrics["correlation"] == 1.0
+    assert metrics["rmsd"] == pytest.approx(0.0)
+    assert metrics["correlation"] == pytest.approx(1.0)
 
 
 def test_shift_metrics_standard() -> None:
@@ -31,5 +31,5 @@ def test_shift_metrics_standard() -> None:
 def test_shift_metrics_empty() -> None:
     """Empty arrays should handle gracefully."""
     metrics = calculate_shift_metrics(np.array([]), np.array([]))
-    assert metrics["rmsd"] == 0.0
-    assert metrics["correlation"] == 0.0
+    assert metrics["rmsd"] == pytest.approx(0.0)
+    assert metrics["correlation"] == pytest.approx(0.0)
