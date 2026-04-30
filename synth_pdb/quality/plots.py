@@ -22,6 +22,8 @@ try:
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
+    mpl = None
+    plt = None
 
 # Optional SciPy dependency (used for Pearson r in correlation plots)
 try:
@@ -34,7 +36,7 @@ except ImportError:
 
 def apply_publication_style() -> None:
     """Apply global matplotlib settings for publication-ready figures."""
-    if not HAS_MATPLOTLIB:
+    if not HAS_MATPLOTLIB or plt is None:
         return
 
     # Use a clean, professional style as a base
@@ -86,7 +88,7 @@ def plot_chemical_shift_correlation(
     output_path: str | None = None,
 ) -> Any:
     """Generate a high-fidelity correlation plot for chemical shifts."""
-    if not HAS_MATPLOTLIB:
+    if not HAS_MATPLOTLIB or plt is None:
         return None
 
     apply_publication_style()
@@ -164,7 +166,7 @@ def plot_ramachandran_publication(
     output_path: str | None = None,
 ) -> Any:
     """Generate a publication-quality Ramachandran plot with favored regions."""
-    if not HAS_MATPLOTLIB:
+    if not HAS_MATPLOTLIB or plt is None:
         return None
 
     apply_publication_style()
@@ -213,7 +215,7 @@ def plot_saxs_publication(
     output_path: str | None = None,
 ) -> Any:
     """Standardized SAXS I(q) vs q plot for papers."""
-    if not HAS_MATPLOTLIB:
+    if not HAS_MATPLOTLIB or plt is None:
         return None
 
     apply_publication_style()
