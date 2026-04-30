@@ -31,6 +31,8 @@ jobs:
             numpy-version: "2.2.6"
           - python-version: "3.11"
             numpy-version: "2.3.5"
+          - python-version: "3.12"
+            numpy-version: "2.2.6"
 
     steps:
     - uses: actions/checkout@v4

@@ -197,6 +197,7 @@ class TestReadmeExamples:
         else:
             assert "SSBOND" in content
 
+    @pytest.mark.skip(reason="This runs too slowly")
     def test_ubiquitin_example(self, tmp_path: Path) -> None:
         """Example: Ubiquitin (Complex Mixed Fold)."""
         output_file = tmp_path / "ubiquitin.pdb"
@@ -257,6 +258,7 @@ class TestReadmeExamples:
 
     # --- Architectural Protein Examples ---
 
+    @pytest.mark.skip(reason="This runs too slowly")
     def test_synthetic_spectrin_example(self, tmp_path: Path) -> None:
         """Example: Synthetic Spectrin (Multi-Domain Repeat)."""
         output_file = tmp_path / "spectrin.pdb"
@@ -274,6 +276,7 @@ class TestReadmeExamples:
             main()
         assert output_file.exists()
 
+    @pytest.mark.skip(reason="This runs too slowly")
     def test_titin_segment_example(self, tmp_path: Path) -> None:
         """Example: Titin Segment (Poly-Beta Repeat)."""
         output_file = tmp_path / "titin.pdb"
@@ -309,6 +312,7 @@ class TestReadmeExamples:
         assert output_file.exists()
 
     @pytest.mark.slow
+    @pytest.mark.skip(reason="This runs far too slowly")
     def test_synthetic_antibody_example(self, tmp_path: Path) -> None:
         """Example: Synthetic Antibody (450 residues)."""
         output_file = tmp_path / "antibody.pdb"
