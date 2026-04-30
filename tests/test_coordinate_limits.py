@@ -13,7 +13,7 @@ class TestCoordinateLimits:
     def test_serial_centering_threshold(self):
         """Verify serial generator centers only when coordinates > 500A."""
         # Small peptide should NOT be centered (origin aligned)
-        pdb_small = generate_pdb_content(sequence_str="AAA", minimize_energy=False)
+        pdb_small = generate_pdb_content(sequence_str="AAA", minimize_energy=False, seed=42)
         struc_small = PDBFile.read(io.StringIO(pdb_small)).get_structure(model=1)
         # N-term of first residue should be at [0,0,0] (with tiny floating point slack)
         np.testing.assert_allclose(struc_small.coord[0], [0.0, 0.0, 0.0], atol=1e-2)
@@ -21,7 +21,7 @@ class TestCoordinateLimits:
         # Very long peptide should be centered
         # A helix is ~1.5A per residue. 1000 residues ~ 1500A.
         # This will definitely exceed 500A from origin.
-        pdb_large = generate_pdb_content(sequence_str="A" * 1000, minimize_energy=False)
+        pdb_large = generate_pdb_content(sequence_str="A" * 1000, minimize_energy=False, seed=42)
         struc_large = PDBFile.read(io.StringIO(pdb_large)).get_structure(model=1)
 
         # Check that it is centered (centroid near origin)
