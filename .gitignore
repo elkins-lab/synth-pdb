@@ -30,6 +30,7 @@ MANIFEST
 bioconda_recipe/
 publish.sh
 *.tgz
+artifacts/publication_figures/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -42,6 +43,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
+pytest-output*.txt
 .venv_colab/
 htmlcov/
 .tox/
@@ -57,6 +59,7 @@ coverage.xml
 random_linear_peptide_*.pdb
 random_linear_peptide_*.pqr
 custom_peptide_*.pdb
+custom_peptide_*.nef
 custom_peptide_*.fasta
 test_*.pdb
 test.pdb
@@ -68,7 +71,10 @@ bmr6457.json
 1d3z_mr.str
 1D3Z.pdb
 1UBQ.pdb
+sfti1.pdb
 tmp/
+benchmarks/bench_results.csv
+
 # Large binary artifacts
 *.mrc
 *.npz

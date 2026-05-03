@@ -17,7 +17,7 @@ from synth_pdb.generator import _resolve_sequence, generate_pdb_content
 from synth_pdb.validator import PDBValidator
 
 # Suppress logging during tests to keep output clean
-logging.getLogger().setLevel(logging.CRITICAL)
+# (Replaced with pytest-based control in configuration)
 
 
 class TestGenerator(unittest.TestCase):

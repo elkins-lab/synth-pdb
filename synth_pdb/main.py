@@ -1241,26 +1241,9 @@ def main() -> None:
                 # Apply steric clash tweak
                 modified_atoms = PDBValidator._apply_steric_clash_tweak(parsed_atoms_for_refinement)
 
-                # Convert modified atoms back to atomic PDB content (no header/footer)
-                new_atomic_content_after_tweak = PDBValidator.atoms_to_pdb_content(modified_atoms)
-
-                # Determine actual length for temporary header
-                current_len = args.length
-                if args.sequence:
-                    current_len = len(args.sequence.replace("-", ""))
-                elif args.length is None:
-                    # Fallback if somehow both are None, though main() usually ensures one
-                    current_len = 10
-
-                # Build command string for temporary header
-                cmd_string = _build_command_string(args)
-                temp_full_pdb = assemble_pdb_content(
-                    new_atomic_content_after_tweak,
-                    current_len,
-                    command_args=cmd_string,
-                    extra_records=preserved_ssbonds,  # Keeps context valid if validator checks bonds
-                )
-                temp_validator = PDBValidator(pdb_content=temp_full_pdb)
+                # Use PDBValidator directly with modified atoms for validation
+                # This avoids the overhead of assemble_pdb_content and re-parsing.
+                temp_validator = PDBValidator(parsed_atoms=modified_atoms)
                 try:
                     temp_validator.validate_all()
                 except Exception as e:
@@ -1277,7 +1260,8 @@ def main() -> None:
                     logger.info(
                         f"Refinement iteration {refine_iter + 1}: Reduced violations from {len(current_refined_violations)} to {len(new_violations)}."
                     )
-                    current_refined_atomic_content = new_atomic_content_after_tweak
+                    # Update atomic content only when needed, lazily
+                    current_refined_atomic_content = temp_validator.get_pdb_content()
                     current_refined_violations = new_violations
                 else:
                     logger.info(

@@ -5,11 +5,9 @@ from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
 
 # Suppress logging during tests to keep output clean
-logging.getLogger().setLevel(logging.CRITICAL)
 
 
 class TestGeneratorWithRotamers(unittest.TestCase):
-
     def test_side_chain_generation_creates_reasonable_chi_angle(self):
         """Test that side-chain generation creates a reasonable chi-1 angle for LEU."""
         # Generate a peptide with a LEU residue

@@ -21,8 +21,6 @@ from synth_pdb.generator import (  # Import create_atom_line
 from synth_pdb.validator import PDBValidator
 
 logger = logging.getLogger(__name__)
-# logging.getLogger().setLevel(logging.DEBUG) # Optional: Configure externally
-logging.getLogger().setLevel(logging.DEBUG)
 
 
 def is_valid_pdb_file(file_path: str) -> bool:

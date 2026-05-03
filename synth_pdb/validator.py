@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -36,6 +36,7 @@ class PDBValidator:
     """
 
     atoms: list[dict[str, Any]]
+    pdb_content: str | None
     grouped_atoms: dict[str, dict[int, dict[str, dict[str, Any]]]]
     sequences_by_chain: dict[str, list[str]]
     violations: list[str]
@@ -52,15 +53,19 @@ class PDBValidator:
                 if isinstance(atom["coords"], list):
                     atom["coords"] = np.array(atom["coords"])
             self.atoms = parsed_atoms
-            self.pdb_content = self.atoms_to_pdb_content(
-                self.atoms
-            )  # Reconstruct pdb_content for consistency
+            self.pdb_content = None  # Lazily generated if needed
         else:
             raise ValueError("Either pdb_content or parsed_atoms must be provided.")
 
         self.grouped_atoms = self._group_atoms_by_residue()
         self.sequences_by_chain = self._get_sequences_by_chain()
         self.violations = []  # Stores detected violations
+
+    def get_pdb_content(self) -> str:
+        """Returns the PDB content string, generating it if it hasn't been already."""
+        if self.pdb_content is None:
+            self.pdb_content = self.atoms_to_pdb_content(self.atoms)
+        return self.pdb_content
 
     @staticmethod
     def _parse_pdb_atoms(pdb_content: str) -> list[dict[str, Any]]:
@@ -1388,113 +1393,111 @@ class PDBValidator:
         vdw_overlap_factor: float = 0.8,
     ) -> list[dict[str, Any]]:
         """Applies a simple heuristic to alleviate steric clashes by pushing clashing atoms apart.
-        Modifies a copy of the input parsed_atoms list.
+
+        EDUCATIONAL NOTE - Performance Optimization via Vectorization:
+        -------------------------------------------------------------
+        Traditional protein modeling often uses nested loops for clash detection.
+        For N atoms, this is an O(N^2) operation. In pure Python, this becomes a
+        bottleneck for proteins with >1,000 atoms.
+
+        This optimized version uses `scipy.spatial.distance.cdist` and NumPy broadcasting:
+        1. Pairwise Distances: Calculated in C via cdist.
+        2. VDW Thresholds: Pre-calculated for all pairs as a matrix using broadcasting.
+        3. Vectorized Masking: Clashes are identified by comparing the distance matrix
+           to the threshold matrix in a single parallel operation.
+
+        This approach eliminates the slow Python-level lookups and branching within
+        the main loops, making it highly scalable for larger proteins.
         """
+        from scipy.spatial.distance import cdist
+
         modified_atoms = [atom.copy() for atom in parsed_atoms]
         num_atoms = len(modified_atoms)
 
         if num_atoms < 2:
             return modified_atoms
 
-        # Reconstruct bonded_pairs for this iteration (simplified, as in validate_steric_clashes)
-        # This is a bit inefficient but avoids deep refactoring for now.
-        temp_grouped_atoms: dict[str, dict[int, dict[str, dict[str, Any]]]] = {}
-        for atom in modified_atoms:
-            chain_id = atom["chain_id"]
-            residue_number = atom["residue_number"]
-            atom_name = atom["atom_name"]
+        # 1. Prepare coordinates and VDW radii
+        coords = np.array([a["coords"] for a in modified_atoms])
+        radii = np.array(
+            [VAN_DER_WAALS_RADII.get(a["element"], 1.5) for a in modified_atoms], dtype=np.float32
+        )
 
-            if chain_id not in temp_grouped_atoms:
-                temp_grouped_atoms[chain_id] = {}
-            if residue_number not in temp_grouped_atoms[chain_id]:
-                temp_grouped_atoms[chain_id][residue_number] = {}
-            temp_grouped_atoms[chain_id][residue_number][atom_name] = atom
+        # 2. Reconstruct bonded_indices
+        temp_grouped_atoms: dict[str, dict[int, dict[str, int]]] = {}
+        for idx, atom in enumerate(modified_atoms):
+            c, r, n = atom["chain_id"], atom["residue_number"], atom["atom_name"]
+            if c not in temp_grouped_atoms:
+                temp_grouped_atoms[c] = {}
+            if r not in temp_grouped_atoms[c]:
+                temp_grouped_atoms[c][r] = {}
+            temp_grouped_atoms[c][r][n] = idx
 
-        bonded_pairs = set()
-        for _chain_id, residues_in_chain in temp_grouped_atoms.items():
-            sorted_res_numbers = sorted(residues_in_chain.keys())
-            for i, res_num in enumerate(sorted_res_numbers):
-                current_res_atoms = residues_in_chain[res_num]
-                n_atom = current_res_atoms.get("N")
-                ca_atom = current_res_atoms.get("CA")
-                c_atom = current_res_atoms.get("C")
-                o_atom = current_res_atoms.get("O")
+        bonded_indices = set()
+        for _c_id, residues in temp_grouped_atoms.items():
+            sorted_res = sorted(residues.keys())
+            for i, res_num in enumerate(sorted_res):
+                res = residues[res_num]
+                n, ca, c, o = res.get("N"), res.get("CA"), res.get("C"), res.get("O")
+                if n is not None and ca is not None:
+                    bonded_indices.add(tuple(sorted((n, ca))))
+                if ca is not None and c is not None:
+                    bonded_indices.add(tuple(sorted((ca, c))))
+                if c is not None and o is not None:
+                    bonded_indices.add(tuple(sorted((c, o))))
+                if i + 1 < len(sorted_res):
+                    next_res = residues[sorted_res[i + 1]]
+                    next_n = next_res.get("N")
+                    if c is not None and next_n is not None:
+                        bonded_indices.add(tuple(sorted((c, next_n))))
 
-                if n_atom and ca_atom:
-                    bonded_pairs.add(tuple(sorted((n_atom["atom_number"], ca_atom["atom_number"]))))
-                if ca_atom and c_atom:
-                    bonded_pairs.add(tuple(sorted((ca_atom["atom_number"], c_atom["atom_number"]))))
-                if c_atom and o_atom:
-                    bonded_pairs.add(tuple(sorted((c_atom["atom_number"], o_atom["atom_number"]))))
+        # 3. Vectorized Clash Detection
+        # Calculate full pairwise distance matrix
+        dist_matrix = cdist(coords, coords)
 
-                if i + 1 < len(sorted_res_numbers):
-                    next_res_num = sorted_res_numbers[i + 1]
-                    next_res_atoms = residues_in_chain.get(next_res_num)
-                    if c_atom and next_res_atoms and next_res_atoms.get("N"):
-                        next_n_atom = next_res_atoms["N"]
-                        bonded_pairs.add(
-                            tuple(sorted((c_atom["atom_number"], next_n_atom["atom_number"])))
-                        )
+        # Calculate VDW sum matrix via broadcasting
+        # (N,) + (1, N) -> (N, N)
+        vdw_sum = (radii[:, np.newaxis] + radii[np.newaxis, :]) * vdw_overlap_factor
+        threshold_matrix = np.maximum(min_atom_distance, vdw_sum)
 
-        clashing_atom_indices = set()  # Store indices of atoms involved in a clash
+        # Find clashes (excluding diagonal and upper triangle)
+        clash_mask = dist_matrix < threshold_matrix
+        clash_mask = np.tril(clash_mask, k=-1)
 
-        for i in range(num_atoms):
-            atom1 = modified_atoms[i]
-            for j in range(i + 1, num_atoms):
-                atom2 = modified_atoms[j]
+        clashing_indices_i, clashing_indices_j = np.where(clash_mask)
 
-                # Skip if atoms are identical or covalently bonded
-                if (
-                    atom1["atom_number"] == atom2["atom_number"]
-                    or tuple(sorted((atom1["atom_number"], atom2["atom_number"]))) in bonded_pairs
-                ):
-                    continue
+        # 4. Resolve Clashes
+        modified_indices = set()
+        for i, j in zip(clashing_indices_i, clashing_indices_j):
+            # Skip if covalently bonded
+            if (i, j) in bonded_indices:
+                continue
 
-                distance = PDBValidator._calculate_distance(atom1["coords"], atom2["coords"])
+            distance = dist_matrix[i, j]
+            required_push = threshold_matrix[i, j] - distance
 
-                clash_detected = False
-                # Check for minimum distance violation
-                if distance < min_atom_distance:
-                    clash_detected = True
+            if required_push > 0:
+                vector = coords[j] - coords[i]
+                if distance < 1e-6:
+                    # Exactly superimposed atoms: push in a random direction (deterministic jitter)
+                    vector = np.array([1.0, 0.0, 0.0])
+                    distance = 1.0
 
-                # Check for Van der Waals overlap violation
-                vdw1 = VAN_DER_WAALS_RADII.get(atom1["element"], 1.5)
-                vdw2 = VAN_DER_WAALS_RADII.get(atom2["element"], 1.5)
-                expected_min_vdw_distance = (vdw1 + vdw2) * vdw_overlap_factor
-                if distance < expected_min_vdw_distance:
-                    clash_detected = True
+                unit_vector = vector / distance
+                push_vec = unit_vector * (required_push / 2.0)
 
-                if clash_detected:
-                    # Calculate required push distance to resolve the clash
-                    required_push = 0.0
-                    if distance < min_atom_distance:
-                        required_push = max(required_push, min_atom_distance - distance)
+                coords[i] -= push_vec
+                coords[j] += push_vec
 
-                    vdw1 = VAN_DER_WAALS_RADII.get(atom1["element"], 1.5)
-                    vdw2 = VAN_DER_WAALS_RADII.get(atom2["element"], 1.5)
-                    expected_min_vdw_distance = (vdw1 + vdw2) * vdw_overlap_factor
-                    if distance < expected_min_vdw_distance:
-                        required_push = max(required_push, expected_min_vdw_distance - distance)
+                modified_indices.add(i)
+                modified_indices.add(j)
 
-                    # Apply push to alleviate clash
-                    vector = atom2["coords"] - atom1["coords"]
-                    norm_vector = np.linalg.norm(vector)
+        # Write back coordinates
+        for idx in modified_indices:
+            modified_atoms[idx]["coords"] = coords[idx]
 
-                    if (
-                        norm_vector > 1e-6
-                    ):  # Avoid division by zero if atoms are exactly superimposed
-                        unit_vector = vector / norm_vector
-                        # Each atom moves by half the required push
-                        modified_atoms[i]["coords"] -= unit_vector * (required_push / 2.0)
-                        modified_atoms[j]["coords"] += unit_vector * (required_push / 2.0)
-                        clashing_atom_indices.add(i)
-                        clashing_atom_indices.add(j)
-
-        # Log how many atoms were tweaked
-        if clashing_atom_indices:
-            logger.debug(
-                f"Applied tweaks to {len(clashing_atom_indices)} atoms to resolve steric clashes."
-            )
+        if modified_indices:
+            logger.debug(f"Applied vectorized tweaks to {len(modified_indices)} atoms.")
 
         return modified_atoms
 

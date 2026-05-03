@@ -57,7 +57,8 @@ def test_calculate_residue_strain() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         p1 = os.path.join(tmp, "p1.pdb")
         # Alpha helix has trans (180) peptide bonds
-        content = generate_pdb_content(length=5, conformation="alpha")
+        # Use fixed seed to ensure reproducibility
+        content = generate_pdb_content(length=5, conformation="alpha", seed=42)
         with open(p1, "w") as f:
             f.write(content)
 
