@@ -79,6 +79,40 @@ print(f"Mean RMSF: {rmsf:.2f} Å")
 
 ---
 
+## Advanced Force Fields: AMOEBA
+
+While `synth-pdb` defaults to the **AMBER14** fixed-charge force field for speed and compatibility, OpenMM supports advanced polarizable force fields like **AMOEBA** (Atomic Multipole Optimized Energetics for Biomolecular Applications).
+
+### What makes AMOEBA different?
+1. **Polarizability:** Unlike fixed-charge models where atom charges are static, AMOEBA allows electronic distributions to respond to their environment via induced dipoles.
+2. **Multipoles:** It uses explicit bond dipoles, quadrupoles, and octupoles instead of just point charges at atom centers.
+3. **Accuracy:** It is significantly more accurate for water-protein interactions and transition metal coordination.
+
+> [!WARNING]
+> **Performance Trade-off:** AMOEBA simulations are typically **10x–100x slower** than AMBER. Supporting AMOEBA in `synth-pdb` would require a specialized pipeline and explicit solvent, which is currently on our long-term roadmap.
+
+---
+
+## Minimization Progress Reporting
+
+Advanced users can monitor the energy minimization process in real-time. This is useful for identifying structural "explosions" or slow convergence in complex macrocycles.
+
+### Enabling Real-Time Logs
+To see the energy decay for every 50 iterations of the L-BFGS optimizer, set the log level to `DEBUG`:
+
+```python
+import logging
+logging.getLogger("synth_pdb.physics").setLevel(logging.DEBUG)
+```
+
+**Log Output Format:**
+`DEBUG:synth_pdb.physics:Physics: Minimization Iteration 150 | Energy: -4521.4302 kJ/mol`
+
+### Educational Insight: The L-BFGS Algorithm
+OpenMM's `minimizeEnergy` uses the **L-BFGS** algorithm. It is a quasi-Newton method that approximates the curvature of the energy landscape without calculating the full Hessian matrix, making it ideal for systems with thousands of atoms.
+
+---
+
 ## The Generation Pipeline
 
 ```text

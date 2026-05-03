@@ -30,6 +30,40 @@ logger = logging.getLogger(__name__)
 _FORCEFIELD_CACHE: dict[tuple[str, ...], "app.ForceField"] = {}
 
 
+class LoggingMinimizationReporter(mm.MinimizationReporter):
+    """OpenMM MinimizationReporter that logs progress to the logger at DEBUG level.
+
+    ### Educational Note: Minimization Reporters
+    -------------------------------------------
+    In high-performance physics engines like OpenMM, energy minimization is
+    often a "black box" operation performed by highly optimized C++ code (like L-BFGS).
+    By default, you only get the final state.
+
+    A `MinimizationReporter` is a "callback" mechanism. It allows the Python
+    layer to "peek" into the C++ optimization loop at every iteration. This is
+    essential for:
+    1. Monitoring convergence: Seeing how fast the energy is dropping.
+    2. Debugging: Identifying exactly which iteration caused a system to "explode."
+    3. Early Exit: Stopping the process if the energy goes above a threshold (e.g. steric clash).
+    """
+
+    def __init__(self, interval: int = 50):
+        super().__init__()
+        self.interval = interval
+
+    def report(self, iteration: int, x: Any, grad: Any, args: Any) -> bool:
+        if iteration % self.interval == 0:
+            # args is a SWIG mapstringdouble; it behaves like a dict but may lack .get()
+            try:
+                energy = args["system energy"]
+            except (KeyError, TypeError, RuntimeError):
+                energy = 0.0
+            logger.debug(
+                f"Physics: Minimization Iteration {iteration} | Energy: {energy:.4f} kJ/mol"
+            )
+        return False  # Continue minimization
+
+
 class EnergyMinimizer:
     """Performs energy minimization on molecular structures using OpenMM.
 
@@ -1611,8 +1645,13 @@ class EnergyMinimizer:
         system = None
         integrator = None
         simulation = None
+        reporter = None
 
         try:
+            # Setup reporter if logging level is DEBUG or lower
+            if HAS_OPENMM and logger.isEnabledFor(logging.DEBUG):
+                reporter = LoggingMinimizationReporter(interval=50)
+
             # ── Stage 1: PDB preprocessing ──────────────────────────────────────
             (
                 topology,
@@ -1710,6 +1749,7 @@ class EnergyMinimizer:
                 simulation.minimizeEnergy(
                     maxIterations=cyc_iter,
                     tolerance=(tolerance * 0.1) * unit.kilojoule / (unit.mole * unit.nanometer),
+                    reporter=reporter,
                 )
 
                 if cyclic:
@@ -1742,6 +1782,7 @@ class EnergyMinimizer:
                                 tolerance=(tolerance * 0.1)
                                 * unit.kilojoule
                                 / (unit.mole * unit.nanometer),
+                                reporter=reporter,
                             )
                     except Exception as e:
                         logger.debug(f"Thermal jiggling failed (likely mocked): {e}")
@@ -1752,6 +1793,7 @@ class EnergyMinimizer:
                         tolerance=(tolerance * 0.01)
                         * unit.kilojoule
                         / (unit.mole * unit.nanometer),
+                        reporter=reporter,
                     )
 
                     logger.info(
@@ -1764,11 +1806,19 @@ class EnergyMinimizer:
                         tolerance=(tolerance * 0.001)
                         * unit.kilojoule
                         / (unit.mole * unit.nanometer),
+                        reporter=reporter,
                     )
             else:
+                # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
+                # ------------------------------------------
+                # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+                # algorithm. It is a quasi-Newton method that approximates the second
+                # derivative (Hessian) of the potential energy to find the local minimum
+                # efficiently without needing to store the full Hessian matrix.
                 simulation.minimizeEnergy(
                     maxIterations=max_iterations,
                     tolerance=tolerance * unit.kilojoule / (unit.mole * unit.nanometer),
+                    reporter=reporter,
                 )
 
             # Post-minimization health check
@@ -1887,7 +1937,13 @@ def simulate_trajectory(
         )
         simulation = app.Simulation(pdb.topology, system, integrator)
         simulation.context.setPositions(pdb.positions)
-        simulation.minimizeEnergy()
+
+        # Setup reporter if logging level is DEBUG or lower
+        reporter = None
+        if HAS_OPENMM and logger.isEnabledFor(logging.DEBUG):
+            reporter = LoggingMinimizationReporter(interval=50)
+
+        simulation.minimizeEnergy(reporter=reporter)
 
         trajectory = []
 

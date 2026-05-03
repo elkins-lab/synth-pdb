@@ -491,3 +491,32 @@ class TestPhysicsCoverage:
         assert minimizer.forcefield.createSystem.call_count == 1
         called_kwargs = minimizer.forcefield.createSystem.call_args[1]
         assert "implicitSolvent" not in called_kwargs
+
+    def test_minimization_reporter_logic(self, caplog: pytest.LogCaptureFixture) -> None:
+        """Test the LoggingMinimizationReporter's report() method and logging integration."""
+        import logging
+
+        from synth_pdb.physics import LoggingMinimizationReporter
+
+        # We must use a logger that actually captures DEBUG logs
+        with caplog.at_level(logging.DEBUG, logger="synth_pdb.physics"):
+            reporter = LoggingMinimizationReporter(interval=10)
+
+            # 1. Test standard reporting
+            args = {"system energy": -1234.5678}
+            # it % 10 == 0 -> should log
+            stop = reporter.report(20, None, None, args)
+            assert stop is False
+            assert "Minimization Iteration 20 | Energy: -1234.5678 kJ/mol" in caplog.text
+
+            # 2. Test interval logic
+            caplog.clear()
+            # it % 10 != 0 -> should NOT log
+            reporter.report(21, None, None, args)
+            assert "Minimization Iteration 21" not in caplog.text
+
+            # 3. Test robustness to missing energy key
+            caplog.clear()
+            reporter.report(30, None, None, {})
+            assert "Iteration 30" in caplog.text
+            assert "Energy: 0.0000 kJ/mol" in caplog.text
