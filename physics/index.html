@@ -988,6 +988,73 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#advanced-force-fields-amoeba" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Force Fields: AMOEBA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Force Fields: AMOEBA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-makes-amoeba-different" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What makes AMOEBA different?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimization-progress-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimization Progress Reporting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimization Progress Reporting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enabling-real-time-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling Real-Time Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#educational-insight-the-l-bfgs-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Educational Insight: The L-BFGS Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-generation-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3945,6 +4012,73 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#advanced-force-fields-amoeba" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Advanced Force Fields: AMOEBA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Advanced Force Fields: AMOEBA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-makes-amoeba-different" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What makes AMOEBA different?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimization-progress-reporting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimization Progress Reporting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimization Progress Reporting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enabling-real-time-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling Real-Time Logs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#educational-insight-the-l-bfgs-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Educational Insight: The L-BFGS Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-generation-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4071,12 +4205,37 @@ By default, <code>synth-pdb</code> strips the thousands of generated <code>HOH</
 <code>simulate_trajectory()</code> requires OpenMM. Install with <code>pip install synth-pdb[physics]</code>.</p>
 </blockquote>
 <hr />
+<h2 id="advanced-force-fields-amoeba">Advanced Force Fields: AMOEBA</h2>
+<p>While <code>synth-pdb</code> defaults to the <strong>AMBER14</strong> fixed-charge force field for speed and compatibility, OpenMM supports advanced polarizable force fields like <strong>AMOEBA</strong> (Atomic Multipole Optimized Energetics for Biomolecular Applications).</p>
+<h3 id="what-makes-amoeba-different">What makes AMOEBA different?</h3>
+<ol>
+<li><strong>Polarizability:</strong> Unlike fixed-charge models where atom charges are static, AMOEBA allows electronic distributions to respond to their environment via induced dipoles.</li>
+<li><strong>Multipoles:</strong> It uses explicit bond dipoles, quadrupoles, and octupoles instead of just point charges at atom centers.</li>
+<li><strong>Accuracy:</strong> It is significantly more accurate for water-protein interactions and transition metal coordination.</li>
+</ol>
+<blockquote>
+<p>[!WARNING]
+<strong>Performance Trade-off:</strong> AMOEBA simulations are typically <strong>10x–100x slower</strong> than AMBER. Supporting AMOEBA in <code>synth-pdb</code> would require a specialized pipeline and explicit solvent, which is currently on our long-term roadmap.</p>
+</blockquote>
+<hr />
+<h2 id="minimization-progress-reporting">Minimization Progress Reporting</h2>
+<p>Advanced users can monitor the energy minimization process in real-time. This is useful for identifying structural "explosions" or slow convergence in complex macrocycles.</p>
+<h3 id="enabling-real-time-logs">Enabling Real-Time Logs</h3>
+<p>To see the energy decay for every 50 iterations of the L-BFGS optimizer, set the log level to <code>DEBUG</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;synth_pdb.physics&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>Log Output Format:</strong>
+<code>DEBUG:synth_pdb.physics:Physics: Minimization Iteration 150 | Energy: -4521.4302 kJ/mol</code></p>
+<h3 id="educational-insight-the-l-bfgs-algorithm">Educational Insight: The L-BFGS Algorithm</h3>
+<p>OpenMM's <code>minimizeEnergy</code> uses the <strong>L-BFGS</strong> algorithm. It is a quasi-Newton method that approximates the curvature of the energy landscape without calculating the full Hessian matrix, making it ideal for systems with thousands of atoms.</p>
+<hr />
 <h2 id="the-generation-pipeline">The Generation Pipeline</h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>[User] → [Generator] → [Geometry Builder] → [Sidechain Packer] → [Energy Minimizer] → [PDB File]
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>             ^                  |                    |                      |
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>             |                                       |                      |
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>             +---------------------------------------+----------------------+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>[User] → [Generator] → [Geometry Builder] → [Sidechain Packer] → [Energy Minimizer] → [PDB File]
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>             ^                  |                    |                      |
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>             |                                       |                      |
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>             +---------------------------------------+----------------------+
 </span></code></pre></div>
 <h2 id="api-reference">API Reference</h2>
 
