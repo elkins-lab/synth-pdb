@@ -1,6 +1,12 @@
 import unittest
 import numpy as np
 import biotite.structure as struc
+from io import StringIO
+import os
+import tempfile
+import sys
+from unittest.mock import patch
+from biotite.structure.io.pdb import PDBFile
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.cd_simulator import (
     CDSimulator,
@@ -15,9 +21,6 @@ class TestCDSimulator(unittest.TestCase):
         """Validates that a poly-alanine helix produces a helix-like CD spectrum."""
         # Generate a 20-residue poly-Ala helix
         pdb_content = generate_pdb_content(length=20, sequence_str="A" * 20, conformation="alpha")
-        from io import StringIO
-        from biotite.structure.io.pdb import PDBFile
-
         pdb_file = PDBFile.read(StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
 
@@ -40,9 +43,6 @@ class TestCDSimulator(unittest.TestCase):
         # Generate a poly-Val beta strand
         # Note: A single strand might be classified as 'C' or 'E' depending on local geometry
         pdb_content = generate_pdb_content(length=20, sequence_str="V" * 20, conformation="beta")
-        from io import StringIO
-        from biotite.structure.io.pdb import PDBFile
-
         pdb_file = PDBFile.read(StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
 
@@ -61,6 +61,79 @@ class TestCDSimulator(unittest.TestCase):
         assert h[WAVELENGTHS == 222][0] == -38000
         assert h[WAVELENGTHS == 208][0] == -36000
         assert h[WAVELENGTHS == 192][0] == 70000
+
+    def test_cd_with_noise(self):
+        """Test that adding noise produces a different but similar spectrum."""
+        pdb_content = generate_pdb_content(length=10, conformation="alpha")
+        pdb_file = PDBFile.read(StringIO(pdb_content))
+        structure = pdb_file.get_structure(model=1)
+        sim = CDSimulator(structure)
+
+        spec1 = sim.get_spectrum(noise_level=0)
+        spec2 = sim.get_spectrum(noise_level=1000)
+
+        assert not np.array_equal(spec1, spec2)
+        assert np.mean(np.abs(spec1 - spec2)) < 2000  # Should be within noise range
+
+    def test_cd_empty_structure(self):
+        """Test handling of empty structure (should return coil)."""
+        # Create a mock structure with no atoms
+        empty_struct = struc.AtomArray(0)
+        sim = CDSimulator(empty_struct)
+        assert sim.fractions["C"] == 1.0
+        assert sim.fractions["H"] == 0.0
+        assert sim.fractions["E"] == 0.0
+
+    def test_cd_plotting_to_file(self):
+        """Test that the plot method successfully saves a file."""
+        pdb_content = generate_pdb_content(length=10, conformation="alpha")
+        pdb_file = PDBFile.read(StringIO(pdb_content))
+        structure = pdb_file.get_structure(model=1)
+        sim = CDSimulator(structure)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            plot_path = os.path.join(tmp, "test_cd.png")
+            sim.plot(save_path=plot_path)
+            assert os.path.exists(plot_path)
+            assert os.path.getsize(plot_path) > 0
+
+    def test_cli_cd_integration(self):
+        """Test the --gen-cd flag through the main CLI entry point."""
+        from synth_pdb.main import main
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_pdb = os.path.join(tmp, "cli_test.pdb")
+            expected_plot = os.path.join(tmp, "cli_test_cd.png")
+
+            test_args = [
+                "synth-pdb",
+                "--sequence",
+                "AAAAAAAAAA",
+                "--conformation",
+                "alpha",
+                "--gen-cd",
+                "--output",
+                out_pdb,
+            ]
+
+            with patch.object(sys, "argv", test_args):
+                main()
+
+            assert os.path.exists(out_pdb)
+            assert os.path.exists(expected_plot)
+
+    def test_validation_negative_cases(self):
+        """Test validation findings for non-ideal structures."""
+        # Pure coil
+        pdb_content = generate_pdb_content(length=10, conformation="random")
+        pdb_file = PDBFile.read(StringIO(pdb_content))
+        structure = pdb_file.get_structure(model=1)
+        sim = CDSimulator(structure)
+        spectrum = sim.get_spectrum(noise_level=0)
+
+        findings = validate_cd_against_literature(sim.fractions, spectrum)
+        # Should NOT find helix/sheet matches because it's random coil
+        assert not any("matches literature" in f for f in findings)
 
 
 if __name__ == "__main__":
