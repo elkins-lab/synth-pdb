@@ -4825,7 +4825,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
     <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🛡️ Setting up environment..."</span><span class="p">)</span>
-        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">biotite</span> <span class="n">numpy</span> <span class="n">matplotlib</span> <span class="n">ipywidgets</span> <span class="n">py3Dmol</span>
+        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">biotite</span> <span class="n">numpy</span> <span class="n">matplotlib</span> <span class="n">ipywidgets</span> <span class="n">py3Dmol</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span>
         <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">elkins</span><span class="o">/</span><span class="n">synth</span><span class="o">-</span><span class="n">pdb</span><span class="o">.</span><span class="n">git</span><span class="nd">@master</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Setup Complete. Please restart the runtime if this is your first run."</span><span class="p">)</span>
@@ -4845,7 +4845,7 @@ if not os.path.exists("installed.marker"):
 
     if IN_COLAB:
         print("🛡️ Setting up environment...")
-        !pip install -q biotite numpy matplotlib ipywidgets py3Dmol
+        !pip install -q biotite numpy matplotlib ipywidgets py3Dmol synth-nmr
         !pip install -q --no-deps git+https://github.com/elkins/synth-pdb.git@master
         with open("installed.marker", "w") as f: f.write("done")
         print("✅ Setup Complete. Please restart the runtime if this is your first run.")
