@@ -83,7 +83,7 @@ def _build_command_string(args: argparse.Namespace) -> str:
         if shift_predictor != "shiftx2":  # Only add if non-default to keep REMARKs concise
             cmd_parts.append(f"--shift-predictor {shift_predictor}")
 
-    if args.gen_cd:
+    if getattr(args, "gen_cd", False):
         cmd_parts.append("--gen-cd")
 
     # Use getattr for all new Phase 9.6 attributes for backward compatibility with code
