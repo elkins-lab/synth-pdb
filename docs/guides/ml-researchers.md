@@ -277,16 +277,16 @@ synth-pdb --length 30 --gen-relax --output structure.pdb
 
 Explore these interactive notebooks:
 
-- [ML Handover Demo](../../examples/ml_integration/ml_handover_demo.ipynb) - Benchmark and integration
-- [Hard Decoy Challenge](../../examples/ml_integration/hard_decoy_challenge.ipynb) - Negative sampling strategies
-- [Dataset Factory](../../examples/ml_integration/dataset_factory.ipynb) - Bulk generation workflows
-- [Neural NMR Pipeline](../../examples/ml_integration/neural_nmr_pipeline.ipynb) - Multi-modal training
+- [ML Handover Demo](../tutorials/ml_handover_demo.ipynb) - Benchmark and integration
+- [Hard Decoy Challenge](../tutorials/hard_decoy_challenge.ipynb) - Negative sampling strategies
+- [Dataset Factory](../tutorials/dataset_factory.ipynb) - Bulk generation workflows
+- [Neural NMR Pipeline](../tutorials/neural_nmr_pipeline.ipynb) - Multi-modal training
 
 ## Framework-Specific Examples
 
-- [JAX Handover](../../examples/ml_loading/jax_handover.ipynb)
-- [PyTorch Handover](../../examples/ml_loading/pytorch_handover.ipynb)
-- [MLX Handover](../../examples/ml_loading/mlx_handover.ipynb) (Apple Silicon)
+- [JAX Handover](https://github.com/elkins/synth-pdb/blob/master/examples/ml_loading/jax_handover.ipynb)
+- [PyTorch Handover](https://github.com/elkins/synth-pdb/blob/master/examples/ml_loading/pytorch_handover.ipynb)
+- [MLX Handover](https://github.com/elkins/synth-pdb/blob/master/examples/ml_loading/mlx_handover.ipynb) (Apple Silicon)
 
 ## Performance Tips
 

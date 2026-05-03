@@ -62,27 +62,26 @@ Explore `synth-pdb` through our curated interactive tutorials. Each notebook can
 ### 🔬 Core Biophysics & NMR
 | Tutorial | Difficulty | Time | Action |
 | :--- | :--- | :---: | :--- |
-| [**The Virtual NMR Spectrometer**](../examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
-| [**Cryo-EM & SAXS Lab**](../examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) | ⭐ | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
-| [**Virtual CD Lab**](../examples/interactive_tutorials/virtual_cd_lab.ipynb) | ⭐ | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_cd_lab.ipynb) |
-| [**BMRB Validation Pipeline**](../examples/interactive_tutorials/bmrb_validation.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb) |
-| [**Ubiquitin Validation Suite**](../examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) | ⭐⭐⭐ | 45 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) |
-| [**RDC Alignment Tensor Explorer**](../examples/interactive_tutorials/rdc_alignment_explorer.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
-| [**RPF Score Validation**](../examples/interactive_tutorials/nmr_validation_rpf.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nmr_validation_rpf.ipynb) |
-| [**NeRF Geometry Lab**](../examples/interactive_tutorials/nerf_geometry_lab.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nerf_geometry_lab.ipynb) |
-| [**The GFP Molecular Forge**](../examples/interactive_tutorials/gfp_molecular_forge.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
-| [**IDP Conformational Ensembles**](../examples/interactive_tutorials/idp_ensemble_validation.ipynb) | ⭐⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb) |
-| [**AlphaFold pLDDT vs NMR S²**](../examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb) |
+| [**The Virtual NMR Spectrometer**](tutorials/virtual_nmr_spectrometer.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
+| [**Cryo-EM & SAXS Lab**](tutorials/cryo_em_saxs_lab.ipynb) | ⭐ | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
+| [**BMRB Validation Pipeline**](tutorials/bmrb_validation.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb) |
+| [**Ubiquitin Validation Suite**](tutorials/ubiquitin_chemical_shift_validation.ipynb) | ⭐⭐⭐ | 45 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) |
+| [**RDC Alignment Tensor Explorer**](tutorials/rdc_alignment_explorer.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
+| [**RPF Score Validation**](tutorials/nmr_validation_rpf.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nmr_validation_rpf.ipynb) |
+| [**NeRF Geometry Lab**](tutorials/nerf_geometry_lab.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nerf_geometry_lab.ipynb) |
+| [**The GFP Molecular Forge**](tutorials/gfp_molecular_forge.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
+| [**IDP Conformational Ensembles**](tutorials/idp_ensemble_validation.ipynb) | ⭐⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb) |
+| [**AlphaFold pLDDT vs NMR S²**](tutorials/alphafold_vs_nmr_dynamics.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb) |
 
 ### 🤖 ML & AI Integration
 | Tutorial | Difficulty | Time | Action |
 | :--- | :--- | :---: | :--- |
-| [**Bulk Dataset Factory**](../examples/ml_integration/dataset_factory.ipynb) | ⭐ | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb) |
-| [**Hard Decoy Challenge**](../examples/ml_integration/hard_decoy_challenge.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hard_decoy_challenge.ipynb) |
-| [**PLM Embeddings (ESM-2)**](../examples/ml_integration/plm_embeddings.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/plm_embeddings.ipynb) |
-| [**Co-evolution Factory**](../examples/interactive_tutorials/coevolution_msa_factory.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/coevolution_msa_factory.ipynb) |
-| [**6D Orientogram Lab**](../examples/ml_integration/orientogram_lab.ipynb) | ⭐⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/orientogram_lab.ipynb) |
-| [**Drug Discovery Pipeline**](../examples/ml_integration/drug_discovery_pipeline.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/drug_discovery_pipeline.ipynb) |
+| [**Bulk Dataset Factory**](tutorials/dataset_factory.ipynb) | ⭐ | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb) |
+| [**Hard Decoy Challenge**](tutorials/hard_decoy_challenge.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hard_decoy_challenge.ipynb) |
+| [**PLM Embeddings (ESM-2)**](tutorials/plm_embeddings.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/plm_embeddings.ipynb) |
+| [**Co-evolution Factory**](tutorials/coevolution_msa_factory.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/coevolution_msa_factory.ipynb) |
+| [**6D Orientogram Lab**](tutorials/orientogram_lab.ipynb) | ⭐⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/orientogram_lab.ipynb) |
+| [**Drug Discovery Pipeline**](tutorials/drug_discovery_pipeline.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/drug_discovery_pipeline.ipynb) |
 
 ### 🎓 Learning Paths
 
@@ -100,11 +99,10 @@ Choose a path based on your background and goals:
 *Understand structure, dynamics, and spectroscopy*
 
 1. **NeRF Geometry Lab** (25 min) - Learn internal coordinate systems.
-2. **Virtual CD Lab** (15 min) - Learn how secondary structure encodes Far-UV spectral signatures.
-3. **Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts.
-4. **Protein Quality Assessment** (25 min) - Validate structure quality and geometry.
-5. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
-6. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
+2. **Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts.
+3. **Protein Quality Assessment** (25 min) - Validate structure quality and geometry.
+4. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
+5. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*

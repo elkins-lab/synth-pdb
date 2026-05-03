@@ -22,7 +22,7 @@ where:
 
 **Why RDCs matter**: Unlike NOEs (purely local distances), RDCs encode **global fold topology** — the orientation of each bond vector in a shared molecular frame. Combined with NOEs, they dramatically improve the accuracy of NMR structure determination.
 
-See [Science: NMR Theory](../science/nmr-theory.md) and the [RDC Alignment Explorer tutorial](../../examples/interactive_tutorials/rdc_alignment_explorer.ipynb) for interactive demonstrations.
+See [Science: NMR Theory](../science/nmr-theory.md) and the [RDC Alignment Explorer tutorial](../tutorials/rdc_alignment_explorer.ipynb) for interactive demonstrations.
 
 ---
 
@@ -139,7 +139,7 @@ The alignment is fully described by the **Saupe matrix** — a traceless, symmet
 - **`Da`** (axial component) — controls the overall magnitude of the RDCs. Larger `|Da|` → larger couplings.
 - **`R`** (rhombicity) — controls the asymmetry. `R = 0` gives an axially symmetric tensor; `R = 2/3` is maximum rhombicity.
 
-Use the interactive [RDC Alignment Explorer](../../examples/interactive_tutorials/rdc_alignment_explorer.ipynb) tutorial to visually understand how `Da` and `R` affect the RDC pattern across a helix or sheet.
+Use the interactive [RDC Alignment Explorer](../tutorials/rdc_alignment_explorer.ipynb) tutorial to visually understand how `Da` and `R` affect the RDC pattern across a helix or sheet.
 
 ---
 
@@ -163,6 +163,6 @@ Use the interactive [RDC Alignment Explorer](../../examples/interactive_tutorial
 ## See Also
 
 - [Science: NMR Theory](../science/nmr-theory.md)
-- [Tutorial: RDC Alignment Explorer](../../examples/interactive_tutorials/rdc_alignment_explorer.ipynb)
-- [Tutorial: Ubiquitin RDC Validation](../../examples/interactive_tutorials/ubiquitin_rdc_validation.ipynb)
+- [Tutorial: RDC Alignment Explorer](../tutorials/rdc_alignment_explorer.ipynb)
+- [Tutorial: Ubiquitin RDC Validation](../tutorials/ubiquitin_rdc_validation.ipynb)
 - [API: nmr module](nmr.md)

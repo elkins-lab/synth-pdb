@@ -99,5 +99,5 @@ print(f"Mean RMSF: {rmsf:.2f} Å")
 ## See Also
 
 - [Science: Energy Minimization](science/energy-minimization.md)
-- [Tutorial: AlphaFold Confidence vs NMR S²](../examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb)
+- [Tutorial: AlphaFold Confidence vs NMR S²](tutorials/alphafold_vs_nmr_dynamics.ipynb)
 - [API: geometry module](api/geometry.md) — Kabsch superposition for RMSF

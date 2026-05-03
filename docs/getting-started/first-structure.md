@@ -137,5 +137,5 @@ The **B-factor** column in `synth-pdb` output encodes a physics-derived flexibil
 
 - [Quick Start](quickstart.md) — more examples in 5 minutes
 - [CLI Reference](../guides/cli-reference.md) — all command-line options
-- [Interactive Tutorials](../../examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) — open in Google Colab
+- [Interactive Tutorials](../tutorials/virtual_nmr_spectrometer.ipynb) — open in Google Colab
 - [API Reference](../api/overview.md) — Python API documentation
