@@ -26,6 +26,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | Tutorial | Difficulty | Time | Action |
 | :--- | :---: | :---: | :--- |
 | **🔬 Cryo-EM & SAXS Lab** | ⭐ Beginner | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
+| **🧪 The Virtual CD Lab** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/virtual_cd_lab.ipynb) |
 | **🤖 AI Protein Data Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/ml_handover_demo.ipynb) |
 | **🏭 Bulk Dataset Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb) |
 | **🔗 Framework Handover** | ⭐ Beginner | 10 min | [View JAX/PyTorch/MLX Examples](https://github.com/elkins/synth-pdb/tree/master/examples/ml_loading) |
@@ -75,17 +76,18 @@ Choose a path based on your background and goals:
 
 1. **🔗 NeRF Geometry Lab** (25 min) - Learn internal coordinate systems
 2. **📏 Geometry Tools Reference** (20 min) - Kabsch, RMSD, and specialized geometry primitives
-3. **🔬 Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts
-4. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualize the alignment tensor and RDC physics interactively
-5. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
-6. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
-7. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
-8. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
-9. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
-10. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
-11. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
-12. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
-13. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
+3. **🧪 Virtual CD Lab** (15 min) - Learn how secondary structure encodes Far-UV spectral signatures
+4. **🔬 Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts
+5. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualize the alignment tensor and RDC physics interactively
+6. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
+7. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
+8. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
+9. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
+10. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
+11. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
+12. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
+13. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
+14. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*

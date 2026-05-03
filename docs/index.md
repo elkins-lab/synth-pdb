@@ -64,6 +64,7 @@ Explore `synth-pdb` through our curated interactive tutorials. Each notebook can
 | :--- | :--- | :---: | :--- |
 | [**The Virtual NMR Spectrometer**](tutorials/virtual_nmr_spectrometer.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
 | [**Cryo-EM & SAXS Lab**](tutorials/cryo_em_saxs_lab.ipynb) | ⭐ | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
+| [**Virtual CD Lab**](tutorials/virtual_cd_lab.ipynb) | ⭐ | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/virtual_cd_lab.ipynb) |
 | [**BMRB Validation Pipeline**](tutorials/bmrb_validation.ipynb) | ⭐⭐ | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb) |
 | [**Ubiquitin Validation Suite**](tutorials/ubiquitin_chemical_shift_validation.ipynb) | ⭐⭐⭐ | 45 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) |
 | [**RDC Alignment Tensor Explorer**](tutorials/rdc_alignment_explorer.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
@@ -99,10 +100,11 @@ Choose a path based on your background and goals:
 *Understand structure, dynamics, and spectroscopy*
 
 1. **NeRF Geometry Lab** (25 min) - Learn internal coordinate systems.
-2. **Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts.
-3. **Protein Quality Assessment** (25 min) - Validate structure quality and geometry.
-4. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
-5. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
+2. **Virtual CD Lab** (15 min) - Learn how secondary structure encodes Far-UV spectral signatures.
+3. **Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts.
+4. **Protein Quality Assessment** (25 min) - Validate structure quality and geometry.
+5. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
+6. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*
