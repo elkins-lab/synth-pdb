@@ -83,6 +83,9 @@ def _build_command_string(args: argparse.Namespace) -> str:
         if shift_predictor != "shiftx2":  # Only add if non-default to keep REMARKs concise
             cmd_parts.append(f"--shift-predictor {shift_predictor}")
 
+    if args.gen_cd:
+        cmd_parts.append("--gen-cd")
+
     # Use getattr for all new Phase 9.6 attributes for backward compatibility with code
     # that creates bare Namespace objects (e.g. existing test_main_coverage.py tests).
     output_rdcs = getattr(args, "output_rdcs", None)
@@ -475,6 +478,13 @@ def main() -> None:
             "about the tensor Z-axis, providing additional orientational information. "
             "Reference: Clore et al. (1998), J Magn Reson, 133, 216–221."
         ),
+    )
+
+    # Phase 9.7: Circular Dichroism (CD)
+    parser.add_argument(
+        "--gen-cd",
+        action="store_true",
+        help="Generate synthetic Circular Dichroism (CD) spectrum based on secondary structure.",
     )
 
     # Phase 10: Constraint Export
@@ -1464,6 +1474,7 @@ def main() -> None:
                     or args.shift_restraints
                     or args.gen_relax
                     or args.gen_shifts
+                    or args.gen_cd
                     or args.gen_couplings
                     or args.output_rdcs
                     or args.export_constraints
@@ -1804,6 +1815,42 @@ def main() -> None:
                                         res_1letter = three_to_one.get(res_3letter, "X")
                                         f.write(f"{rid},{res_1letter},{val:.4f}\n")
                                 logger.info(f"RDC data exported to: {os.path.abspath(rdc_csv)}")
+
+                            # 3.7 Circular Dichroism (Phase 9.7)
+                            if args.gen_cd:
+                                # EDUCATIONAL NOTE — CD Background:
+                                # Circular Dichroism (CD) measures the differential absorption
+                                # of left and right circularly polarized light. In the far-UV
+                                # (190-250 nm), it is the premier tool for measuring the
+                                # overall secondary structure content of a protein sample.
+                                #
+                                # The physics is based on the interaction between amide
+                                # chromophores. For a given conformation, we can synthesize
+                                # the expected spectrum as a weighted average of basis
+                                # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
+                                #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
+                                from .cd_simulator import (
+                                    CDSimulator,
+                                    validate_cd_against_literature,
+                                )
+
+                                cd_sim = CDSimulator(structure)
+                                cd_plot = output_filename.replace(".pdb", "_cd.png")
+                                cd_sim.plot(save_path=cd_plot)
+
+                                # Provide an automated scientific validation report
+                                cd_findings = validate_cd_against_literature(
+                                    cd_sim.fractions, cd_sim.get_spectrum(noise_level=0)
+                                )
+                                if cd_findings:
+                                    logger.info("--- Synthetic CD Validation Report ---")
+                                    for find_item in cd_findings:
+                                        logger.info(f"  {find_item}")
+                                    logger.info("--------------------------------------")
+
+                                logger.info(
+                                    f"Synthetic CD Spectrum generated: {os.path.abspath(cd_plot)}"
+                                )
 
                             # 4. Constraint Export (Phase 10)
                             if args.export_constraints:

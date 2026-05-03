@@ -57,6 +57,7 @@ nav:
     - Publication Figures: guides/publication-figures.md
     - Visualization: visualization.md
     - Physics Engine: physics.md
+    - CD Spectroscopy: biophysics/cd_spectroscopy.md
     - NMR Observables: nmr.md
     - Technical Notes: technical_notes.md
   - Tutorials:
