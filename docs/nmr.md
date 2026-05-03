@@ -101,13 +101,13 @@ print(f"R={score.recall:.3f}  P={score.precision:.3f}  F={score.f_score:.3f}  DP
 | F 0.50–0.70 | Moderate — review restraint completeness |
 | F < 0.50 | Poor — significant structural errors |
 
-See the [RPF Validation tutorial](tutorials/nmr_validation_rpf.ipynb) for an interactive demonstration.
+See the [RPF Validation tutorial](../examples/interactive_tutorials/nmr_validation_rpf.ipynb) for an interactive demonstration.
 
 ---
 
 ## Residual Dipolar Couplings (RDC)
 
-See the dedicated **[RDC module documentation](api/rdc.md)** and the [RDC Alignment Explorer tutorial](tutorials/rdc_alignment_explorer.ipynb).
+See the dedicated **[RDC module documentation](api/rdc.md)** and the [RDC Alignment Explorer tutorial](../examples/interactive_tutorials/rdc_alignment_explorer.ipynb).
 
 ---
 
@@ -135,5 +135,5 @@ synth-pdb --sequence "LKELEKELEKELEKEL" --gen-couplings
 - [API: nmr module](api/nmr.md) — `calculate_rpf_score`, `read_restraint_file`
 - [API: rdc module](api/rdc.md) — RDC back-calculation and Q-factor
 - [API: relaxation module](api/relaxation.md) — $R_1$, $R_2$, NOE equations
-- [Tutorial: Virtual NMR Spectrometer](tutorials/virtual_nmr_spectrometer.ipynb)
+- [Tutorial: Virtual NMR Spectrometer](../examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb)
 - [Guide: For NMR Spectroscopists](guides/nmr-spectroscopists.md)

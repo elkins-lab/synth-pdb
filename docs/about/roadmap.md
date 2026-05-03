@@ -43,7 +43,7 @@ Sorted by **High-Value / Low-Risk** first.
 
 ### 2. ✅ Macrocycle Design Lab (Cyclic Peptides)
 *   **Result**: Implemented modeling for Oxytocin (disulfide) and Cyclosporine A (cyclic/D-amino).
-*   **Demo**: [hormone_lab.ipynb](file:///Users/georgeelkins/nmr/synth-pdb/examples/ml_integration/hormone_lab.ipynb)
+*   **Demo**: [hormone_lab.ipynb](../../examples/ml_integration/hormone_lab.ipynb)
 *   **Value**: Macrocycles are at the forefront of drug discovery. An AI model that can design cyclic peptides needs a training set of realistic closed loops, which standard PDBs lack in sufficient quantity.
 
 ---
@@ -57,15 +57,15 @@ Sorted by **High-Value / Low-Risk** first.
 
 ### 2. ✅ Full Orientogram Factory ($\omega, \theta, \phi$ angles)
 *   **Result**: Implemented vectorized 6D inter-residue orientations with virtual GLY $C\beta$ support.
-*   **Demo**: [orientogram_lab.ipynb](file:///Users/georgeelkins/nmr/synth-pdb/examples/ml_integration/orientogram_lab.ipynb)
+*   **Demo**: [orientogram_lab.ipynb](../../examples/ml_integration/orientogram_lab.ipynb)
 
 ### 3. ✅ Bulk Dataset Factory (NPZ Pipeline)
 *   **Result**: Implemented high-performance NPZ export and PyTorch integration.
-*   **Demo**: [dataset_factory.ipynb](file:///Users/georgeelkins/nmr/synth-pdb/examples/ml_integration/dataset_factory.ipynb)
+*   **Demo**: [dataset_factory.ipynb](../../examples/ml_integration/dataset_factory.ipynb)
 
 ### 4. ✅ Multi-Modal Transformer Training (Structure + NMR)
 *   **Result**: Integrated synchronized structural generation with synthetic NMR observables.
-*   **Demo**: [neural_nmr_pipeline.ipynb](file:///Users/georgeelkins/nmr/synth-pdb/examples/ml_integration/neural_nmr_pipeline.ipynb)
+*   **Demo**: [neural_nmr_pipeline.ipynb](../../examples/ml_integration/neural_nmr_pipeline.ipynb)
 *   **Value**: Demonstrates how synth-pdb can train models to predict experimental observables (like NMR shifts) directly from sequence or 3D geometry.
 
 ### 5. 📉 Torsion Angle Drift & Distribution Analysis

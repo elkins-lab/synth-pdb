@@ -69,7 +69,7 @@ For **Intrinsically Disordered Proteins (IDPs)**, these thresholds do not apply 
 
 Validation of IDP ensembles requires comparing ensemble-averaged observables (PRE rates, SAXS profiles, chemical shifts) to experiment rather than applying rigid RMSD thresholds.
 
-See [Science: Intrinsically Disordered Proteins](idp-dynamics.md) and the [IDP Ensemble tutorial](../tutorials/idp_ensemble_validation.ipynb).
+See [Science: Intrinsically Disordered Proteins](idp-dynamics.md) and the [IDP Ensemble tutorial](../../examples/interactive_tutorials/idp_ensemble_validation.ipynb).
 
 ---
 
@@ -82,5 +82,5 @@ See [Science: Intrinsically Disordered Proteins](idp-dynamics.md) and the [IDP E
 ## See Also
 
 - [API: ensemble module](../api/ensemble.md) — `DAOPCalculator`, `EnsembleStatistics`, `QualityAssessment`
-- [Tutorial: IDP Conformational Ensembles](../tutorials/idp_ensemble_validation.ipynb)
+- [Tutorial: IDP Conformational Ensembles](../../examples/interactive_tutorials/idp_ensemble_validation.ipynb)
 - [API: geometry module](../api/geometry.md) — Kabsch superposition

@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added 11 new references (Engh & Huber 1991, Hyberts 1992, Tejero 2013, Tjandra & Bax 1997, Saupe 1968, Morcos 2011, Lin 2023, Jumper 2021, Ruff & Pappu 2021, Clore & Iwahara 2009, Cornilescu 1998).
 
 ### Fixed
-- **Docs site badges**: Replaced broken `Open in Colab` badge (pointed to non-existent `demo.ipynb`) with correct link to `docs/tutorials/virtual_nmr_spectrometer.ipynb`.
+- **Docs site badges**: Replaced broken `Open in Colab` badge (pointed to non-existent `demo.ipynb`) with correct link to `examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb`.
 - **PyPI badge**: Replaced unreliable `badge.fury.io` endpoint with live `shields.io/pypi/v` badge.
 - **mkdocs.yml**: Added `api/rdc.md` and `api/ensemble.md` to the API Reference nav; added `science/ensemble-analysis.md` to the Scientific Background nav.
 
@@ -202,7 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Residual Dipolar Coupling (RDC) module** (`synth_pdb/rdc.py`): New `calculate_rdcs()`
   function implementing the Saupe-matrix formalism for computing backbone N–H RDCs given
   an alignment tensor defined by axial component `Da` and rhombicity `R`.
-- **RDC tutorial notebook** (`examples/interactive_tutorials/rdc_tutorial.ipynb`):
+- **RDC tutorial notebook** (`examples/interactive_tutorials/rdc_alignment_explorer.ipynb`):
   Standalone Colab-compatible notebook demonstrating RDC calculation, Q-factor
   validation against published ubiquitin data (1D3Z), and interactive alignment-tensor
   exploration.
@@ -256,7 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.19.1] - 2026-02-19
 
 ### Fixed
-- **PLM Tutorial Bug**: Fixed a `TypeError` in `docs/tutorials/plm_embeddings.ipynb` where an obsolete `ss_type` argument was used instead of `conformation` for `generate_pdb_content()`.
+- **PLM Tutorial Bug**: Fixed a `TypeError` in `examples/ml_integration/plm_embeddings.ipynb` where an obsolete `ss_type` argument was used instead of `conformation` for `generate_pdb_content()`.
 
 ### Changed
 - **Educational Enhancements**: Significantly expanded the PLM tutorial notebook (`plm_embeddings.ipynb`) with plain-language explanations of Protein Language Models, embeddings, similarity metrics, and UMAP clustering for chemists and biologists without machine learning backgrounds.
@@ -267,7 +267,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **PLM Embeddings**: Integrated ESM-2 protein language model support via `synth_pdb.quality.plm`. Generates per-residue and pooled embeddings from generated structures, enabling zero-shot quality scoring and downstream ML tasks.
-- **PLM Tutorial**: Added `docs/tutorials/plm_embeddings.ipynb` Colab-compatible notebook demonstrating ESM-2 embedding extraction and visualization.
+- **PLM Tutorial**: Added `examples/ml_integration/plm_embeddings.ipynb` Colab-compatible notebook demonstrating ESM-2 embedding extraction and visualization.
 - New optional dependency group `[plm]` (`torch>=2.0.0`, `transformers>=4.30.0`).
 
 ---

@@ -114,7 +114,7 @@ Physical Interpretation:
 - Proper use of constants and configuration data
 - Black/Ruff formatting enforced via `pyproject.toml`
 
-**Example of Clean Code** ([generator.py:255-270](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/generator.py#L255-L270)):
+**Example of Clean Code** ([generator.py:255-270](./synth_pdb/generator.py#L255-L270)):
 ```python
 def _place_atom_with_dihedral(
     atom1: np.ndarray,
@@ -137,8 +137,8 @@ def _place_atom_with_dihedral(
 ### 2.3 Function Complexity
 
 **Concerns**:
-- `generate_pdb_content()` in [generator.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/generator.py) is **1,081 lines** (lines 697-1781)
-- `_run_simulation()` in [physics.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/physics.py) is **840 lines** (lines 351-1190)
+- `generate_pdb_content()` in [generator.py](./synth_pdb/generator.py) is **1,081 lines** (lines 697-1781)
+- `_run_simulation()` in [physics.py](./synth_pdb/physics.py) is **840 lines** (lines 351-1190)
 
 **Recommendation**: Consider refactoring these into smaller, testable functions:
 ```python
@@ -171,12 +171,12 @@ def generate_pdb_content(...):
 The codebase demonstrates **deep understanding of structural biology**:
 
 #### 3.1.1 Ramachandran Validation
-- Uses **MolProbity-style polygonal regions** ([data.py:240-300](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/data.py#L240-L300))
+- Uses **MolProbity-style polygonal regions** ([data.py:240-300](./synth_pdb/data.py#L240-L300))
 - Residue-specific handling for GLY, PRO, and Pre-Proline
 - Point-in-polygon algorithm for accurate classification
 
 #### 3.1.2 Rotamer Libraries
-- **Backbone-dependent rotamers** ([data.py:661-850](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/data.py#L661-L850))
+- **Backbone-dependent rotamers** ([data.py:661-850](./synth_pdb/data.py#L661-L850))
 - Proper distinction between alpha-helix and beta-sheet preferences
 - Based on Dunbrack library (industry standard)
 
@@ -195,7 +195,7 @@ Example:
 ```
 
 #### 3.1.3 Physics Engine Integration
-- Proper use of **OpenMM** for energy minimization ([physics.py:130-190](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/physics.py#L130-L190))
+- Proper use of **OpenMM** for energy minimization ([physics.py:130-190](./synth_pdb/physics.py#L130-L190))
 - Implicit solvent (OBC2) with correct parameters
 - Harmonic restraints for:
   - Disulfide bonds (SSBOND)
@@ -209,17 +209,17 @@ Example:
 
 The NMR prediction modules show **advanced understanding**:
 
-1. **Chemical Shifts** ([chemical_shifts.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/chemical_shifts.py)):
+1. **Chemical Shifts** ([chemical_shifts.py](./synth_pdb/chemical_shifts.py)):
    - SPARTA-lite predictions
    - Ring current effects (aromatic shielding/deshielding)
    - Secondary structure dependence
 
-2. **Relaxation Rates** ([relaxation.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/relaxation.py)):
+2. **Relaxation Rates** ([relaxation.py](./synth_pdb/relaxation.py)):
    - Lipari-Szabo Model-Free formalism
    - SASA-modulated order parameters (S²)
    - Proper spectral density functions
 
-3. **NOE Generation** ([nmr.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/nmr.py)):
+3. **NOE Generation** ([nmr.py](./synth_pdb/nmr.py)):
    - Distance-based restraint generation
    - NEF format output
 
@@ -246,7 +246,7 @@ The project has **comprehensive test coverage** across multiple dimensions:
 
 ### 4.2 Test Quality Examples
 
-**Excellent Test Design** ([test_bfactor.py](file:///Users/georgeelkins/nmr/synth-pdb/tests/test_bfactor.py)):
+**Excellent Test Design** ([test_bfactor.py](./tests/test_bfactor.py)):
 ```python
 def test_backbone_vs_sidechain_bfactors(self):
     """Backbone atoms should have lower B-factors than side-chain atoms."""
@@ -313,7 +313,7 @@ The project demonstrates **excellent architectural patterns**:
 
 ### 5.2 Error Handling
 
-**Robust Error Handling Example** ([physics.py:293-349](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/physics.py#L293-L349)):
+**Robust Error Handling Example** ([physics.py:293-349](./synth_pdb/physics.py#L293-L349)):
 ```python
 def _create_system_robust(self, topology, constraints, modeller=None):
     """
@@ -340,7 +340,7 @@ def _create_system_robust(self, topology, constraints, modeller=None):
 
 ### 5.3 Dependency Management
 
-**Dependencies** ([pyproject.toml:48-53](file:///Users/georgeelkins/nmr/synth-pdb/pyproject.toml#L48-L53)):
+**Dependencies** ([pyproject.toml:48-53](./pyproject.toml#L48-L53)):
 ```toml
 dependencies = [
     "numpy>=1.20.0,<2.0.0",
@@ -360,7 +360,7 @@ dependencies = [
 
 The project uses **NumPy vectorization** effectively:
 
-**Example** ([batch_generator.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/batch_generator.py)):
+**Example** ([batch_generator.py](./synth_pdb/batch_generator.py)):
 ```python
 # Vectorized backbone generation for N structures simultaneously
 phi_rad = np.deg2rad(phi_angles)  # Shape: (N, L)
@@ -409,7 +409,7 @@ except ImportError:
 
 ### 7.1 Input Validation
 
-**Example** ([generator.py:533-694](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/generator.py#L533-L694)):
+**Example** ([generator.py:533-694](./synth_pdb/generator.py#L533-L694)):
 ```python
 def _parse_structure_regions(structure_str: str, sequence_length: int):
     """Parse structure region specification with comprehensive validation."""
@@ -446,7 +446,7 @@ def _parse_structure_regions(structure_str: str, sequence_length: int):
 
 ### 7.2 Edge Case Handling
 
-**Example** ([physics.py:364-531](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/physics.py#L364-L531)):
+**Example** ([physics.py:364-531](./synth_pdb/physics.py#L364-L531)):
 - Handles missing OpenMM gracefully
 - Strips problematic atoms (ions, PTMs) before processing
 - Renames residues for template compatibility
@@ -527,12 +527,12 @@ This codebase is production-ready and serves as an excellent example of how to b
 
 | File | Lines | Purpose | Assessment |
 |------|-------|---------|------------|
-| [generator.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/generator.py) | 1,781 | Core peptide generation | ⭐⭐⭐⭐ Excellent |
-| [physics.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/physics.py) | 1,191 | Energy minimization | ⭐⭐⭐⭐ Excellent |
-| [validator.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/validator.py) | 1,335 | Structure validation | ⭐⭐⭐⭐ Excellent |
-| [data.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/data.py) | 957 | Constants & libraries | ⭐⭐⭐⭐⭐ Outstanding |
-| [main.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/main.py) | 1,045 | CLI interface | ⭐⭐⭐⭐ Excellent |
-| [viewer.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/viewer.py) | 903 | 3D visualization | ⭐⭐⭐⭐ Excellent |
-| [geometry.py](file:///Users/georgeelkins/nmr/synth-pdb/synth_pdb/geometry.py) | 620 | Coordinate math | ⭐⭐⭐⭐ Excellent |
+| [generator.py](./synth_pdb/generator.py) | 1,781 | Core peptide generation | ⭐⭐⭐⭐ Excellent |
+| [physics.py](./synth_pdb/physics.py) | 1,191 | Energy minimization | ⭐⭐⭐⭐ Excellent |
+| [validator.py](./synth_pdb/validator.py) | 1,335 | Structure validation | ⭐⭐⭐⭐ Excellent |
+| [data.py](./synth_pdb/data.py) | 957 | Constants & libraries | ⭐⭐⭐⭐⭐ Outstanding |
+| [main.py](./synth_pdb/main.py) | 1,045 | CLI interface | ⭐⭐⭐⭐ Excellent |
+| [viewer.py](./synth_pdb/viewer.py) | 903 | 3D visualization | ⭐⭐⭐⭐ Excellent |
+| [geometry.py](./synth_pdb/geometry.py) | 620 | Coordinate math | ⭐⭐⭐⭐ Excellent |
 
 **Legend**: ⭐⭐⭐⭐⭐ Outstanding | ⭐⭐⭐⭐ Excellent | ⭐⭐⭐ Good | ⭐⭐ Needs Work | ⭐ Poor
