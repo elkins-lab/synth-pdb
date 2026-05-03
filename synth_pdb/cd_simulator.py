@@ -23,7 +23,6 @@ fraction of each secondary structure element in the PDB model.
 import logging
 from typing import Any
 
-import matplotlib.pyplot as plt
 import numpy as np
 import biotite.structure as struc
 
@@ -89,6 +88,8 @@ class CDSimulator:
 
     def plot(self, save_path: str | None = None) -> None:
         """Plots the synthetic CD spectrum."""
+        import matplotlib.pyplot as plt
+
         spectrum = self.get_spectrum()
 
         plt.figure(figsize=(8, 5))

@@ -15,6 +15,13 @@ from synth_pdb.cd_simulator import (
     WAVELENGTHS,
 )
 
+try:
+    import matplotlib.pyplot as plt
+
+    HAS_MATPLOTLIB = True
+except ImportError:
+    HAS_MATPLOTLIB = False
+
 
 class TestCDSimulator(unittest.TestCase):
     def test_pure_helix_cd(self):
@@ -86,6 +93,8 @@ class TestCDSimulator(unittest.TestCase):
 
     def test_cd_plotting_to_file(self):
         """Test that the plot method successfully saves a file."""
+        if not HAS_MATPLOTLIB:
+            self.skipTest("Matplotlib not installed")
         pdb_content = generate_pdb_content(length=10, conformation="alpha")
         pdb_file = PDBFile.read(StringIO(pdb_content))
         structure = pdb_file.get_structure(model=1)
@@ -99,6 +108,8 @@ class TestCDSimulator(unittest.TestCase):
 
     def test_cli_cd_integration(self):
         """Test the --gen-cd flag through the main CLI entry point."""
+        if not HAS_MATPLOTLIB:
+            self.skipTest("Matplotlib not installed")
         from synth_pdb.main import main
 
         with tempfile.TemporaryDirectory() as tmp:
