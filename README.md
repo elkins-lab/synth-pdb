@@ -26,7 +26,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | Tutorial | Difficulty | Time | Action |
 | :--- | :---: | :---: | :--- |
 | **🔬 Cryo-EM & SAXS Lab** | ⭐ Beginner | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/cryo_em_saxs_lab.ipynb) |
-| **🧪 The Virtual CD Lab** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/virtual_cd_lab.ipynb) |
+| **🧪 The Virtual CD Lab** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_cd_lab.ipynb) |
 | **🤖 AI Protein Data Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/ml_handover_demo.ipynb) |
 | **🏭 Bulk Dataset Factory** | ⭐ Beginner | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/dataset_factory.ipynb) |
 | **🔗 Framework Handover** | ⭐ Beginner | 10 min | [View JAX/PyTorch/MLX Examples](https://github.com/elkins/synth-pdb/tree/master/examples/ml_loading) |

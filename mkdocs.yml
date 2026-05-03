@@ -72,6 +72,7 @@ nav:
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
       - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
       - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
+      - Virtual CD Lab: tutorials/virtual_cd_lab.ipynb
       - RPF Validation: tutorials/nmr_validation_rpf.ipynb
       - Coevolution MSA Factory: tutorials/coevolution_msa_factory.ipynb
       - Executed MSA Pipeline: tutorials/executed_msa.ipynb
