@@ -46,7 +46,7 @@ classifiers = [
 dependencies = [
     "numpy>=1.26.4,<2.3",
     "biotite>=0.35.0",
-    "openmm>=8.1.0",
+    "openmm>=8.1.0,!=8.5.0,!=8.5.1",
     "numba>=0.57.0",
     "synth-nmr>=0.9.0",
     "scipy>=1.7.0",

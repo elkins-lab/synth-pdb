@@ -48,7 +48,7 @@ pip install \
     pynmrstar \
     jax \
     jaxlib \
-    openmm
+    "openmm>=8.1.0,!=8.5.0,!=8.5.1"
 
 # 5. Install synth-pdb with all optional extras
 echo "Installing synth-pdb with [dev,ai,gnn,plm,test] extras..."
