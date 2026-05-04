@@ -29,6 +29,10 @@ logger = logging.getLogger(__name__)
 # Loading XML forcefield files repeatedly is expensive and can accumulate memory.
 _FORCEFIELD_CACHE: dict[tuple[str, ...], "app.ForceField"] = {}
 
+# Global cache for the best available platform to avoid repeated failed initializations
+# of platforms that are registered but not functional (e.g. OpenCL with broken drivers).
+_BEST_PLATFORM_CACHE: dict[str, Any] = {"platform": None, "props": {}}
+
 
 class LoggingMinimizationReporter(mm.MinimizationReporter):
     """OpenMM MinimizationReporter that logs progress to the logger at DEBUG level.
@@ -1399,32 +1403,53 @@ class EnergyMinimizer:
             try:
                 platform = mm.Platform.getPlatformByName(self.platform_name)
                 logger.info(f"Using Explicit OpenMM Platform: {self.platform_name}")
+                if self.precision:
+                    props["Precision"] = self.precision
+                elif self.platform_name in ["CUDA", "OpenCL"]:
+                    props["Precision"] = "mixed"
             except Exception as e:
                 raise RuntimeError(
                     f"Requested platform '{self.platform_name}' is not available: {e}"
                 )
+        elif _BEST_PLATFORM_CACHE["platform"] is not None:
+            # Use cached auto-detected platform
+            platform = _BEST_PLATFORM_CACHE["platform"]
+            props = _BEST_PLATFORM_CACHE["props"].copy()
+            logger.debug(f"Using Cached OpenMM Platform: {platform.getName()}")
         else:
             # Fallback auto-detection logic
             for name in ["CUDA", "Metal", "OpenCL"]:
                 try:
-                    platform = mm.Platform.getPlatformByName(name)
+                    temp_platform = mm.Platform.getPlatformByName(name)
+                    temp_props = {}
+                    if name in ["CUDA", "OpenCL"]:
+                        temp_props["Precision"] = "mixed"
+
+                    # Try to initialize a tiny dummy simulation to verify functionality
+                    # This prevents caching a 'broken' platform (like OpenCL without drivers)
+                    dummy_sys = mm.System()
+                    dummy_sys.addParticle(1.0 * unit.amu)
+                    dummy_int = mm.LangevinIntegrator(
+                        300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                    )
+                    # This call validates the platform/driver stack
+                    dummy_context = None
+                    try:
+                        dummy_context = mm.Context(dummy_sys, dummy_int, temp_platform, temp_props)
+                    finally:
+                        if dummy_context:
+                            del dummy_context
+                        del dummy_int
+                        del dummy_sys
+
+                    platform = temp_platform
+                    props = temp_props
+                    _BEST_PLATFORM_CACHE["platform"] = platform
+                    _BEST_PLATFORM_CACHE["props"] = props.copy()
                     logger.info(f"Using Auto-detected OpenMM Platform: {name}")
                     break
                 except Exception:
                     continue
-
-        # Configure precision properties
-        if platform:
-            name = platform.getName()
-            if self.precision:
-                if name in ["CUDA", "OpenCL"]:
-                    props["Precision"] = self.precision
-                elif name == "Metal":
-                    # Metal often uses single by default, but we can try to set it
-                    props["Precision"] = self.precision
-            elif name in ["CUDA", "OpenCL"]:
-                # Default to mixed precision for high-performance platforms
-                props["Precision"] = "mixed"
 
         if platform:
             try:
@@ -1433,8 +1458,15 @@ class EnergyMinimizer:
                 if self.platform_name:
                     # If user explicitly asked for this, fail
                     raise RuntimeError(f"Failed to initialize simulation on {name}: {e}")
-                logger.warning(f"Failed to initialize {name}, falling back to CPU: {e}")
+                logger.warning(
+                    f"Failed to initialize {platform.getName()}, falling back to CPU: {e}"
+                )
                 platform = None
+                # Create a fresh integrator and system as they might be tainted by the failed call
+                # Re-using them often fails with 'Integrator already bound to context'
+                integrator = mm.LangevinIntegrator(
+                    300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                )
 
         if not platform:
             simulation = app.Simulation(topology, system, integrator)
@@ -1658,6 +1690,9 @@ class EnergyMinimizer:
 
             final_lines.append("END")
             f.write("\n".join(final_lines) + "\n")
+
+        # Explicitly delete OpenMM State to free memory
+        del state
         return True
 
     def _run_simulation(
@@ -1926,10 +1961,23 @@ class EnergyMinimizer:
                     del integrator
                 if modeller is not None:
                     del modeller
+                if reporter is not None:
+                    del reporter
+
+                # Clean up local references that can be large
+                if "topology" in locals():
+                    del topology
+                if "positions" in locals():
+                    del positions
+                if "atom_list" in locals():
+                    del atom_list
+                if "original_metadata" in locals():
+                    del original_metadata
+
                 # Trigger collection to help free C++ backed memory
                 gc.collect()
-            except Exception as cleanup_err:
-                logger.debug(f"OpenMM cleanup failed (non-critical): {cleanup_err}")
+            except Exception:
+                pass
 
 
 def simulate_trajectory(
