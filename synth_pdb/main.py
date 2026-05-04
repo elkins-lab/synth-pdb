@@ -51,6 +51,11 @@ def _build_command_string(args: argparse.Namespace) -> str:
     if args.minimize:
         cmd_parts.append("--minimize")
         cmd_parts.append(f"--forcefield {args.forcefield}")
+        # Phase 1: Hardware Acceleration Overrides
+        if getattr(args, "platform", None):
+            cmd_parts.append(f"--platform {args.platform}")
+        if getattr(args, "precision", None):
+            cmd_parts.append(f"--precision {args.precision}")
 
     if args.cyclic:
         cmd_parts.append("--cyclic")
@@ -236,6 +241,20 @@ def main() -> None:
         type=str,
         default="amber14-all.xml",
         help="Forcefield to use for minimization (default: amber14-all.xml).",
+    )
+    parser.add_argument(
+        "--platform",
+        type=str,
+        default=None,
+        choices=["CUDA", "Metal", "OpenCL", "CPU", "Reference"],
+        help="Explicit OpenMM platform for hardware acceleration (default: auto-detect).",
+    )
+    parser.add_argument(
+        "--precision",
+        type=str,
+        default=None,
+        choices=["single", "mixed", "double"],
+        help="Numerical precision for GPU platforms (default: mixed for CUDA/OpenCL).",
     )
 
     parser.add_argument(
@@ -1088,6 +1107,8 @@ def main() -> None:
                 cis_proline_frequency=args.cis_proline_frequency,
                 phosphorylation_rate=args.phosphorylation_rate,
                 cyclic=args.cyclic,
+                platform=args.platform,
+                precision=args.precision,
             )
 
             if not current_pdb_content:

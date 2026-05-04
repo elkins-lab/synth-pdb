@@ -520,3 +520,47 @@ class TestPhysicsCoverage:
             reporter.report(30, None, None, {})
             assert "Iteration 30" in caplog.text
             assert "Energy: 0.0000 kJ/mol" in caplog.text
+
+    @patch("synth_pdb.physics.mm.Platform.getPlatformByName")
+    @patch("synth_pdb.physics.app.Simulation")
+    def test_explicit_platform_and_precision(
+        self, mock_sim: MagicMock, mock_get_platform: MagicMock
+    ) -> None:
+        """Test that explicit platform and precision are passed to OpenMM."""
+        import openmm as mm
+
+        from synth_pdb.physics import EnergyMinimizer
+
+        # Setup mock platform
+        mock_platform = MagicMock(spec=mm.Platform)
+        mock_platform.getName.return_value = "Metal"
+        mock_get_platform.return_value = mock_platform
+
+        # Instantiate with explicit settings
+        minimizer = EnergyMinimizer(platform_name="Metal", precision="mixed", disable_cache=True)
+
+        # Mock dependencies for _run_simulation to avoid file I/O and complex logic
+        with patch.object(minimizer, "_preprocess_pdb_for_simulation") as mock_preprocess:
+            mock_preprocess.return_value = (MagicMock(), MagicMock(), [], [])
+            with patch.object(minimizer, "_setup_openmm_modeller") as mock_setup:
+                mock_setup.return_value = (
+                    MagicMock(),
+                    [],
+                    [],
+                    [],
+                    [],
+                )
+                with patch.object(minimizer, "_create_system_robust") as mock_create_sys:
+                    mock_create_sys.return_value = (MagicMock(), MagicMock(), [])
+
+                    # Run simulation (which builds the context)
+                    minimizer._run_simulation("in.pdb", "out.pdb")
+
+                    # Verify platform was requested by name
+                    mock_get_platform.assert_called_with("Metal")
+
+                    # Verify Simulation was created with the correct platform and properties
+                    # args[3] is platform, args[4] is props
+                    called_args = mock_sim.call_args[0]
+                    assert called_args[3] == mock_platform
+                    assert called_args[4] == {"Precision": "mixed"}

@@ -102,6 +102,8 @@ class EnergyMinimizer:
         solvent_model: str = "app.OBC2",
         box_size: float = 1.0,
         disable_cache: bool = False,
+        platform_name: str | None = None,
+        precision: str | None = None,
     ) -> None:
         """Initialize the Minimizer with a Forcefield and Solvent Model.
 
@@ -115,6 +117,8 @@ class EnergyMinimizer:
             box_size:        The padding distance (in nm) for the explicit solvent box.
                              Default 1.0 nm ensures the protein doesn't see its own image.
             disable_cache:   If True, reloads ForceField from scratch (used for testing).
+            platform_name:   Optional: Explicit OpenMM platform ('CUDA', 'Metal', 'OpenCL', 'CPU').
+            precision:       Optional: Numerical precision ('single', 'mixed', 'double').
 
         ### EDUCATIONAL NOTE - Explicit vs. Implicit Solvent:
         ---------------------------------------------------
@@ -176,6 +180,8 @@ class EnergyMinimizer:
         self.water_model = "amber14/tip3pfb.xml"
         self.solvent_model = solvent_model
         self.box_size = box_size * unit.nanometers
+        self.platform_name = platform_name
+        self.precision = precision
         ff_files = [self.forcefield_name]
 
         if self.solvent_model == "explicit":
@@ -1384,23 +1390,52 @@ class EnergyMinimizer:
         integrator = mm.LangevinIntegrator(
             300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
         )
+
         platform = None
         props: dict = {}
-        for name in ["CUDA", "Metal", "OpenCL"]:
+
+        # Use explicit platform if requested
+        if self.platform_name:
             try:
-                platform = mm.Platform.getPlatformByName(name)
+                platform = mm.Platform.getPlatformByName(self.platform_name)
+                logger.info(f"Using Explicit OpenMM Platform: {self.platform_name}")
+            except Exception as e:
+                raise RuntimeError(
+                    f"Requested platform '{self.platform_name}' is not available: {e}"
+                )
+        else:
+            # Fallback auto-detection logic
+            for name in ["CUDA", "Metal", "OpenCL"]:
+                try:
+                    platform = mm.Platform.getPlatformByName(name)
+                    logger.info(f"Using Auto-detected OpenMM Platform: {name}")
+                    break
+                except Exception:
+                    continue
+
+        # Configure precision properties
+        if platform:
+            name = platform.getName()
+            if self.precision:
                 if name in ["CUDA", "OpenCL"]:
-                    props = {"Precision": "mixed"}
-                logger.info(f"Using OpenMM Platform: {name}")
-                break
-            except Exception:
-                continue
+                    props["Precision"] = self.precision
+                elif name == "Metal":
+                    # Metal often uses single by default, but we can try to set it
+                    props["Precision"] = self.precision
+            elif name in ["CUDA", "OpenCL"]:
+                # Default to mixed precision for high-performance platforms
+                props["Precision"] = "mixed"
 
         if platform:
             try:
                 simulation = app.Simulation(topology, system, integrator, platform, props)
-            except Exception:
+            except Exception as e:
+                if self.platform_name:
+                    # If user explicitly asked for this, fail
+                    raise RuntimeError(f"Failed to initialize simulation on {name}: {e}")
+                logger.warning(f"Failed to initialize {name}, falling back to CPU: {e}")
                 platform = None
+
         if not platform:
             simulation = app.Simulation(topology, system, integrator)
 
@@ -1902,6 +1937,8 @@ def simulate_trajectory(
     temperature_kelvin: float = 300.0,
     steps: int = 1000,
     report_interval: int = 20,
+    platform_name: str | None = None,
+    precision: str | None = None,
 ) -> list[str]:
     """Runs a short Molecular Dynamics simulation in implicit solvent and returns a list of PDB trajectory frames.
 
@@ -1910,6 +1947,8 @@ def simulate_trajectory(
         temperature_kelvin: Simulation temperature.
         steps: Total number of 2fs integration steps to run.
         report_interval: How many steps between saving a frame to the trajectory.
+        platform_name: Optional: Explicit OpenMM platform ('CUDA', 'Metal', 'OpenCL', 'CPU').
+        precision: Optional: Numerical precision ('single', 'mixed', 'double').
 
     Returns:
         A list of PDB formatted strings, one for each recorded frame.
@@ -1935,7 +1974,31 @@ def simulate_trajectory(
         integrator = mm.LangevinMiddleIntegrator(
             temperature_kelvin * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
         )
-        simulation = app.Simulation(pdb.topology, system, integrator)
+
+        platform = None
+        props: dict = {}
+        if platform_name:
+            platform = mm.Platform.getPlatformByName(platform_name)
+        else:
+            for name in ["CUDA", "Metal", "OpenCL"]:
+                try:
+                    platform = mm.Platform.getPlatformByName(name)
+                    break
+                except Exception:
+                    continue
+
+        if platform:
+            name = platform.getName()
+            if precision:
+                props["Precision"] = precision
+            elif name in ["CUDA", "OpenCL"]:
+                props["Precision"] = "mixed"
+
+        if platform:
+            simulation = app.Simulation(pdb.topology, system, integrator, platform, props)
+        else:
+            simulation = app.Simulation(pdb.topology, system, integrator)
+
         simulation.context.setPositions(pdb.positions)
 
         # Setup reporter if logging level is DEBUG or lower

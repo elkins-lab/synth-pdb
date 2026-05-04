@@ -1271,7 +1271,7 @@ pytest tests/test_generator.py -v
 ```
 
 **Test Coverage**: 93% overall
-- 1207 tests covering generation, validation, CLI and edge cases
+- 1213 tests covering generation, validation, CLI and edge cases
 
 
 

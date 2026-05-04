@@ -1329,6 +1329,8 @@ def _do_energy_minimization(
     solvent_padding: float,
     keep_solvent: bool,
     coordination: list[dict] | None = None,
+    platform: str | None = None,
+    precision: str | None = None,
 ) -> tuple[str | None, struc.AtomArray]:
     """Run OpenMM energy minimization (or MD equilibration) and return results.
 
@@ -1374,7 +1376,11 @@ def _do_energy_minimization(
             pdb_file_write.write(input_pdb_path)
 
             minimizer = EnergyMinimizer(
-                forcefield_name=forcefield, solvent_model=solvent_model, box_size=solvent_padding
+                forcefield_name=forcefield,
+                solvent_model=solvent_model,
+                box_size=solvent_padding,
+                platform_name=platform,
+                precision=precision,
             )
             current_disulfides = _detect_disulfide_bonds(peptide)
 
@@ -1723,6 +1729,8 @@ def generate_pdb_content(
     phi_list: list[float] | None = None,  # Explicit Phi angles
     psi_list: list[float] | None = None,  # Explicit Psi angles
     omega_list: list[float] | None = None,  # Explicit Omega angles
+    platform: str | None = None,  # OpenMM platform override
+    precision: str | None = None,  # OpenMM precision override
 ) -> str:
     r"""Generates PDB content for a linear or cyclic peptide chain.
 
@@ -1915,6 +1923,8 @@ def generate_pdb_content(
             solvent_padding,
             keep_solvent,
             coordination=sites,
+            platform=platform,
+            precision=precision,
         )
 
     # Assemble final PDB with B-factors, occupancy, TER, CONECT records

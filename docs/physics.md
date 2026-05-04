@@ -108,6 +108,34 @@ logging.getLogger("synth_pdb.physics").setLevel(logging.DEBUG)
 **Log Output Format:**
 `DEBUG:synth_pdb.physics:Physics: Minimization Iteration 150 | Energy: -4521.4302 kJ/mol`
 
+---
+
+## Hardware Acceleration (CUDA / Metal)
+
+By default, `synth-pdb` automatically detects the fastest available hardware (CUDA > Metal > OpenCL > CPU). Power users can explicitly override this targeting for performance tuning or benchmarking.
+
+### Explicit Platform Control
+Use the `--platform` and `--precision` flags to control the hardware backend and numerical precision.
+
+```bash
+# Apple Silicon Mac: Force Metal platform with mixed precision
+synth-pdb --sequence ALA-GLY-PRO --minimize --platform Metal --precision mixed
+
+# NVIDIA GPU: Force CUDA platform
+synth-pdb --sequence ALA-GLY-PRO --minimize --platform CUDA --precision mixed
+
+# Force CPU (Reference) for high-precision debugging
+synth-pdb --sequence ALA-GLY-PRO --minimize --platform CPU --precision double
+```
+
+**Supported Platforms:** `CUDA`, `Metal`, `OpenCL`, `CPU`, `Reference`
+**Supported Precisions:** `single`, `mixed`, `double`
+
+> [!TIP]
+> **Mixed Precision:** Most molecular simulations use "mixed" precision, which uses single precision for calculations and double precision for accumulation. This provides a 2x-4x speedup on GPUs with negligible impact on accuracy.
+
+---
+
 ### Educational Insight: The L-BFGS Algorithm
 OpenMM's `minimizeEnergy` uses the **L-BFGS** algorithm. It is a quasi-Newton method that approximates the curvature of the energy landscape without calculating the full Hessian matrix, making it ideal for systems with thousands of atoms.
 
