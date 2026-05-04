@@ -2025,27 +2025,76 @@ def simulate_trajectory(
 
         platform = None
         props: dict = {}
+
+        # Use explicit platform if requested
         if platform_name:
-            platform = mm.Platform.getPlatformByName(platform_name)
+            try:
+                platform = mm.Platform.getPlatformByName(platform_name)
+                if precision:
+                    props["Precision"] = precision
+                elif platform_name in ["CUDA", "OpenCL"]:
+                    props["Precision"] = "mixed"
+            except Exception as e:
+                raise RuntimeError(f"Requested platform '{platform_name}' is not available: {e}")
+        elif _BEST_PLATFORM_CACHE["platform"] is not None:
+            # Use cached auto-detected platform
+            platform = _BEST_PLATFORM_CACHE["platform"]
+            props = _BEST_PLATFORM_CACHE["props"].copy()
         else:
+            # Fallback auto-detection logic
             for name in ["CUDA", "Metal", "OpenCL"]:
                 try:
-                    platform = mm.Platform.getPlatformByName(name)
+                    temp_platform = mm.Platform.getPlatformByName(name)
+                    temp_props = {}
+                    if name in ["CUDA", "OpenCL"]:
+                        temp_props["Precision"] = "mixed"
+
+                    # Validate functional stack
+                    dummy_sys = mm.System()
+                    dummy_sys.addParticle(1.0 * unit.amu)
+                    dummy_int = mm.LangevinIntegrator(
+                        300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                    )
+                    dummy_context = None
+                    try:
+                        dummy_context = mm.Context(dummy_sys, dummy_int, temp_platform, temp_props)
+                    finally:
+                        if dummy_context:
+                            del dummy_context
+                        del dummy_int
+                        del dummy_sys
+
+                    platform = temp_platform
+                    props = temp_props
+                    _BEST_PLATFORM_CACHE["platform"] = platform
+                    _BEST_PLATFORM_CACHE["props"] = props.copy()
                     break
                 except Exception:
                     continue
 
+        simulation: Any = None
         if platform:
-            name = platform.getName()
-            if precision:
-                props["Precision"] = precision
-            elif name in ["CUDA", "OpenCL"]:
-                props["Precision"] = "mixed"
+            try:
+                simulation = app.Simulation(pdb.topology, system, integrator, platform, props)
+            except Exception as e:
+                if platform_name:
+                    raise RuntimeError(
+                        f"Failed to initialize simulation on {platform.getName()}: {e}"
+                    )
+                logger.warning(
+                    f"Failed to initialize {platform.getName()}, falling back to CPU: {e}"
+                )
+                platform = None
+                # Reset integrator
+                integrator = mm.LangevinMiddleIntegrator(
+                    temperature_kelvin * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                )
 
-        if platform:
-            simulation = app.Simulation(pdb.topology, system, integrator, platform, props)
-        else:
+        if not platform:
             simulation = app.Simulation(pdb.topology, system, integrator)
+
+        if simulation is None:
+            raise RuntimeError("Failed to create OpenMM Simulation object.")
 
         simulation.context.setPositions(pdb.positions)
 
