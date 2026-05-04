@@ -1038,6 +1038,34 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-acceleration-cuda-metal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Acceleration (CUDA / Metal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware Acceleration (CUDA / Metal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#explicit-platform-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit Platform Control
+      
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#educational-insight-the-l-bfgs-algorithm" class="md-nav__link">
     <span class="md-ellipsis">
@@ -4062,6 +4090,34 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware-acceleration-cuda-metal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware Acceleration (CUDA / Metal)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Hardware Acceleration (CUDA / Metal)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#explicit-platform-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit Platform Control
+      
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#educational-insight-the-l-bfgs-algorithm" class="md-nav__link">
     <span class="md-ellipsis">
@@ -4227,15 +4283,36 @@ By default, <code>synth-pdb</code> strips the thousands of generated <code>HOH</
 </span></code></pre></div>
 <p><strong>Log Output Format:</strong>
 <code>DEBUG:synth_pdb.physics:Physics: Minimization Iteration 150 | Energy: -4521.4302 kJ/mol</code></p>
+<hr />
+<h2 id="hardware-acceleration-cuda-metal">Hardware Acceleration (CUDA / Metal)</h2>
+<p>By default, <code>synth-pdb</code> automatically detects the fastest available hardware (CUDA &gt; Metal &gt; OpenCL &gt; CPU). Power users can explicitly override this targeting for performance tuning or benchmarking.</p>
+<h3 id="explicit-platform-control">Explicit Platform Control</h3>
+<p>Use the <code>--platform</code> and <code>--precision</code> flags to control the hardware backend and numerical precision.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Apple Silicon Mac: Force Metal platform with mixed precision</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span>ALA-GLY-PRO<span class="w"> </span>--minimize<span class="w"> </span>--platform<span class="w"> </span>Metal<span class="w"> </span>--precision<span class="w"> </span>mixed
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># NVIDIA GPU: Force CUDA platform</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span>ALA-GLY-PRO<span class="w"> </span>--minimize<span class="w"> </span>--platform<span class="w"> </span>CUDA<span class="w"> </span>--precision<span class="w"> </span>mixed
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Force CPU (Reference) for high-precision debugging</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>synth-pdb<span class="w"> </span>--sequence<span class="w"> </span>ALA-GLY-PRO<span class="w"> </span>--minimize<span class="w"> </span>--platform<span class="w"> </span>CPU<span class="w"> </span>--precision<span class="w"> </span>double
+</span></code></pre></div>
+<p><strong>Supported Platforms:</strong> <code>CUDA</code>, <code>Metal</code>, <code>OpenCL</code>, <code>CPU</code>, <code>Reference</code>
+<strong>Supported Precisions:</strong> <code>single</code>, <code>mixed</code>, <code>double</code></p>
+<blockquote>
+<p>[!TIP]
+<strong>Mixed Precision:</strong> Most molecular simulations use "mixed" precision, which uses single precision for calculations and double precision for accumulation. This provides a 2x-4x speedup on GPUs with negligible impact on accuracy.</p>
+</blockquote>
+<hr />
 <h3 id="educational-insight-the-l-bfgs-algorithm">Educational Insight: The L-BFGS Algorithm</h3>
 <p>OpenMM's <code>minimizeEnergy</code> uses the <strong>L-BFGS</strong> algorithm. It is a quasi-Newton method that approximates the curvature of the energy landscape without calculating the full Hessian matrix, making it ideal for systems with thousands of atoms.</p>
 <hr />
 <h2 id="the-generation-pipeline">The Generation Pipeline</h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>[User] → [Generator] → [Geometry Builder] → [Sidechain Packer] → [Energy Minimizer] → [PDB File]
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>             ^                  |                    |                      |
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>             |                                       |                      |
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>             +---------------------------------------+----------------------+
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>[User] → [Generator] → [Geometry Builder] → [Sidechain Packer] → [Energy Minimizer] → [PDB File]
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>             ^                  |                    |                      |
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>             |              (N-CA-C-O)           (Rotamers)             (OpenMM)
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>             |                                       |                      |
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>             +---------------------------------------+----------------------+
 </span></code></pre></div>
 <h2 id="api-reference">API Reference</h2>
 
@@ -4244,7 +4321,7 @@ By default, <code>synth-pdb</code> strips the thousands of generated <code>HOH</
 
 
 <h2 id="synth_pdb.physics.simulate_trajectory" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">simulate_trajectory</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">,</span> <span class="n">temperature_kelvin</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">report_interval</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">simulate_trajectory</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">,</span> <span class="n">temperature_kelvin</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">report_interval</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">platform_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h2>
 
@@ -4327,6 +4404,38 @@ By default, <code>synth-pdb</code> strips the thousands of generated <code>HOH</
             </td>
             <td>
                   <code>20</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>platform_name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional: Explicit OpenMM platform ('CUDA', 'Metal', 'OpenCL', 'CPU').</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>precision</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional: Numerical precision ('single', 'mixed', 'double').</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
