@@ -42,6 +42,34 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.visualization_saxs_path = os.path.join(
             self.base_dir, "synth_pdb", "visualization_saxs.py"
         )
+        self.msa_path = os.path.join(self.base_dir, "synth_pdb", "msa.py")
+        self.chemical_shifts_path = os.path.join(self.base_dir, "synth_pdb", "chemical_shifts.py")
+        self.cd_simulator_path = os.path.join(self.base_dir, "synth_pdb", "cd_simulator.py")
+        self.relaxation_path = os.path.join(self.base_dir, "synth_pdb", "relaxation.py")
+        self.nmr_path = os.path.join(self.base_dir, "synth_pdb", "nmr.py")
+        self.coupling_path = os.path.join(self.base_dir, "synth_pdb", "coupling.py")
+        self.structure_utils_path = os.path.join(self.base_dir, "synth_pdb", "structure_utils.py")
+        self.j_coupling_path = os.path.join(self.base_dir, "synth_pdb", "j_coupling.py")
+
+        # Test file paths
+        self.test_rdc_q_path = os.path.join(
+            self.base_dir, "tests", "test_rdc_q_factor_validation.py"
+        )
+        self.test_karplus_path = os.path.join(self.base_dir, "tests", "test_karplus_j_coupling.py")
+        self.test_main_rdc_path = os.path.join(
+            self.base_dir, "tests", "test_main_rdc_and_predictor.py"
+        )
+        self.test_scientific_path = os.path.join(
+            self.base_dir, "tests", "test_scientific_validation.py"
+        )
+        self.test_ssbond_path = os.path.join(self.base_dir, "tests", "test_ssbond.py")
+        self.test_chirality_path = os.path.join(self.base_dir, "tests", "test_chirality.py")
+        self.test_rdc_shim_path = os.path.join(self.base_dir, "tests", "test_rdc.py")
+        self.test_cis_proline_path = os.path.join(self.base_dir, "tests", "test_cis_proline.py")
+        self.test_rigor_path = os.path.join(
+            self.base_dir, "tests", "functional", "test_scientific_rigor.py"
+        )
+        self.test_occupancy_path = os.path.join(self.base_dir, "tests", "test_occupancy.py")
 
         # Modular Geometry Paths
         self.geometry_nerf_path = os.path.join(self.base_dir, "synth_pdb", "geometry", "nerf.py")
@@ -56,7 +84,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Helper to assert file contains list of substrings."""
 
         with open(filepath, encoding="utf-8") as f:
-            content = " ".join(f.read().split())
+            # Replace '#' with ' ' to handle line-wrapped comments
+            raw_content = f.read().replace("#", " ")
+            content = " ".join(raw_content.split())
 
         for substring in substrings:
             normalized_substring = " ".join(substring.split())
@@ -91,6 +121,8 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Uncapped termini (NH3+ and COO-) introduce strong charges",
             "EDUCATIONAL NOTE: Salt Bridges",
             "combination of two non-covalent interactions",
+            "EDUCATIONAL NOTE - Conformational Assumptions:",
+            "EDUCATIONAL NOTE - Vectorized Proximity Search:",
         ]
         self._check_file_contains(self.biophysics_path, required_notes)
 
@@ -131,6 +163,30 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - The Importance of Metadata Restoration:",
             "violently mutated the input structure",
             "EDUCATIONAL NOTE - PDB Atom Sorting:",
+            "Educational Note: Minimization Reporters",
+            "black box",
+            "L-BFGS",
+            "callback",
+            'peek" into the C++ optimization loop',
+            "Monitoring convergence",
+            "Identifying exactly which iteration caused a system to",
+            "Stopping the process if the energy goes above a threshold",
+            "EDUCATIONAL NOTE - Cyclic CONECT Stripping:",
+            "EDUCATIONAL NOTE - Ion Stripping:",
+            "EDUCATIONAL NOTE - Dummy OXT Insertion:",
+            "EDUCATIONAL NOTE: We do NOT add the bond to the Topology here.",
+            "EDUCATIONAL NOTE - Why Add Hydrogens?",
+            "EDUCATIONAL NOTE - Atom Index Refresh:",
+            "EDUCATIONAL NOTE - Why we avoid adding a hard constraint initially:",
+            "EDUCATIONAL NOTE - Simulation Setup:",
+            "EDUCATIONAL NOTE - Disulfide Mapping:",
+            "EDUCATIONAL NOTE - CONECT Records & Visualization:",
+            "EDUCATIONAL NOTE - HETATM Restoration:",
+            "EDUCATIONAL NOTE: Gradient Descent (L-BFGS)",
+            "Limited-memory Broyden–Fletcher–Goldfarb–Shanno",
+            "quasi-Newton method",
+            "approximates the second derivative (Hessian)",
+            "store the full Hessian matrix",
         ]
         self._check_file_contains(self.physics_path, required_notes)
 
@@ -149,6 +205,17 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "trans",
             "EDUCATIONAL NOTE - Physics of the Ramachandran Plot:",
             "HARD-SPHERE STERICS",
+            "EDUCATIONAL NOTE - The Shrake-Rupley Algorithm:",
+            "EDUCATIONAL NOTE - VdW Radii:",
+            "EDUCATIONAL NOTE - Energy as a Clash Detector:",
+            "EDUCATIONAL NOTE - Performance Optimization via Vectorization:",
+            "nested loops for clash detection",
+            "O(N^2) operation",
+            "scipy.spatial.distance.cdist",
+            "NumPy broadcasting",
+            "Pre-calculated for all pairs as a matrix",
+            "EDUCATIONAL NOTE - NOE Effective Distance:",
+            "EDUCATIONAL NOTE - The Structural Interactome:",
         ]
         self._check_file_contains(self.validator_path, required_notes)
 
@@ -158,6 +225,8 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "Educational Note - Coordination Chemistry:",
             "Cys Sulfur, His Nitrogen",
             "Tetrahedral",
+            "EDUCATIONAL NOTE: Local Optimization",
+            "EDUCATIONAL NOTE: Geometric Realism",
         ]
         self._check_file_contains(self.cofactors_path, required_notes)
 
@@ -197,6 +266,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - Peptidyl Chain Walk:",
             'EDUCATIONAL NOTE - The "Memory Wall" in AI Training:',
             "PCIE Latency",
+            "EDUCATIONAL NOTE - PDB Specification:",
         ]
         self._check_file_contains(self.batch_generator_path, required_notes)
 
@@ -212,6 +282,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - Rotamers for Non-Branched Residues:",
             "EDUCATIONAL NOTE - Aromatic Residues (PHE, TYR, TRP):",
             "EDUCATIONAL NOTE - Electrostatics vs Sterics:",
+            "EDUCATIONAL NOTE - Why Stricter Standards?",
         ]
         self._check_file_contains(self.data_path, required_notes)
 
@@ -234,6 +305,37 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - Hard Decoy Support (AI Training):",
             "Torsion Drift",
             "Threading",
+            "EDUCATIONAL OVERVIEW - How Synthetic Protein Generation Works:",
+            "EDUCATIONAL NOTE - PDB ATOM Record Format:",
+            "EDUCATIONAL NOTE - Disulfide Bond Detection:",
+            "EDUCATIONAL NOTE - PDB SSBOND Format:",
+            "EDUCATIONAL NOTE - Why This Matters:",
+            "EDUCATIONAL NOTE - Return Format:",
+            "EDUCATIONAL NOTE - Design Decisions:",
+            "EDUCATIONAL NOTE - Data Structure Choice:",
+            "EDUCATIONAL NOTE - Why These Checks Matter:",
+            "EDUCATIONAL NOTE - Why We Forbid Overlaps:",
+            "EDUCATIONAL NOTE - Error Message Design:",
+            "EDUCATIONAL NOTE - What Happens to Gaps:",
+            "EDUCATIONAL NOTE - Input Validation:",
+            "EDUCATIONAL NOTE - Per-Residue Conformation Assignment:",
+            "EDUCATIONAL NOTE - Gap Handling:",
+            "EDUCATIONAL NOTE - Why We Don't Validate Conformations Here:",
+            "EDUCATIONAL NOTE - D-Amino Acid Handling:",
+            "EDUCATIONAL NOTE - PDB Coordinate Range Limits:",
+            "EDUCATIONAL NOTE - Biophysical Realism (Phase 2):",
+            "EDUCATIONAL NOTE - Side-Chain Optimization:",
+            "EDUCATIONAL NOTE - Metal Ion Coordination (Phase 15):",
+            "EDUCATIONAL NOTE - Energy Minimization (Phase 2):",
+            "EDUCATIONAL NOTE - Explicit Solvent Pruning:",
+            "EDUCATIONAL NOTE - Adding Realistic B-factors:",
+            "EDUCATIONAL NOTE - Adding Realistic Occupancy:",
+            "EDUCATIONAL NOTE - HETATM vs ATOM:",
+            "EDUCATIONAL NOTE - New Feature: Cyclic Peptides",
+            "EDUCATIONAL NOTE - Why Per-Region Conformations Matter:",
+            "EDUCATIONAL NOTE - Macrocyclization (Cyclic Peptides):",
+            "EDUCATIONAL NOTE - Multi-Chain Complex Generation (Phase 16):",
+            "EDUCATIONAL NOTE - Post-Translational Modifications (PTMs):",
         ]
         self._check_file_contains(self.generator_path, required_notes)
 
@@ -329,6 +431,13 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE — RDC Background:",
             "EDUCATIONAL NOTE — Predictor Selection:",
             "EDUCATIONAL NOTE — RDC Calculation:",
+            "EDUCATIONAL NOTE — CD Background:",
+            "Circular Dichroism (CD) measures the differential absorption",
+            "weighted average of basis",
+            "spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):",
+            "f_helix",
+            "f_sheet",
+            "f_coil",
         ]
         self._check_file_contains(self.main_path, required_notes)
 
@@ -364,3 +473,136 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "slope of this line is -Rg^2 / 3",
         ]
         self._check_file_contains(self.visualization_saxs_path, required_notes)
+
+    def test_msa_educational_notes(self) -> None:
+        """Ensure msa.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE - Steric Volume Compatibility:",
+            "Educational Note: Hydrophobic Core Collapse",
+            "Educational Note: Electrostatic Compatibility",
+            "Educational Note: Big-O Performance Breakthrough",
+            'Educational Note: The "Magic Step" coupled mutation',
+        ]
+        self._check_file_contains(self.msa_path, required_notes)
+
+    def test_chemical_shifts_educational_notes(self) -> None:
+        """Ensure chemical_shifts.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — Chemical Shifts in Structural Biology",
+            "EDUCATIONAL NOTE - Approximation via Parent Mapping:",
+        ]
+        self._check_file_contains(self.chemical_shifts_path, required_notes)
+
+    def test_cd_simulator_educational_notes(self) -> None:
+        """Ensure cd_simulator.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — CD Background:",
+            "Circular Dichroism (CD) measures the differential absorption",
+            "premier tool for measuring the",
+            "overall secondary structure",
+            "weighted average of basis",
+            "spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):",
+            "f_helix",
+            "f_sheet",
+            "f_coil",
+        ]
+        self._check_file_contains(self.cd_simulator_path, required_notes)
+
+    def test_relaxation_educational_notes(self) -> None:
+        """Ensure relaxation.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — NMR Relaxation and the Lipari-Szabo Model",
+        ]
+        self._check_file_contains(self.relaxation_path, required_notes)
+
+    def test_nmr_educational_notes(self) -> None:
+        """Ensure nmr.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — The Nuclear Overhauser Effect (NOE)",
+        ]
+        self._check_file_contains(self.nmr_path, required_notes)
+
+    def test_coupling_educational_notes(self) -> None:
+        """Ensure coupling.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings",
+            "EDUCATIONAL NOTE — Proline and Secondary Amines",
+            "EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry",
+        ]
+        self._check_file_contains(self.coupling_path, required_notes)
+
+    def test_structure_utils_educational_notes(self) -> None:
+        """Ensure structure_utils.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — NMR Structure Utilities and RMSD",
+        ]
+        self._check_file_contains(self.structure_utils_path, required_notes)
+
+    def test_j_coupling_educational_notes(self) -> None:
+        """Ensure j_coupling.py retains key educational blocks."""
+        required_notes = [
+            "EDUCATIONAL NOTE — Scalar J-Couplings and Karplus Equations",
+        ]
+        self._check_file_contains(self.j_coupling_path, required_notes)
+
+    def test_test_files_educational_notes(self) -> None:
+        """Ensure test files retain key educational blocks."""
+        self._check_file_contains(self.test_rdc_q_path, ["EDUCATIONAL NOTE:"])
+        self._check_file_contains(self.test_karplus_path, ["EDUCATIONAL NOTE:"])
+        self._check_file_contains(
+            self.test_main_rdc_path,
+            [
+                "EDUCATIONAL NOTE — Synthetic RDCs in AI Training:",
+                "EDUCATIONAL NOTE — Chemical Shift Prediction Methods:",
+                "EDUCATIONAL NOTE — Provenance in PDB Headers:",
+            ],
+        )
+        self._check_file_contains(
+            self.test_scientific_path,
+            ["EDUCATIONAL NOTE: This sliding-window approach (Local RMSD) is used in"],
+        )
+        self._check_file_contains(
+            self.test_ssbond_path,
+            [
+                "EDUCATIONAL NOTE - Disulfide Bonds in Proteins",
+                "EDUCATIONAL NOTE:",
+                "EDUCATIONAL NOTE - Distance Criteria:",
+                "EDUCATIONAL NOTE - False Positives:",
+                "EDUCATIONAL NOTE - PDB SSBOND Format:",
+                "EDUCATIONAL NOTE - Edge Cases:",
+                "EDUCATIONAL NOTE - Multiple Disulfides:",
+            ],
+        )
+        self._check_file_contains(
+            self.test_chirality_path, ["EDUCATIONAL NOTE - Molecular Chirality (Handedness)"]
+        )
+        self._check_file_contains(
+            self.test_rdc_shim_path,
+            [
+                "EDUCATIONAL NOTE — Why shims?",
+                "EDUCATIONAL NOTE — Proline as a secondary amine:",
+            ],
+        )
+        self._check_file_contains(
+            self.test_cis_proline_path, ["EDUCATIONAL NOTE - Peptide Bond Isomerism (Cis vs Trans)"]
+        )
+        self._check_file_contains(
+            self.test_rigor_path,
+            [
+                "EDUCATIONAL NOTE - The Philosophy of Scientific Verification:",
+                "EDUCATIONAL NOTE - The Chemical Shift Index (CSI):",
+            ],
+        )
+        self._check_file_contains(
+            self.test_occupancy_path,
+            [
+                "EDUCATIONAL NOTE - What is Occupancy?",
+                "EDUCATIONAL NOTE:",
+                "EDUCATIONAL NOTE - Residue Flexibility:",
+                "EDUCATIONAL NOTE - Rigid Residues:",
+                "EDUCATIONAL NOTE - Typical Occupancy Ranges:",
+                "EDUCATIONAL NOTE - Occupancy vs B-factor Relationship:",
+                "EDUCATIONAL NOTE - Occupancy in PDB Files:",
+                "EDUCATIONAL NOTE - Occupancy Gradients:",
+            ],
+        )
