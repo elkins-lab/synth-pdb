@@ -139,6 +139,7 @@ Check out the [Incubator README](./incubator/README.md) for the full roadmap of 
 - Customizable sequence (1-letter or 3-letter amino acid codes)
 - Random sequence generation with uniform or biologically plausible frequencies
 - **Conformational diversity**: Generate alpha helices, beta sheets, extended chains, or random conformations
+- **Prompt-to-Protein Interface**: Use natural language to describe structures via `--prompt`. Supports interactive input and piping for complex requirements.
 - **Backbone-Dependent Rotamers**: Side-chain conformations are selected based on local secondary structure (Helix/Sheet) to minimize steric clashes (Dunbrack library).
 - **Bulk Dataset Generation**: Generate thousands of (Structure, Sequence, Contact Map) triplets for AI training via `--mode dataset`.
 - **Metal Ion Coordination**: Automatic detection and structural injection of cofactors like **Zinc (Zn2+)** with physics-aware harmonic constraints.
@@ -1271,7 +1272,7 @@ pytest tests/test_generator.py -v
 ```
 
 **Test Coverage**: 93% overall
-- 1234 tests covering generation, validation, CLI and edge cases
+- 1237 tests covering generation, validation, CLI and edge cases
 
 
 

@@ -19,7 +19,24 @@ export OPENAI_API_KEY="sk-your-api-key"
 synth-pdb --prompt "Build a 30-residue cyclic peptide in a beta-sheet conformation, minimize it, and generate the RDC coupling data."
 ```
 
-### Option B: Local SLM (Offline & Private)
+### Option B: Interactive & Piped Prompts
+You can also provide your prompt via standard input, which is useful for complex multi-line instructions or for piping the output of other tools.
+
+**Piping a prompt:**
+```bash
+echo "Generate a 15-mer alpha helix" | synth-pdb --prompt
+```
+
+**Interactive mode:**
+If you run `--prompt` without a value, it will open an interactive buffer:
+```bash
+synth-pdb --prompt
+# Enter your natural language prompt (type 'exit' on a new line or press Ctrl+D to finish):
+# > Build an alpha helix
+# > exit
+```
+
+### Option C: Local SLM (Offline & Private)
 For total privacy and zero API costs, `synth-pdb` supports downloading and running a highly compressed **Small Language Model (SLM)** locally on your CPU or GPU.
 
 1. Install the optional local AI dependencies:

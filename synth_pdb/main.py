@@ -146,6 +146,8 @@ def main() -> None:
     parser.add_argument(
         "--prompt",
         type=str,
+        nargs="?",
+        const="",
         help="Natural language prompt to generate structures using an LLM.",
     )
     parser.add_argument(
@@ -737,29 +739,54 @@ def main() -> None:
     logger.debug("Logging level set to %s.", args.log_level.upper())
 
     # Process Natural Language Prompt if provided
-    if getattr(args, "prompt", None):
-        try:
-            from .llm import LLMInterface
+    if args.prompt is not None:
+        if args.prompt == "":
+            try:
+                if sys.stdin.isatty():
+                    print(
+                        "Enter your natural language prompt (type 'exit' on a new line or press Ctrl+D to finish):",
+                        file=sys.stderr,
+                    )
+                    lines = []
+                    while True:
+                        line = sys.stdin.readline()
+                        if not line:
+                            break
+                        if line.strip().lower() == "exit":
+                            break
+                        lines.append(line)
+                    args.prompt = "".join(lines).strip()
+                else:
+                    args.prompt = sys.stdin.read().strip()
 
-            llm = LLMInterface(backend=args.llm_backend)
-            llm_args = llm.translate_prompt(args.prompt)
+                if args.prompt:
+                    logger.debug(f"Read prompt from stdin: {args.prompt}")
+            except EOFError:
+                pass
 
-            # Inform the user what the prompt was translated into
-            if llm_args:
-                args_str = " ".join(f"--{k} {v}" for k, v in llm_args.items())
-                logger.info(f"Translated prompt into: {args_str}")
-            else:
-                logger.warning(
-                    "No specific structural instructions identified in prompt. Using defaults."
-                )
+        if args.prompt:
+            try:
+                from .llm import LLMInterface
 
-            for key, value in llm_args.items():
-                setattr(args, key, value)
-        except Exception as e:
-            print(f"Failed to process natural language prompt: {e}", file=sys.stderr)
-            sys.exit(1)
+                llm = LLMInterface(backend=args.llm_backend)
+                llm_args = llm.translate_prompt(args.prompt)
 
-    if getattr(args, "prompt", None):
+                # Inform the user what the prompt was translated into
+                if llm_args:
+                    args_str = " ".join(f"--{k} {v}" for k, v in llm_args.items())
+                    logger.info(f"Translated prompt into: {args_str}")
+                else:
+                    logger.warning(
+                        "No specific structural instructions identified in prompt. Using defaults."
+                    )
+
+                for key, value in llm_args.items():
+                    setattr(args, key, value)
+            except Exception as e:
+                print(f"Failed to process natural language prompt: {e}", file=sys.stderr)
+                sys.exit(1)
+
+    if args.prompt:
         logger.info("Successfully translated prompt into command-line arguments.")
 
     logger.info("Starting PDB file generation process.")
