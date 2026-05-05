@@ -54,6 +54,7 @@ nav:
     - For AI/ML Researchers: guides/ml-researchers.md
     - For NMR Spectroscopists: guides/nmr-spectroscopists.md
     - Command-Line Reference: guides/cli-reference.md
+    - Prompt-to-Protein Interface: guides/prompt-interface.md
     - Publication Figures: guides/publication-figures.md
     - Visualization: visualization.md
     - Physics Engine: physics.md

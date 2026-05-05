@@ -132,6 +132,18 @@ def main() -> None:
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL).",
     )
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        help="Natural language prompt to generate structures using an LLM.",
+    )
+    parser.add_argument(
+        "--llm-backend",
+        type=str,
+        default="local",
+        choices=["local", "openai"],
+        help="Backend to use for --prompt. 'local' downloads and runs a model locally. 'openai' requires OPENAI_API_KEY.",
+    )
 
     parser.add_argument(
         "--sequence",
@@ -700,6 +712,19 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    # Process Natural Language Prompt if provided
+    if getattr(args, "prompt", None):
+        try:
+            from .llm import LLMInterface
+
+            llm = LLMInterface(backend=args.llm_backend)
+            llm_args = llm.translate_prompt(args.prompt)
+            for key, value in llm_args.items():
+                setattr(args, key, value)
+        except Exception as e:
+            print(f"Failed to process natural language prompt: {e}", file=sys.stderr)
+            sys.exit(1)
+
     # Set the logging level based on user input
     log_level = getattr(logging, args.log_level.upper(), None)
     if not isinstance(log_level, int):
@@ -711,6 +736,9 @@ def main() -> None:
 
     logging.getLogger().setLevel(log_level)
     logger.debug("Logging level set to %s.", args.log_level.upper())
+
+    if getattr(args, "prompt", None):
+        logger.info("Successfully translated prompt into command-line arguments.")
 
     logger.info("Starting PDB file generation process.")
     logger.debug(

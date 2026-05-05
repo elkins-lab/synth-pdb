@@ -98,6 +98,10 @@ plm = [
 gui = [
     "streamlit>=1.30.0",
 ]
+local-llm = [
+    "llama-cpp-python>=0.2.0",
+    "huggingface_hub>=0.20.0",
+]
 
 [project.scripts]
 synth-pdb = "synth_pdb.main:main"
