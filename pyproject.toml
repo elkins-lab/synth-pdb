@@ -232,9 +232,11 @@ module = [
     "sklearn.*",
     "mrcfile",
     "psutil",
-    "py3Dmol",
-    "seaborn",
     "matplotlib.*",
+    "llama_cpp",
+    "llama_cpp.*",
+    "huggingface_hub",
+    "huggingface_hub.*",
 ]
 ignore_missing_imports = true
 

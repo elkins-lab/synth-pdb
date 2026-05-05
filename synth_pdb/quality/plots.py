@@ -22,8 +22,8 @@ try:
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
-    mpl = None
-    plt = None
+    mpl = None  # type: ignore
+    plt = None  # type: ignore
 
 # Optional SciPy dependency (used for Pearson r in correlation plots)
 try:

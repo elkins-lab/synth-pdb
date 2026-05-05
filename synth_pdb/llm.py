@@ -159,11 +159,14 @@ class LocalLLMProvider(LLMProvider):
         }
 
         response = self.llm.create_chat_completion(
-            messages=messages, temperature=0.0, max_tokens=256, response_format=schema
+            messages=messages,  # type: ignore[arg-type]
+            temperature=0.0,
+            max_tokens=256,
+            response_format=schema,  # type: ignore[arg-type]
         )
 
-        content = response["choices"][0]["message"]["content"]
-        parsed_args = self._parse_response(content)
+        content = response["choices"][0]["message"]["content"]  # type: ignore[index]
+        parsed_args = self._parse_response(content)  # type: ignore[arg-type]
         if "error" in parsed_args:
             raise ValueError(f"Local LLM could not translate prompt: {parsed_args['error']}")
         return parsed_args
