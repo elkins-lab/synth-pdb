@@ -139,6 +139,7 @@ nav:
     - Contributing: development/contributing.md
     - Architecture: development/architecture.md
     - Testing: development/testing.md
+    - AI Integration Strategy: development/ai_strategy.md
     - Release Process: development/release.md
   - About:
     - Changelog: about/changelog.md
