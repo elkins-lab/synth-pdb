@@ -6,7 +6,9 @@ Instead of memorizing dozens of complex command-line flags, you can pass a `--pr
 
 ## Quick Start
 
-### Option A: Cloud API (OpenAI)
+### 1. Choose a Backend
+
+#### Option A: Cloud API (OpenAI)
 By default, if you have an OpenAI API key, you can use the ultra-fast cloud backend.
 
 1. Set your API key in your environment:
@@ -14,29 +16,7 @@ By default, if you have an OpenAI API key, you can use the ultra-fast cloud back
 export OPENAI_API_KEY="sk-your-api-key"
 ```
 
-2. Run your natural language prompt:
-```bash
-synth-pdb --prompt "Build a 30-residue cyclic peptide in a beta-sheet conformation, minimize it, and generate the RDC coupling data."
-```
-
-### Option B: Interactive & Piped Prompts
-You can also provide your prompt via standard input, which is useful for complex multi-line instructions or for piping the output of other tools.
-
-**Piping a prompt:**
-```bash
-echo "Generate a 15-mer alpha helix" | synth-pdb --prompt
-```
-
-**Interactive mode:**
-If you run `--prompt` without a value, it will open an interactive buffer:
-```bash
-synth-pdb --prompt
-# Enter your natural language prompt (type 'exit' on a new line or press Ctrl+D to finish):
-# > Build an alpha helix
-# > exit
-```
-
-### Option C: Local SLM (Offline & Private)
+#### Option B: Local SLM (Offline & Private)
 For total privacy and zero API costs, `synth-pdb` supports downloading and running a highly compressed **Small Language Model (SLM)** locally on your CPU or GPU.
 
 1. Install the optional local AI dependencies:
@@ -44,12 +24,35 @@ For total privacy and zero API costs, `synth-pdb` supports downloading and runni
 pip install synth-pdb[local-llm]
 ```
 
-2. Run your prompt using the local backend:
-```bash
-synth-pdb --prompt "Build an alpha helix" --llm-backend local
-```
+2. Use the `--llm-backend local` flag in your commands.
 
 *Note: The first time you use the local backend, it will automatically download a ~2.4GB GGUF model file (like Phi-3-Mini) to your HuggingFace cache. Subsequent runs will load it instantly.*
+
+### 2. Provide your Prompt
+
+There are three ways to pass a natural language request to `synth-pdb`.
+
+#### A. Inline Argument (Standard)
+Pass the prompt directly on the command line:
+```bash
+synth-pdb --prompt "Build a 30-residue cyclic peptide in a beta-sheet conformation."
+```
+
+#### B. Piped Input
+Pipe the output of another tool or a file into `synth-pdb`:
+```bash
+echo "Generate a 15-mer alpha helix" | synth-pdb --prompt
+```
+
+#### C. Interactive Mode
+Run `--prompt` without a value to open an interactive buffer. This is useful for complex, multi-line instructions:
+```bash
+synth-pdb --prompt
+# Enter your natural language prompt (type 'exit' on a new line or press Ctrl+D to finish):
+# > Build an alpha helix with 
+# > a zinc binding motif.
+# > exit
+```
 
 ## Example Prompts
 
