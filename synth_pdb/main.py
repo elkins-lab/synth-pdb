@@ -23,6 +23,17 @@ from .viewer import view_structure_in_browser
 logger = logging.getLogger(__name__)
 
 
+class CLIFormatter(logging.Formatter):
+    """Custom formatter to only show level name for WARNING and above."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        # Use the standard formatting logic to resolve %s and other placeholders
+        formatted_msg = super().format(record)
+        if record.levelno >= logging.WARNING:
+            return f"{record.levelname}: {formatted_msg}"
+        return formatted_msg
+
+
 def _build_command_string(args: argparse.Namespace) -> str:
     """Build a command string from parsed arguments for PDB header."""
     cmd_parts = ["synth-pdb"]
@@ -712,19 +723,6 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Process Natural Language Prompt if provided
-    if getattr(args, "prompt", None):
-        try:
-            from .llm import LLMInterface
-
-            llm = LLMInterface(backend=args.llm_backend)
-            llm_args = llm.translate_prompt(args.prompt)
-            for key, value in llm_args.items():
-                setattr(args, key, value)
-        except Exception as e:
-            print(f"Failed to process natural language prompt: {e}", file=sys.stderr)
-            sys.exit(1)
-
     # Set the logging level based on user input
     log_level = getattr(logging, args.log_level.upper(), None)
     if not isinstance(log_level, int):
@@ -732,10 +730,34 @@ def main() -> None:
 
     # Configure logging if not already configured (e.g., by pytest or another caller)
     if not logging.getLogger().handlers:
-        logging.basicConfig(level=log_level, format="%(message)s")
-
-    logging.getLogger().setLevel(log_level)
+        handler = logging.StreamHandler(sys.stderr)
+        handler.setFormatter(CLIFormatter())
+        logging.getLogger().addHandler(handler)
+        logging.getLogger().setLevel(log_level)
     logger.debug("Logging level set to %s.", args.log_level.upper())
+
+    # Process Natural Language Prompt if provided
+    if getattr(args, "prompt", None):
+        try:
+            from .llm import LLMInterface
+
+            llm = LLMInterface(backend=args.llm_backend)
+            llm_args = llm.translate_prompt(args.prompt)
+
+            # Inform the user what the prompt was translated into
+            if llm_args:
+                args_str = " ".join(f"--{k} {v}" for k, v in llm_args.items())
+                logger.info(f"Translated prompt into: {args_str}")
+            else:
+                logger.warning(
+                    "No specific structural instructions identified in prompt. Using defaults."
+                )
+
+            for key, value in llm_args.items():
+                setattr(args, key, value)
+        except Exception as e:
+            print(f"Failed to process natural language prompt: {e}", file=sys.stderr)
+            sys.exit(1)
 
     if getattr(args, "prompt", None):
         logger.info("Successfully translated prompt into command-line arguments.")

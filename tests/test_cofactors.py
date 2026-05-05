@@ -7,7 +7,6 @@ from synth_pdb.cofactors import add_metal_ion, find_metal_binding_sites
 
 
 class TestCofactors(unittest.TestCase):
-
     def setUp(self):
         # Create a more robust structure with a C2H2 zinc finger motif.
         # We will have CYS, HIS, CYS, HIS residues.
@@ -125,6 +124,127 @@ class TestCofactors(unittest.TestCase):
         ligand_coords = self.structure.coord[[3, 13, 17, 27]]
         expected_centroid = np.mean(ligand_coords, axis=0)
         np.testing.assert_allclose(ion.coord, expected_centroid, atol=1e-6)
+
+    def test_multi_chain_coordination(self):
+        """Verify that coordination can occur between atoms on different chains."""
+        # Setup: 2 ligands on Chain A, 2 on Chain B
+        struct = struc.AtomArray(4)
+        struct.res_name = np.array(["CYS", "CYS", "HIS", "HIS"])
+        struct.atom_name = np.array(["SG", "SG", "NE2", "NE2"])
+        struct.res_id = np.array([1, 2, 1, 2])
+        struct.chain_id = np.array(["A", "A", "B", "B"])
+        struct.coord = np.array([[0, 0, 0], [2, 0, 0], [0, 2, 0], [2, 2, 0]])
+        struct.hetero = np.array([False] * 4)
+
+        sites = find_metal_binding_sites(struct, distance_threshold=5.0)
+        self.assertEqual(len(sites), 1, "Should coordinate across chains")
+        self.assertEqual(len(sites[0]["ligand_indices"]), 4)
+
+    def test_insufficient_unique_residues(self):
+        """Ensure 4 atoms from only 3 unique residues do NOT form a site."""
+        struct = struc.AtomArray(4)
+        # Residue 1 has two coordination atoms (ND1 and NE2)
+        struct.res_name = np.array(["HIS", "HIS", "CYS", "CYS"])
+        struct.atom_name = np.array(["ND1", "NE2", "SG", "SG"])
+        struct.res_id = np.array([1, 1, 2, 3])
+        struct.chain_id = np.array(["A", "A", "A", "A"])
+        struct.coord = np.array([[0, 0, 0], [0.1, 0, 0], [1, 0, 0], [0, 1, 0]])
+        struct.hetero = np.array([False] * 4)
+
+        sites = find_metal_binding_sites(struct, distance_threshold=5.0)
+        self.assertEqual(len(sites), 0, "Should not coordinate with only 3 unique residues")
+
+    def test_overlapping_sites_tightest_first(self):
+        """Verify that the algorithm picks the tightest cluster when sites overlap."""
+        # 5 ligands total. Atom 0-3 form a tight cluster. Atom 0-2 + 4 form a loose cluster.
+        struct = struc.AtomArray(5)
+        struct.res_name = np.array(["CYS"] * 5)
+        struct.atom_name = np.array(["SG"] * 5)
+        struct.res_id = np.array([1, 2, 3, 4, 5])
+        struct.chain_id = np.array(["A"] * 5)
+        struct.coord = np.array(
+            [
+                [0, 0, 0],
+                [1, 0, 0],
+                [0, 1, 0],
+                [1, 1, 0],  # Tight partner
+                [10, 10, 10],  # Loose partner
+            ]
+        )
+        struct.hetero = np.array([False] * 5)
+
+        sites = find_metal_binding_sites(struct, distance_threshold=20.0)
+        self.assertEqual(len(sites), 1)
+        # Should have picked indices 0, 1, 2, 3
+        self.assertIn(3, sites[0]["ligand_indices"])
+        self.assertNotIn(4, sites[0]["ligand_indices"])
+
+    def test_multi_atom_residue_logic(self):
+        """Test a hypothetical residue with 3 potential ligands (triple-counting check)."""
+        # Residue 1 has 3 atoms that match the ligand mask
+        struct = struc.AtomArray(6)
+        struct.res_name = np.array(["HIS", "HIS", "HIS", "CYS", "CYS", "CYS"])
+        struct.atom_name = np.array(
+            ["ND1", "NE2", "CG", "SG", "SG", "SG"]
+        )  # CG is not in mask usually, let's use valid ones
+        # Actually HIS only has ND1 and NE2. Let's force them via mask in a custom way if needed,
+        # or just use 2 HIS and 2 CYS but one HIS has both.
+
+        # Reset to real scenario: 2 atoms in HIS 1, 1 atom in CYS 2, 1 atom in CYS 3
+        # Total 4 atoms, but only 3 unique residues.
+        struct.res_name = np.array(["HIS", "HIS", "CYS", "CYS", "ALA", "ALA"])
+        struct.atom_name = np.array(["ND1", "NE2", "SG", "SG", "CA", "CA"])
+        struct.res_id = np.array([1, 1, 2, 3, 4, 5])
+        struct.chain_id = np.array(["A", "A", "A", "A", "A", "A"])
+        struct.coord = np.array(
+            [
+                [0, 0, 0],  # HIS 1 ND1
+                [0.1, 0, 0],  # HIS 1 NE2 (very close)
+                [1, 0, 0],  # CYS 2
+                [0, 1, 0],  # CYS 3
+                [10, 10, 10],
+                [11, 11, 11],
+            ]
+        )
+        struct.hetero = np.array([False] * 6)
+
+        sites = find_metal_binding_sites(struct, distance_threshold=20.0)
+        self.assertEqual(
+            len(sites),
+            0,
+            "Should NOT form a site with only 3 unique residues even if 4 candidate atoms exist",
+        )
+
+        # Now add a 4th unique residue
+        struct2 = struc.AtomArray(7)
+        struct2.res_name = np.array(["HIS", "HIS", "CYS", "CYS", "CYS", "ALA", "ALA"])
+        struct2.atom_name = np.array(["ND1", "NE2", "SG", "SG", "SG", "CA", "CA"])
+        struct2.res_id = np.array([1, 1, 2, 3, 4, 5, 6])
+        struct2.chain_id = np.array(["A", "A", "A", "A", "A", "A", "A"])
+        struct2.coord = np.array(
+            [
+                [0, 0, 0],  # HIS 1 ND1
+                [0.1, 0, 0],  # HIS 1 NE2
+                [1, 0, 0],  # CYS 2
+                [0, 1, 0],  # CYS 3
+                [1, 1, 0],  # CYS 4
+                [10, 10, 10],
+                [11, 11, 11],
+            ]
+        )
+        struct2.hetero = np.array([False] * 7)
+
+        sites2 = find_metal_binding_sites(struct2, distance_threshold=20.0)
+        self.assertEqual(
+            len(sites2), 1, "Should form a site now that 4 unique residues are present"
+        )
+        self.assertEqual(len(sites2[0]["ligand_indices"]), 4)
+
+        # Verify it picked the BEST atom from HIS 1 (the one closest to the centroid or seed)
+        # If we use HIS 1 ND1 (index 0) as seed, distance to NE2 (index 1) is 0.1, but it should
+        # only pick ONE of them.
+        ligands = sites2[0]["ligand_indices"]
+        self.assertTrue((0 in ligands) ^ (1 in ligands), "Should pick exactly one atom from HIS 1")
 
 
 if __name__ == "__main__":

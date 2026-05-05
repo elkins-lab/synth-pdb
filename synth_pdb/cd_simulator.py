@@ -113,13 +113,13 @@ class CDSimulator:
         if self.fractions["H"] > 0.3:
             plt.annotate(
                 "222 nm",
-                xy=(222, spectrum[WAVELENGTHS == 222]),
+                xy=(222, spectrum[WAVELENGTHS == 222][0]),
                 xytext=(230, -30000),
                 arrowprops={"arrowstyle": "->"},
             )
             plt.annotate(
                 "208 nm",
-                xy=(208, spectrum[WAVELENGTHS == 208]),
+                xy=(208, spectrum[WAVELENGTHS == 208][0]),
                 xytext=(200, -45000),
                 arrowprops={"arrowstyle": "->"},
             )

@@ -205,6 +205,6 @@ with tab_pathology:
 # Footer
 st.divider()
 st.markdown(
-    "<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v1.35.0 | Professional Edition</div>",
+    "<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v1.36.0 | Professional Edition</div>",
     unsafe_allow_html=True,
 )

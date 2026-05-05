@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.36.0] - 2026-05-04
+
+### Added
+- **Enhanced Prompt Transparency**: The CLI now explicitly logs interpreted command-line arguments when using the `--prompt` interface, providing full visibility into how the LLM maps natural language to biophysical parameters.
+- **Intelligent CLI Logging**: Implemented a custom `CLIFormatter` that keeps standard output clean while explicitly labeling `WARNING:` and `ERROR:` messages for improved diagnostic visibility.
+- **Robust Prompt Documentation**: Added a "Tips for Reliable Generation" section to the Prompt-to-Protein guide, covering SLM hallucination management and clinical phrasing best practices.
+- **Explicit GPU Control**: New `--platform` and `--precision` flags for OpenMM-driven energy minimization, allowing users to force `CUDA`, `Metal`, or `OpenCL` platforms and choose between `single`, `mixed`, or `double` precision for optimized performance.
+- **Physics Progress Tracking**: Integrated `LoggingMinimizationReporter` to provide real-time energy convergence feedback during minimization at the `DEBUG` level.
+- **Hardware Acceleration Benchmark**: New `scripts/benchmark_hardware.py` utility to quantify performance gains across different compute platforms (CPU vs GPU).
+
+### Fixed
+- **Metal Coordination Realism**: Refactored the Zinc Finger detection logic to require ligands from 4 unique residues (chain + residue ID mapping). This eliminates false-positive coordination sites caused by "double-counting" multiple atoms (e.g., His NE2/ND1) from the same residue.
+- **CLI Logging Stream**: Standardized logging output to `stderr` to ensure compatibility with shell piping and automated test suites.
+- **Memory Management**: Implemented caching for functional OpenMM platforms and improved cleanup in `simulate_trajectory` to resolve intermittent memory leaks and redundant initialization overhead.
+- **Dependency Stability**: Explicitly excluded buggy OpenMM versions (8.5.0, 8.5.1) to protect against known upstream memory leaks.
+
 ## [1.35.0] - 2026-05-02
 
 ### Added

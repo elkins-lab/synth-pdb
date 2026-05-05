@@ -89,9 +89,9 @@ class TestGalleryExamples:
         test_args = [
             "synth_pdb",
             "--sequence",
-            "CPHCGKSFSQKSDLVKHQRT",
-            "--structure",
-            "1-10:beta,11-20:alpha",
+            "KCPVCHKKFSRSDELTRHIRIHTG",
+            "--conformation",
+            "random",
             "--metal-ions",
             "auto",
             "--minimize",

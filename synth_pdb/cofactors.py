@@ -82,20 +82,27 @@ def find_metal_binding_sites(
 
             # Filter unassigned neighbors that fall within the threshold
             neighbor_mask = dists < distance_threshold
-            unassigned_neighbor_indices = [
-                j
-                for j in range(len(candidate_indices))
-                if neighbor_mask[j] and candidate_indices[j] not in assigned_indices
-            ]
+
+            # UNIQUE RESIDUE SELECTION:
+            # To avoid false positives (e.g. counting NE2 and ND1 of the same HIS),
+            # we must ensure each ligand comes from a unique residue.
+            # We map (chain, res_id) -> (distance, candidate_index)
+            res_to_best_atom: dict[tuple[str, int], tuple[float, int]] = {}
+            for j in range(len(candidate_indices)):
+                if neighbor_mask[j] and candidate_indices[j] not in assigned_indices:
+                    c_id = structure.chain_id[candidate_indices[j]]
+                    r_id = structure.res_id[candidate_indices[j]]
+                    rid = (c_id, r_id)
+                    d = float(dists[j])
+                    if rid not in res_to_best_atom or d < res_to_best_atom[rid][0]:
+                        res_to_best_atom[rid] = (d, j)
 
             # Zinc Fingers traditionally coordinate with exactly 4 ligands (Cys4 or Cys2His2)
-            if len(unassigned_neighbor_indices) >= 4:
+            if len(res_to_best_atom) >= 4:
                 # EDUCATIONAL NOTE: Local Optimization
-                # We sort neighbors by distance and take the 4 closest to the seed
-                sorted_neighbor_indices = sorted(
-                    unassigned_neighbor_indices, key=lambda x: float(dists[x])
-                )
-                cluster_indices = sorted_neighbor_indices[:4]
+                # We sort residues by distance and take the 4 closest to the seed
+                sorted_rids = sorted(res_to_best_atom.keys(), key=lambda r: res_to_best_atom[r][0])
+                cluster_indices = [res_to_best_atom[rid][1] for rid in sorted_rids[:4]]
 
                 # EDUCATIONAL NOTE: Geometric Realism
                 # We calculate 'spread' as the average distance between ALL atoms in the group.
