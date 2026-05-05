@@ -49,7 +49,20 @@ BASIS_SPECTRA = {
 
 
 class CDSimulator:
-    """Simulates Circular Dichroism spectra from structural data."""
+    """Simulates Circular Dichroism spectra from structural data.
+
+    ### EDUCATIONAL NOTE — CD Background:
+    # Circular Dichroism (CD) measures the differential absorption
+    # of left and right circularly polarized light. In the far-UV
+    # (190-250 nm), it is the premier tool for measuring the
+    # overall secondary structure content of a protein sample.
+    #
+    # The physics is based on the interaction between amide
+    # chromophores. For a given conformation, we can synthesize
+    # the expected spectrum as a weighted average of basis
+    # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
+    #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
+    """
 
     def __init__(self, structure: struc.AtomArray):
         self.structure = structure

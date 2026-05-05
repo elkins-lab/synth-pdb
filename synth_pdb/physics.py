@@ -2103,6 +2103,12 @@ def simulate_trajectory(
         if HAS_OPENMM and logger.isEnabledFor(logging.DEBUG):
             reporter = LoggingMinimizationReporter(interval=50)
 
+        # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
+        # ------------------------------------------
+        # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+        # algorithm. It is a quasi-Newton method that approximates the second
+        # derivative (Hessian) of the potential energy to find the local minimum
+        # efficiently without needing to store the full Hessian matrix.
         simulation.minimizeEnergy(reporter=reporter)
 
         trajectory = []

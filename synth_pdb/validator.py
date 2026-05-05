@@ -2013,6 +2013,7 @@ class PDBValidator:
     def validate_all(self) -> None:
         """Run all validation checks."""
         logger.info("Running all validation checks.")
+        self.violations = []  # Reset violations before running all checks
         self.validate_bond_lengths()
         self.validate_bond_angles()
         self.validate_ramachandran()
