@@ -922,10 +922,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#option-b-local-slm-offline-private" class="md-nav__link">
+  <a href="#option-b-interactive-piped-prompts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option B: Local SLM (Offline &amp; Private)
+        Option B: Interactive &amp; Piped Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-c-local-slm-offline-private" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option C: Local SLM (Offline &amp; Private)
       
     </span>
   </a>
@@ -4069,10 +4080,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#option-b-local-slm-offline-private" class="md-nav__link">
+  <a href="#option-b-interactive-piped-prompts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Option B: Local SLM (Offline &amp; Private)
+        Option B: Interactive &amp; Piped Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-c-local-slm-offline-private" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option C: Local SLM (Offline &amp; Private)
       
     </span>
   </a>
@@ -4266,17 +4288,29 @@
 </span></code></pre></div></p>
 </li>
 </ol>
-<h3 id="option-b-local-slm-offline-private">Option B: Local SLM (Offline &amp; Private)</h3>
+<h3 id="option-b-interactive-piped-prompts">Option B: Interactive &amp; Piped Prompts</h3>
+<p>You can also provide your prompt via standard input, which is useful for complex multi-line instructions or for piping the output of other tools.</p>
+<p><strong>Piping a prompt:</strong>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Generate a 15-mer alpha helix&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>synth-pdb<span class="w"> </span>--prompt
+</span></code></pre></div></p>
+<p><strong>Interactive mode:</strong>
+If you run <code>--prompt</code> without a value, it will open an interactive buffer:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>synth-pdb<span class="w"> </span>--prompt
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Enter your natural language prompt (type &#39;exit&#39; on a new line or press Ctrl+D to finish):</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># &gt; Build an alpha helix</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># &gt; exit</span>
+</span></code></pre></div></p>
+<h3 id="option-c-local-slm-offline-private">Option C: Local SLM (Offline &amp; Private)</h3>
 <p>For total privacy and zero API costs, <code>synth-pdb</code> supports downloading and running a highly compressed <strong>Small Language Model (SLM)</strong> locally on your CPU or GPU.</p>
 <ol>
 <li>
 <p>Install the optional local AI dependencies:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>synth-pdb<span class="o">[</span>local-llm<span class="o">]</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pip<span class="w"> </span>install<span class="w"> </span>synth-pdb<span class="o">[</span>local-llm<span class="o">]</span>
 </span></code></pre></div></p>
 </li>
 <li>
 <p>Run your prompt using the local backend:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>synth-pdb<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Build an alpha helix&quot;</span><span class="w"> </span>--llm-backend<span class="w"> </span><span class="nb">local</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>synth-pdb<span class="w"> </span>--prompt<span class="w"> </span><span class="s2">&quot;Build an alpha helix&quot;</span><span class="w"> </span>--llm-backend<span class="w"> </span><span class="nb">local</span>
 </span></code></pre></div></p>
 </li>
 </ol>
@@ -4307,7 +4341,7 @@
 <p>While the Prompt-to-Protein interface is designed to be intuitive, performance varies depending on the LLM backend you choose. </p>
 <h3 id="1-verify-the-interpretation">1. Verify the Interpretation</h3>
 <p>When you run a prompt, <code>synth-pdb</code> will log exactly how it interpreted your request. <strong>Always check this line</strong> to ensure the model understood your structural requirements:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Translated<span class="w"> </span>prompt<span class="w"> </span>into:<span class="w"> </span>--length<span class="w"> </span><span class="m">20</span><span class="w"> </span>--conformation<span class="w"> </span>alpha
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Translated<span class="w"> </span>prompt<span class="w"> </span>into:<span class="w"> </span>--length<span class="w"> </span><span class="m">20</span><span class="w"> </span>--conformation<span class="w"> </span>alpha
 </span></code></pre></div>
 <h3 id="2-handling-slm-hallucinations-local-backend">2. Handling "SLM Hallucinations" (Local Backend)</h3>
 <p>The local backend uses Small Language Models (SLMs) like <code>Phi-3</code>. These models are efficient but can occasionally hallucinate long sequences or "forget" to set structural flags if the prompt is too conversational.</p>
@@ -4320,7 +4354,7 @@
 <p>If you need high-precision mapping of multiple complex requirements (e.g., specific solvent models, rdc tensors, and PTM rates all in one prompt), the <code>openai</code> backend (using GPT-4o-mini) is significantly more robust and less prone to hallucinations than the smaller local models.</p>
 <h3 id="4-nonsense-prompts">4. Nonsense Prompts</h3>
 <p>If you provide a prompt that contains no biological or structural instructions (e.g., "The quick brown fox..."), the system will log a warning:</p>
-<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>WARNING:<span class="w"> </span>No<span class="w"> </span>specific<span class="w"> </span>structural<span class="w"> </span>instructions<span class="w"> </span>identified<span class="w"> </span><span class="k">in</span><span class="w"> </span>prompt.<span class="w"> </span>Using<span class="w"> </span>defaults.
+<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>WARNING:<span class="w"> </span>No<span class="w"> </span>specific<span class="w"> </span>structural<span class="w"> </span>instructions<span class="w"> </span>identified<span class="w"> </span><span class="k">in</span><span class="w"> </span>prompt.<span class="w"> </span>Using<span class="w"> </span>defaults.
 </span></code></pre></div>
 In this case, it will fall back to a standard 10-residue linear peptide.</p>
 <h2 id="how-it-works-under-the-hood">How it Works (Under the Hood)</h2>
