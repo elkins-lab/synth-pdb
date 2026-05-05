@@ -4235,6 +4235,10 @@
 <p>Or via conda (recommended for Apple Silicon):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openmm
 </span></code></pre></div>
+<div class="admonition caution">
+<p class="admonition-title">OpenMM Version Warning</p>
+<p>Versions <strong>8.5.0</strong> and <strong>8.5.1</strong> have known memory leaks. <code>synth-pdb</code> excludes these versions. Please ensure you are using <strong>8.4.x</strong> or older for production workloads.</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Apple Silicon Users</p>
 <p>OpenMM on M1/M2/M3/M4 Macs supports GPU acceleration via OpenCL/Metal, providing 5x speedup over CPU.</p>

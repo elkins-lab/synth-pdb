@@ -4200,6 +4200,10 @@
 
 <h1 id="physics-engine">Physics Engine</h1>
 <p><code>synth-pdb</code> uses <strong>OpenMM</strong> as its physics backend, providing GPU-accelerated energy minimization and molecular dynamics simulation. This page documents the physics capabilities and their CLI/Python interfaces.</p>
+<blockquote>
+<p>[!CAUTION]
+<strong>OpenMM Version Warning</strong>: Due to known upstream memory leaks in <strong>OpenMM 8.5.0</strong> and <strong>8.5.1</strong>, these versions are explicitly excluded from <code>synth-pdb</code> dependencies. We recommend using <strong>OpenMM 8.4.x</strong> or older for stable long-running generations.</p>
+</blockquote>
 <h2 id="understanding-energy-minimization">Understanding Energy Minimization</h2>
 <p><strong>Energy Minimization</strong> moves atoms "downhill" on the potential energy surface to find the nearest stable configuration.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>      High Energy

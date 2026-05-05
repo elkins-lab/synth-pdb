@@ -59,6 +59,9 @@ Or via conda (recommended for Apple Silicon):
 conda install -c conda-forge openmm
 ```
 
+!!! caution "OpenMM Version Warning"
+    Versions **8.5.0** and **8.5.1** have known memory leaks. `synth-pdb` excludes these versions. Please ensure you are using **8.4.x** or older for production workloads.
+
 !!! tip "Apple Silicon Users"
     OpenMM on M1/M2/M3/M4 Macs supports GPU acceleration via OpenCL/Metal, providing 5x speedup over CPU.
 

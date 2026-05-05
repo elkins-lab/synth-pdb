@@ -2,6 +2,9 @@
 
 `synth-pdb` uses **OpenMM** as its physics backend, providing GPU-accelerated energy minimization and molecular dynamics simulation. This page documents the physics capabilities and their CLI/Python interfaces.
 
+> [!CAUTION]
+> **OpenMM Version Warning**: Due to known upstream memory leaks in **OpenMM 8.5.0** and **8.5.1**, these versions are explicitly excluded from `synth-pdb` dependencies. We recommend using **OpenMM 8.4.x** or older for stable long-running generations.
+
 ## Understanding Energy Minimization
 
 **Energy Minimization** moves atoms "downhill" on the potential energy surface to find the nearest stable configuration.

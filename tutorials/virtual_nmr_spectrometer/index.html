@@ -4899,10 +4899,10 @@ except ImportError as e:
 
     <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"🛡️ Locking Environment to NumPy 1.x..."</span><span class="p">)</span>
-
         <span class="c1"># 1. Create constraint file (We effectively bully pip into submission here)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"constraints.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'numpy&lt;2.0'</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"numpy&lt;2.0</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"openmm&gt;=8.1.0,!=8.5.0,!=8.5.1</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># 2. Install with explicit constraints</span>
         <span class="c1"># We ignore 'shap' errors because we don't use it.</span>
@@ -4943,10 +4943,10 @@ if not os.path.exists("installed.marker"):
 
     if IN_COLAB:
         print("🛡️ Locking Environment to NumPy 1.x...")
-
         # 1. Create constraint file (We effectively bully pip into submission here)
         with open("constraints.txt", "w") as f:
-            f.write('numpy&lt;2.0')
+            f.write("numpy&lt;2.0\n")
+            f.write("openmm&gt;=8.1.0,!=8.5.0,!=8.5.1\n")
 
         # 2. Install with explicit constraints
         # We ignore 'shap' errors because we don't use it.
