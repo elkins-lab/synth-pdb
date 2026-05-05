@@ -999,6 +999,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tips-for-reliable-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips for Reliable Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips for Reliable Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-verify-the-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Verify the Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-handling-slm-hallucinations-local-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Handling "SLM Hallucinations" (Local Backend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-use-the-cloud-for-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Use the Cloud for Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-nonsense-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Nonsense Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-it-works-under-the-hood" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4085,6 +4146,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tips-for-reliable-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips for Reliable Generation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips for Reliable Generation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-verify-the-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Verify the Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-handling-slm-hallucinations-local-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Handling "SLM Hallucinations" (Local Backend)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-use-the-cloud-for-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Use the Cloud for Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-nonsense-prompts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Nonsense Prompts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-it-works-under-the-hood" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4181,6 +4303,26 @@
 <p>"I need a 40-residue polyproline II extended structure. Please simulate its Circular Dichroism spectrum and generate its expected NMR chemical shifts."
 <em>(Automatically parses <code>--length 40 --conformation ppii --gen-cd --gen-shifts</code>)</em></p>
 </blockquote>
+<h2 id="tips-for-reliable-generation">Tips for Reliable Generation</h2>
+<p>While the Prompt-to-Protein interface is designed to be intuitive, performance varies depending on the LLM backend you choose. </p>
+<h3 id="1-verify-the-interpretation">1. Verify the Interpretation</h3>
+<p>When you run a prompt, <code>synth-pdb</code> will log exactly how it interpreted your request. <strong>Always check this line</strong> to ensure the model understood your structural requirements:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Translated<span class="w"> </span>prompt<span class="w"> </span>into:<span class="w"> </span>--length<span class="w"> </span><span class="m">20</span><span class="w"> </span>--conformation<span class="w"> </span>alpha
+</span></code></pre></div>
+<h3 id="2-handling-slm-hallucinations-local-backend">2. Handling "SLM Hallucinations" (Local Backend)</h3>
+<p>The local backend uses Small Language Models (SLMs) like <code>Phi-3</code>. These models are efficient but can occasionally hallucinate long sequences or "forget" to set structural flags if the prompt is too conversational.</p>
+<ul>
+<li><strong>Avoid Conversation Filler:</strong> Instead of "Hey there, would you please generate me a...", try clinical phrasing: <strong>"Length 30, conformation beta, minimize"</strong>.</li>
+<li><strong>Sequence Over-Generation:</strong> If the model starts generating an extremely long sequence (e.g., "Successfully predicted S2 for 225 residues") when you didn't ask for one, try being more explicit about the length: <strong>"Generate exactly 20 residues"</strong>.</li>
+<li><strong>Defaulting to Alpha:</strong> If you don't see <code>--conformation beta</code> (or your requested type) in the translation logs, the system will default to an <strong>Alpha Helix</strong>.</li>
+</ul>
+<h3 id="3-use-the-cloud-for-precision">3. Use the Cloud for Precision</h3>
+<p>If you need high-precision mapping of multiple complex requirements (e.g., specific solvent models, rdc tensors, and PTM rates all in one prompt), the <code>openai</code> backend (using GPT-4o-mini) is significantly more robust and less prone to hallucinations than the smaller local models.</p>
+<h3 id="4-nonsense-prompts">4. Nonsense Prompts</h3>
+<p>If you provide a prompt that contains no biological or structural instructions (e.g., "The quick brown fox..."), the system will log a warning:</p>
+<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>WARNING:<span class="w"> </span>No<span class="w"> </span>specific<span class="w"> </span>structural<span class="w"> </span>instructions<span class="w"> </span>identified<span class="w"> </span><span class="k">in</span><span class="w"> </span>prompt.<span class="w"> </span>Using<span class="w"> </span>defaults.
+</span></code></pre></div>
+In this case, it will fall back to a standard 10-residue linear peptide.</p>
 <h2 id="how-it-works-under-the-hood">How it Works (Under the Hood)</h2>
 <p>The LLM interface is strictly isolated from the core biophysics engine. It uses a <strong>Zero-Shot JSON Translation</strong> technique:</p>
 <ol>

@@ -54,6 +54,35 @@ The natural language interface is designed to understand complex, multi-step bio
 > "I need a 40-residue polyproline II extended structure. Please simulate its Circular Dichroism spectrum and generate its expected NMR chemical shifts."
 *(Automatically parses `--length 40 --conformation ppii --gen-cd --gen-shifts`)*
 
+## Tips for Reliable Generation
+
+While the Prompt-to-Protein interface is designed to be intuitive, performance varies depending on the LLM backend you choose. 
+
+### 1. Verify the Interpretation
+When you run a prompt, `synth-pdb` will log exactly how it interpreted your request. **Always check this line** to ensure the model understood your structural requirements:
+
+```bash
+Translated prompt into: --length 20 --conformation alpha
+```
+
+### 2. Handling "SLM Hallucinations" (Local Backend)
+The local backend uses Small Language Models (SLMs) like `Phi-3`. These models are efficient but can occasionally hallucinate long sequences or "forget" to set structural flags if the prompt is too conversational.
+
+*   **Avoid Conversation Filler:** Instead of "Hey there, would you please generate me a...", try clinical phrasing: **"Length 30, conformation beta, minimize"**.
+*   **Sequence Over-Generation:** If the model starts generating an extremely long sequence (e.g., "Successfully predicted S2 for 225 residues") when you didn't ask for one, try being more explicit about the length: **"Generate exactly 20 residues"**.
+*   **Defaulting to Alpha:** If you don't see `--conformation beta` (or your requested type) in the translation logs, the system will default to an **Alpha Helix**.
+
+### 3. Use the Cloud for Precision
+If you need high-precision mapping of multiple complex requirements (e.g., specific solvent models, rdc tensors, and PTM rates all in one prompt), the `openai` backend (using GPT-4o-mini) is significantly more robust and less prone to hallucinations than the smaller local models.
+
+### 4. Nonsense Prompts
+If you provide a prompt that contains no biological or structural instructions (e.g., "The quick brown fox..."), the system will log a warning:
+
+```bash
+WARNING: No specific structural instructions identified in prompt. Using defaults.
+```
+In this case, it will fall back to a standard 10-residue linear peptide.
+
 ## How it Works (Under the Hood)
 The LLM interface is strictly isolated from the core biophysics engine. It uses a **Zero-Shot JSON Translation** technique:
 
