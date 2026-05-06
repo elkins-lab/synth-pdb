@@ -6,9 +6,23 @@ Trains the ProteinGNN with two jointly optimised objectives:
 2. **Per-residue pLDDT regression** — MSE loss on per-node sigmoid output vs.
    Ramachandran Z-score targets derived from ground-truth torsion angles.
 
-The per-residue auxiliary task forces the shared message-passing backbone to
-encode local geometry information, which improves global classifier performance
-even on small datasets (multi-task regularisation).
+─────────────────────────────────────────────────────────────────────────────
+STRUCTURAL BIOLOGY CONTEXT — Why this multi-task approach?
+─────────────────────────────────────────────────────────────────────────────
+
+A structural biologist typically judges protein quality using two lenses:
+  • Global fold: Does the overall architecture look like a protein?
+  • Local geometry: Are the bond lengths, angles, and torsions physically
+    plausible (e.g., Ramachandran favoured, no steric clashes)?
+
+Standard GNN classifiers often focus on the global fold but ignore local
+"micro-violations" like a single clashing atom. By adding an auxiliary
+per-residue task (pLDDT regression), we force the GNN's internal message-passing
+layers to encode local geometric features (φ/ψ angles).
+
+pLDDT (predicted Local Distance Difference Test) is the same metric used by
+AlphaFold 2 to communicate confidence. Here, we use a Ramachandran-derived
+Z-score as a ground-truth proxy for pLDDT during training.
 
 Usage
 -----
@@ -34,6 +48,8 @@ logger = logging.getLogger(__name__)
 
 # Ideal Ramachandran centres for alpha-helix (φ=-60°, ψ=-45°) and
 # beta-strand (φ=-120°, ψ=+120°).  Used to derive per-residue quality targets.
+# These centres represent the "sweet spots" of the backbone energy landscape
+# where steric hindrance between side-chain atoms and the backbone is minimised.
 _HELIX_PHI, _HELIX_PSI = -60.0, -45.0
 _STRAND_PHI, _STRAND_PSI = -120.0, 120.0
 _COIL_PHI, _COIL_PSI = -60.0, 140.0  # PPII/extended approximate centre
@@ -42,28 +58,42 @@ _COIL_PHI, _COIL_PSI = -60.0, 140.0  # PPII/extended approximate centre
 def _ramachandran_score(phi: float | None, psi: float | None) -> float:
     """Return a Ramachandran-based per-residue quality score ∈ [0, 1].
 
-    Educational note — Ramachandran Z-score
-    ─────────────────────────────────────────
-    A residue's backbone torsion angles (φ, ψ) should fall in one of the
-    favoured regions of the Ramachandran plot (helix, strand, PPII).
-    We compute the distance from the nearest favoured centre and convert
-    it to a score via a Gaussian kernel with σ=40°.
+    Educational note — Ramachandran Z-score and Steric Constraints
+    ────────────────────────────────────────────────────────────────
+    A residue's backbone torsion angles (φ, ψ) are not free to rotate 360°.
+    The peptide bond has a planar character, and the Cβ atom of the side-chain
+    collides with the backbone O and N atoms if the angles are "forbidden."
 
-    A residue exactly at a helix/strand centre → score ≈ 1.0 (Very High).
-    A residue 90° away from all centres → score ≈ 0.1 (Low confidence).
+    We compute the distance from the nearest "favoured" centre (alpha, beta,
+    or poly-proline II) and convert it to a score via a Gaussian kernel
+    with σ=40°.
+
+    • Residue in a perfect alpha-helix → score ≈ 1.0 (High confidence).
+    • Residue in a "disallowed" region → score ≈ 0.0 (Unphysical/Clashing).
 
     This is a simplified but physically motivated proxy for MolProbity's
-    per-residue Ramachandran Z-score used in CASP quality assessment.
+    per-residue Ramachandran Z-score used in CASP (Critical Assessment
+    of Structure Prediction) quality assessment.
     """
     if phi is None or psi is None:
-        # Terminal residues have undefined dihedrals → moderate confidence
+        # Terminal residues have undefined dihedrals (missing C_{i-1} or N_{i+1})
+        # We assign a moderate confidence of 0.5.
         return 0.5
 
-    sigma = 40.0  # degrees — half-width of favoured regions
+    sigma = 40.0  # degrees — approximate half-width of favoured regions
 
     def gaussian_dist(phi_ref: float, psi_ref: float) -> float:
         dphi = phi - phi_ref
         dpsi = psi - psi_ref
+        # Handle wrap-around for circular dihedrals
+        if dphi > 180:
+            dphi -= 360
+        if dphi < -180:
+            dphi += 360
+        if dpsi > 180:
+            dpsi -= 360
+        if dpsi < -180:
+            dpsi += 360
         d2 = dphi**2 + dpsi**2
         return math.exp(-d2 / (2 * sigma**2))
 
@@ -84,17 +114,20 @@ def compute_per_residue_targets(
 ) -> np.ndarray:
     """Compute per-residue pLDDT targets for training.
 
+    pLDDT (predicted Local Distance Difference Test) is a per-residue confidence
+    metric. In our GNN, we want the model to predict high pLDDT for well-formed
+    residues and low pLDDT for those with distorted geometry.
+
     Args:
         pdb_content: PDB-format string.
         label: Global structure label (1 = Good, 0 = Bad).
         perturbed_residue_idx: If this structure was distorted by perturbing a
-            specific residue (e.g. a clash injection at index i), pass i here.
-            That residue receives a hard target of 0.0 regardless of its
-            Ramachandran angles (which may still look plausible for a clash).
+            specific residue (e.g. a clash injection), pass its index here.
+            That residue receives a hard target of 0.0 (High error) to teach
+            the GNN to spot local steric violations even if torsions are okay.
 
     Returns:
         np.ndarray of shape [N,] with per-residue targets ∈ [0, 1].
-
     """
     from synth_pdb.quality.gnn.graph import _parse_backbone
 
@@ -120,7 +153,20 @@ def compute_per_residue_targets(
 
 
 def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
-    """Generate synthetic PDB strings for the four structural classes.
+    """Generate synthetic PDB strings across four structural classes.
+
+    Why these four classes?
+    ───────────────────────
+    1. GOOD (Alpha Helix): Provides a baseline for idealized, "folded"
+       geometry with perfect H-bonding and Ramachandran placement.
+    2. RANDOM (Coil): Models "disordered" or "unfolded" states with unconstrained
+       torsions. Teaches the GNN to recognise forbidden Ramachandran regions.
+    3. DISTORTED: Models "shaken" structures or low-resolution models where
+       the global fold is roughly correct but local Cα positions have 0.5 Å
+       noise. Teaches the GNN to be sensitive to fine-grained coordinate error.
+    4. CLASHING: Models "threading" or "sampling" errors where a single atom
+       is physically in the wrong place (steric clash). Teaches the GNN to
+       spot local outliers in an otherwise good structure.
 
     Returns
     -------
@@ -156,7 +202,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
     clash_indices: list[int | None] = []
     failure_counts = {"good": 0, "random": 0, "distorted": 0, "clash": 0}
 
-    # 1. Good (Alpha Helix)
+    # 1. Good (Alpha Helix) — idealized backbone geometry
     for i in range(n_good):
         if i % 20 == 0:
             logger.info("  Good %d/%d", i, n_good)
@@ -171,6 +217,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
             logger.warning("Good sample %d failed: %s", i, e, exc_info=True)
 
     # 2. Bad (Random coil — poor Ramachandran geometry)
+    # Torsion angles are sampled uniformly [0, 360], ignoring steric hindrance.
     for i in range(n_bad_random):
         if i % 10 == 0:
             logger.info("  Random %d/%d", i, n_bad_random)
@@ -185,6 +232,8 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
             logger.warning("Random sample %d failed: %s", i, e, exc_info=True)
 
     # 3. Bad (Distorted — good helix with Gaussian coordinate noise)
+    # This simulates a "loose" structure where Cα atoms are wobbling away
+    # from their ideal lattice positions.
     for i in range(n_bad_distorted):
         if i % 10 == 0:
             logger.info("  Distorted %d/%d", i, n_bad_distorted)
@@ -205,6 +254,9 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
             logger.warning("Distorted sample %d failed: %s", i, e, exc_info=True)
 
     # 4. Bad (Clashing — single Cα displacement)
+    # We move a Cα atom directly on top of another residue's position.
+    # This creates a massive steric clash (Van der Waals overlap) which is
+    # a classic sign of a poor-quality structural model.
     for i in range(n_bad_clash):
         if i % 10 == 0:
             logger.info("  Clashing %d/%d", i, n_bad_clash)
@@ -245,6 +297,10 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
 def build_graph_dataset(y: np.ndarray, pdb_list: list, clash_indices: list):
     """Convert raw PDB strings to PyG Data objects with global labels and per-residue targets.
 
+    Each protein is represented as a contact graph:
+      Nodes: Residues (Cα atoms)
+      Edges: Connectivity if Cα–Cα distance < 8 Å.
+
     Args:
         y: Global label array (1 = Good, 0 = Bad), length N.
         pdb_list: List of N PDB strings.
@@ -252,7 +308,6 @@ def build_graph_dataset(y: np.ndarray, pdb_list: list, clash_indices: list):
 
     Returns:
         List of torch_geometric.data.Data objects with .y and .residue_targets set.
-
     """
     import torch
 
@@ -267,7 +322,7 @@ def build_graph_dataset(y: np.ndarray, pdb_list: list, clash_indices: list):
             g = build_protein_graph(pdb_content)
             g.y = torch.tensor([int(label)], dtype=torch.long)
 
-            # Per-residue pLDDT targets
+            # Per-residue pLDDT targets based on local geometry
             targets = compute_per_residue_targets(pdb_content, int(label), clash_idx)
             g.residue_targets = torch.tensor(targets, dtype=torch.float)  # [N,]
 
@@ -297,6 +352,13 @@ def train_gnn(
 ):
     """Train the GNN quality classifier with joint global + per-residue loss.
 
+    The model learns to predict:
+    1. Is this structure valid overall? (Global Label)
+    2. Which residues have bad local geometry? (Per-residue pLDDT)
+
+    This multi-task setup regularises the GNN, making it more robust than
+    a simple binary classifier.
+
     Args:
         output_path: Where to save the .pt checkpoint.
         n_samples: Training samples to generate.
@@ -308,7 +370,6 @@ def train_gnn(
             Total loss = NLL_global + λ × MSE_per_residue.
             Default 0.3 balances the two tasks without overwhelming the
             primary classification objective.
-
     """
     try:
         import torch
@@ -362,6 +423,8 @@ def train_gnn(
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
     # ── Training loop ──────────────────────────────────────────────────
+    # λ_residue (residue_loss_weight) controls how much the model prioritises
+    # local geometry (pLDDT) over global classification.
     logger.info("Training for %d epochs (λ_residue=%.2f)...", epochs, residue_loss_weight)
 
     for epoch in range(1, epochs + 1):
@@ -387,6 +450,7 @@ def train_gnn(
             global_loss = F.nll_loss(log_probs, batch.y)
 
             # ── Loss 2: per-residue pLDDT regression ──────────────────
+            # Forces the GNN to understand local residue quality.
             # residue_targets is [total_nodes,] concatenated from all graphs
             # in the batch (same ordering as batch.x rows).
             residue_loss = F.mse_loss(
