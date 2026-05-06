@@ -1,30 +1,6 @@
 """synth_pdb.quality.gnn.gnn_classifier.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Drop-in replacement for :class:`synth_pdb.quality.classifier.ProteinQualityClassifier`
-using the GNN model.
-
-─────────────────────────────────────────────────────────────────────────────
-EDUCATIONAL BACKGROUND — Inference with a GNN classifier
-─────────────────────────────────────────────────────────────────────────────
-
-Once the GNN is trained, using it at inference time follows this flow:
-
-    PDB string
-        │
-        ▼  (graph.py)
-    Data object (nodes, edges, features)
-        │
-        ▼  (Batch.from_data_list)
-    PyG Batch  ← wraps a single graph in a batch of size 1
-        │
-        ▼  (model.forward)
-    log-probabilities  [1, 2]    ← log P(Bad), log P(Good)
-        │
-        ▼  (.exp()[:, 1])
-    prob_good  ∈ [0, 1]          ← probability that the structure is high-quality
-        │
-        ▼  (> 0.5 threshold)
-    is_good  True / False        ← binary quality judgement
+GNN-based protein structure quality classifier with global and per-residue outputs.
 
 ─────────────────────────────────────────────────────────────────────────────
 DESIGN CONTRACT — Same API as ProteinQualityClassifier (RF)
@@ -33,7 +9,7 @@ DESIGN CONTRACT — Same API as ProteinQualityClassifier (RF)
 Both classifiers expose:
     predict(pdb_str) → (is_good: bool, probability: float, features: dict)
 
-This lets downstream code swap between the RF and GNN model without changes:
+This lets downstream code swap between the RF and GNN model without changes::
 
     from synth_pdb.quality.classifier    import ProteinQualityClassifier   # RF
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier  # GNN
@@ -41,11 +17,20 @@ This lets downstream code swap between the RF and GNN model without changes:
     clf = GNNQualityClassifier()       # or ProteinQualityClassifier()
     is_good, prob, feats = clf.predict(pdb_string)
 
+Additionally, GNNQualityClassifier exposes a richer API::
+
+    result = clf.score(pdb_string)
+    # result.global_score       → float ∈ [0, 1]  (P(Good))
+    # result.per_residue        → list[float]      (pLDDT per residue)
+    # result.residue_labels     → list[str]        ("Very High"/"High"/"Uncertain"/"Low")
+    # result.label              → str              ("High Quality" / "Low Quality")
+
 ─────────────────────────────────────────────────────────────────────────────
 CHECKPOINT FORMAT (.pt)
 ─────────────────────────────────────────────────────────────────────────────
 
-GNN weights are saved with torch.save() as a dict:
+GNN weights are saved with torch.save() as a dict::
+
     {
       "state_dict"   : OrderedDict of parameter tensors,
       "node_features": int,    ← architecture metadata
@@ -57,22 +42,24 @@ GNN weights are saved with torch.save() as a dict:
 We store architecture metadata alongside weights so the model can be
 re-instantiated without any external configuration file.  This is the
 standard pattern for "self-describing" PyTorch checkpoints.
-
-Compare this to scikit-learn's joblib format (RF), which pickles the entire
-fitted estimator object (weights + architecture + preprocessing all merged).
-The PyTorch approach is more portable across Python / PyTorch versions.
 """
 
 import logging
 import os
+from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-# Default checkpoint path (bundled inside the package after training)
-_DEFAULT_CHECKPOINT = os.path.join(os.path.dirname(__file__), "..", "models", "gnn_quality_v1.pt")
+# Default checkpoint path — v2 has per-residue pLDDT head; falls back to v1
+_DEFAULT_CHECKPOINT_V2 = os.path.join(
+    os.path.dirname(__file__), "..", "models", "gnn_quality_v2.pt"
+)
+_DEFAULT_CHECKPOINT_V1 = os.path.join(
+    os.path.dirname(__file__), "..", "models", "gnn_quality_v1.pt"
+)
 
 # Feature names matching graph.py's node feature ordering.
 # Used to build the feature dict returned by predict() — useful for debugging
@@ -88,12 +75,74 @@ _FEATURE_NAMES = [
     "is_c_terminus",  # 1 if this is the C-terminal residue, else 0
 ]
 
+# pLDDT colour-band thresholds, matching AlphaFold's colour scheme.
+# This makes synth-pdb outputs directly comparable to AlphaFold confidence plots.
+_PLDDT_BANDS = [
+    (0.90, "Very High"),  # blue in AlphaFold
+    (0.70, "High"),  # cyan
+    (0.50, "Uncertain"),  # yellow
+    (0.00, "Low"),  # orange
+]
+
+
+def _plddt_label(score: float) -> str:
+    """Convert a pLDDT score ∈ [0, 1] to a human-readable confidence label."""
+    for threshold, label in _PLDDT_BANDS:
+        if score >= threshold:
+            return label
+    return "Low"
+
+
+@dataclass
+class QualityScore:
+    """Rich quality assessment result for a single protein structure.
+
+    Attributes
+    ----------
+    global_score : float
+        P(Good) ∈ [0, 1].  Values near 1 indicate high confidence the
+        structure is biophysically plausible.  Values near 0.5 indicate the
+        model is uncertain.
+    label : str
+        "High Quality" if global_score > 0.5, else "Low Quality".
+    per_residue : list[float]
+        Per-residue pLDDT-like confidence scores ∈ [0, 1].  Length equals
+        the number of residues with Cα atoms in the PDB.  Analogous to
+        AlphaFold's per-residue pLDDT output.
+    residue_labels : list[str]
+        Human-readable confidence band for each residue:
+        "Very High" (≥0.90), "High" (≥0.70), "Uncertain" (≥0.50), "Low" (<0.50).
+    features : dict[str, float]
+        Mean per-feature summary of the input graph's node feature matrix.
+        Useful for debugging.
+    n_residues : int
+        Number of residues scored.
+
+    Examples
+    --------
+    >>> clf = GNNQualityClassifier()
+    >>> result = clf.score(pdb_string)
+    >>> print(f"Global score: {result.global_score:.3f}  ({result.label})")
+    >>> low_conf = [i for i, lbl in enumerate(result.residue_labels) if lbl == "Low"]
+    >>> print(f"Low-confidence residues: {low_conf}")
+    """
+
+    global_score: float
+    label: str
+    per_residue: list[float] = field(default_factory=list)
+    residue_labels: list[str] = field(default_factory=list)
+    features: dict[str, float] = field(default_factory=dict)
+    n_residues: int = 0
+
 
 class GNNQualityClassifier:
     """GNN-based protein structure quality classifier.
 
     Predicts whether a PDB structure is "High Quality" (biophysically plausible,
     good Ramachandran geometry, no steric clashes) or "Low Quality".
+
+    Also supports per-residue pLDDT-like confidence scoring (requires a v2
+    checkpoint trained with the per-residue auxiliary head).
 
     ── When is a GNN better than a Random Forest? ─────────────────────────
     The RF classifier uses hand-crafted, per-structure summary statistics
@@ -114,31 +163,35 @@ class GNNQualityClassifier:
     def __init__(self, model_path: str | None = None):
         """Args:
         model_path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
-                    If None, looks for the default bundled checkpoint.
+                    If None, looks for the default bundled checkpoint (v2 first, v1 fallback).
                     If no checkpoint is found, initialises a random-weight model
                     (useful for testing graph construction without training).
 
         """
         self.model: Any | None = None
         self._model_path: str | None = None
+        self._has_residue_head: bool = False  # True if v2 checkpoint with pLDDT head
 
         if model_path:
             self.load(model_path)
         else:
-            default = os.path.normpath(_DEFAULT_CHECKPOINT)
-            if os.path.exists(default):
-                self.load(default)
+            # Prefer v2 (per-residue head) over v1 (global only)
+            v2 = os.path.normpath(_DEFAULT_CHECKPOINT_V2)
+            v1 = os.path.normpath(_DEFAULT_CHECKPOINT_V1)
+            if os.path.exists(v2):
+                self.load(v2)
+            elif os.path.exists(v1):
+                logger.info(
+                    "v2 checkpoint not found, loading v1 (no per-residue pLDDT). "
+                    "Run scripts/train_gnn_quality_filter.py to produce v2."
+                )
+                self.load(v1)
             else:
                 logger.info(
-                    "No pre-trained GNN checkpoint found at %s. "
-                    "Classifier initialised with a random-weight model. "
-                    "Run scripts/train_gnn_quality_filter.py to train.",
-                    default,
+                    "No pre-trained GNN checkpoint found. "
+                    "Classifier initialised with random weights. "
+                    "Run scripts/train_gnn_quality_filter.py to train."
                 )
-                # A freshly initialised (untrained) model still produces valid
-                # probability outputs — they just won't be meaningful.  This
-                # allows the predict() API to be called for graph-construction
-                # testing without requiring a trained model.
                 self._init_fresh_model()
 
     # ------------------------------------------------------------------
@@ -154,11 +207,6 @@ class GNNQualityClassifier:
         3. model.forward(...)               → log-probabilities [1, 2]
         4. .exp()[0, 1]                     → P(Good) ∈ [0, 1]
         5. > 0.5 threshold                  → is_good bool
-
-        The feature dict is derived from the NODE features, not from the
-        model's internal activations.  It shows the mean value of each
-        input feature across all residues — useful for debugging why the
-        model assigned a particular score.
         ─────────────────────────────────────────────────────────────────
 
         Args:
@@ -166,10 +214,29 @@ class GNNQualityClassifier:
 
         Returns:
             is_good (bool): True if P(Good) > 0.5.
-            probability (float): P(Good), in [0, 1].  Values near 0.5 indicate
-                the model is uncertain; values near 0 or 1 are confident.
+            probability (float): P(Good), in [0, 1].
             features (dict): Mean per-feature summary of the input graph's
                 node feature matrix.  Useful for logging and introspection.
+
+        Raises:
+            ImportError: If torch or torch_geometric are not installed.
+            ValueError: If the PDB contains too few residues to build a graph.
+
+        """
+        result = self.score(pdb_content)
+        return (result.label == "High Quality"), result.global_score, result.features
+
+    def score(self, pdb_content: str) -> QualityScore:
+        """Score a PDB structure, returning a rich :class:`QualityScore` object.
+
+        This is the preferred API over ``predict()`` because it also returns
+        per-residue pLDDT confidence scores (when the v2 checkpoint is loaded).
+
+        Args:
+            pdb_content: PDB-format string.
+
+        Returns:
+            QualityScore with global and per-residue quality information.
 
         Raises:
             ImportError: If torch or torch_geometric are not installed.
@@ -188,42 +255,48 @@ class GNNQualityClassifier:
 
         from .graph import build_protein_graph
 
-        # Step 1 — Build graph from PDB coordinates
         graph = build_protein_graph(pdb_content)
-
-        # Step 2 — Wrap in a batch (required by PyG's DataLoader API even for
-        # single graphs; the model's global_mean_pool needs a ``batch`` vector)
         batch = Batch.from_data_list([graph])
 
-        # Step 3 — Forward pass (no gradient needed at inference time)
         assert self.model is not None, "Model not loaded"
         self.model.eval()
+
         with torch.no_grad():
-            log_probs = self.model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
-            # .exp() undoes the log: converts log P(class) → P(class)
-            # Index 1 = "Good" class (matching the training label convention)
-            prob_good = float(log_probs.exp()[0, 1].item())
+            if self._has_residue_head:
+                # v2 checkpoint: dual-output forward pass
+                log_probs, per_res_tensor = type(self.model).forward_with_node_embeddings(
+                    self.model,
+                    batch.x,
+                    batch.edge_index,
+                    batch.edge_attr,
+                    batch.batch,
+                )
+                per_residue = per_res_tensor.squeeze(-1).tolist()
+            else:
+                # v1 checkpoint: global only
+                log_probs = self.model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
+                per_residue = []
 
-        # Decision boundary at 0.5.  In production you might tune this
-        # threshold on a validation set to optimise precision/recall trade-off.
-        is_good = prob_good > 0.5
+        prob_good = float(log_probs.exp()[0, 1].item())
+        label = "High Quality" if prob_good > 0.5 else "Low Quality"
+        residue_labels = [_plddt_label(s) for s in per_residue]
 
-        # Build the feature dict by averaging each node feature column.
-        # This is a summary, not a per-residue breakdown — for per-residue
-        # interpretation you would extract individual rows of graph.x.
         node_feats = graph.x.numpy()
         feat_dict = {
             name: float(np.mean(node_feats[:, i])) for i, name in enumerate(_FEATURE_NAMES)
         }
 
-        return bool(is_good), prob_good, feat_dict
+        return QualityScore(
+            global_score=prob_good,
+            label=label,
+            per_residue=per_residue,
+            residue_labels=residue_labels,
+            features=feat_dict,
+            n_residues=graph.num_nodes,
+        )
 
     def save(self, path: str) -> None:
         """Save model weights and architecture config to a ``.pt`` checkpoint.
-
-        The checkpoint is a plain Python dict serialised with torch.save().
-        It contains the architecture hyperparameters alongside the weight
-        tensors so the model can be reconstructed without any external config.
 
         Args:
             path: Destination file path (should end in .pt).
@@ -239,12 +312,7 @@ class GNNQualityClassifier:
         assert self.model is not None, "Model not loaded"
         torch.save(
             {
-                # state_dict: OrderedDict mapping parameter names → tensors
-                # This is the standard PyTorch checkpoint format.
                 "state_dict": self.model.state_dict(),
-                # Architecture metadata: necessary to re-instantiate the model
-                # correctly on load without requiring the caller to remember
-                # the original constructor arguments.
                 "node_features": self.model.node_features,
                 "edge_features": self.model.edge_features,
                 "hidden_dim": self.model.hidden_dim,
@@ -258,17 +326,8 @@ class GNNQualityClassifier:
     def load(self, path: str) -> None:
         """Load model weights from a ``.pt`` checkpoint.
 
-        The architecture is reconstructed from the metadata stored in the
-        checkpoint, then the saved state_dict is loaded into the new model.
-        This means the checkpoint is fully self-describing — you do not need
-        to know the original hidden_dim, heads, etc.
-
         Args:
             path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
-
-        Raises:
-            FileNotFoundError / RuntimeError: If the checkpoint is missing or
-                corrupt.
 
         """
         try:
@@ -279,12 +338,8 @@ class GNNQualityClassifier:
         from .model import ProteinGNN
 
         try:
-            # weights_only=False allows loading the full checkpoint dict
-            # (metadata + weights).  Set to True if you only need weights and
-            # want extra security against arbitrary code execution via pickle.
             checkpoint = torch.load(path, map_location="cpu", weights_only=False)
 
-            # Re-create the model architecture from stored metadata
             import typing
 
             self.model = typing.cast(
@@ -296,11 +351,17 @@ class GNNQualityClassifier:
                     num_classes=checkpoint["num_classes"],
                 ),
             )
-            # Copy the trained weights into the fresh model skeleton
             self.model.load_state_dict(checkpoint["state_dict"])
             self.model.eval()
             self._model_path = path
-            logger.info("GNN classifier loaded from %s", path)
+
+            # Detect if this checkpoint has the per-residue pLDDT head (v2)
+            self._has_residue_head = "residue_lin1.weight" in checkpoint["state_dict"]
+            logger.info(
+                "GNN classifier loaded from %s (per-residue head: %s)",
+                path,
+                self._has_residue_head,
+            )
         except Exception as exc:
             logger.error("Failed to load GNN checkpoint from %s: %s", path, exc, exc_info=True)
             raise
@@ -310,16 +371,7 @@ class GNNQualityClassifier:
     # ------------------------------------------------------------------
 
     def _init_fresh_model(self) -> None:
-        """Initialise a randomly-weighted model.
-
-        Used when no checkpoint is available — for example, during graph-
-        construction unit tests where accuracy doesn't matter, or as the
-        starting point before calling train_gnn_quality_filter.py.
-
-        A freshly-initialised model produces random log-probabilities that
-        are close to log(0.5) ≈ -0.693 for both classes (random guessing),
-        because the weights are initialised near zero by PyTorch's defaults.
-        """
+        """Initialise a randomly-weighted model (v2 architecture with per-residue head)."""
         import typing
 
         from .model import ProteinGNN
@@ -328,3 +380,4 @@ class GNNQualityClassifier:
             Any, ProteinGNN(node_features=8, edge_features=2, hidden_dim=64, num_classes=2)
         )
         self.model.eval()
+        self._has_residue_head = True

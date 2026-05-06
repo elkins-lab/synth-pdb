@@ -1,17 +1,25 @@
 """Train the GNN-based protein quality classifier.
 
+Trains the ProteinGNN with two jointly optimised objectives:
+
+1. **Global binary classification** (Good / Bad) — NLL loss on graph-pooled output.
+2. **Per-residue pLDDT regression** — MSE loss on per-node sigmoid output vs.
+   Ramachandran Z-score targets derived from ground-truth torsion angles.
+
+The per-residue auxiliary task forces the shared message-passing backbone to
+encode local geometry information, which improves global classifier performance
+even on small datasets (multi-task regularisation).
+
 Usage
 -----
     python scripts/train_gnn_quality_filter.py
     python scripts/train_gnn_quality_filter.py --n-samples 400 --epochs 100
     python scripts/train_gnn_quality_filter.py --n-samples 40 --epochs 5 --output /tmp/test.pt
-
-The script reuses generate_dataset() from the RF training script so both
-models train on exactly the same synthetic data splits.
 """
 
 import argparse
 import logging
+import math
 import os
 import sys
 
@@ -20,43 +28,107 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-def build_graph_dataset(X_feats: np.ndarray, y: np.ndarray, pdb_list: list):
-    """Convert raw PDB strings to PyG Data objects with ground-truth labels.
+# ─────────────────────────────────────────────────────────────────────────────
+# Per-residue pLDDT target generation
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Ideal Ramachandran centres for alpha-helix (φ=-60°, ψ=-45°) and
+# beta-strand (φ=-120°, ψ=+120°).  Used to derive per-residue quality targets.
+_HELIX_PHI, _HELIX_PSI = -60.0, -45.0
+_STRAND_PHI, _STRAND_PSI = -120.0, 120.0
+_COIL_PHI, _COIL_PSI = -60.0, 140.0  # PPII/extended approximate centre
+
+
+def _ramachandran_score(phi: float | None, psi: float | None) -> float:
+    """Return a Ramachandran-based per-residue quality score ∈ [0, 1].
+
+    Educational note — Ramachandran Z-score
+    ─────────────────────────────────────────
+    A residue's backbone torsion angles (φ, ψ) should fall in one of the
+    favoured regions of the Ramachandran plot (helix, strand, PPII).
+    We compute the distance from the nearest favoured centre and convert
+    it to a score via a Gaussian kernel with σ=40°.
+
+    A residue exactly at a helix/strand centre → score ≈ 1.0 (Very High).
+    A residue 90° away from all centres → score ≈ 0.1 (Low confidence).
+
+    This is a simplified but physically motivated proxy for MolProbity's
+    per-residue Ramachandran Z-score used in CASP quality assessment.
+    """
+    if phi is None or psi is None:
+        # Terminal residues have undefined dihedrals → moderate confidence
+        return 0.5
+
+    sigma = 40.0  # degrees — half-width of favoured regions
+
+    def gaussian_dist(phi_ref: float, psi_ref: float) -> float:
+        dphi = phi - phi_ref
+        dpsi = psi - psi_ref
+        d2 = dphi**2 + dpsi**2
+        return math.exp(-d2 / (2 * sigma**2))
+
+    # Score = max Gaussian score across the three main favoured regions.
+    # We take the maximum so a residue in ANY favoured region scores high.
+    score = max(
+        gaussian_dist(_HELIX_PHI, _HELIX_PSI),
+        gaussian_dist(_STRAND_PHI, _STRAND_PSI),
+        gaussian_dist(_COIL_PHI, _COIL_PSI),
+    )
+    return float(score)
+
+
+def compute_per_residue_targets(
+    pdb_content: str,
+    label: int,
+    perturbed_residue_idx: int | None = None,
+) -> np.ndarray:
+    """Compute per-residue pLDDT targets for training.
 
     Args:
-        X_feats: Unused here (kept for API parity with RF script); the graph
-            builder extracts its own richer features directly from the PDB.
-        y: Label array (1 = Good, 0 = Bad), length N.
-        pdb_list: List of N PDB strings.
+        pdb_content: PDB-format string.
+        label: Global structure label (1 = Good, 0 = Bad).
+        perturbed_residue_idx: If this structure was distorted by perturbing a
+            specific residue (e.g. a clash injection at index i), pass i here.
+            That residue receives a hard target of 0.0 regardless of its
+            Ramachandran angles (which may still look plausible for a clash).
 
     Returns:
-        List of torch_geometric.data.Data objects with .y set.
+        np.ndarray of shape [N,] with per-residue targets ∈ [0, 1].
 
     """
-    import torch
+    from synth_pdb.quality.gnn.graph import _parse_backbone
 
-    from synth_pdb.quality.gnn.graph import build_protein_graph
+    residues = _parse_backbone(pdb_content)
+    targets = np.array(
+        [_ramachandran_score(r["phi"], r["psi"]) for r in residues],
+        dtype=np.float32,
+    )
 
-    graphs = []
-    failures = 0
-    for i, (pdb_content, label) in enumerate(zip(pdb_list, y, strict=False)):
-        try:
-            g = build_protein_graph(pdb_content)
-            g.y = torch.tensor([int(label)], dtype=torch.long)
-            graphs.append(g)
-        except Exception as e:
-            failures += 1
-            logger.warning("Graph build failed for sample %d: %s", i, e)
+    # For Bad structures produced by clash injection, the perturbed residue
+    # should explicitly receive low confidence even if its torsions look ok.
+    if label == 0 and perturbed_residue_idx is not None:
+        idx = int(perturbed_residue_idx)
+        if 0 <= idx < len(targets):
+            targets[idx] = 0.0
 
-    if failures:
-        logger.warning("%d / %d graph builds failed.", failures, len(pdb_list))
-    return graphs
+    return targets
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Dataset generation
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
-    """Generate synthetic PDB strings for the four structural classes used in
-    training. Returns (pdb_list, y) rather than (X_feats, y) since the GNN
-    builds its own graph features directly from the PDB atoms.
+    """Generate synthetic PDB strings for the four structural classes.
+
+    Returns
+    -------
+    pdbs   : list[str]   — PDB format strings
+    labels : np.ndarray  — global label (1 = Good, 0 = Bad)
+    clash_indices : list[int | None]
+        For Clashing structures, the residue index that was displaced.
+        None for all other structure types (used for per-residue target generation).
     """
     import io
 
@@ -79,7 +151,9 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
         n_bad_clash,
     )
 
-    pdbs, labels = [], []
+    pdbs: list[str] = []
+    labels: list[int] = []
+    clash_indices: list[int | None] = []
     failure_counts = {"good": 0, "random": 0, "distorted": 0, "clash": 0}
 
     # 1. Good (Alpha Helix)
@@ -91,11 +165,12 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
                 generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
             )
             labels.append(1)
+            clash_indices.append(None)
         except Exception as e:
             failure_counts["good"] += 1
             logger.warning("Good sample %d failed: %s", i, e, exc_info=True)
 
-    # 2. Bad (Random coil)
+    # 2. Bad (Random coil — poor Ramachandran geometry)
     for i in range(n_bad_random):
         if i % 10 == 0:
             logger.info("  Random %d/%d", i, n_bad_random)
@@ -104,11 +179,12 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
                 generate_pdb_content(length=20, conformation="random", minimize_energy=False)
             )
             labels.append(0)
+            clash_indices.append(None)
         except Exception as e:
             failure_counts["random"] += 1
             logger.warning("Random sample %d failed: %s", i, e, exc_info=True)
 
-    # 3. Bad (Distorted)
+    # 3. Bad (Distorted — good helix with Gaussian coordinate noise)
     for i in range(n_bad_distorted):
         if i % 10 == 0:
             logger.info("  Distorted %d/%d", i, n_bad_distorted)
@@ -123,11 +199,12 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
             pdb_file.write(f_out)
             pdbs.append(f_out.getvalue())
             labels.append(0)
+            clash_indices.append(None)
         except Exception as e:
             failure_counts["distorted"] += 1
             logger.warning("Distorted sample %d failed: %s", i, e, exc_info=True)
 
-    # 4. Bad (Single Clash)
+    # 4. Bad (Clashing — single Cα displacement)
     for i in range(n_bad_clash):
         if i % 10 == 0:
             logger.info("  Clashing %d/%d", i, n_bad_clash)
@@ -136,14 +213,17 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
             f = io.StringIO(clean)
             struc_obj = pdb_io.PDBFile.read(f).get_structure(model=1)
             ca_idx = [j for j, a in enumerate(struc_obj) if a.atom_name == "CA"]
+            clash_res_idx = None
             if len(ca_idx) >= 5:
                 struc_obj.coord[ca_idx[1]] = struc_obj.coord[ca_idx[4]]
+                clash_res_idx = 1  # residue index 1 (0-based) was displaced
             f_out = io.StringIO()
             pdb_file = pdb_io.PDBFile()
             pdb_file.set_structure(struc_obj)
             pdb_file.write(f_out)
             pdbs.append(f_out.getvalue())
             labels.append(0)
+            clash_indices.append(clash_res_idx)
         except Exception as e:
             failure_counts["clash"] += 1
             logger.warning("Clash sample %d failed: %s", i, e, exc_info=True)
@@ -156,10 +236,54 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
 
     if len(pdbs) < int(n_samples * 0.5):
         raise RuntimeError(
-            f"Only {len(pdbs)} of {n_samples} samples generated. " f"Failures: {failure_counts}"
+            f"Only {len(pdbs)} of {n_samples} samples generated. Failures: {failure_counts}"
         )
 
-    return pdbs, np.array(labels, dtype=np.int64)
+    return pdbs, np.array(labels, dtype=np.int64), clash_indices
+
+
+def build_graph_dataset(y: np.ndarray, pdb_list: list, clash_indices: list):
+    """Convert raw PDB strings to PyG Data objects with global labels and per-residue targets.
+
+    Args:
+        y: Global label array (1 = Good, 0 = Bad), length N.
+        pdb_list: List of N PDB strings.
+        clash_indices: List of per-structure clash residue indices (or None).
+
+    Returns:
+        List of torch_geometric.data.Data objects with .y and .residue_targets set.
+
+    """
+    import torch
+
+    from synth_pdb.quality.gnn.graph import build_protein_graph
+
+    graphs = []
+    failures = 0
+    for i, (pdb_content, label, clash_idx) in enumerate(
+        zip(pdb_list, y, clash_indices, strict=False)
+    ):
+        try:
+            g = build_protein_graph(pdb_content)
+            g.y = torch.tensor([int(label)], dtype=torch.long)
+
+            # Per-residue pLDDT targets
+            targets = compute_per_residue_targets(pdb_content, int(label), clash_idx)
+            g.residue_targets = torch.tensor(targets, dtype=torch.float)  # [N,]
+
+            graphs.append(g)
+        except Exception as e:
+            failures += 1
+            logger.warning("Graph build failed for sample %d: %s", i, e)
+
+    if failures:
+        logger.warning("%d / %d graph builds failed.", failures, len(pdb_list))
+    return graphs
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Training
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 def train_gnn(
@@ -169,7 +293,23 @@ def train_gnn(
     hidden_dim: int = 64,
     lr: float = 1e-3,
     random_state: int = 42,
+    residue_loss_weight: float = 0.3,
 ):
+    """Train the GNN quality classifier with joint global + per-residue loss.
+
+    Args:
+        output_path: Where to save the .pt checkpoint.
+        n_samples: Training samples to generate.
+        epochs: Number of training epochs.
+        hidden_dim: GNN hidden dimension.
+        lr: Initial learning rate (AdamW + CosineAnnealing).
+        random_state: RNG seed for reproducibility.
+        residue_loss_weight: Weight λ for the per-residue MSE loss term.
+            Total loss = NLL_global + λ × MSE_per_residue.
+            Default 0.3 balances the two tasks without overwhelming the
+            primary classification objective.
+
+    """
     try:
         import torch
         import torch.nn.functional as F
@@ -183,22 +323,18 @@ def train_gnn(
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
     from synth_pdb.quality.gnn.model import ProteinGNN
 
-    # ------------------------------------------------------------------
-    # Data generation
-    # ------------------------------------------------------------------
-    logger.info("=== GNN Quality Scorer Training ===")
-    pdbs, y = generate_pdb_dataset(n_samples=n_samples, random_state=random_state)
+    # ── Data generation ────────────────────────────────────────────────
+    logger.info("=== GNN Quality Scorer Training (v2 — with per-residue pLDDT head) ===")
+    pdbs, y, clash_indices = generate_pdb_dataset(n_samples=n_samples, random_state=random_state)
 
-    logger.info("Building protein graphs...")
-    graphs = build_graph_dataset(None, y, pdbs)
+    logger.info("Building protein graphs with per-residue targets...")
+    graphs = build_graph_dataset(y, pdbs, clash_indices)
 
     if not graphs:
         raise RuntimeError("No graphs were built. Aborting training.")
 
-    # Rebuild labels from graphs (some may have failed building)
     y_graphs = np.array([g.y.item() for g in graphs])
 
-    # Train/test split
     idx = np.arange(len(graphs))
     idx_train, idx_test = train_test_split(idx, test_size=0.2, random_state=42, stratify=y_graphs)
     train_graphs = [graphs[i] for i in idx_train]
@@ -215,9 +351,7 @@ def train_gnn(
     train_loader = DataLoader(train_graphs, batch_size=16, shuffle=True)
     test_loader = DataLoader(test_graphs, batch_size=16, shuffle=False)
 
-    # ------------------------------------------------------------------
-    # Model, optimiser, scheduler
-    # ------------------------------------------------------------------
+    # ── Model, optimiser, scheduler ────────────────────────────────────
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info("Training on: %s", device)
 
@@ -227,10 +361,8 @@ def train_gnn(
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
-    # ------------------------------------------------------------------
-    # Training loop
-    # ------------------------------------------------------------------
-    logger.info("Training for %d epochs...", epochs)
+    # ── Training loop ──────────────────────────────────────────────────
+    logger.info("Training for %d epochs (λ_residue=%.2f)...", epochs, residue_loss_weight)
 
     for epoch in range(1, epochs + 1):
         model.train()
@@ -241,12 +373,33 @@ def train_gnn(
         for batch in train_loader:
             batch = batch.to(device)
             optimizer.zero_grad()
-            log_probs = model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
-            loss = F.nll_loss(log_probs, batch.y)
+
+            # Dual-output forward pass.
+            # We call via type(model) to bypass nn.Module.__getattr__, which
+            # intercepts attribute lookup on Module instances and only checks
+            # _parameters / _buffers / _modules — it never reaches ordinary
+            # methods defined on inner classes created by the __new__ factory.
+            log_probs, per_residue_scores = type(model).forward_with_node_embeddings(
+                model, batch.x, batch.edge_index, batch.edge_attr, batch.batch
+            )
+
+            # ── Loss 1: global binary classification ───────────────────
+            global_loss = F.nll_loss(log_probs, batch.y)
+
+            # ── Loss 2: per-residue pLDDT regression ──────────────────
+            # residue_targets is [total_nodes,] concatenated from all graphs
+            # in the batch (same ordering as batch.x rows).
+            residue_loss = F.mse_loss(
+                per_residue_scores.squeeze(-1),  # [total_nodes]
+                batch.residue_targets,  # [total_nodes]
+            )
+
+            # ── Combined loss ─────────────────────────────────────────
+            loss = global_loss + residue_loss_weight * residue_loss
             loss.backward()
             optimizer.step()
 
-            total_loss += loss.item() * batch.num_graphs
+            total_loss += global_loss.item() * batch.num_graphs
             preds = log_probs.argmax(dim=-1)
             correct += (preds == batch.y).sum().item()
             total += batch.num_graphs
@@ -256,7 +409,7 @@ def train_gnn(
 
         if epoch % max(1, epochs // 10) == 0 or epoch == epochs:
             logger.info(
-                "Epoch %3d/%d  loss=%.4f  train_acc=%.3f  lr=%.2e",
+                "Epoch %3d/%d  global_loss=%.4f  train_acc=%.3f  lr=%.2e",
                 epoch,
                 epochs,
                 total_loss / total,
@@ -264,9 +417,7 @@ def train_gnn(
                 scheduler.get_last_lr()[0],
             )
 
-    # ------------------------------------------------------------------
-    # Evaluation
-    # ------------------------------------------------------------------
+    # ── Evaluation ─────────────────────────────────────────────────────
     model.eval()
     all_preds, all_labels = [], []
     with torch.no_grad():
@@ -285,9 +436,7 @@ def train_gnn(
         classification_report(all_labels, all_preds, target_names=["Bad", "Good"], labels=[0, 1]),
     )
 
-    # ------------------------------------------------------------------
-    # Save via GNNQualityClassifier
-    # ------------------------------------------------------------------
+    # ── Save ───────────────────────────────────────────────────────────
     clf = GNNQualityClassifier.__new__(GNNQualityClassifier)
     clf.model = model.cpu()
     clf._model_path = None
@@ -307,7 +456,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output",
-        default="synth_pdb/quality/models/gnn_quality_v1.pt",
+        default="synth_pdb/quality/models/gnn_quality_v2.pt",
         help="Output path for the .pt checkpoint",
     )
     parser.add_argument("--n-samples", type=int, default=200, help="Training samples to generate")
@@ -315,6 +464,12 @@ if __name__ == "__main__":
     parser.add_argument("--hidden-dim", type=int, default=64, help="GNN hidden dimension")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
     parser.add_argument("--random-state", type=int, default=42, help="RNG seed")
+    parser.add_argument(
+        "--residue-loss-weight",
+        type=float,
+        default=0.3,
+        help="Weight λ for per-residue MSE loss (default 0.3)",
+    )
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
@@ -326,4 +481,5 @@ if __name__ == "__main__":
         hidden_dim=args.hidden_dim,
         lr=args.lr,
         random_state=args.random_state,
+        residue_loss_weight=args.residue_loss_weight,
     )

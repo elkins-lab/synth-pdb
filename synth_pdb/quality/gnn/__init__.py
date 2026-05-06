@@ -5,8 +5,8 @@ PyTorch Geometric-based protein quality GNN scorer.
 Install requirements:  pip install synth-pdb[gnn]
 """
 
-from .gnn_classifier import GNNQualityClassifier
+from .gnn_classifier import GNNQualityClassifier, QualityScore
 from .graph import build_protein_graph
 from .model import ProteinGNN
 
-__all__ = ["build_protein_graph", "ProteinGNN", "GNNQualityClassifier"]
+__all__ = ["build_protein_graph", "ProteinGNN", "GNNQualityClassifier", "QualityScore"]

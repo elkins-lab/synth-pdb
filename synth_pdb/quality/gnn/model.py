@@ -99,16 +99,20 @@ FULL ARCHITECTURE
   │  BatchNorm1d(64) → ELU                            │
   └──────┬────────────────────────────────────────────┘
          │  node embeddings [N, 64]
-  global_mean_pool()  →  graph embedding [batch_size, 64]
-         │
-  ┌──────▼────────────────────────────────────────────┐
-  │  Linear(64 → 32) → ELU → Dropout(0.3)            │
-  │  Linear(32 → 2)  → log_softmax                   │ MLP head
-  └──────┬────────────────────────────────────────────┘
-         │  [batch_size, 2]  log P(Bad), log P(Good)
+         ├───────────────────────────────────────────────────────┐
+         │                                                       │
+  global_mean_pool()  →  graph embedding [batch_size, 64]       │  per-node branch
+         │                                                       │
+  ┌──────▼────────────────────────────────────────────┐  ┌──────▼───────────────┐
+  │  Linear(64 → 32) → ELU → Dropout(0.3)            │  │  Linear(64 → 32)     │
+  │  Linear(32 → 2)  → log_softmax                   │  │  ELU                 │
+  └──────┬────────────────────────────────────────────┘  │  Linear(32 → 1)     │
+         │  [batch_size, 2]  log P(Bad), log P(Good)      │  Sigmoid             │
+                                                          └──────┬───────────────┘
+                                                                 │  [N, 1] pLDDT ∈ [0,1]
 
-Loss: Negative Log-Likelihood (NLLLoss), equivalent to cross-entropy
-      when the input is log-softmax output.
+Loss: global head → NLLLoss (cross-entropy equivalent)
+      per-residue head → MSELoss vs Ramachandran Z-score targets
 """
 
 import logging
@@ -146,8 +150,16 @@ class ProteinGNN:
 
         model = ProteinGNN()           # returns a torch.nn.Module
         model.eval()
-        out = model(data.x, data.edge_index, data.edge_attr, data.batch)
-        # out: [batch_size, 2] log-probabilities (Good class = index 1)
+
+        # Global quality classification
+        log_probs = model(data.x, data.edge_index, data.edge_attr, data.batch)
+        # log_probs: [batch_size, 2] — log P(Bad), log P(Good)
+
+        # Dual output: global + per-residue pLDDT
+        log_probs, per_res = model.forward_with_node_embeddings(
+            data.x, data.edge_index, data.edge_attr, data.batch
+        )
+        # per_res: [total_nodes, 1] — pLDDT ∈ [0, 1] per residue
     """
 
     def __new__(
@@ -158,6 +170,7 @@ class ProteinGNN:
         num_classes: int = 2,
     ) -> Any:
         _check_pyg()
+        import torch
         import torch.nn as nn
         import torch.nn.functional as functional
         from torch_geometric.nn import GATConv, global_mean_pool
@@ -184,7 +197,7 @@ class ProteinGNN:
                 super().__init__()
 
                 # ── Message-passing layers ─────────────────────────────────
-                # GATConv  arguments:
+                # GATConv arguments:
                 #   in_channels  — input feature size
                 #   out_channels — output feature size PER HEAD
                 #   heads        — number of independent attention heads
@@ -240,6 +253,19 @@ class ProteinGNN:
                 self.dropout = nn.Dropout(p=0.3)
                 self.lin2 = nn.Linear(hidden_dim // 2, num_classes)
 
+                # ── Per-residue pLDDT head ─────────────────────────────────
+                # Operates on per-node embeddings BEFORE global pooling.
+                # Predicts a confidence score ∈ [0, 1] for each residue,
+                # analogous to AlphaFold's per-residue pLDDT metric:
+                #   • > 0.90  → Very high confidence (blue)
+                #   • 0.70–0.90 → High confidence (cyan)
+                #   • 0.50–0.70 → Uncertain (yellow)
+                #   • < 0.50  → Low confidence (orange)
+                # Trained jointly with the global classifier using MSE loss
+                # against per-residue Ramachandran Z-score targets.
+                self.residue_lin1 = nn.Linear(hidden_dim, hidden_dim // 2)
+                self.residue_lin2 = nn.Linear(hidden_dim // 2, 1)
+
                 # Store architecture hyperparameters so they can be serialised
                 # into the checkpoint alongside the weights (see gnn_classifier.py).
                 self.node_features = node_features
@@ -247,15 +273,56 @@ class ProteinGNN:
                 self.hidden_dim = hidden_dim
                 self.num_classes = num_classes
 
+            # ─────────────────────────────────────────────────────────────
+            # Internal: shared message-passing backbone
+            # ─────────────────────────────────────────────────────────────
+
+            def _node_embeddings(self, x: Any, edge_index: Any, edge_attr: Any) -> Any:
+                """Run all three GAT layers; return per-node embeddings [N, hidden_dim].
+
+                Factored out of forward() so the same computation feeds both
+                the global graph-level head and the per-residue pLDDT head
+                without running message passing twice.
+                """
+                # ── Layer 1: local geometry ────────────────────────────────
+                # After layer 1, each node has aggregated information from its
+                # direct neighbours — the first "shell" of contacts.
+                # For a helix residue, this includes i±1, i±2, i±3, i+4.
+                x = self.conv1(x, edge_index, edge_attr)
+                x = self.bn1(x)
+                # ELU is chosen over ReLU because it has non-zero gradient for
+                # negative inputs, avoiding the "dying neuron" problem in GNNs.
+                x = functional.elu(x)
+
+                # ── Layer 2: neighbourhood of neighbourhoods ───────────────
+                # Each node now aggregates from nodes 2 hops away —
+                # contacts-of-contacts.  Captures secondary structure patterns
+                # (e.g. helix turns) and local packing.
+                x = self.conv2(x, edge_index, edge_attr)
+                x = self.bn2(x)
+                x = functional.elu(x)
+
+                # ── Layer 3: medium-range interactions ─────────────────────
+                # 3-hop receptive field.  For small peptides (≤ 20 residues)
+                # this effectively pools global structural information into
+                # each node's embedding.
+                x = self.conv3(x, edge_index, edge_attr)
+                x = self.bn3(x)
+                x = functional.elu(x)
+
+                return x  # [total_nodes, hidden_dim]
+
+            # ─────────────────────────────────────────────────────────────
+            # Public forward passes
+            # ─────────────────────────────────────────────────────────────
+
             def forward(self, x: Any, edge_index: Any, edge_attr: Any, batch: Any) -> Any:
-                """Forward pass.
+                """Forward pass — global quality classification only.
 
                 Parameters
                 ----------
                 x          : Tensor [total_nodes, node_features]
                     Node feature matrix for all proteins in the batch.
-                    (Batching concatenates all node matrices; ``batch`` tracks
-                    which protein each node belongs to.)
                 edge_index : Tensor [2, total_edges]
                     COO edge index.
                 edge_attr  : Tensor [total_edges, edge_features]
@@ -271,33 +338,7 @@ class ProteinGNN:
                     Use .exp() to get probabilities.  argmax(-1) for label.
 
                 """
-                # ── Layer 1: local geometry ────────────────────────────────
-                # After layer 1, each node has aggregated information from its
-                # direct neighbours — the first "shell" of contacts.
-                # For a helix residue, this includes i±1, i±2, i±3, i+4.
-                x = self.conv1(x, edge_index, edge_attr)
-                x = self.bn1(x)
-                # ELU (Exponential Linear Unit) is chosen over ReLU because:
-                #   • ELU has non-zero gradient for negative inputs → avoids
-                #     "dying neuron" problem common in deep GNNs
-                #   • Smooth at 0, unlike ReLU's sharp kink
-                x = functional.elu(x)
-
-                # ── Layer 2: neighbourhood of neighbourhoods ───────────────
-                # Each node now has information from nodes 2 hops away, i.e.
-                # contacts-of-contacts.  This captures secondary structure
-                # patterns (e.g. helix turns) and local packing.
-                x = self.conv2(x, edge_index, edge_attr)
-                x = self.bn2(x)
-                x = functional.elu(x)
-
-                # ── Layer 3: medium-range interactions ─────────────────────
-                # 3-hop receptive field.  For small peptides (≤ 20 residues)
-                # this effectively pools global structural information into
-                # each node's embedding.
-                x = self.conv3(x, edge_index, edge_attr)
-                x = self.bn3(x)
-                x = functional.elu(x)
+                node_emb = self._node_embeddings(x, edge_index, edge_attr)
 
                 # ── Readout: node embeddings → graph embedding ─────────────
                 # global_mean_pool sums node embeddings per graph and divides
@@ -305,21 +346,71 @@ class ProteinGNN:
                 #     z_G = (1/N) Σ_v h_v^(3)
                 # The ``batch`` vector tells PyG which protein each node
                 # belongs to so it averages correctly across the batch.
-                x = global_mean_pool(x, batch)  # [batch_size, hidden_dim]
+                pooled = global_mean_pool(node_emb, batch)  # [batch_size, hidden_dim]
 
                 # ── MLP classification head ────────────────────────────────
-                x = self.lin1(x)
-                x = functional.elu(x)
+                out = self.lin1(pooled)
+                out = functional.elu(out)
                 # Dropout is only active during .train() mode; disabled in
                 # .eval() mode (inference), which is the correct behaviour.
-                x = self.dropout(x)
-                x = self.lin2(x)  # raw logits [batch_size, 2]
+                out = self.dropout(out)
+                out = self.lin2(out)  # raw logits [batch_size, 2]
 
                 # log_softmax is numerically more stable than log(softmax(x)).
                 # Combined with nn.NLLLoss it is mathematically equivalent to
                 # nn.CrossEntropyLoss (which takes raw logits).
-                # We use log_softmax + NLLLoss to make the probability extraction
-                # step (.exp()) explicit and readable in gnn_classifier.py.
-                return functional.log_softmax(x, dim=-1)
+                return functional.log_softmax(out, dim=-1)
+
+            def forward_with_node_embeddings(
+                self, x: Any, edge_index: Any, edge_attr: Any, batch: Any
+            ) -> tuple[Any, Any]:
+                """Forward pass returning global log-probs AND per-residue scores.
+
+                Used by ``GNNQualityClassifier.predict_per_residue()``.
+                Runs message passing exactly once and branches two output heads
+                from the shared node embeddings (multi-task learning).
+
+                Parameters
+                ----------
+                x, edge_index, edge_attr, batch
+                    Same as ``forward()``.
+
+                Returns
+                -------
+                log_probs : Tensor [batch_size, num_classes]
+                    Global log-probabilities (identical to forward() output).
+                per_residue_scores : Tensor [total_nodes, 1]
+                    Per-residue pLDDT-like confidence ∈ [0, 1].
+                    Rows align 1-to-1 with the input node feature matrix.
+
+                Educational note — multi-task learning
+                ───────────────────────────────────────
+                Running message passing once and branching two output heads
+                (multi-task learning) gives two key benefits:
+
+                1. Efficiency: one forward pass produces both outputs.
+                2. Regularisation: the per-residue auxiliary task forces the
+                   shared node embeddings to encode local quality information,
+                   improving the global head's generalisation as a side-effect.
+                """
+                node_emb = self._node_embeddings(x, edge_index, edge_attr)
+
+                # ── Global classification branch ───────────────────────────
+                pooled = global_mean_pool(node_emb, batch)  # [batch_size, 64]
+                g = self.lin1(pooled)
+                g = functional.elu(g)
+                g = self.dropout(g)
+                g = self.lin2(g)
+                log_probs = functional.log_softmax(g, dim=-1)
+
+                # ── Per-residue pLDDT branch ───────────────────────────────
+                # Each node gets an independent confidence score derived from
+                # its local structural context (phi/psi, contacts, B-factor).
+                r = self.residue_lin1(node_emb)
+                r = functional.elu(r)
+                per_residue_scores = torch.sigmoid(self.residue_lin2(r))
+                # [total_nodes, 1], values ∈ [0, 1]
+
+                return log_probs, per_residue_scores
 
         return _ProteinGNNModule()
