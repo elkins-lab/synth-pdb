@@ -34,6 +34,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | [**⭕ Macrocycle Design Lab**](examples/ml_integration/macrocycle_lab.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/macrocycle_lab.ipynb) |
 | [**💊 Bio-Active Hormone Lab**](examples/ml_integration/hormone_lab.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hormone_lab.ipynb) |
 | [**🔍 Protein Quality Assessment**](examples/interactive_tutorials/protein_quality_assessment.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/protein_quality_assessment.ipynb) |
+| [**🧠 GNN pLDDT Explorer**](docs/tutorials/gnn_plddt_explorer.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/gnn_plddt_explorer.ipynb) |
 | [**🔬 The Virtual NMR Spectrometer**](examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb) |
 | [**🧲 RDC Alignment Tensor Explorer**](examples/interactive_tutorials/rdc_alignment_explorer.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/rdc_alignment_explorer.ipynb) |
 | [**📊 RPF Score Validation**](examples/interactive_tutorials/nmr_validation_rpf.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/nmr_validation_rpf.ipynb) |
@@ -80,7 +81,8 @@ Choose a path based on your background and goals:
 4. **🔬 Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts
 5. **🧲 RDC Alignment Tensor Explorer** (30 min) - Visualize the alignment tensor and RDC physics interactively
 6. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
-7. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
+7. **🧠 GNN pLDDT Explorer** (30 min) - Score structures with a Graph Neural Network; interpret per-residue pLDDT confidence using AlphaFold's colour scheme; compute TM-score, lDDT, and GDT-TS metrics
+8. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
 8. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
 9. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
 10. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
