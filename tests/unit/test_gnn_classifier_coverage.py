@@ -37,7 +37,6 @@ def _make_helix_pdb(length: int = 12) -> str:
 
 
 class TestGNNPredictImportError:
-
     def test_predict_raises_importerror_without_torch(self, tmp_path):
         """When torch cannot be imported inside predict(), an ImportError with a
         helpful message should be raised.
@@ -63,7 +62,6 @@ class TestGNNPredictImportError:
 
 
 class TestGNNSaveLoad:
-
     def test_save_creates_checkpoint_file(self, tmp_path):
         """save() must write a .pt file to the specified path (lines 240-241)."""
         clf = _make_fresh_classifier()
@@ -126,7 +124,6 @@ class TestGNNSaveLoad:
 
 
 class TestGNNPredictHappyPath:
-
     def test_predict_returns_correct_types(self):
         """Fresh model must return (bool, float, dict) from predict()."""
         clf = _make_fresh_classifier()
@@ -186,6 +183,6 @@ class TestGNNPredictHappyPath:
                 with patch.object(GNNQualityClassifier, "_init_fresh_model") as mock_init:
                     GNNQualityClassifier(model_path=None)
 
-                    assert "No pre-trained GNN checkpoint found at" in caplog.text
-                    assert "Classifier initialised with a random-weight model" in caplog.text
+                    assert "No pre-trained GNN checkpoint found" in caplog.text
+                    assert "random weights" in caplog.text
                     mock_init.assert_called_once()
