@@ -186,7 +186,12 @@ class EnergyMinimizer:
         self.box_size = box_size * unit.nanometers
         self.platform_name = platform_name
         self.precision = precision
-        ff_files = [self.forcefield_name]
+
+        # Flatten forcefield files list
+        if isinstance(self.forcefield_name, list):
+            ff_files = list(self.forcefield_name)
+        else:
+            ff_files = [self.forcefield_name]
 
         if self.solvent_model == "explicit":
             ff_files.append(self.water_model)
