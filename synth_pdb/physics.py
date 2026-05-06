@@ -630,16 +630,24 @@ class EnergyMinimizer:
             # addHydrogens later does not see a conflicting terminal N–C bond.
             n_term_serial, c_term_serial = None, None
             c_coords, c_line_template = None, None
+            has_existing_oxt = False
             if cyclic and atom_lines:
                 for line in atom_lines:
                     res_id = line[22:26].strip()
                     atom_name = line[12:16].strip()
                     if res_id == first_res_id and atom_name == "N":
                         n_term_serial = line[6:11].strip()
-                    if res_id == last_res_id and atom_name == "C":
-                        c_term_serial = line[6:11].strip()
-                        c_coords = (float(line[30:38]), float(line[38:46]), float(line[46:54]))
-                        c_line_template = line
+                    if res_id == last_res_id:
+                        if atom_name == "C":
+                            c_term_serial = line[6:11].strip()
+                            c_coords = (
+                                float(line[30:38]),
+                                float(line[38:46]),
+                                float(line[46:54]),
+                            )
+                            c_line_template = line
+                        if atom_name == "OXT":
+                            has_existing_oxt = True
 
             for line in pdb_lines:
                 if line.startswith("CONECT") and cyclic and n_term_serial and c_term_serial:
@@ -687,7 +695,7 @@ class EnergyMinimizer:
             # so we add a temporary OXT positioned ~1.2 Å from the terminal C.
             # physics.py _finalize_output() will delete it after minimization.
             # Add dummy OXT for cyclic peptides to satisfy C-terminal templates
-            if cyclic and last_res_id and c_line_template:
+            if cyclic and last_res_id and c_line_template and not has_existing_oxt:
                 insert_idx = -1
                 for idx, line in enumerate(modified_lines):
                     if line.startswith("ATOM") and line[22:26].strip() == last_res_id:
