@@ -213,6 +213,27 @@ class TestPhysicsCoverage:
         minimizer = EnergyMinimizer(forcefield_name=["amber14-all.xml", "amber14/tip3pfb.xml"])
         assert minimizer.forcefield is not None
 
+    def test_cyclic_no_duplicate_oxt_warning(self, recwarn):
+        """Regression test: Ensure cyclic minimization doesn't warn about duplicate OXT."""
+        # Linear PDB content (which contains OXT)
+        pdb_content = generate_pdb_content(sequence_str="ALA-GLY-ALA", minimize_energy=False)
+        assert "OXT" in pdb_content
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            in_path = os.path.join(tmpdir, "cyclic_oxt.pdb")
+            out_path = os.path.join(tmpdir, "cyclic_oxt_out.pdb")
+            with open(in_path, "w") as f:
+                f.write(pdb_content)
+
+            minimizer = EnergyMinimizer()
+            # This should not trigger "WARNING: duplicate atom" from OpenMM
+            success = minimizer.minimize(in_path, out_path, cyclic=True)
+            assert success is True
+
+            # Check for warnings from OpenMM (it uses warnings.warn internally)
+            for warning in recwarn:
+                assert "duplicate atom" not in str(warning.message)
+
     def test_minimization_reporter_error(self, caplog):
         from synth_pdb.physics import LoggingMinimizationReporter
 
