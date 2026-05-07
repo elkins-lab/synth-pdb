@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
 """Train the GNN-based protein quality classifier.
 
 Trains the ProteinGNN with two jointly optimised objectives:

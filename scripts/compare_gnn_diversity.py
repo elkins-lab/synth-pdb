@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+from __future__ import annotations
+
 """
 Deep Comparison: Alpha-only vs Diverse GNN Quality Scorer.
 
