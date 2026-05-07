@@ -152,13 +152,13 @@ def compute_per_residue_targets(
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
+def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_good: bool = False):
     """Generate synthetic PDB strings across four structural classes.
 
     Why these four classes?
     ───────────────────────
-    1. GOOD (Alpha Helix): Provides a baseline for idealized, "folded"
-       geometry with perfect H-bonding and Ramachandran placement.
+    1. GOOD: Provides a baseline for idealized, "folded" geometry.
+       If diverse_good=True, this samples from Alpha, Beta, and PPII.
     2. RANDOM (Coil): Models "disordered" or "unfolded" states with unconstrained
        torsions. Teaches the GNN to recognise forbidden Ramachandran regions.
     3. DISTORTED: Models "shaken" structures or low-resolution models where
@@ -167,6 +167,12 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
     4. CLASHING: Models "threading" or "sampling" errors where a single atom
        is physically in the wrong place (steric clash). Teaches the GNN to
        spot local outliers in an otherwise good structure.
+
+    Args:
+        n_samples: Total samples to generate.
+        random_state: RNG seed.
+        diverse_good: If True, the "Good" category includes Beta and PPII
+            conformations in addition to Alpha helices.
 
     Returns
     -------
@@ -190,8 +196,9 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
     n_bad_clash = n_samples - n_good - n_bad_random - n_bad_distorted
 
     logger.info(
-        "Generating: %d Good, %d Random, %d Distorted, %d Clashing",
+        "Generating: %d Good%s, %d Random, %d Distorted, %d Clashing",
         n_good,
+        " (Diverse)" if diverse_good else "",
         n_bad_random,
         n_bad_distorted,
         n_bad_clash,
@@ -202,14 +209,18 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42):
     clash_indices: list[int | None] = []
     failure_counts = {"good": 0, "random": 0, "distorted": 0, "clash": 0}
 
-    # 1. Good (Alpha Helix) — idealized backbone geometry
+    # 1. Good — idealized backbone geometry
     for i in range(n_good):
         if i % 20 == 0:
             logger.info("  Good %d/%d", i, n_good)
         try:
-            pdbs.append(
-                generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
-            )
+            conf = "alpha"
+            if diverse_good:
+                # Sample from the three main favoured regions of the Ramachandran plot.
+                # 60% Alpha, 30% Beta, 10% PPII
+                conf = rng.choice(["alpha", "beta", "ppii"], p=[0.6, 0.3, 0.1])
+
+            pdbs.append(generate_pdb_content(length=20, conformation=conf, minimize_energy=False))
             labels.append(1)
             clash_indices.append(None)
         except Exception as e:
@@ -349,6 +360,7 @@ def train_gnn(
     lr: float = 1e-3,
     random_state: int = 42,
     residue_loss_weight: float = 0.3,
+    diverse_good: bool = False,
 ):
     """Train the GNN quality classifier with joint global + per-residue loss.
 
@@ -370,6 +382,8 @@ def train_gnn(
             Total loss = NLL_global + λ × MSE_per_residue.
             Default 0.3 balances the two tasks without overwhelming the
             primary classification objective.
+        diverse_good: If True, the "Good" category includes Beta and PPII
+            conformations in addition to Alpha helices.
     """
     try:
         import torch
@@ -386,7 +400,9 @@ def train_gnn(
 
     # ── Data generation ────────────────────────────────────────────────
     logger.info("=== GNN Quality Scorer Training (v2 — with per-residue pLDDT head) ===")
-    pdbs, y, clash_indices = generate_pdb_dataset(n_samples=n_samples, random_state=random_state)
+    pdbs, y, clash_indices = generate_pdb_dataset(
+        n_samples=n_samples, random_state=random_state, diverse_good=diverse_good
+    )
 
     logger.info("Building protein graphs with per-residue targets...")
     graphs = build_graph_dataset(y, pdbs, clash_indices)
@@ -534,6 +550,11 @@ if __name__ == "__main__":
         default=0.3,
         help="Weight λ for per-residue MSE loss (default 0.3)",
     )
+    parser.add_argument(
+        "--diverse-good",
+        action="store_true",
+        help="Include Beta and PPII conformations in the 'Good' training set",
+    )
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
@@ -546,4 +567,5 @@ if __name__ == "__main__":
         lr=args.lr,
         random_state=args.random_state,
         residue_loss_weight=args.residue_loss_weight,
+        diverse_good=args.diverse_good,
     )
