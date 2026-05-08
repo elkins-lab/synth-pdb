@@ -126,7 +126,7 @@ class BenchmarkResults:
         gnn_pred = [r.gnn_score_pred for r in good if np.isfinite(r.gnn_score_pred)]
 
         lines = [
-            f"━━ Benchmark: {self.predictor} ({'%d' % self.n_success}/{self.n_structures} structures) ━━",
+            f"━━ Benchmark: {self.predictor} ({self.n_success}/{self.n_structures} structures) ━━",
             f"  TM-score   mean={np.mean(tm_scores):.3f}  std={np.std(tm_scores):.3f}  min={np.min(tm_scores):.3f}  max={np.max(tm_scores):.3f}",
             f"  GDT-TS     mean={np.mean(gdt):.3f}  std={np.std(gdt):.3f}",
             f"  lDDT       mean={np.mean(lddts):.3f}  std={np.std(lddts):.3f}",
