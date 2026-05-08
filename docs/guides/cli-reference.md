@@ -106,6 +106,25 @@ python -m synth_pdb.main --sequence "ALA-GLY-SER-THR-VAL" --output test.pdb
 | `--input-pattern` | Glob pattern for input PDB files for `cluster` (e.g., 'decoys/*.pdb'). | - |
 | `--n-clusters` | Number of clusters to form for `cluster`. | 5 |
 
+## AI Training & Benchmarking
+
+`synth-pdb` includes a suite of scripts for training and validating GNN-based quality filters.
+
+### GNN Training (`scripts/train_gnn_quality_filter.py`)
+
+| Option | Description |
+| :--- | :--- |
+| `--output` | Path to save the trained `.pt` model. |
+| `--n-samples` | Number of synthetic structures to generate for training. |
+| `--epochs` | Number of training iterations. |
+| `--diverse-good` | **Recommended.** Samples Alpha, Beta, and PPII for the "Good" category. |
+| `--residue-loss-weight` | Weight (λ) for the auxiliary pLDDT regression task. |
+
+### GNN Benchmarking
+
+-   `scripts/compare_gnn_diversity.py`: Compares model accuracy across different secondary structure motifs (Alpha vs Beta vs PPII).
+-   `scripts/stress_test_gnn.py`: Adversarial testing to find the "Breaking Point" (Critical Drift) of a model's physical understanding.
+
 ## Visualization
 
 Use the `--visualize` flag to open the generated structure in a browser-based 3D viewer (powered by 3Dmol.js).

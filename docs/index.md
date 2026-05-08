@@ -72,6 +72,7 @@ Explore `synth-pdb` through our curated interactive tutorials. Each notebook can
 | [**The GFP Molecular Forge**](tutorials/gfp_molecular_forge.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
 | [**IDP Conformational Ensembles**](tutorials/idp_ensemble_validation.ipynb) | ⭐⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/idp_ensemble_validation.ipynb) |
 | [**AlphaFold pLDDT vs NMR S²**](tutorials/alphafold_vs_nmr_dynamics.ipynb) | ⭐⭐⭐ | 35 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb) |
+| [**GNN pLDDT Explorer**](tutorials/gnn_plddt_explorer.ipynb) | ⭐⭐ | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/docs/tutorials/gnn_plddt_explorer.ipynb) |
 
 ### 🤖 ML & AI Integration
 | Tutorial | Difficulty | Time | Action |
@@ -101,8 +102,9 @@ Choose a path based on your background and goals:
 1. **NeRF Geometry Lab** (25 min) - Learn internal coordinate systems.
 2. **Virtual NMR Spectrometer** (25 min) - Predict relaxation rates and chemical shifts.
 3. **Protein Quality Assessment** (25 min) - Validate structure quality and geometry.
-4. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
-5. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
+4. **GNN pLDDT Explorer** (30 min) - Score with a GNN; interpret per-residue pLDDT; compute TM-score and lDDT.
+5. **GFP Molecular Forge** (30 min) - Explore chromophore chemistry.
+6. **AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical dynamics.
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*

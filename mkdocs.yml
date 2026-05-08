@@ -72,6 +72,7 @@ nav:
       - Geometry Tools Reference: tutorials/geometry_tools_reference.ipynb
       - RDC Alignment Explorer: tutorials/rdc_alignment_explorer.ipynb
       - Protein Quality Assessment: tutorials/protein_quality_assessment.ipynb
+      - GNN pLDDT Explorer: tutorials/gnn_plddt_explorer.ipynb
       - Virtual NMR Spectrometer: tutorials/virtual_nmr_spectrometer.ipynb
       - Virtual CD Lab: tutorials/virtual_cd_lab.ipynb
       - RPF Validation: tutorials/nmr_validation_rpf.ipynb
@@ -120,9 +121,12 @@ nav:
       - viewer: api/viewer.md
       - dataset: api/dataset.md
       - quality: api/quality.md
+      - score (GNN scoring): api/scoring.md
+      - benchmark: api/benchmark.md
       - coupling: api/coupling.md
   - Scientific Background:
     - Scientific Benchmarking: science/benchmarking.md
+    - GNN Structure Scoring: science/gnn-structure-scoring.md
     - Multimodal Overview: science/multimodal.md
     - Multi-Modal Observables: science/multi-modal-observables.md
     - Biophysics Fundamentals: science/biophysics.md
