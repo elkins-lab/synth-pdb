@@ -50,6 +50,15 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.coupling_path = os.path.join(self.base_dir, "synth_pdb", "coupling.py")
         self.structure_utils_path = os.path.join(self.base_dir, "synth_pdb", "structure_utils.py")
         self.j_coupling_path = os.path.join(self.base_dir, "synth_pdb", "j_coupling.py")
+        self.gnn_classifier_path = os.path.join(
+            self.base_dir, "synth_pdb", "quality", "gnn", "gnn_classifier.py"
+        )
+        self.gnn_graph_path = os.path.join(self.base_dir, "synth_pdb", "quality", "gnn", "graph.py")
+
+        # Script paths
+        self.train_gnn_path = os.path.join(self.base_dir, "scripts", "train_gnn_quality_filter.py")
+        self.compare_gnn_path = os.path.join(self.base_dir, "scripts", "compare_gnn_diversity.py")
+        self.stress_test_gnn_path = os.path.join(self.base_dir, "scripts", "stress_test_gnn.py")
 
         # Test file paths
         self.test_rdc_q_path = os.path.join(
@@ -544,6 +553,49 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE — Scalar J-Couplings and Karplus Equations",
         ]
         self._check_file_contains(self.j_coupling_path, required_notes)
+
+    def test_gnn_library_educational_notes(self) -> None:
+        """Ensure GNN library files retain key educational blocks."""
+        graph_notes = [
+            "EDUCATIONAL BACKGROUND — Why represent a protein as a graph?",
+            "GEOMETRIC VECTORIZATION — Why skip PDB parsing?",
+            "TOPOLOGY VS CARTESIAN — Why Graphs Win",
+            "GRAPH STRUCTURE",
+        ]
+        self._check_file_contains(self.gnn_graph_path, graph_notes)
+
+        classifier_notes = [
+            "DESIGN CONTRACT — Same API as ProteinQualityClassifier (RF)",
+            "CHECKPOINT FORMAT (.pt)",
+            "HIGH-THROUGHPUT AUDITING — Vectorized Ensemble Scoring",
+            "VECTORIZED ENSEMBLE AUDITING",
+        ]
+        self._check_file_contains(self.gnn_classifier_path, classifier_notes)
+
+    def test_gnn_scripts_educational_notes(self) -> None:
+        """Ensure GNN training and benchmark scripts retain key educational blocks."""
+        train_notes = [
+            "STRUCTURAL BIOLOGY CONTEXT — Why this multi-task approach?",
+            "Educational note — Ramachandran Z-score and Steric Constraints",
+            "Why these four classes?",
+            "Good — idealized backbone geometry with physical 'wobble'",
+            'High Torsion Drift (40-60°) — Marginal "Bad"',
+            "Surgical Torsion Corruption (1-2 bad residues in good backbone)",
+        ]
+        self._check_file_contains(self.train_gnn_path, train_notes)
+
+        compare_notes = [
+            "SCIENTIFIC OBJECTIVE:",
+            "Educational Insight:",
+        ]
+        self._check_file_contains(self.compare_gnn_path, compare_notes)
+
+        stress_notes = [
+            "SCIENTIFIC OBJECTIVE:",
+            "Torsion Drift (Backbone Wobble)",
+            "Local Corruption (One Bad Apple)",
+        ]
+        self._check_file_contains(self.stress_test_gnn_path, stress_notes)
 
     def test_test_files_educational_notes(self) -> None:
         """Ensure test files retain key educational blocks."""
