@@ -43,7 +43,10 @@ def random_pdb():
 
 class TestScoreStructure:
     def test_helix_scores_high_quality(self, helix_pdb):
-        from synth_pdb.score import score_structure
+        from synth_pdb.score import _get_classifier, score_structure
+
+        if not _get_classifier().is_pretrained:
+            pytest.skip("No pre-trained model found — skipping accuracy assertion")
 
         result = score_structure(helix_pdb)
         assert result.label == "High Quality", (
@@ -53,7 +56,10 @@ class TestScoreStructure:
         assert result.global_score > 0.5
 
     def test_random_coil_scores_low_quality(self, random_pdb):
-        from synth_pdb.score import score_structure
+        from synth_pdb.score import _get_classifier, score_structure
+
+        if not _get_classifier().is_pretrained:
+            pytest.skip("No pre-trained model found — skipping accuracy assertion")
 
         result = score_structure(random_pdb)
         assert result.label == "Low Quality", (
@@ -72,7 +78,10 @@ class TestScoreStructure:
             ), f"global_score={result.global_score} is outside [0, 1]"
 
     def test_helix_scores_higher_than_random(self, helix_pdb, random_pdb):
-        from synth_pdb.score import score_structure
+        from synth_pdb.score import _get_classifier, score_structure
+
+        if not _get_classifier().is_pretrained:
+            pytest.skip("No pre-trained model found — skipping accuracy assertion")
 
         helix_result = score_structure(helix_pdb)
         random_result = score_structure(random_pdb)
@@ -82,14 +91,15 @@ class TestScoreStructure:
 
     def test_file_path_input(self, helix_pdb):
         """score_structure() should accept a file path as well as a PDB string."""
-        from synth_pdb.score import score_structure
+        from synth_pdb.score import _get_classifier, score_structure
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as f:
             f.write(helix_pdb)
             tmp_path = f.name
         try:
             result = score_structure(tmp_path)
-            assert result.global_score > 0.5
+            if _get_classifier().is_pretrained:
+                assert result.global_score > 0.5
         finally:
             os.unlink(tmp_path)
 
@@ -137,7 +147,10 @@ class TestPerResiduePLDDT:
 
     def test_helix_residues_mostly_very_high(self, helix_pdb):
         """For a clean alpha helix, most residues should be Very High confidence."""
-        from synth_pdb.score import score_structure
+        from synth_pdb.score import _get_classifier, score_structure
+
+        if not _get_classifier().is_pretrained:
+            pytest.skip("No pre-trained model found — skipping accuracy assertion")
 
         result = score_structure(helix_pdb)
         very_high_count = result.residue_labels.count("Very High")

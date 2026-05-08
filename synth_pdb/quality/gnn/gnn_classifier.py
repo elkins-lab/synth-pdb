@@ -210,6 +210,7 @@ class GNNQualityClassifier:
         # Track if the model supports per-residue confidence (v2) or just global (v1).
         # v2 models have an auxiliary regression head that predicts local confidence.
         self._has_residue_head: bool = False
+        self._is_pretrained: bool = False
 
         if model_path:
             # User provided an explicit path — load it or die.
@@ -640,6 +641,7 @@ class GNNQualityClassifier:
             # due to active Dropout layers.
             self.model.eval()
             self._model_path = path
+            self._is_pretrained = True
 
             # Detect if this checkpoint has the per-residue pLDDT head (v2).
             # We look for the existence of the specific linear layer parameters
@@ -684,3 +686,9 @@ class GNNQualityClassifier:
 
         # New models always include the residue head (standard for v2+)
         self._has_residue_head = True
+        self._is_pretrained = False
+
+    @property
+    def is_pretrained(self) -> bool:
+        """Return True if the model weights were loaded from a checkpoint."""
+        return self._is_pretrained
