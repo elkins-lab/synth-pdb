@@ -22,6 +22,7 @@ if (repo_root / "synth_pdb").exists():
 
 from synth_pdb.batch_generator import BatchedGenerator  # noqa: E402
 from synth_pdb.cryo_em import generate_density_map, save_mrc_file  # noqa: E402
+from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier  # noqa: E402
 from synth_pdb.rdc import calculate_rdcs  # noqa: E402
 from synth_pdb.saxs import calculate_saxs_profile, export_saxs_profile  # noqa: E402
 
@@ -70,6 +71,18 @@ def main() -> None:
     parser.add_argument("--skip-mrc", action="store_true", help="Skip Cryo-EM map generation.")
     parser.add_argument("--skip-saxs", action="store_true", help="Skip SAXS profile generation.")
     parser.add_argument("--skip-nmr", action="store_true", help="Skip NMR observable generation.")
+    parser.add_argument(
+        "--quality-model",
+        type=str,
+        default=None,
+        help="Path to GNN quality model (.pt) to filter structures.",
+    )
+    parser.add_argument(
+        "--min-quality",
+        type=float,
+        default=0.7,
+        help="Minimum P(Good) probability to keep a structure. Default 0.7.",
+    )
 
     args = parser.parse_args()
 
@@ -93,9 +106,31 @@ def main() -> None:
     bg = BatchedGenerator(args.sequence, n_batch=args.n, full_atom=True)
     batch = bg.generate_batch(drift=args.drift, seed=args.seed)
 
+    # ── Quality Filtering ───────────────────────────────────────────
+    if args.quality_model:
+        logger.info(
+            f"Applying quality filter using {args.quality_model} (threshold={args.min_quality})..."
+        )
+        clf = GNNQualityClassifier(args.quality_model)
+        scores = clf.score_batch(batch)
+
+        # Create boolean mask for 'Good' structures
+        mask = np.array([s.global_score >= args.min_quality for s in scores])
+        n_kept = int(np.sum(mask))
+        logger.info(f"Quality Filter: Kept {n_kept}/{args.n} structures ({n_kept/args.n:.1%}).")
+
+        if n_kept == 0:
+            logger.error("No structures passed the quality filter. Aborting.")
+            return
+
+        # Filter the BatchedPeptide object
+        batch = batch[mask]
+        # Update n for the loop below
+        args.n = n_kept
+
     # Pre-convert to Biotite Stack for simulation functions
     stack = batch.to_stack()
-    logger.info(f"Ensemble generation complete. Structure shape: {batch.coords.shape}")
+    logger.info(f"Ensemble ready. Structure shape: {batch.coords.shape}")
 
     metadata = []
 

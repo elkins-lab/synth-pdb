@@ -341,6 +341,121 @@ def _parse_backbone(pdb_content: str) -> list[dict]:
     return residues
 
 
+def build_protein_graphs_from_batch(batch: Any, ca_distance_threshold: float = 8.0) -> list[Any]:
+    """Build a list of PyG Data objects from a BatchedPeptide container.
+
+    This avoids the overhead of converting structures to PDB strings and
+    re-parsing them, enabling high-throughput quality scoring.
+
+    Args:
+        batch: A :class:`synth_pdb.batch_generator.BatchedPeptide` object.
+        ca_distance_threshold: Spatial cutoff for edges.
+
+    Returns:
+        A list of torch_geometric.data.Data objects.
+    """
+    try:
+        import torch
+        from torch_geometric.data import Data
+    except ImportError:
+        return []
+
+    # 1. Extract Backbone coordinates (CA atoms)
+    # batch.atom_names contains the names for the static topology
+    ca_mask = np.array([name == "CA" for name in batch.atom_names])
+    if not np.any(ca_mask):
+        return []
+
+    # coords is (B, N_atoms, 3) -> ca_coords is (B, L, 3)
+    ca_coords = batch.coords[:, ca_mask, :]
+    b, length, _ = ca_coords.shape
+
+    # 2. Compute Dihedrals for all structures in the batch
+    # We use a vectorized version of the dihedral calculation
+    # To keep it simple and consistent with _parse_backbone, we calculate
+    # the 8 node features structure by structure, but we use the coordinate
+    # tensor directly.
+
+    # Identify indices of N, CA, C in the static topology for the walker
+    n_idx = [i for i, name in enumerate(batch.atom_names) if name == "N"]
+    ca_idx = [i for i, name in enumerate(batch.atom_names) if name == "CA"]
+    c_idx = [i for i, name in enumerate(batch.atom_names) if name == "C"]
+
+    graphs = []
+
+    for i in range(b):
+        # Extract coordinates for this structure
+        struc_coords = batch.coords[i]
+
+        node_feats = np.zeros((length, 8), dtype=np.float32)
+        seq_pos = np.linspace(0.0, 1.0, length, dtype=np.float32)
+
+        # Calculate dihedrals structure-by-structure for now to reuse _dihedral
+        for res_idx in range(length):
+            phi = None
+            psi = None
+
+            if res_idx > 0:
+                p1 = struc_coords[c_idx[res_idx - 1]]
+                p2 = struc_coords[n_idx[res_idx]]
+                p3 = struc_coords[ca_idx[res_idx]]
+                p4 = struc_coords[c_idx[res_idx]]
+                phi = _dihedral(p1, p2, p3, p4)
+
+            if res_idx < length - 1:
+                p1 = struc_coords[n_idx[res_idx]]
+                p2 = struc_coords[ca_idx[res_idx]]
+                p3 = struc_coords[c_idx[res_idx]]
+                p4 = struc_coords[n_idx[res_idx + 1]]
+                psi = _dihedral(p1, p2, p3, p4)
+
+            node_feats[res_idx, 0] = math.sin(math.radians(phi)) if phi is not None else 0.0
+            node_feats[res_idx, 1] = math.cos(math.radians(phi)) if phi is not None else 0.0
+            node_feats[res_idx, 2] = math.sin(math.radians(psi)) if psi is not None else 0.0
+            node_feats[res_idx, 3] = math.cos(math.radians(psi)) if psi is not None else 0.0
+            node_feats[
+                res_idx, 4
+            ] = 0.5  # Constant B-factor for now as BatchedPeptide doesn't store them yet
+            node_feats[res_idx, 5] = seq_pos[res_idx]
+            node_feats[res_idx, 6] = 1.0 if res_idx == 0 else 0.0
+            node_feats[res_idx, 7] = 1.0 if res_idx == length - 1 else 0.0
+
+        # 3. Edges (Distance matrix)
+        struc_ca = ca_coords[i]
+        diff = struc_ca[:, None, :] - struc_ca[None, :, :]
+        dist_matrix = np.sqrt((diff**2).sum(axis=-1))
+
+        src_list, dst_list, edge_attr_list = [], [], []
+        for u in range(length):
+            for v in range(length):
+                if u == v:
+                    continue
+                d = dist_matrix[u, v]
+                if d < ca_distance_threshold:
+                    src_list.append(u)
+                    dst_list.append(v)
+                    edge_attr_list.append([d, float(abs(u - v))])
+
+        if not src_list:
+            for u in range(length - 1):
+                d = float(dist_matrix[u, u + 1])
+                src_list.extend([u, u + 1])
+                dst_list.extend([u + 1, u])
+                edge_attr_list.extend([[d, 1.0], [d, 1.0]])
+
+        # 4. Pack
+        graphs.append(
+            Data(
+                x=torch.tensor(node_feats, dtype=torch.float),
+                edge_index=torch.tensor([src_list, dst_list], dtype=torch.long),
+                edge_attr=torch.tensor(edge_attr_list, dtype=torch.float),
+                num_nodes=length,
+            )
+        )
+
+    return graphs
+
+
 def _dihedral(p1: np.ndarray, p2: np.ndarray, p3: np.ndarray, p4: np.ndarray) -> float:
     """Compute the dihedral angle (degrees) defined by four 3D points.
 

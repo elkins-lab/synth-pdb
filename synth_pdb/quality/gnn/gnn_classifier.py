@@ -363,6 +363,95 @@ class GNNQualityClassifier:
             n_residues=graph.num_nodes,
         )
 
+    def score_batch(self, batch: Any) -> list[QualityScore]:
+        """Score an entire batch of structures in a single vectorized pass.
+
+        This is significantly faster than calling ``score()`` in a loop.
+
+        Args:
+            batch: A :class:`synth_pdb.batch_generator.BatchedPeptide` object.
+
+        Returns:
+            A list of QualityScore objects, one for each structure in the batch.
+        """
+        try:
+            import torch
+            from torch_geometric.data import Batch
+        except ImportError:
+            return []
+
+        from .graph import build_protein_graphs_from_batch
+
+        # 1. Build graphs for the entire batch
+        graphs = build_protein_graphs_from_batch(batch)
+        if not graphs:
+            return []
+
+        # 2. Pack into a single PyG Batch object for GPU parallelism
+        pyg_batch = Batch.from_data_list(graphs)
+
+        # 3. Model setup
+        assert self.model is not None, "Model not loaded"
+        self.model.eval()
+
+        # Move to same device as model
+        device = next(self.model.parameters()).device
+        pyg_batch = pyg_batch.to(device)
+
+        # 4. Forward pass
+        with torch.no_grad():
+            if self._has_residue_head:
+                log_probs, per_res_tensor = type(self.model).forward_with_node_embeddings(
+                    self.model,
+                    pyg_batch.x,
+                    pyg_batch.edge_index,
+                    pyg_batch.edge_attr,
+                    pyg_batch.batch,
+                )
+                per_residue_all = per_res_tensor.squeeze(-1).cpu().numpy()
+            else:
+                log_probs = self.model(
+                    pyg_batch.x, pyg_batch.edge_index, pyg_batch.edge_attr, pyg_batch.batch
+                )
+                per_residue_all = None
+
+        # 5. Post-process
+        # log_probs is [B, 2]
+        probs_good = log_probs.exp()[:, 1].cpu().numpy()
+
+        results = []
+        node_ptr = pyg_batch.ptr.cpu().numpy()
+
+        for i in range(len(graphs)):
+            prob_good = float(probs_good[i])
+            label = "High Quality" if prob_good > 0.5 else "Low Quality"
+
+            # Slice per-residue scores if available
+            plddt = []
+            res_lbls = []
+            if per_residue_all is not None:
+                plddt = per_residue_all[node_ptr[i] : node_ptr[i + 1]].tolist()
+                res_lbls = [_plddt_label(s) for s in plddt]
+
+            # Extract features for this graph
+            node_feats = graphs[i].x.numpy()
+            feat_dict = {
+                name: float(np.mean(node_feats[:, j])) for j, name in enumerate(_FEATURE_NAMES)
+            }
+
+            results.append(
+                QualityScore(
+                    global_score=prob_good,
+                    label=label,
+                    per_residue=plddt,
+                    residue_labels=res_lbls,
+                    features=feat_dict,
+                    n_residues=graphs[i].num_nodes,
+                )
+            )
+
+        return results
+
     def save(self, path: str) -> None:
         """Save model weights and architecture config to a ``.pt`` checkpoint.
 
