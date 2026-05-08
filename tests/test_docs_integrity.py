@@ -50,6 +50,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self.coupling_path = os.path.join(self.base_dir, "synth_pdb", "coupling.py")
         self.structure_utils_path = os.path.join(self.base_dir, "synth_pdb", "structure_utils.py")
         self.j_coupling_path = os.path.join(self.base_dir, "synth_pdb", "j_coupling.py")
+        self.benchmark_path = os.path.join(self.base_dir, "synth_pdb", "benchmark.py")
         self.gnn_classifier_path = os.path.join(
             self.base_dir, "synth_pdb", "quality", "gnn", "gnn_classifier.py"
         )
@@ -553,6 +554,18 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE — Scalar J-Couplings and Karplus Equations",
         ]
         self._check_file_contains(self.j_coupling_path, required_notes)
+
+    def test_benchmark_educational_notes(self) -> None:
+        """Ensure benchmark.py retains key structural biology and AI notes."""
+        required_notes = [
+            "The benchmark asks a simple but powerful question:",
+            "SCIENTIFIC RATIONALE — Why benchmark against synthetic structures?",
+            "METRICS EXPLAINED — The Structural Biology Toolkit",
+            "Metrics computed",
+            "BENCHMARK LIFECYCLE",
+            "Generates ``n_structures`` synthetic protein structures",
+        ]
+        self._check_file_contains(self.benchmark_path, required_notes)
 
     def test_gnn_library_educational_notes(self) -> None:
         """Ensure GNN library files retain key educational blocks."""
