@@ -125,6 +125,7 @@ nav:
       - benchmark: api/benchmark.md
       - coupling: api/coupling.md
   - Scientific Background:
+    - Ground Truth Philosophy: science/ground-truth-philosophy.md
     - Scientific Benchmarking: science/benchmarking.md
     - GNN Structure Scoring: science/gnn-structure-scoring.md
     - Multimodal Overview: science/multimodal.md

@@ -4,6 +4,10 @@ synth-pdb is designed as a **high-performance data factory** for training protei
 
 ## Why Use synth-pdb for ML?
 
+### 0. **Mathematically Pure [Ground Truth](../science/ground-truth-philosophy.md)** 💎
+
+Unlike experimental data which is noisy and biased, `synth-pdb` provides "ideal" labels that capture the exact geometric intent of a fold, free from forcefield artifacts.
+
 ### 1. **Zero-Copy Handover** 🚀
 
 Direct NumPy → PyTorch/JAX/MLX without memory copying:
