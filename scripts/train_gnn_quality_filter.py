@@ -40,6 +40,7 @@ import logging
 import math
 import os
 import sys
+from typing import List, Optional
 
 import numpy as np
 
@@ -162,15 +163,16 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
     Why these four classes?
     ───────────────────────
     1. GOOD: Provides a baseline for idealized, "folded" geometry.
-       If diverse_good=True, this samples from Alpha, Beta, and PPII.
+       Includes physical 'wobble' (drift 0-15°) to ensure robustness.
     2. RANDOM (Coil): Models "disordered" or "unfolded" states with unconstrained
        torsions. Teaches the GNN to recognise forbidden Ramachandran regions.
-    3. DISTORTED: Models "shaken" structures or low-resolution models where
-       the global fold is roughly correct but local Cα positions have 0.5 Å
-       noise. Teaches the GNN to be sensitive to fine-grained coordinate error.
-    4. CLASHING: Models "threading" or "sampling" errors where a single atom
-       is physically in the wrong place (steric clash). Teaches the GNN to
-       spot local outliers in an otherwise good structure.
+    3. DISTORTED/DRIFTED: Models marginal "Bad" structures.
+       - 1/3 are 'shaken' (0.5 Å noise).
+       - 1/3 are 'drunken' (High drift 40-60°). This defines the quality cliff.
+       - 1/3 are 'surgical' (Perfect backbone with 1-2 random residues).
+         This teaches the GNN that "One bad apple spoils the bunch."
+    4. CLASHING: Models "threading" or "sampling" errors where 1-4 residues
+       are physically in the wrong place (steric clash).
 
     Args:
         n_samples: Total samples to generate.
@@ -183,8 +185,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
     pdbs   : list[str]   — PDB format strings
     labels : np.ndarray  — global label (1 = Good, 0 = Bad)
     clash_indices : list[int | None]
-        For Clashing structures, the residue index that was displaced.
-        None for all other structure types (used for per-residue target generation).
+        For Clashing structures, a representative residue index that was displaced.
     """
     import io
 
@@ -200,7 +201,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
     n_bad_clash = n_samples - n_good - n_bad_random - n_bad_distorted
 
     logger.info(
-        "Generating: %d Good%s, %d Random, %d Distorted, %d Clashing",
+        "Generating: %d Good%s, %d Random, %d Distorted/Drifted/Surgical, %d Clashing",
         n_good,
         " (Diverse)" if diverse_good else "",
         n_bad_random,
@@ -213,26 +214,30 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
     clash_indices: list[int | None] = []
     failure_counts = {"good": 0, "random": 0, "distorted": 0, "clash": 0}
 
-    # 1. Good — idealized backbone geometry
+    # 1. Good — idealized backbone geometry with physical 'wobble'
     for i in range(n_good):
         if i % 20 == 0:
             logger.info("  Good %d/%d", i, n_good)
         try:
             conf = "alpha"
             if diverse_good:
-                # Sample from the three main favoured regions of the Ramachandran plot.
-                # 60% Alpha, 30% Beta, 10% PPII
                 conf = rng.choice(["alpha", "beta", "ppii"], p=[0.6, 0.3, 0.1])
 
-            pdbs.append(generate_pdb_content(length=20, conformation=conf, minimize_energy=False))
+            # Small drift (0-15°) is still considered 'Good'.
+            drift_val = rng.uniform(0.0, 15.0)
+
+            pdbs.append(
+                generate_pdb_content(
+                    length=20, conformation=conf, drift=drift_val, minimize_energy=False
+                )
+            )
             labels.append(1)
             clash_indices.append(None)
         except Exception as e:
             failure_counts["good"] += 1
-            logger.warning("Good sample %d failed: %s", i, e, exc_info=True)
+            logger.warning("Good sample %d failed: %s", i, e)
 
     # 2. Bad (Random coil — poor Ramachandran geometry)
-    # Torsion angles are sampled uniformly [0, 360], ignoring steric hindrance.
     for i in range(n_bad_random):
         if i % 10 == 0:
             logger.info("  Random %d/%d", i, n_bad_random)
@@ -244,34 +249,58 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
             clash_indices.append(None)
         except Exception as e:
             failure_counts["random"] += 1
-            logger.warning("Random sample %d failed: %s", i, e, exc_info=True)
+            logger.warning("Random sample %d failed: %s", i, e)
 
-    # 3. Bad (Distorted — good helix with Gaussian coordinate noise)
-    # This simulates a "loose" structure where Cα atoms are wobbling away
-    # from their ideal lattice positions.
+    # 3. Bad (Distorted/Drifted/Surgical — defining the cliff)
     for i in range(n_bad_distorted):
         if i % 10 == 0:
-            logger.info("  Distorted %d/%d", i, n_bad_distorted)
+            logger.info("  Distorted/Drifted/Surgical %d/%d", i, n_bad_distorted)
         try:
-            clean = generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
-            f = io.StringIO(clean)
-            struc_obj = pdb_io.PDBFile.read(f).get_structure(model=1)
-            struc_obj.coord += rng.normal(0, 0.5, struc_obj.coord.shape)
-            f_out = io.StringIO()
-            pdb_file = pdb_io.PDBFile()
-            pdb_file.set_structure(struc_obj)
-            pdb_file.write(f_out)
-            pdbs.append(f_out.getvalue())
+            rval = rng.random()
+            if rval < 0.33:
+                # Type A: Coordinate noise (0.5 Å)
+                clean = generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
+                f = io.StringIO(clean)
+                struc_obj = pdb_io.PDBFile.read(f).get_structure(model=1)
+                struc_obj.coord += rng.normal(0, 0.5, struc_obj.coord.shape)
+                f_out = io.StringIO()
+                pdb_file = pdb_io.PDBFile()
+                pdb_file.set_structure(struc_obj)
+                pdb_file.write(f_out)
+                pdbs.append(f_out.getvalue())
+            elif rval < 0.66:
+                # Type B: High Torsion Drift (40-60°) — Marginal "Bad"
+                pdbs.append(
+                    generate_pdb_content(
+                        length=20,
+                        conformation=rng.choice(["alpha", "beta"]),
+                        drift=rng.uniform(40.0, 60.0),
+                        minimize_energy=False,
+                    )
+                )
+            else:
+                # Type C: Surgical Torsion Corruption (1-2 bad residues in good backbone)
+                # This forces the GNN to be sensitive to local "broken" spots.
+                n_corrupt = rng.integers(1, 3)
+                # Generate indices like "5-5:random" or "5-6:random"
+                start = rng.integers(2, 18)
+                end = start + n_corrupt - 1
+                struct_spec = f"{start}-{end}:random"
+                pdbs.append(
+                    generate_pdb_content(
+                        length=20,
+                        structure=struct_spec,
+                        conformation=rng.choice(["alpha", "beta"]),
+                        minimize_energy=False,
+                    )
+                )
             labels.append(0)
             clash_indices.append(None)
         except Exception as e:
             failure_counts["distorted"] += 1
-            logger.warning("Distorted sample %d failed: %s", i, e, exc_info=True)
+            logger.warning("Distorted sample %d failed: %s", i, e)
 
-    # 4. Bad (Clashing — single Cα displacement)
-    # We move a Cα atom directly on top of another residue's position.
-    # This creates a massive steric clash (Van der Waals overlap) which is
-    # a classic sign of a poor-quality structural model.
+    # 4. Bad (Clashing — multi-residue displacement)
     for i in range(n_bad_clash):
         if i % 10 == 0:
             logger.info("  Clashing %d/%d", i, n_bad_clash)
@@ -280,84 +309,53 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
             f = io.StringIO(clean)
             struc_obj = pdb_io.PDBFile.read(f).get_structure(model=1)
             ca_idx = [j for j, a in enumerate(struc_obj) if a.atom_name == "CA"]
-            clash_res_idx = None
-            if len(ca_idx) >= 5:
-                struc_obj.coord[ca_idx[1]] = struc_obj.coord[ca_idx[4]]
-                clash_res_idx = 1  # residue index 1 (0-based) was displaced
+
+            # Perturb 1 to 4 random residues
+            n_perturb = rng.integers(1, 5)
+            perturbed_indices = rng.choice(len(ca_idx), size=n_perturb, replace=False)
+
+            for p_idx in perturbed_indices:
+                target_idx = (p_idx + 5) % len(ca_idx)
+                struc_obj.coord[ca_idx[p_idx]] = struc_obj.coord[ca_idx[target_idx]]
+
             f_out = io.StringIO()
             pdb_file = pdb_io.PDBFile()
             pdb_file.set_structure(struc_obj)
             pdb_file.write(f_out)
             pdbs.append(f_out.getvalue())
             labels.append(0)
-            clash_indices.append(clash_res_idx)
+            clash_indices.append(int(perturbed_indices[0]))
         except Exception as e:
             failure_counts["clash"] += 1
-            logger.warning("Clash sample %d failed: %s", i, e, exc_info=True)
+            logger.warning("Clash sample %d failed: %s", i, e)
 
     total_failures = sum(failure_counts.values())
     if total_failures:
         logger.warning("Generation failures: %s (total=%d)", failure_counts, total_failures)
-    else:
-        logger.info("All %d samples generated successfully.", len(pdbs))
-
-    if len(pdbs) < int(n_samples * 0.5):
-        raise RuntimeError(
-            f"Only {len(pdbs)} of {n_samples} samples generated. Failures: {failure_counts}"
-        )
 
     return pdbs, np.array(labels, dtype=np.int64), clash_indices
 
 
 def build_graph_dataset(y: np.ndarray, pdb_list: list, clash_indices: list):
-    """Convert raw PDB strings to PyG Data objects with global labels and per-residue targets.
-
-    Each protein is represented as a contact graph:
-      Nodes: Residues (Cα atoms)
-      Edges: Connectivity if Cα–Cα distance < 8 Å.
-
-    Args:
-        y: Global label array (1 = Good, 0 = Bad), length N.
-        pdb_list: List of N PDB strings.
-        clash_indices: List of per-structure clash residue indices (or None).
-
-    Returns:
-        List of torch_geometric.data.Data objects with .y and .residue_targets set.
-    """
+    """Convert raw PDB strings to PyG Data objects."""
     import torch
-
     from synth_pdb.quality.gnn.graph import build_protein_graph
 
     graphs = []
-    failures = 0
-    for i, (pdb_content, label, clash_idx) in enumerate(
-        zip(pdb_list, y, clash_indices, strict=False)
-    ):
+    for pdb_content, label, clash_idx in zip(pdb_list, y, clash_indices):
         try:
             g = build_protein_graph(pdb_content)
             g.y = torch.tensor([int(label)], dtype=torch.long)
-
-            # Per-residue pLDDT targets based on local geometry
             targets = compute_per_residue_targets(pdb_content, int(label), clash_idx)
-            g.residue_targets = torch.tensor(targets, dtype=torch.float)  # [N,]
-
+            g.residue_targets = torch.tensor(targets, dtype=torch.float)
             graphs.append(g)
         except Exception as e:
-            failures += 1
-            logger.warning("Graph build failed for sample %d: %s", i, e)
-
-    if failures:
-        logger.warning("%d / %d graph builds failed.", failures, len(pdb_list))
+            logger.debug("Graph build failed: %s", e)
     return graphs
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Training
-# ─────────────────────────────────────────────────────────────────────────────
-
-
 def train_gnn(
-    output_path: str,
+    output: str,
     n_samples: int = 200,
     epochs: int = 50,
     hidden_dim: int = 64,
@@ -366,29 +364,7 @@ def train_gnn(
     residue_loss_weight: float = 0.3,
     diverse_good: bool = False,
 ):
-    """Train the GNN quality classifier with joint global + per-residue loss.
-
-    The model learns to predict:
-    1. Is this structure valid overall? (Global Label)
-    2. Which residues have bad local geometry? (Per-residue pLDDT)
-
-    This multi-task setup regularises the GNN, making it more robust than
-    a simple binary classifier.
-
-    Args:
-        output_path: Where to save the .pt checkpoint.
-        n_samples: Training samples to generate.
-        epochs: Number of training epochs.
-        hidden_dim: GNN hidden dimension.
-        lr: Initial learning rate (AdamW + CosineAnnealing).
-        random_state: RNG seed for reproducibility.
-        residue_loss_weight: Weight λ for the per-residue MSE loss term.
-            Total loss = NLL_global + λ × MSE_per_residue.
-            Default 0.3 balances the two tasks without overwhelming the
-            primary classification objective.
-        diverse_good: If True, the "Good" category includes Beta and PPII
-            conformations in addition to Alpha helices.
-    """
+    """Train the GNN quality classifier with joint global + per-residue loss."""
     try:
         import torch
         import torch.nn.functional as F
@@ -396,110 +372,57 @@ def train_gnn(
         from sklearn.model_selection import train_test_split
         from torch_geometric.loader import DataLoader
     except ImportError as exc:
-        logger.error("Missing dependency: %s. Run: pip install synth-pdb[gnn]", exc)
+        logger.error("Missing dependency: %s", exc)
         sys.exit(1)
 
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
     from synth_pdb.quality.gnn.model import ProteinGNN
 
-    # ── Data generation ────────────────────────────────────────────────
-    logger.info("=== GNN Quality Scorer Training (v2 — with per-residue pLDDT head) ===")
     pdbs, y, clash_indices = generate_pdb_dataset(
         n_samples=n_samples, random_state=random_state, diverse_good=diverse_good
     )
-
-    logger.info("Building protein graphs with per-residue targets...")
     graphs = build_graph_dataset(y, pdbs, clash_indices)
-
     if not graphs:
-        raise RuntimeError("No graphs were built. Aborting training.")
+        raise RuntimeError("No graphs built.")
 
     y_graphs = np.array([g.y.item() for g in graphs])
-
     idx = np.arange(len(graphs))
     idx_train, idx_test = train_test_split(idx, test_size=0.2, random_state=42, stratify=y_graphs)
     train_graphs = [graphs[i] for i in idx_train]
     test_graphs = [graphs[i] for i in idx_test]
 
-    logger.info(
-        "Dataset: %d train / %d test  (Good: %d, Bad: %d)",
-        len(train_graphs),
-        len(test_graphs),
-        int(np.sum(y_graphs == 1)),
-        int(np.sum(y_graphs == 0)),
-    )
-
     train_loader = DataLoader(train_graphs, batch_size=16, shuffle=True)
     test_loader = DataLoader(test_graphs, batch_size=16, shuffle=False)
 
-    # ── Model, optimiser, scheduler ────────────────────────────────────
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.info("Training on: %s", device)
-
-    model = ProteinGNN(node_features=8, edge_features=2, hidden_dim=hidden_dim, num_classes=2)
-    model = model.to(device)
-
+    model = ProteinGNN(node_features=8, edge_features=2, hidden_dim=hidden_dim, num_classes=2).to(
+        device
+    )
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
-    # ── Training loop ──────────────────────────────────────────────────
-    # λ_residue (residue_loss_weight) controls how much the model prioritises
-    # local geometry (pLDDT) over global classification.
-    logger.info("Training for %d epochs (λ_residue=%.2f)...", epochs, residue_loss_weight)
+    logger.info("Training Robust GNN (λ_residue=%.2f)...", residue_loss_weight)
 
     for epoch in range(1, epochs + 1):
         model.train()
         total_loss = 0.0
-        correct = 0
         total = 0
-
         for batch in train_loader:
             batch = batch.to(device)
             optimizer.zero_grad()
-
-            # Dual-output forward pass.
-            # We call via type(model) to bypass nn.Module.__getattr__, which
-            # intercepts attribute lookup on Module instances and only checks
-            # _parameters / _buffers / _modules — it never reaches ordinary
-            # methods defined on inner classes created by the __new__ factory.
             log_probs, per_residue_scores = type(model).forward_with_node_embeddings(
                 model, batch.x, batch.edge_index, batch.edge_attr, batch.batch
             )
-
-            # ── Loss 1: global binary classification ───────────────────
             global_loss = F.nll_loss(log_probs, batch.y)
-
-            # ── Loss 2: per-residue pLDDT regression ──────────────────
-            # Forces the GNN to understand local residue quality.
-            # residue_targets is [total_nodes,] concatenated from all graphs
-            # in the batch (same ordering as batch.x rows).
-            residue_loss = F.mse_loss(
-                per_residue_scores.squeeze(-1),  # [total_nodes]
-                batch.residue_targets,  # [total_nodes]
-            )
-
-            # ── Combined loss ─────────────────────────────────────────
+            residue_loss = F.mse_loss(per_residue_scores.squeeze(-1), batch.residue_targets)
             loss = global_loss + residue_loss_weight * residue_loss
             loss.backward()
             optimizer.step()
-
             total_loss += global_loss.item() * batch.num_graphs
-            preds = log_probs.argmax(dim=-1)
-            correct += (preds == batch.y).sum().item()
             total += batch.num_graphs
-
         scheduler.step()
-        train_acc = correct / total if total > 0 else 0.0
-
-        if epoch % max(1, epochs // 10) == 0 or epoch == epochs:
-            logger.info(
-                "Epoch %3d/%d  global_loss=%.4f  train_acc=%.3f  lr=%.2e",
-                epoch,
-                epochs,
-                total_loss / total,
-                train_acc,
-                scheduler.get_last_lr()[0],
-            )
+        if epoch % max(1, epochs // 10) == 0:
+            logger.info("Epoch %3d/%d  global_loss=%.4f", epoch, epochs, total_loss / total)
 
     # ── Evaluation ─────────────────────────────────────────────────────
     model.eval()
@@ -520,56 +443,24 @@ def train_gnn(
         classification_report(all_labels, all_preds, target_names=["Bad", "Good"], labels=[0, 1]),
     )
 
-    # ── Save ───────────────────────────────────────────────────────────
     clf = GNNQualityClassifier.__new__(GNNQualityClassifier)
     clf.model = model.cpu()
     clf._model_path = None
-    clf.save(output_path)
-    logger.info("Done! Model saved to %s", output_path)
+    clf.save(output)
+    logger.info("Saved Robust model to %s", output)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%H:%M:%S",
-    )
-
-    parser = argparse.ArgumentParser(
-        description="Train GNN Protein Quality Classifier (Graph Attention Network)"
-    )
-    parser.add_argument(
-        "--output",
-        default="synth_pdb/quality/models/gnn_quality_v2.pt",
-        help="Output path for the .pt checkpoint",
-    )
-    parser.add_argument("--n-samples", type=int, default=200, help="Training samples to generate")
-    parser.add_argument("--epochs", type=int, default=50, help="Training epochs")
-    parser.add_argument("--hidden-dim", type=int, default=64, help="GNN hidden dimension")
-    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
-    parser.add_argument("--random-state", type=int, default=42, help="RNG seed")
-    parser.add_argument(
-        "--residue-loss-weight",
-        type=float,
-        default=0.3,
-        help="Weight λ for per-residue MSE loss (default 0.3)",
-    )
-    parser.add_argument(
-        "--diverse-good",
-        action="store_true",
-        help="Include Beta and PPII conformations in the 'Good' training set",
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", default="synth_pdb/quality/models/gnn_quality_v2.pt")
+    parser.add_argument("--n-samples", type=int, default=200)
+    parser.add_argument("--epochs", type=int, default=50)
+    parser.add_argument("--hidden-dim", type=int, default=64)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--random-state", type=int, default=42)
+    parser.add_argument("--residue-loss-weight", type=float, default=0.3)
+    parser.add_argument("--diverse-good", action="store_true")
     args = parser.parse_args()
-
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
-
-    train_gnn(
-        output_path=args.output,
-        n_samples=args.n_samples,
-        epochs=args.epochs,
-        hidden_dim=args.hidden_dim,
-        lr=args.lr,
-        random_state=args.random_state,
-        residue_loss_weight=args.residue_loss_weight,
-        diverse_good=args.diverse_good,
-    )
+    train_gnn(**vars(args))
