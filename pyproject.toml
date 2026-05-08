@@ -234,8 +234,8 @@ module = [
     "mrcfile",
     "psutil",
     "matplotlib.*",
+    "pandas",
     "llama_cpp",
-    "llama_cpp.*",
     "huggingface_hub",
     "huggingface_hub.*",
 ]

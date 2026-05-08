@@ -173,7 +173,7 @@ class BenchmarkResults:
     def to_dataframe(self) -> pd.DataFrame:  # type: ignore[name-defined]
         """Return results as a pandas DataFrame (requires pandas)."""
         try:
-            import pandas as pd
+            import pandas as pd  # type: ignore[import-untyped]
         except ImportError as exc:
             raise ImportError("pandas is required for to_dataframe().") from exc
 
@@ -221,7 +221,7 @@ def _load_esmfold_predictor() -> Callable[[str], str]:
         import torch
 
         if torch.cuda.is_available():
-            model = model.cuda()
+            model = model.cuda()  # type: ignore[call-arg]
             logger.info("ESMFold moved to CUDA.")
     except ImportError:
         pass
@@ -234,7 +234,7 @@ def _load_esmfold_predictor() -> Callable[[str], str]:
             inputs = tokenizer([sequence], return_tensors="pt", add_special_tokens=False)
             if next(model.parameters()).is_cuda:
                 inputs = {k: v.cuda() for k, v in inputs.items()}
-            outputs = model(**inputs)
+            outputs = model(**inputs)  # type: ignore[call-arg]
 
         # Convert ESMFold output to PDB
         from transformers.models.esm.openfold_utils.protein import Protein, to_pdb
