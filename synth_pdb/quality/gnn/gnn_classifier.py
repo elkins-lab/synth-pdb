@@ -42,6 +42,20 @@ GNN weights are saved with torch.save() as a dict::
 We store architecture metadata alongside weights so the model can be
 re-instantiated without any external configuration file.  This is the
 standard pattern for "self-describing" PyTorch checkpoints.
+
+─────────────────────────────────────────────────────────────────────────────
+HIGH-THROUGHPUT AUDITING — Vectorized Ensemble Scoring
+─────────────────────────────────────────────────────────────────────────────
+
+For large-scale structural genomics or generative AI tasks, scoring
+structures individually is prohibitively slow. Each structure requires
+a Python function call, PDB serialization, and a GPU kernel launch.
+
+The `GNNQualityClassifier` solves this via the `score_batch` method.
+By accepting a `BatchedPeptide` object, the classifier can process
+thousands of structures in a single massive GPU operation. This
+"vectorized auditing" allows synth-pdb to act as a real-time quality
+filter for high-diversity secondary structure ensembles.
 """
 
 import logging
@@ -54,6 +68,7 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 # Default checkpoint path — v2 has per-residue pLDDT head; falls back to v1
+# These paths are resolved relative to the installed package directory.
 _DEFAULT_CHECKPOINT_V2 = os.path.join(
     os.path.dirname(__file__), "..", "models", "gnn_quality_v2.pt"
 )
@@ -86,7 +101,10 @@ _PLDDT_BANDS = [
 
 
 def _plddt_label(score: float) -> str:
-    """Convert a pLDDT score ∈ [0, 1] to a human-readable confidence label."""
+    """Convert a pLDDT score ∈ [0, 1] to a human-readable confidence label.
+
+    Confidence bands align with industry standards (MolProbity, CASP).
+    """
     for threshold, label in _PLDDT_BANDS:
         if score >= threshold:
             return label
@@ -165,11 +183,16 @@ class GNNQualityClassifier:
     def __init__(self, model_path: str | None = None):
         """Initialise the GNN quality classifier.
 
-        The classifier follows a 'lazy' loading pattern where the heavy GNN
+        The classifier follows a **'Lazy Loading'** pattern where the heavy GNN
         architecture and weights are only loaded when explicitly requested or
-        during first inference.  This prevents synth-pdb from crashing on
-        systems where torch is not installed, as long as the user doesn't
+        during first inference. This prevents synth-pdb from crashing on
+        systems where `torch` is not installed, as long as the user doesn't
         try to use the GNN features.
+
+        ── Model Versioning ───────────────────────────────────────────────────
+        • **v2 Models**: Include an auxiliary regression head for pLDDT.
+        • **v1 Models**: Legacy global-only classification.
+        ───────────────────────────────────────────────────────────────────────
 
         Args:
             model_path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
@@ -178,19 +201,19 @@ class GNNQualityClassifier:
                         (useful for testing graph construction without training).
 
         """
-        # Internal model storage (Lazy loaded)
+        # Internal model storage (Lazy loaded via self.load() or _init_fresh_model())
         self.model: Any | None = None
 
-        # Keep track of where we loaded the weights from for provenance
+        # Keep track of where we loaded the weights from for provenance and auditing.
         self._model_path: str | None = None
 
         # Track if the model supports per-residue confidence (v2) or just global (v1).
-        # v2 models have an auxiliary regression head that predicts lDDT.
+        # v2 models have an auxiliary regression head that predicts local confidence.
         self._has_residue_head: bool = False
 
         if model_path:
             # User provided an explicit path — load it or die.
-            # This allows researchers to use their own trained checkpoints.
+            # This allows researchers to use their own trained checkpoints (e.g. robust_final.pt).
             self.load(model_path)
         else:
             # Search for bundled pre-trained weights in the installation folder.
@@ -227,7 +250,7 @@ class GNNQualityClassifier:
 
         This method satisfies the `ProteinQualityClassifier` protocol,
         allowing it to be used as a drop-in replacement for the
-        Random Forest classifier.
+        Random Forest (RF) classifier used in the core `Validator`.
 
         ── Internal Pipeline ────────────────────────────────────────────
         1. Parse PDB → Extract Cα coords → Build spatial graph
@@ -240,7 +263,7 @@ class GNNQualityClassifier:
             pdb_content: PDB-format string.
 
         Returns:
-            is_good (bool): True if P(Good) > 0.5.
+            is_good (bool): True if P(Good) > 0.5 (Categorical threshold).
             probability (float): P(Good), in [0, 1].
             features (dict): Mean per-feature summary of the input graph's
                 node feature matrix.  Useful for logging and introspection.
@@ -251,7 +274,7 @@ class GNNQualityClassifier:
 
         """
         # score() handles the heavy lifting; predict() wraps it for the legacy API.
-        # This ensures that both APIs stay in sync.
+        # This ensures that both the categorical and rich APIs stay in sync.
         result = self.score(pdb_content)
         return (result.label == "High Quality"), result.global_score, result.features
 
@@ -259,7 +282,7 @@ class GNNQualityClassifier:
         """Score a PDB structure, returning a rich :class:`QualityScore` object.
 
         This is the preferred API over ``predict()`` because it also returns
-        per-residue pLDDT confidence scores (when the v2 checkpoint is loaded).
+        per-residue pLDDT confidence scores (when a v2 checkpoint is loaded).
 
         Args:
             pdb_content: PDB-format string.
@@ -284,7 +307,7 @@ class GNNQualityClassifier:
                 "Install with: pip install synth-pdb[gnn]"
             ) from exc
 
-        # Import PyG utilities only at runtime to minimize overhead.
+        # Import PyG utilities only at runtime to minimize memory overhead.
         # Batch is used to group individual graphs into a single tensor structure.
         from torch_geometric.data import Batch
         from .graph import build_protein_graph
@@ -304,17 +327,17 @@ class GNNQualityClassifier:
         # Check that a model was successfully loaded during __init__.
         assert self.model is not None, "Model not loaded"
 
-        # Set to evaluation mode to disable Dropout and Batch Normalization training.
+        # Set to evaluation mode to disable Dropout and Batch Normalization.
         # This is critical for obtaining deterministic and correct inference results.
         self.model.eval()
 
-        # Disable gradient tracking to speed up the forward pass and save memory.
+        # Disable gradient tracking to speed up the forward pass and save VRAM.
         with torch.no_grad():
             if self._has_residue_head:
                 # v2 checkpoint logic: dual-output forward pass.
                 # We use forward_with_node_embeddings to retrieve both the
                 # global classification log-probs and the node-level pLDDT.
-                # This head was trained specifically to predict local lDDT.
+                # This head was trained specifically to predict local confidence.
                 log_probs, per_res_tensor = type(self.model).forward_with_node_embeddings(
                     self.model,
                     batch.x,
@@ -364,43 +387,79 @@ class GNNQualityClassifier:
         )
 
     def score_batch(self, batch: Any) -> list[QualityScore]:
-        """Score an entire batch of structures in a single vectorized pass.
+        r"""Score an entire batch of structures in a single vectorized pass.
 
-        This is significantly faster than calling ``score()`` in a loop.
+        ─────────────────────────────────────────────────────────────────────────────
+        VECTORIZED ENSEMBLE AUDITING
+        ─────────────────────────────────────────────────────────────────────────────
+        While the standard ``score()`` method processes a single PDB string,
+        this method is optimized for the **high-throughput generation pipeline**.
+        It operates directly on the coordinate tensors of a ``BatchedPeptide``,
+        eliminating the CPU-bound bottlenecks of string serialization.
+
+        ── GPU Parallelism ──────────────────────────────────────────────────────────
+        Instead of iterating structure-by-structure, we leverage PyTorch
+        Geometric's **Graph Batching** mechanism. All $B$ structures are
+        packed into a single disjoint Interaction Graph:
+          1. $N_{total} = \sum N_i$ nodes are combined into a single matrix.
+          2. Edge indices are shifted by node offsets to maintain connectivity.
+          3. A single forward pass on the GPU evaluates the entire ensemble.
+
+        This architecture is critical for screening large-scale "Bio-Active"
+        libraries where thousands of candidates must be validated in seconds.
 
         Args:
-            batch: A :class:`synth_pdb.batch_generator.BatchedPeptide` object.
+            batch: A :class:`synth_pdb.batch_generator.BatchedPeptide` object
+                containing $B$ protein structures.
 
         Returns:
-            A list of QualityScore objects, one for each structure in the batch.
+            A list of $B$ :class:`QualityScore` objects, containing global and
+            per-residue confidence for every member of the ensemble.
         """
         try:
             import torch
             from torch_geometric.data import Batch
         except ImportError:
+            # Silent fallback — scoring will be skipped in downstream pipelines
+            # if the optional 'gnn' dependencies are missing.
             return []
 
         from .graph import build_protein_graphs_from_batch
 
-        # 1. Build graphs for the entire batch
+        # 1. Vectorized Graph Construction
+        # ─────────────────────────────────────────────────────────────────────
+        # We bypass PDB parsing and build graphs directly from the
+        # (Batch, Atoms, 3) coordinate tensor using optimized NumPy kernels.
         graphs = build_protein_graphs_from_batch(batch)
         if not graphs:
+            # No structures to score (empty batch)
             return []
 
-        # 2. Pack into a single PyG Batch object for GPU parallelism
+        # 2. PyG Packing
+        # ─────────────────────────────────────────────────────────────────────
+        # Convert the list of individual graphs into a single large
+        # 'Batch' object for parallel GPU processing.
         pyg_batch = Batch.from_data_list(graphs)
 
-        # 3. Model setup
+        # 3. Model & Device Synchronization
+        # ─────────────────────────────────────────────────────────────────────
+        # Ensure the model is loaded and in evaluation mode (disables dropout).
         assert self.model is not None, "Model not loaded"
         self.model.eval()
 
-        # Move to same device as model
+        # Identify the active device (CPU/CUDA/MPS) and move the entire packed
+        # batch tensor to that device in one transfer.
         device = next(self.model.parameters()).device
         pyg_batch = pyg_batch.to(device)
 
-        # 4. Forward pass
+        # 4. Forward Pass (Inference)
+        # ─────────────────────────────────────────────────────────────────────
+        # Gradient tracking is disabled to save VRAM and increase speed.
         with torch.no_grad():
             if self._has_residue_head:
+                # v2 models: Retrieve both global log-probs and local pLDDT.
+                # per_res_tensor shape: [TotalNodes, 1] — contains confidence
+                # for every atom across all B structures.
                 log_probs, per_res_tensor = type(self.model).forward_with_node_embeddings(
                     self.model,
                     pyg_batch.x,
@@ -410,35 +469,44 @@ class GNNQualityClassifier:
                 )
                 per_residue_all = per_res_tensor.squeeze(-1).cpu().numpy()
             else:
+                # v1 models: Legacy global-only scoring head.
                 log_probs = self.model(
                     pyg_batch.x, pyg_batch.edge_index, pyg_batch.edge_attr, pyg_batch.batch
                 )
                 per_residue_all = None
 
-        # 5. Post-process
-        # log_probs is [B, 2]
+        # 5. Result Post-Processing & Slicing
+        # ─────────────────────────────────────────────────────────────────────
+        # Convert log-probabilities back to linear probability space [0, 1].
+        # probs_good[i] represents P(High Quality) for structure i.
         probs_good = log_probs.exp()[:, 1].cpu().numpy()
 
         results = []
+        # ptr (pointer) array defines the residue boundaries for each graph
+        # in the packed batch tensor. node_ptr[i] to node_ptr[i+1] is the slice.
         node_ptr = pyg_batch.ptr.cpu().numpy()
 
         for i in range(len(graphs)):
             prob_good = float(probs_good[i])
             label = "High Quality" if prob_good > 0.5 else "Low Quality"
 
-            # Slice per-residue scores if available
+            # Slice the per-residue pLDDT scores using the node pointers
             plddt = []
             res_lbls = []
             if per_residue_all is not None:
+                # Extract the confidence values for this specific structure
                 plddt = per_residue_all[node_ptr[i] : node_ptr[i + 1]].tolist()
+                # Map to human-readable AlphaFold confidence bands
                 res_lbls = [_plddt_label(s) for s in plddt]
 
-            # Extract features for this graph
+            # Extract aggregate feature statistics (e.g. mean dihedrals)
+            # for downstream transparency and debugging.
             node_feats = graphs[i].x.numpy()
             feat_dict = {
                 name: float(np.mean(node_feats[:, j])) for j, name in enumerate(_FEATURE_NAMES)
             }
 
+            # Wrap in structured QualityScore container
             results.append(
                 QualityScore(
                     global_score=prob_good,
@@ -457,8 +525,17 @@ class GNNQualityClassifier:
 
         The checkpoint is 'self-describing' — it includes the layer dimensions
         required to re-instantiate the `ProteinGNN` class without an external
-        config or JSON file.  This follows the 'single file per asset' philosophy
-        which simplifies deployment and model versioning.
+        config or JSON file.  This follows the **'Single File Per Asset'**
+        philosophy which simplifies deployment, model versioning, and
+        cloud-based distribution of pre-trained structural auditors.
+
+        ── Persistence Mechanism ──────────────────────────────────────────────
+        We use standard `torch.save()`, which uses Python's `pickle` module
+        internally. The payload includes:
+          1. The `state_dict`: An OrderedDict mapping layer names to parameter
+             tensors (weights and biases).
+          2. Architectural Hyperparameters: `hidden_dim`, `node_features`, etc.
+        ───────────────────────────────────────────────────────────────────────
 
         Args:
             path: Destination file path (should end in .pt).
@@ -478,6 +555,7 @@ class GNNQualityClassifier:
         os.makedirs(target_dir, exist_ok=True)
 
         # Verification check: we cannot save a non-existent or uninitialized model.
+        # The internal self.model must be an instance of ProteinGNN.
         assert self.model is not None, "Model not loaded; nothing to save"
 
         # Compile the state dictionary (weights) and architecture metadata.
@@ -494,7 +572,8 @@ class GNNQualityClassifier:
         }
 
         # Standard PyTorch serialization (uses pickle/zip under the hood).
-        # We use standard torch.save() to remain compatible with standard tools.
+        # We use standard torch.save() to remain compatible with standard tools
+        # like Netron for model visualization.
         torch.save(payload, path)
         self._model_path = path
         logger.info("GNN checkpoint saved to %s", path)
@@ -502,10 +581,18 @@ class GNNQualityClassifier:
     def load(self, path: str) -> None:
         """Load model weights and re-configure architecture from a checkpoint.
 
-        This method acts as a factory: it reads the metadata in the checkpoint
-        to determine the model's width and depth, builds the graph layers,
-        and then injects the learned weights. This allows one classifier instance
-        to seamlessly switch between different model variants or generations.
+        This method acts as a **Dynamic Factory**: it reads the metadata
+        inside the checkpoint to determine the model's width and depth,
+        builds the graph attention layers, and then injects the learned weights.
+        This allows one classifier instance to seamlessly switch between
+        different model variants (e.g. v1 vs v2) or generations.
+
+        ── Portability (CPU/GPU) ──────────────────────────────────────────────
+        Models trained on a GPU (CUDA) often contain tensors tied to that
+        hardware. We use `map_location='cpu'` during the load phase to
+        ensure the model can be deployed on standard workstations without
+        specialized hardware, then move it to the active device later.
+        ───────────────────────────────────────────────────────────────────────
 
         Args:
             path: Path to a .pt checkpoint written by GNNQualityClassifier.save().
@@ -523,8 +610,8 @@ class GNNQualityClassifier:
 
         try:
             # Load into CPU memory by default for maximum compatibility across systems.
-            # Even if trained on CUDA, we load to CPU for local inference.
-            # weights_only=False is used because our checkpoint is a custom dict.
+            # weights_only=False is used because our checkpoint is a custom dict
+            # rather than a raw tensor stream.
             checkpoint = torch.load(path, map_location="cpu", weights_only=False)
 
             import typing
@@ -545,10 +632,12 @@ class GNNQualityClassifier:
 
             # Inject parameter tensors (weights/biases) into the instantiated layers.
             # This uses the standard state_dict mechanism for weight restoration.
+            # This step performs the heavy transfer of floating-point weights.
             self.model.load_state_dict(checkpoint["state_dict"])
 
             # Switch to evaluation mode (essential: fixes dropout and batchnorm behavior).
-            # Without this, the model might produce stochastic or incorrect results.
+            # Without this, the model might produce stochastic or incorrect results
+            # due to active Dropout layers.
             self.model.eval()
             self._model_path = path
 
