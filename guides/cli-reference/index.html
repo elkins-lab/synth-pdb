@@ -1004,6 +1004,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ai-training-benchmarking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI Training &amp; Benchmarking
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AI Training &amp; Benchmarking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gnn-training-scriptstrain_gnn_quality_filterpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GNN Training (scripts/train_gnn_quality_filter.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gnn-benchmarking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GNN Benchmarking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#visualization" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1573,6 +1612,34 @@
     
   
     🔍 Protein Quality Assessment Lab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/gnn_plddt_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧬 GNN pLDDT Explorer
   
 
     
@@ -3173,6 +3240,62 @@
   
   
     <li class="md-nav__item">
+      <a href="../../api/scoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    score (GNN scoring)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    benchmark
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../api/coupling/" class="md-nav__link">
         
   
@@ -3278,6 +3401,34 @@
     
   
     Scientific Benchmarking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../science/gnn-structure-scoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Structure Scoring
   
 
     
@@ -4168,6 +4319,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ai-training-benchmarking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI Training &amp; Benchmarking
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AI Training &amp; Benchmarking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gnn-training-scriptstrain_gnn_quality_filterpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GNN Training (scripts/train_gnn_quality_filter.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gnn-benchmarking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GNN Benchmarking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#visualization" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4482,6 +4672,44 @@
 </tr>
 </tbody>
 </table>
+<h2 id="ai-training-benchmarking">AI Training &amp; Benchmarking</h2>
+<p><code>synth-pdb</code> includes a suite of scripts for training and validating GNN-based quality filters.</p>
+<h3 id="gnn-training-scriptstrain_gnn_quality_filterpy">GNN Training (<code>scripts/train_gnn_quality_filter.py</code>)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>--output</code></td>
+<td style="text-align: left;">Path to save the trained <code>.pt</code> model.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--n-samples</code></td>
+<td style="text-align: left;">Number of synthetic structures to generate for training.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--epochs</code></td>
+<td style="text-align: left;">Number of training iterations.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--diverse-good</code></td>
+<td style="text-align: left;"><strong>Recommended.</strong> Samples Alpha, Beta, and PPII for the "Good" category.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>--residue-loss-weight</code></td>
+<td style="text-align: left;">Weight (λ) for the auxiliary pLDDT regression task.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gnn-benchmarking">GNN Benchmarking</h3>
+<ul>
+<li><code>scripts/compare_gnn_diversity.py</code>: Compares model accuracy across different secondary structure motifs (Alpha vs Beta vs PPII).</li>
+<li><code>scripts/stress_test_gnn.py</code>: Adversarial testing to find the "Breaking Point" (Critical Drift) of a model's physical understanding.</li>
+</ul>
 <h2 id="visualization">Visualization</h2>
 <p>Use the <code>--visualize</code> flag to open the generated structure in a browser-based 3D viewer (powered by 3Dmol.js).</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>-m<span class="w"> </span>synth_pdb.main<span class="w"> </span>--sequence<span class="w"> </span><span class="s2">&quot;MEELQK&quot;</span><span class="w"> </span>--visualize
