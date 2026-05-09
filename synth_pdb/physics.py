@@ -1431,7 +1431,7 @@ class EnergyMinimizer:
             logger.debug(f"Using Cached OpenMM Platform: {platform.getName()}")
         else:
             # Fallback auto-detection logic
-            for name in ["CUDA", "Metal", "OpenCL"]:
+            for name in ["CUDA", "Metal", "OpenCL", "CPU"]:
                 try:
                     temp_platform = mm.Platform.getPlatformByName(name)
                     temp_props = {}
@@ -1463,6 +1463,15 @@ class EnergyMinimizer:
                     break
                 except Exception:
                     continue
+
+            if platform is None:
+                try:
+                    platform = mm.Platform.getPlatformByName("Reference")
+                    logger.warning(
+                        "No accelerated OpenMM platform found. Falling back to 'Reference' (slow)."
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to initialize even the Reference platform: {e}")
 
         if platform:
             try:
