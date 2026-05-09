@@ -5937,7 +5937,8 @@ Observations:
 (averaging the 320-number vectors over all L residues). This gives one vector per
 protein representing the whole sequence.</p>
 <p>We then compute <strong>cosine similarity</strong> between all pairs:</p>
-$$\text{sim}(A, B) = \frac{\overline{\text{emb}}(A) \cdot \overline{\text{emb}}(B)}{\|\overline{\text{emb}}(A)\| \cdot \|\overline{\text{emb}}(B)\|}$$<h3 id="what-is-cosine-similarity">What is cosine similarity?<a class="anchor-link" href="#what-is-cosine-similarity">¶</a></h3><p>Think of two arrows starting from the same point in 320-dimensional space.
+<p>$$\text{sim}(A, B) = \frac{\overline{\text{emb}}(A) \cdot \overline{\text{emb}}(B)}{\|\overline{\text{emb}}(A)\| \cdot \|\overline{\text{emb}}(B)\|}$$</p>
+<h3 id="what-is-cosine-similarity">What is cosine similarity?<a class="anchor-link" href="#what-is-cosine-similarity">¶</a></h3><p>Think of two arrows starting from the same point in 320-dimensional space.
 Cosine similarity measures the <strong>angle</strong> between them -- not their lengths:</p>
 <ul>
 <li><strong>1.0</strong> -- identical directions -- the two proteins look the same to ESM-2</li>

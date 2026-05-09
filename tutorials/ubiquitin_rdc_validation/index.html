@@ -4952,7 +4952,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <h2 id="academic-context-the-q-factor">🎯 Academic Context &amp; The Q-Factor<a class="anchor-link" href="#academic-context-the-q-factor">¶</a></h2><p>To prove a computational physics engine is accurately predicting biological observables, we must benchmark it against "gold-standard" experimental data.</p>
 <p>In NMR, <strong>Residual Dipolar Couplings (RDCs)</strong> provide highly precise long-range orientational restraints. They describe the angle between an internuclear bond vector (like N-H) and the external magnetic field.</p>
 <p>The standard metric for evaluating the agreement between a theoretical 3D structural model and experimental RDCs is the <strong>Cornilescu Q-factor</strong> (<em>J Biomol NMR</em>, 1998):</p>
-$$ Q = \frac{RMS(D_{exp} - D_{calc})}{RMS(D_{exp})} $$<ul>
+<p>$$ Q = \frac{RMS(D_{exp} - D_{calc})}{RMS(D_{exp})} $$</p>
+<ul>
 <li><strong>Q &lt; 0.20</strong> indicates excellent agreement (typical of high-resolution structures refined against RDCs).</li>
 <li><strong>Q &lt; 0.35</strong> indicates a fundamentally correct fold but with local geometric inaccuracies.</li>
 <li><strong>Q &gt; 0.50</strong> indicates severe structural errors or an incorrect fold.</li>

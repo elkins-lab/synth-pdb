@@ -5298,7 +5298,8 @@ the protein surface.</p>
 <li>Polar residues (SER, THR, ASN, GLN, LYS, ARG, ASP, GLU, HIS): <strong>high SASA</strong> ← exposed</li>
 </ul>
 <p>We measure this with the <strong>burial_ratio</strong>:</p>
-$$\text{burial\_ratio} = \frac{\overline{\text{SASA}_{\text{polar}}}}{\overline{\text{SASA}_{\text{hydrophobic}}} + 10^{-6}}$$<p>A burial_ratio ≥ 0.8 means the polar mean SASA is at least 80% of the hydrophobic mean SASA —
+<p>$$\text{burial\_ratio} = \frac{\overline{\text{SASA}_{\text{polar}}}}{\overline{\text{SASA}_{\text{hydrophobic}}} + 10^{-6}}$$</p>
+<p>A burial_ratio ≥ 0.8 means the polar mean SASA is at least 80% of the hydrophobic mean SASA —
 consistent with hydrophobic burial. This is the threshold used in <code>get_quality_report()</code>.</p>
 </div>
 </div>

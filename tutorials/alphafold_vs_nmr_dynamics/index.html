@@ -5703,7 +5703,8 @@ plt.show()</div>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="5-bridging-md-flexibility-to-nmr-s2-and-alphafold-plddt">5. Bridging MD Flexibility to NMR $S^2$ and AlphaFold pLDDT<a class="anchor-link" href="#5-bridging-md-flexibility-to-nmr-s2-and-alphafold-plddt">¶</a></h2><h3 id="the-three-way-correlation">The Three-Way Correlation<a class="anchor-link" href="#the-three-way-correlation">¶</a></h3><p>The Lipari-Szabo model-free formalism relates backbone flexibility to the
 <strong>order parameter</strong> $S^2 \in [0, 1]$:</p>
-$$S^2 \approx 1 - \left(\frac{\text{RMSF}}{\text{RMSF}_{\max}}\right)^2$$<p><em>(Simplified illustrative mapping; real $S^2$ is derived from $^{15}$N relaxation.)</em></p>
+<p>$$S^2 \approx 1 - \left(\frac{\text{RMSF}}{\text{RMSF}_{\max}}\right)^2$$</p>
+<p><em>(Simplified illustrative mapping; real $S^2$ is derived from $^{15}$N relaxation.)</em></p>
 <p>AlphaFold's pLDDT roughly tracks the same axis: structured, rigid residues score
 high; disordered residues score low. We simulate a pLDDT profile from known
 secondary structure labels and overlay all three observables.</p>

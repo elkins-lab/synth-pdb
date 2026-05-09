@@ -7515,7 +7515,7 @@ if not IN_CI:
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="2-neural-network-shift-predictor-the-machine-learning-frontier">🤖 2. Neural Network Shift Predictor (The Machine Learning Frontier)<a class="anchor-link" href="#2-neural-network-shift-predictor-the-machine-learning-frontier">¶</a></h3><p>The Chemical Shift Index (CSI) we calculated earlier relies on a simple physics-based "Lookup Table" (e.g., SPARTA-lite): <em>If amino acid X is in an alpha helix, add Y ppm to the baseline.</em></p>
 <p><strong>The Problem:</strong> This ignores almost all sequence context. The chemical shift of an Alanine in an alpha helix is slightly different depending on whether the <em>neighboring</em> residue is a bulky Tryptophan or a tiny Glycine.</p>
-<p><strong>The ML Solution:</strong> We use a Multilayer Perceptron (MLP) Neural Network! 
+<p><strong>The ML Solution:</strong> We use a Multilayer Perceptron (MLP) Neural Network!
 The network takes the explicit atomic geometry (dihedral angles $\phi, \psi$), the exact amino acid type, AND the sequence-neighbor identities (using one-hot encoding). It learns a non-linear continuous surface rather than a discrete step-function, predicting a $\Delta$CS correction term to add to the baseline.</p>
 </div>
 </div>

@@ -5124,7 +5124,7 @@ print(f"📊 Average B-factor: {np.mean(result.structure.b_factor):.2f}")</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-binarycif-bcif-the-ai-format">2. BinaryCIF (BCIF): The AI format<a class="anchor-link" href="#2-binarycif-bcif-the-ai-format">¶</a></h2><p><strong>BinaryCIF</strong> is the high-performance sibling of mmCIF. It uses binary compression and delta-encoding to reduce file sizes by up to 10x and parsing times by 50x. It is the format used by <strong>Mol</strong>* (the viewer in the RCSB PDB website).</p>
+<h2 id="2-binarycif-bcif-the-ai-format">2. BinaryCIF (BCIF): The AI format<a class="anchor-link" href="#2-binarycif-bcif-the-ai-format">¶</a></h2><p><strong>BinaryCIF</strong> is the high-performance sibling of mmCIF. It uses binary compression and delta-encoding to reduce file sizes by up to 10x and parsing times by 50x. It is the format used by **Mol*** (the viewer in the RCSB PDB website).</p>
 </div>
 </div>
 </div>
@@ -5201,11 +5201,10 @@ print(f"\n✅ Parsed {result_bcif.structure.array_length()} atoms from BCIF bina
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"🏗️ Building a massive 8,000 residue peptide..."</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"🏗️ Building a massive 12,600 residue peptide..."</span><span class="p">)</span>
 
-<span class="c1"># This structure would have ~64,000 atoms (within PDB limit for SERIAL but close)</span>
-<span class="c1"># Let's go bigger: 15,000 residues (~120,000 atoms)</span>
-<span class="n">massive_cif</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">15000</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">"cif"</span><span class="p">)</span>
+<span class="c1"># 12,600 residues * ~8 atoms/residue = ~100,800 atoms (exceeds 99,999 limit)</span>
+<span class="n">massive_cif</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">12600</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">"cif"</span><span class="p">)</span>
 
 <span class="n">result_massive</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">massive_cif</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">"cif"</span><span class="p">)</span>
 <span class="n">n_atoms</span> <span class="o">=</span> <span class="n">result_massive</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">array_length</span><span class="p">()</span>
@@ -5216,11 +5215,10 @@ print(f"\n✅ Parsed {result_bcif.structure.array_length()} atoms from BCIF bina
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Still within limits, but CIF is ready for more."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">print("🏗️ Building a massive 8,000 residue peptide...")
+<div class="clipboard-copy-txt" id="cell-4">print("🏗️ Building a massive 12,600 residue peptide...")
 
-# This structure would have ~64,000 atoms (within PDB limit for SERIAL but close)
-# Let's go bigger: 15,000 residues (~120,000 atoms)
-massive_cif = generate_pdb_content(length=15000, output_format="cif")
+# 12,600 residues * ~8 atoms/residue = ~100,800 atoms (exceeds 99,999 limit)
+massive_cif = generate_pdb_content(length=12600, output_format="cif")
 
 result_massive = PeptideResult(massive_cif, format="cif")
 n_atoms = result_massive.structure.array_length()

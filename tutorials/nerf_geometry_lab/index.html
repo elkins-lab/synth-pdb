@@ -5239,7 +5239,9 @@ print('   Loaded: 10-residue polyalanine α-helix')</div>
 </tbody>
 </table>
 <h3 id="the-backbone-dihedrals">The Backbone Dihedrals<a class="anchor-link" href="#the-backbone-dihedrals">¶</a></h3><p>For each residue <em>i</em>, we have three key angles:</p>
-$$\phi_i = \text{dihedral}(C_{i-1}, N_i, C\alpha_i, C_i)$$$$\psi_i = \text{dihedral}(N_i, C\alpha_i, C_i, N_{i+1})$$$$\omega_i = \text{dihedral}(C\alpha_i, C_i, N_{i+1}, C\alpha_{i+1})$$
+<p>$$\phi_i = \text{dihedral}(C_{i-1}, N_i, C\alpha_i, C_i)$$
+$$\psi_i = \text{dihedral}(N_i, C\alpha_i, C_i, N_{i+1})$$
+$$\omega_i = \text{dihedral}(C\alpha_i, C_i, N_{i+1}, C\alpha_{i+1})$$</p>
 </div>
 </div>
 </div>
@@ -5368,14 +5370,24 @@ update(None)</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span><span class="p">,</span> <span class="n">PeptideResult</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_rmsd</span><span class="p">,</span> <span class="n">kabsch_superposition</span>
 
-<span class="n">seq</span> <span class="o">=</span> <span class="s2">"MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTK"</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="s2">"MVLSPADKTN"</span>
 
 <span class="c1"># 1. Geometric Ground Truth (Non-minimized)</span>
 <span class="n">res_geom</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">struct_geom</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">res_geom</span><span class="p">)</span><span class="o">.</span><span class="n">structure</span>
 
 <span class="c1"># 2. Physical Reality (Minimized)</span>
-<span class="n">res_phys</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">IS_CI</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'GITHUB_ACTIONS'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'true'</span>
+<span class="n">max_iter</span> <span class="o">=</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">IS_CI</span> <span class="k">else</span> <span class="mi">200</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🧬 Generating minimized structure (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2"> iterations)... "</span><span class="p">)</span>
+<span class="n">res_phys</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> 
+    <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> 
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="n">max_iter</span>
+<span class="p">)</span>
 <span class="n">struct_phys</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">res_phys</span><span class="p">)</span><span class="o">.</span><span class="n">structure</span>
 
 <span class="c1"># 3. Align and measure Strain</span>
@@ -5393,14 +5405,24 @@ update(None)</div>
 <div class="clipboard-copy-txt" id="cell-4">from synth_pdb.generator import generate_pdb_content, PeptideResult
 from synth_pdb.geometry import calculate_rmsd, kabsch_superposition
 
-seq = "MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTK"
+seq = "MVLSPADKTN"
 
 # 1. Geometric Ground Truth (Non-minimized)
 res_geom = generate_pdb_content(sequence_str=seq, conformation="alpha", minimize_energy=False)
 struct_geom = PeptideResult(res_geom).structure
 
 # 2. Physical Reality (Minimized)
-res_phys = generate_pdb_content(sequence_str=seq, conformation="alpha", minimize_energy=True)
+import os
+IS_CI = os.getenv('GITHUB_ACTIONS') == 'true'
+max_iter = 10 if IS_CI else 200
+
+print(f"🧬 Generating minimized structure ({max_iter} iterations)... ")
+res_phys = generate_pdb_content(
+    sequence_str=seq, 
+    conformation="alpha", 
+    minimize_energy=True, 
+    minimization_max_iter=max_iter
+)
 struct_phys = PeptideResult(res_phys).structure
 
 # 3. Align and measure Strain
@@ -5437,7 +5459,7 @@ print("   High RMSD means the physics engine had to 'warp' the intent to avoid c
 <h2 id="further-reading">📖 Further Reading<a class="anchor-link" href="#further-reading">¶</a></h2><ul>
 <li>Jumper et al. (2021). "Highly accurate protein structure prediction with AlphaFold." <em>Nature</em> 596:583-589. <a href="https://doi.org/10.1038/s41586-021-03819-2">DOI: 10.1038/s41586-021-03819-2</a></li>
 <li>Parsons et al. (2005). "Practical conversion from torsion space to Cartesian space for in silico protein synthesis." <em>J Comput Chem</em> 26:1063-1068. <a href="https://doi.org/10.1002/jcc.20237">DOI: 10.1002/jcc.20237</a></li>
-<li>Ramachandran et al. (1963). "Stereochemistry of polypeptide chain configurations." <em>J Mol Biol</em> 7:95-99. <a href="https://doi.org/10.1016/S0022-2836(63)80023-6">DOI: 10.1016/S0022-2836(63)80023-6</a></li>
+<li>Ramachandran et al. (1963). "Stereochemistry of polypeptide chain configurations." <em>J Mol Biol</em> 7:95-99. <a href="https://doi.org/10.1016/S0022-2836(63">DOI: 10.1016/S0022-2836(63)80023-6</a>80023-6)</li>
 </ul>
 <hr/>
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white; text-align: center;">

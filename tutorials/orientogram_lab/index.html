@@ -5257,9 +5257,9 @@ print(f"Tensors available: {list(orientations.keys())}")
 <li><strong>Distance ($d$)</strong>: $C\beta - C\beta$ Euclidean distance.</li>
 <li><strong>$\\omega$</strong>: Absolute rotation between frames.</li>
 <li><strong>$\\theta$</strong>: Orientation angle.</li>
-<li><strong>$\\phi$</strong>: Dihedral angle between frames.</li>
+<li><strong>$\\phi$</strong>: Dihedral angle between frames.
+Below we plot the four tensors as $L \times L$ heatmaps.</li>
 </ol>
-<p>Below we plot the four tensors as $L \times L$ heatmaps.</p>
 <p><strong>Educational Insight</strong>: Note how the 6D tensors capture the diagonal structure of the fold differently than a simple distance map.### How to read these "Images":</p>
 <ul>
 <li><strong>Symmetry</strong>: $d$ is symmetric ($dist_{i,j} = dist_{j,i}$), but the others might not be! $\\theta$ is specifically defined relative to the "source" residue $i$.</li>
@@ -5437,9 +5437,9 @@ print("✅ Virtual C-beta mapping successful.")
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="experiment-for-the-user">🏆 Experiment for the User<a class="anchor-link" href="#experiment-for-the-user">¶</a></h3><ol>
 <li><strong>Ensemble Variance</strong>: Generate a batch with <code>drift=10.0</code> and plot the <em>Standard Deviation</em> of the distance maps. 📉</li>
-<li><strong>Feature Engineering</strong>: Standardize these tensors (e.g. <code>log(dist)</code>) to prepare them as direct inputs for a <strong>Convolutional Neural Network</strong> (CNN) classifier.</li>
+<li><strong>Feature Engineering</strong>: Standardize these tensors (e.g. <code>log(dist)</code>) to prepare them as direct inputs for a <strong>Convolutional Neural Network</strong> (CNN) classifier.
+Try generating structures with <code>conformation='alpha'</code> instead of <code>'beta'</code>.</li>
 </ol>
-<p>Try generating structures with <code>conformation='alpha'</code> instead of <code>'beta'</code>.</p>
 <p><strong>Predict</strong>: How will the distance map change? (Hint: Alpha helices stay closer to their immediate neighbors, creating a thick diagonal line!).</p>
 <p>You are now extracting the rich 3D information that powers modern structural AI. <strong>Happy building.</strong> 📐🤖<strong>The structural signatures are yours to explore.</strong> 🧬📐🤖</p>
 </div>
