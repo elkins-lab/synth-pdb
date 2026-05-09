@@ -1171,6 +1171,15 @@ def main() -> None:
         current_violations = []
 
         try:
+            # EDUCATIONAL NOTE - The Internal PDB Standard:
+            # While synth-pdb supports exporting to modern formats like mmCIF,
+            # we use the legacy PDB format as our "Internal Standard" for
+            # validation and refinement. This is because many robust
+            # bioinformatics algorithms (like our PDBValidator) are optimized
+            # for the deterministic, fixed-width nature of PDB text.
+            # The final conversion to other formats happens only at the
+            # very end of the pipeline.
+            #
             # We always generate PDB format internally for validation and refinement
             generated_content = generate_pdb_content(
                 length=length_for_generator,

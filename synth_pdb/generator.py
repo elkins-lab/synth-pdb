@@ -2174,6 +2174,14 @@ class PeptideResult:
         It leverages the cached AtomArray to ensure that all biophysical
         annotations (B-factors, order parameters) are preserved in the
         target format.
+
+        EDUCATIONAL RATIONALE - Polyglot Export Architecture:
+        In modern structural biology, tools must be "polyglot"—able to speak
+        multiple file formats fluently. By using a high-level AtomArray as
+        the intermediate representation, we ensure that converting a PDB to
+        an mmCIF does not lose scientific metadata (like occupancies or
+        residue numbering) which often happens with simple text-to-text
+        converters.
         """
         if target_format == self.format:
             return self.content
