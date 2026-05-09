@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../science/benchmarking/" class="md-tabs__link">
+        <a href="../../science/ground-truth-philosophy/" class="md-tabs__link">
           
   
   
@@ -825,6 +825,17 @@
   
     <nav class="md-nav" aria-label="Why Use synth-pdb for ML?">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-mathematically-pure-ground-truth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Mathematically Pure Ground Truth 💎
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#1-zero-copy-handover" class="md-nav__link">
@@ -3515,6 +3526,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../science/ground-truth-philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ground Truth Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../science/benchmarking/" class="md-nav__link">
         
   
@@ -4320,6 +4359,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#0-mathematically-pure-ground-truth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Mathematically Pure Ground Truth 💎
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#1-zero-copy-handover" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4635,6 +4685,8 @@
 <h1 id="guide-for-aiml-researchers">Guide for AI/ML Researchers</h1>
 <p>synth-pdb is designed as a <strong>high-performance data factory</strong> for training protein AI models. This guide shows you how to leverage its unique capabilities for machine learning workflows.</p>
 <h2 id="why-use-synth-pdb-for-ml">Why Use synth-pdb for ML?</h2>
+<h3 id="0-mathematically-pure-ground-truth">0. <strong>Mathematically Pure <a href="../../science/ground-truth-philosophy/">Ground Truth</a></strong> 💎</h3>
+<p>Unlike experimental data which is noisy and biased, <code>synth-pdb</code> provides "ideal" labels that capture the exact geometric intent of a fold, free from forcefield artifacts.</p>
 <h3 id="1-zero-copy-handover">1. <strong>Zero-Copy Handover</strong> 🚀</h3>
 <p>Direct NumPy → PyTorch/JAX/MLX without memory copying:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>

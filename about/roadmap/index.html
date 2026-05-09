@@ -358,7 +358,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../science/benchmarking/" class="md-tabs__link">
+        <a href="../../science/ground-truth-philosophy/" class="md-tabs__link">
           
   
   
@@ -3160,6 +3160,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../science/ground-truth-philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ground Truth Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../science/benchmarking/" class="md-nav__link">
         
   
@@ -4071,6 +4099,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#6-pdbxmmcif-binarycif-support-high-value-low-risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. PDBx/mmCIF &amp; BinaryCIF Support 📦 (High Value / Low Risk)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4352,6 +4391,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#6-pdbxmmcif-binarycif-support-high-value-low-risk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. PDBx/mmCIF &amp; BinaryCIF Support 📦 (High Value / Low Risk)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4464,6 +4514,12 @@
 <li><strong>Objective</strong>: Statistically analyze how adding "Drift" to Ramachandran angles affects the overall fold and the radius of gyration.</li>
 <li><strong>Key Features</strong>: <code>--drift</code>, <code>dihedral_backbone</code>, and <code>BatchedGenerator</code>.</li>
 <li><strong>Value</strong>: Useful for researchers testing the robustness of their GNNs (Graph Neural Networks) to small backbone perturbations.</li>
+</ul>
+<h3 id="6-pdbxmmcif-binarycif-support-high-value-low-risk">6. PDBx/mmCIF &amp; BinaryCIF Support 📦 (High Value / Low Risk)</h3>
+<ul>
+<li><strong>Concept</strong>: Transition from legacy 80-column PDB format to modern mmCIF and binary-compressed BCIF.</li>
+<li><strong>Why</strong>: Required for structures &gt; 99k atoms, 12-character PDB IDs, and high-performance visualization in Mol*.</li>
+<li><strong>Implementation</strong>: Add <code>--format [pdb|cif|bcif]</code> to the CLI and integrate Biotite's <code>PDBxFile</code> API.</li>
 </ul>
 <hr />
 <h2 id="long-term-high-risk">📉 Long-Term / High Risk</h2>

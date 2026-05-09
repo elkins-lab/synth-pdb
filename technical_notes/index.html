@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../science/benchmarking/" class="md-tabs__link">
+        <a href="../science/ground-truth-philosophy/" class="md-tabs__link">
           
   
   
@@ -1150,6 +1150,34 @@
     <span class="md-ellipsis">
       
         PTM and Residue Restoration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-formats-pdbxmmcif-binarycif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Formats (PDBx/mmCIF &amp; BinaryCIF)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Formats (PDBx/mmCIF &amp; BinaryCIF)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
       
     </span>
   </a>
@@ -3305,6 +3333,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../science/ground-truth-philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ground Truth Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../science/benchmarking/" class="md-nav__link">
         
   
@@ -4192,6 +4248,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#output-formats-pdbxmmcif-binarycif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Formats (PDBx/mmCIF &amp; BinaryCIF)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Formats (PDBx/mmCIF &amp; BinaryCIF)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4259,6 +4343,15 @@ Downstream tools and viewers (PyMOL, ChimeraX) rely on the original PTM names (<
 After minimization, the <code>_do_energy_minimization</code> function in <code>generator.py</code> manually restores these names by mapping the original sequence back onto the minimized coordinates. This is applied to both the <code>Biotite</code> AtomArray and the raw PDB string output.</p>
 <p><strong>Future Enhancement:</strong>
 Currently, this restoration logic covers PTMs (<code>SEP</code>, <code>TPO</code>, <code>PTR</code>) and Histidine tautomers (<code>HIE</code>, <code>HID</code>, <code>HIP</code>). It should be extended to include <strong>D-Amino Acids</strong> (e.g., <code>DAL</code>, <code>DSE</code>, etc.), which are also renamed to standard types before simulation in <code>physics.py</code>.</p>
+<h2 id="output-formats-pdbxmmcif-binarycif">Output Formats (PDBx/mmCIF &amp; BinaryCIF)</h2>
+<p><code>synth-pdb</code> now supports modern PDB formats to address the limitations of the legacy <code>.pdb</code> format (e.g., 99k atom limit).</p>
+<h3 id="implementation-details">Implementation Details</h3>
+<ul>
+<li><strong>Text CIF (<code>.cif</code>)</strong>: Uses the <code>CIFFile</code> API in Biotite to generate PDBx/mmCIF data.</li>
+<li><strong>BinaryCIF (<code>.bcif</code>)</strong>: Uses <code>BinaryCIFFile</code> for high-performance, compressed output.</li>
+<li><strong>Metadata Preservation</strong>: B-factors and Occupancy values (derived from order parameters) are explicitly mapped to the <code>_atom_site.B_iso_or_equiv</code> and <code>_atom_site.occupancy</code> columns in CIF.</li>
+<li><strong>Biotite Compatibility</strong>: When re-parsing CIF/BCIF files using <code>PeptideResult</code>, <code>extra_fields=["b_factor", "occupancy"]</code> is used to ensure these annotations are loaded back into the <code>AtomArray</code>.</li>
+</ul>
 
 
 

@@ -20,7 +20,7 @@ In structural biology and bioinformatics, researchers frequently require dataset
 
 1.  **Bias**: PDB data is biased toward crystallizable or stable proteins.
 2.  **Complexity**: Experimental files often contain artifacts, missing atoms, or non-standard residues.
-3.  **Lack of Ground Truth**: For NMR assignment or structure calculation, "perfect" synthetic data is essential for unit testing.
+3.  **Lack of [Ground Truth](science/ground-truth-philosophy.md)**: For NMR assignment or structure calculation, "perfect" synthetic data is essential for unit testing.
 
 `synth-pdb` fills this gap by providing a lightweight, deterministic generator that produces chemically valid, full-atom PDB files with user-defined secondary structures (helices, sheets) in seconds.
 
