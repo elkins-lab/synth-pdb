@@ -36,6 +36,7 @@ from typing import Any, cast
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 import numpy as np
+from biotite.structure.io.pdbx import BinaryCIFFile, CIFFile, get_structure, set_structure
 
 from . import biophysics  # New Module
 from .batch_generator import BatchedGenerator
@@ -1497,34 +1498,36 @@ def _do_energy_minimization(
         return None, peptide
 
 
-def _assemble_pdb_output(
+def _assemble_output(
     peptide: struc.AtomArray,
     atomic_and_ter_content: str | None,
     sequence_length: int,
     cyclic: bool,
     rng: random.Random | None = None,
-) -> str:
-    """Assemble the final PDB string with realistic B-factors, occupancy, and records.
+    output_format: str = "pdb",
+) -> str | bytes:
+    """Assemble the final structure string or bytes with realistic metadata.
 
-    If *atomic_and_ter_content* is ``None`` (no minimization was run), generates
-    the raw PDB from the Biotite AtomArray first.  Then post-processes every
-    ATOM/HETATM line to insert order-parameter-derived B-factors and occupancy,
-    adds a TER record if missing, generates CONECT records for cyclic and
-    disulfide bonds, and delegates final assembly to :func:`.assemble_pdb_content`.
+    This function is the final stage of the generation pipeline. It takes
+    the geometric coordinates (AtomArray) and the optional physical
+    refinement output (PDB string), and merges them with biophysical
+    metadata like B-factors and occupancies.
 
     Args:
         peptide: Final AtomArray (minimized or raw).
         atomic_and_ter_content: Raw ATOM-block PDB string from OpenMM, or ``None``.
         sequence_length: Number of residues (used for PDB header metadata).
         cyclic: Whether to add a head-to-tail CONECT record.
+        output_format: "pdb", "cif", or "bcif".
 
     Returns:
-        Complete PDB file as a string.
-
+        Complete structure file as a string (pdb/cif) or bytes (bcif).
     """
     # ── Step 1: Initialize Atomic Block ─────────────────────────────────────
     # If no minimization was performed, we convert the AtomArray directly to PDB format.
+    # This provides a baseline set of ATOM records that we can then post-process.
     if atomic_and_ter_content is None:
+        # Ensure atom_id is sequential for the initial PDB dump.
         peptide.atom_id = np.arange(1, peptide.array_length() + 1)
         pdb_file_out = pdb.PDBFile()
         pdb_file_out.set_structure(peptide)
@@ -1532,14 +1535,7 @@ def _assemble_pdb_output(
         pdb_file_out.write(string_io)
         atomic_and_ter_content = string_io.getvalue()
 
-    # EDUCATIONAL NOTE - Adding Realistic B-factors:
-    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
-    # to replace these with realistic values based on atom type, position, and residue type.
-    # This makes the output look more professional and realistic.
-
-    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
-    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
-    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
+    # BIOPHYSICAL ANALYSIS: Identifying protein atoms for ATOM vs HETATM tagging.
     # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
     is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
     protein_res_ids = peptide.res_id[is_protein]
@@ -1547,12 +1543,14 @@ def _assemble_pdb_output(
     max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
     total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
 
-    # Predict Order Parameters (S2) to derive B-factors from geometric flexibility.
-    # SEC fix: Temporarily rename SEC to CYS and SE to SG for SASA/Order Parameter calculation
+    # GEOMETRIC FLEXIBILITY: Predict Order Parameters (S2) to derive B-factors.
+    # The S2 parameter (0.0 to 1.0) represents the degree of spatial restriction
+    # of a chemical bond. We use it here to simulate realistic thermal motion.
     sec_mask = peptide.res_name == "SEC"
     se_mask = (peptide.atom_name == "SE") & sec_mask
 
     if sec_mask.any():
+        # Temporary renaming for compatibility with SASA-based S2 predictors.
         peptide.res_name[sec_mask] = "CYS"
         if se_mask.any():
             peptide.atom_name[se_mask] = "SG"
@@ -1560,36 +1558,57 @@ def _assemble_pdb_output(
 
     s2_map = predict_order_parameters(peptide)
 
-    # Restore SEC names
+    # RESTORATION: Revert temporary SEC names back to their chemical identity.
     if sec_mask.any():
         peptide.res_name[sec_mask] = "SEC"
         if se_mask.any():
             peptide.atom_name[se_mask] = "SE"
             peptide.element[se_mask] = "SE"
 
-    # Sanitize: Extract only atomic content to avoid header duplication
+    # DATA INTEGRITY: Ensure peptide has b_factor and occupancy annotations.
+    # These are required for modern formats like CIF and BCIF where annotations
+    # are stored as explicit columns rather than fixed-width text fields.
+    if "b_factor" not in peptide.get_annotation_categories():
+        peptide.set_annotation("b_factor", np.zeros(peptide.array_length()))
+    if "occupancy" not in peptide.get_annotation_categories():
+        peptide.set_annotation("occupancy", np.ones(peptide.array_length()))
+    if "atom_id" not in peptide.get_annotation_categories():
+        peptide.set_annotation("atom_id", np.arange(1, peptide.array_length() + 1))
+
+    # EDUCATIONAL NOTE - Adding Realistic B-factors:
+    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
+    # (or the AtomArray for CIF) to replace these with realistic values based on
+    # atom type, position, and residue type. This makes the output look more professional.
+
+    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
+    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
+    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
+
+    # Sanitize: Extract only atomic content to prevent header duplication during assembly.
     atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
 
     processed_lines = []
     n_term_serial = None
     c_term_serial = None
     sg_serials: dict[int, int] = {}
-    serial = 0  # tracks last serial of any ATOM/HETATM line
-    last_atom_serial = 0  # tracks last serial of ATOM (polymer) lines only
-    last_protein_atom_line: str | None = None  # last ATOM line text
+    serial = 0
+    last_atom_serial = 0
+    last_protein_atom_line: str | None = None
 
-    # ── Step 2: Line-by-Line Refinement ────────────────────────────────────
+    # EFFICIENT MAPPING: Index atom_ids for fast lookup during annotation updates.
+    atom_id_to_idx = {aid: i for i, aid in enumerate(peptide.atom_id)}
+
+    # ── Step 2: Metadata Calculation ───────────────────────────────────────
     # We iterate over every ATOM line to apply biophysical metadata.
+    # This pass ensures that the floating-point values for occupancy and
+    # B-factors match the calculated S2 order parameters.
     for line in atomic_and_ter_content.splitlines():
         if line.startswith("ATOM") or line.startswith("HETATM"):
             try:
                 res_num = int(line[22:26].strip())
             except ValueError:
-                # Handle alphanumeric residue IDs from large solvent boxes (e.g., A000)
-                # We use the raw string to ensure we don't crash, though S2 mapping
-                # might be limited for these residues.
+                # Alphanumeric residue ID handling for massive systems.
                 res_num_str = line[22:26].strip()
-                # Try to extract numeric part if possible, otherwise use a dummy
                 import re
 
                 match = re.search(r"\d+", res_num_str)
@@ -1609,18 +1628,18 @@ def _assemble_pdb_output(
             atom_name = line[12:16].strip()
             res_name = line[17:20].strip()
 
-            # Identify terminal atoms for CONECT record generation in cyclic peptides.
+            # TOPOLOGY TRACKING: Identify terminals for CONECT record generation.
             if cyclic:
                 if res_num == 1 and atom_name == "N":
                     n_term_serial = serial
                 if res_num == max_protein_res_id and atom_name == "C":
                     c_term_serial = serial
 
-            # Track sulfur atom serials for disulfide bond CONECT records.
+            # COVALENT BONDING: Track sulfurs for disulfide bridge annotation.
             if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
                 sg_serials[res_num] = serial
 
-            # Calculate and inject realistic B-factor and Occupancy values.
+            # BIOPHYSICAL DERIVATION: Convert S2 to B-factor and Occupancy.
             current_s2 = s2_map.get(res_num, 0.85)
             bfactor = _calculate_bfactor(
                 atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
@@ -1629,35 +1648,55 @@ def _assemble_pdb_output(
                 atom_name, res_num, total_residues, res_name, bfactor, rng=rng
             )
 
-            # Patch the PDB line with the new floating-point values.
+            # ANNOTATION UPDATE: Persist values back to the AtomArray for non-PDB formats.
+            if serial in atom_id_to_idx:
+                idx = atom_id_to_idx[serial]
+                peptide.b_factor[idx] = bfactor
+                peptide.occupancy[idx] = occupancy
+
+            # STRING PATCHING: Inject values into the fixed-width PDB line.
             line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
 
         processed_lines.append(line)
 
     atomic_and_ter_content = "\n".join(processed_lines) + "\n"
 
-    # ── Step 3: PDB Termination (TER) ──────────────────────────────────────
+    # ── Step 3: Format-Specific Export ─────────────────────────────────────
+    if output_format in ["cif", "bcif"]:
+        if output_format == "bcif":
+            bcif_file = BinaryCIFFile()
+            set_structure(bcif_file, peptide)
+            out_bytes = io.BytesIO()
+            bcif_file.write(out_bytes)
+            return out_bytes.getvalue()
+        else:
+            cif_file = CIFFile()
+            set_structure(cif_file, peptide)
+            out_str = io.StringIO()
+            cif_file.write(out_str)
+            return out_str.getvalue()
+
+    # Default PDB Path
+    # ── Step 4: PDB Termination (TER) ──────────────────────────────────────
+    # EDUCATIONAL NOTE - PDB Termination (TER):
     # Ensure a proper TER record exists to separate polymer from ligands/solvent.
+    # PDB standard: TER follows the last atom of the polymer chain.
     lines = atomic_and_ter_content.strip().splitlines()
     if not lines:
-        logger.error("Generated PDB content is empty! Falling back to raw sequence string.")
         return atomic_and_ter_content
 
     has_ter = any(line_str.startswith("TER") for line_str in lines)
     if not has_ter and last_protein_atom_line is not None:
-        # PDB standard: TER follows the last atom of the polymer chain.
         ter_atom_num = last_atom_serial + 1
         ter_res_name = last_protein_atom_line[17:20].strip()
         ter_chain_id = last_protein_atom_line[21].strip()
         ter_res_num = int(last_protein_atom_line[22:26].strip())
 
-        # Build a standard 80-character TER record.
         ter_record = (
             f"TER   {ter_atom_num: >5}      {ter_res_name: >3} "
             f"{ter_chain_id: <1}{ter_res_num: >4}"
         ).ljust(80)
 
-        # Splicing: Insert TER immediately after the polymer ATOM block.
         insert_lines = atomic_and_ter_content.strip().splitlines()
         last_atom_idx = max(
             i for i, line_str in enumerate(insert_lines) if line_str.startswith("ATOM")
@@ -1665,18 +1704,18 @@ def _assemble_pdb_output(
         insert_lines.insert(last_atom_idx + 1, ter_record)
         atomic_and_ter_content = "\n".join(insert_lines) + "\n"
 
-    # Ensure all lines are padded to 80 characters for legacy PDB compatibility.
     padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]
     final_atomic_content_block = "\n".join(padded_lines).strip()
 
-    # ── Step 4: Connectivity (CONECT & SSBOND) ─────────────────────────────
+    # ── Step 5: Connectivity (CONECT & SSBOND) ─────────────────────────────
+    # EDUCATIONAL NOTE - Connectivity (CONECT & SSBOND):
     # Generate records for cyclic peptides and disulfide bonds.
+    # SSBOND records specifically annotate covalent sulfur-sulfur bridges.
     conect_records = []
     if cyclic and n_term_serial and c_term_serial:
         conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
 
     disulfides = _detect_disulfide_bonds(peptide)
-    # SSBOND records specifically annotate covalent sulfur-sulfur bridges.
     ssbond_records = _generate_ssbond_records(disulfides, chain_id="A")
 
     if disulfides:
@@ -1684,7 +1723,6 @@ def _assemble_pdb_output(
             s1 = sg_serials.get(r1)
             s2 = sg_serials.get(r2)
             if s1 and s2:
-                # Disulfide connectivity requires bidirectional records.
                 conect_records.append(f"CONECT{s1:5d}{s2:5d}".ljust(80))
                 conect_records.append(f"CONECT{s2:5d}{s1:5d}".ljust(80))
 
@@ -1692,13 +1730,28 @@ def _assemble_pdb_output(
     if conect_block:
         conect_block += "\n"
 
-    # Final assembly using the project-standard utility.
     return assemble_pdb_content(
         final_atomic_content_block,
         sequence_length,
         command_args=None,
         extra_records=ssbond_records if ssbond_records else None,
         conect_records=conect_block if conect_block else None,
+    )
+
+
+def _assemble_pdb_output(
+    peptide: struc.AtomArray,
+    atomic_and_ter_content: str | None,
+    sequence_length: int,
+    cyclic: bool,
+    rng: random.Random | None = None,
+) -> str:
+    """Backward compatibility wrapper for _assemble_output."""
+    return cast(
+        str,
+        _assemble_output(
+            peptide, atomic_and_ter_content, sequence_length, cyclic, rng, output_format="pdb"
+        ),
     )
 
 
@@ -1731,8 +1784,9 @@ def generate_pdb_content(
     omega_list: list[float] | None = None,  # Explicit Omega angles
     platform: str | None = None,  # OpenMM platform override
     precision: str | None = None,  # OpenMM precision override
-) -> str:
-    r"""Generates PDB content for a linear or cyclic peptide chain.
+    output_format: str = "pdb",  # Output format: pdb, cif, bcif
+) -> str | bytes:
+    r"""Generates a realistic protein structure in PDB, mmCIF, or BinaryCIF format.
 
     EDUCATIONAL NOTE - New Feature: Cyclic Peptides
     Cyclic peptides have their N-terminus bonded to their C-terminus.
@@ -1927,9 +1981,16 @@ def generate_pdb_content(
             precision=precision,
         )
 
-    # Assemble final PDB with B-factors, occupancy, TER, CONECT records
+    # Assemble final structure with B-factors, occupancy, and metadata
     total_res_count = sum(len(s) for s in chain_sequences)
-    return _assemble_pdb_output(peptide, atomic_and_ter_content, total_res_count, cyclic, rng=rng)
+    return _assemble_output(
+        peptide,
+        atomic_and_ter_content,
+        total_res_count,
+        cyclic,
+        rng=rng,
+        output_format=output_format,
+    )
 
 
 class PeptideGenerator:
@@ -1959,12 +2020,13 @@ class PeptideGenerator:
         """
         # Merge init config with call-time overrides
         call_config = {**self.config, **overrides}
+        output_format = call_config.get("output_format", "pdb")
 
         # Call the functional generator which handles multichain splitting
-        pdb_content = generate_pdb_content(sequence_str=self.sequence, **call_config)
+        content = generate_pdb_content(sequence_str=self.sequence, **call_config)
 
         # Package into a Result object for easy access to structures
-        self._last_result = PeptideResult(pdb_content)
+        self._last_result = PeptideResult(content, format=output_format)
         return self._last_result
 
     def generate_ensemble(self, n_models: int = 10, as_stack: bool = True, **overrides: Any) -> Any:
@@ -2012,53 +2074,122 @@ class PeptideGenerator:
 
 class PeptideResult:
     """Container for generation outputs, providing easy access to
-    PDB strings, Biotite structures, and metadata.
+    PDB/mmCIF strings, Biotite structures, and metadata.
 
     BIOPHYSICAL SIGNIFICANCE:
     Storing the result in a structured container allows for seamless
     integration with downstream analysis modules like NMR predictors
-    or interface validators.
+    or interface validators. It acts as a bridge between the raw
+    text/binary file formats and the high-level geometric objects
+    needed for structural biology.
+
+    STRUCTURAL INTEGRITY:
+    The container lazily parses the content only when needed, which
+    saves memory during large-scale data generation (ensembles).
+    It also preserves the 'format' metadata, ensuring that re-parsing
+    always uses the correct engine (e.g., PDB vs PDBx).
     """
 
-    def __init__(self, pdb_content: str) -> None:
-        """Initialize the result container with a PDB-formatted string."""
-        self.pdb = pdb_content
+    def __init__(self, content: str | bytes, format: str = "pdb") -> None:
+        """Initialize the result container with generated content."""
+        self.content = content
+        self.format = format
         self._structure = None
+
+    @property
+    def pdb(self) -> str:
+        """Compatibility property for legacy PDB access.
+
+        If the content is in BinaryCIF format, it is first decoded.
+        Note that this returns the RAW content; if you need a PDB
+        representation of a CIF-originated structure, use
+        `get_content('pdb')`.
+        """
+        if isinstance(self.content, bytes):
+            return self.content.decode("utf-8")
+        return str(self.content)
 
     @property
     def structure(self) -> struc.AtomArray:
         """Returns the structure as a Biotite AtomArray (cached).
 
-        This property lazily parses the PDB string into a high-level
-        biotite structure object for geometric analysis.
+        This property lazily parses the content into a high-level
+        biotite structure object for geometric analysis. It includes
+        metadata retrieval for B-factors and occupancies which are
+        critical for realistic structural modeling.
         """
         if self._structure is None:
-            # Defensive check for empty or invalid PDB content
-            if not self.pdb or ("ATOM" not in self.pdb and "HETATM" not in self.pdb):
-                logger.error("PeptideResult contains no atomic data. Returning empty AtomArray.")
+            if self.format == "bcif":
+                import io
+
+                # BinaryCIF requires a byte-stream for parsing.
+                f = BinaryCIFFile.read(io.BytesIO(cast(bytes, self.content)))
+                # We explicitly request b_factor and occupancy to maintain
+                # biophysical fidelity during the transition from binary to memory.
+                self._structure = get_structure(f, model=1, extra_fields=["b_factor", "occupancy"])
+                return self._structure
+
+            # Text formats (PDB, CIF)
+            content_str = self.pdb
+
+            # Defensive check for empty or invalid content
+            if not content_str or ("ATOM" not in content_str and "HETATM" not in content_str):
+                logger.error(f"PeptideResult ({self.format}) contains no atomic data.")
                 self._structure = struc.AtomArray(0)
                 return self._structure
 
-            # We use io.StringIO to avoid unnecessary disk I/O
             import io
 
-            from biotite.structure.io.pdb import PDBFile
-
-            f = PDBFile.read(io.StringIO(self.pdb))
-
-            # Additional check: ensure at least one model exists in the PDB
-            if f.get_model_count() == 0:
-                logger.error("PDB content has 0 models. Returning empty AtomArray.")
-                self._structure = struc.AtomArray(0)
+            if self.format == "cif":
+                # mmCIF (PDBx) parsing using the modern CIFFile API.
+                f = CIFFile.read(io.StringIO(content_str))
+                self._structure = get_structure(f, model=1, extra_fields=["b_factor", "occupancy"])
             else:
-                self._structure = f.get_structure(model=1)
+                # Legacy PDB format handling.
+                from biotite.structure.io.pdb import PDBFile
+
+                f = PDBFile.read(io.StringIO(content_str))
+                if f.get_model_count() == 0:
+                    logger.error("PDB content has 0 models. Returning empty AtomArray.")
+                    self._structure = struc.AtomArray(0)
+                else:
+                    self._structure = f.get_structure(model=1)
+
         return self._structure
 
     def save(self, path: str) -> None:
-        """Saves the generated PDB content to a permanent file on disk."""
-        with open(path, "w") as f:
-            f.write(self.pdb)
+        """Saves the generated content to a permanent file on disk.
+
+        Automatically handles text (w) vs binary (wb) modes based on
+        the content type.
+        """
+        mode = "wb" if isinstance(self.content, bytes) else "w"
+        with open(path, mode) as f:
+            f.write(self.content)
+
+    def get_content(self, target_format: str) -> str | bytes:
+        """Returns the structure content in the requested format.
+
+        This method enables on-the-fly format conversion (e.g., PDB to CIF).
+        It leverages the cached AtomArray to ensure that all biophysical
+        annotations (B-factors, order parameters) are preserved in the
+        target format.
+        """
+        if target_format == self.format:
+            return self.content
+
+        # Convert via _assemble_output (using cached structure)
+        # We need sequence length for PDB header metadata.
+        sequence_length = len(set(self.structure.res_id))
+        content = _assemble_output(
+            self.structure,
+            None,  # No raw PDB block needed, will generate from structure
+            sequence_length,
+            cyclic=False,  # Default to False for generic conversion
+            output_format=target_format,
+        )
+        return content
 
     def __repr__(self) -> str:
         """Structured representation of the peptide result."""
-        return f"<PeptideResult: {len(self.pdb)} chars, {self.structure.array_length()} atoms>"
+        return f"<PeptideResult: {self.format.upper()}, {self.structure.array_length()} atoms>"

@@ -11,6 +11,7 @@ import datetime
 import logging
 import os
 import sys
+from typing import cast
 
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
@@ -134,7 +135,14 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=str,
-        help="Optional: Output PDB filename. If not provided, a default name will be generated.",
+        help="Optional: Output filename. If not provided, a default name will be generated.",
+    )
+    parser.add_argument(
+        "--format",
+        type=str,
+        default="pdb",
+        choices=["pdb", "cif", "bcif"],
+        help="Output file format (pdb, cif, bcif). Default: pdb.",
     )
     parser.add_argument(
         "--log-level",
@@ -1159,11 +1167,12 @@ def main() -> None:
 
     for attempt_num in range(1, generation_attempts + 1):
         logger.info(f"Generation attempt {attempt_num}/{generation_attempts}.")
-        current_pdb_content = None
+        current_pdb_content = ""
         current_violations = []
 
         try:
-            current_pdb_content = generate_pdb_content(
+            # We always generate PDB format internally for validation and refinement
+            generated_content = generate_pdb_content(
                 length=length_for_generator,
                 sequence_str=args.sequence,
                 use_plausible_frequencies=args.plausible_frequencies,
@@ -1186,7 +1195,10 @@ def main() -> None:
                 cyclic=args.cyclic,
                 platform=args.platform,
                 precision=args.precision,
+                output_format="pdb",  # Internal format is always PDB
             )
+            # generate_pdb_content returns str | bytes, but for "pdb" it's always str
+            current_pdb_content = cast(str, generated_content)
 
             if not current_pdb_content:
                 logger.warning(
@@ -1197,13 +1209,15 @@ def main() -> None:
             if args.validate:
                 logger.info("Performing PDB validation checks for current generation...")
                 logger.debug(
-                    f"PDB content passed to validator (attempt {attempt_num}):\n{current_pdb_content}"
+                    "PDB content passed to validator (attempt %d):\n%s",
+                    attempt_num,
+                    current_pdb_content,
                 )
                 validator = PDBValidator(current_pdb_content)
                 validator.validate_all()
                 current_violations = validator.get_violations()
                 logger.debug(
-                    f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}. Content: {current_violations}"
+                    f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}."
                 )
 
             if args.quality_filter:
@@ -1431,18 +1445,31 @@ def main() -> None:
                 logger.debug("Using user-provided output filename: %s", output_filename)
             else:
                 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                ext = args.format
                 if args.sequence:
                     # Use a simplified sequence string for filename to avoid very long names
                     sequence_tag = args.sequence.replace("-", "")[:10]
-                    output_filename = f"custom_peptide_{sequence_tag}_{timestamp}.pdb"
+                    output_filename = f"custom_peptide_{sequence_tag}_{timestamp}.{ext}"
                 else:
-                    output_filename = f"random_linear_peptide_{args.length}_{timestamp}.pdb"
+                    output_filename = f"random_linear_peptide_{args.length}_{timestamp}.{ext}"
                 logger.debug("Generated default output filename: %s", output_filename)
 
             try:
-                with open(output_filename, "w") as f:
-                    f.write(final_full_pdb_content_to_write)
-                logger.info("Successfully generated PDB file: %s", os.path.abspath(output_filename))
+                # ── Step 4: Final Format Conversion ─────────────────────────
+                final_content_to_write: str | bytes = final_full_pdb_content_to_write
+                if args.format != "pdb":
+                    from .generator import PeptideResult
+
+                    # Create a temporary Result to handle conversion via AtomArray
+                    res = PeptideResult(final_full_pdb_content_to_write, format="pdb")
+                    final_content_to_write = res.get_content(args.format)
+
+                mode = "wb" if isinstance(final_content_to_write, bytes) else "w"
+                with open(output_filename, mode) as f:
+                    f.write(final_content_to_write)
+                logger.info(
+                    f"Successfully generated {args.format.upper()} file: {os.path.abspath(output_filename)}"
+                )
 
                 # 1. Unified Scorecard and Validation
                 if args.scorecard or args.validate or final_violations:
