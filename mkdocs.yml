@@ -89,6 +89,7 @@ nav:
       - 6D Orientogram Lab: tutorials/orientogram_lab.ipynb
       - Drug Discovery Pipeline: tutorials/drug_discovery_pipeline.ipynb
     - Validation & Physics:
+      - Modern Formats Lab (CIF/BCIF): tutorials/modern_formats_lab.ipynb
       - Ubiquitin Chemical Shift: tutorials/ubiquitin_chemical_shift_validation.ipynb
       - Ubiquitin J-Coupling: tutorials/ubiquitin_j_coupling_validation.ipynb
       - Ubiquitin RDCs: tutorials/ubiquitin_rdc_validation.ipynb
