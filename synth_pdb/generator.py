@@ -889,6 +889,7 @@ def _build_peptide_chains(
             # ── Backbone coordinate placement ───────────────────────────────────
             if i == 0:
                 # First residue (N-terminus)
+                # Position N at origin, CA on X-axis, C in XY-plane
                 n_coord = np.array([0.0, 0.0, 0.0])
                 ca_coord = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
 
@@ -897,17 +898,34 @@ def _build_peptide_chains(
                 c_y = ca_coord[1] + BOND_LENGTH_CA_C * np.sin(angle_with_x)
                 c_coord = np.array([c_x, c_y, 0.0])
 
-                if res_conformation in RAMACHANDRAN_PRESETS:
+                # Determine phi/psi for the FIRST residue
+                if (
+                    phi_list is not None
+                    and i < len(phi_list)
+                    and psi_list is not None
+                    and i < len(psi_list)
+                ):
+                    current_phi = phi_list[i]
+                    current_psi = psi_list[i]
+                elif res_conformation in RAMACHANDRAN_PRESETS:
+                    current_phi = RAMACHANDRAN_PRESETS[res_conformation]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS[res_conformation]["psi"]
                 elif res_conformation == "random":
                     next_res_name = sequence[i + 1] if i + 1 < sequence_length else None
-                    _, current_psi = _sample_ramachandran_angles(res_name, next_res_name, rng=rng)
+                    current_phi, current_psi = _sample_ramachandran_angles(
+                        res_name, next_res_name, rng=rng
+                    )
                 elif res_conformation in BETA_TURN_TYPES:
+                    current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
                 else:
-                    current_psi = -47.0  # Default Alpha
+                    # Fallback to Alpha Helix
+                    current_phi = -60.0
+                    current_psi = -47.0
 
                 if is_d:
+                    # Flip chirality for D-amino acids
+                    current_phi = -current_phi
                     current_psi = -current_psi
 
             else:
@@ -928,10 +946,11 @@ def _build_peptide_chains(
                 prev_conformation = residue_conformations.get(prev_res_idx, conformation)
                 prev_is_d = sequence[prev_res_idx].startswith("D-")
 
-                current_phi = None
-                current_psi = None
-
-                if prev_conformation in RAMACHANDRAN_PRESETS:
+                # 1. Determine PSI from the PREVIOUS residue
+                # This places the Nitrogen of the current residue
+                if psi_list is not None and prev_res_idx < len(psi_list):
+                    prev_psi = psi_list[prev_res_idx]
+                elif prev_conformation in RAMACHANDRAN_PRESETS:
                     prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]["psi"]
                 elif prev_conformation in BETA_TURN_TYPES:
                     c_prev = prev_conformation
@@ -972,7 +991,8 @@ def _build_peptide_chains(
                     prev_psi,
                 )
 
-                # Place CA(i)
+                # 2. Determine OMEGA from the PREVIOUS-CURRENT bond
+                # This places the Alpha Carbon of the current residue
                 omega_mean = OMEGA_TRANS
                 if res_name == "PRO" and rng.random() < cis_proline_frequency:
                     omega_mean = 0.0
@@ -986,7 +1006,7 @@ def _build_peptide_chains(
                     prev_ca_coord, prev_c_coord, n_coord, BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
                 )
 
-                # Determine phi/psi for this residue
+                # 3. Determine PHI/PSI for the CURRENT residue
                 if (
                     phi_list is not None
                     and i < len(phi_list)
@@ -1030,23 +1050,30 @@ def _build_peptide_chains(
                     current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
                 if is_d:
+                    # Threaded angles already handle chirality; flip only presets/sampling
                     if phi_list is None or i >= len(phi_list):
                         current_phi = -current_phi
                     if psi_list is None or i >= len(psi_list):
                         current_psi = -current_psi
 
+                # Apply drift if requested (simulates conformational noise)
                 if drift > 0:
                     current_phi += rng.uniform(-drift, drift)
                     current_psi += rng.uniform(-drift, drift)
+                    # Normalize angles to [-180, 180]
                     current_phi = ((current_phi + 180) % 360) - 180
                     current_psi = ((current_psi + 180) % 360) - 180
 
+                # Place C(i) using PHI
                 c_coord = _place_atom_with_dihedral(
                     prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
                 )
 
             # ── Place Oxygen (O) explicitly ──
-            o_dihedral = 180.0
+            # The O atom is placed relative to N, CA, C using the current PSI.
+            # Rationale: The peptide plane is roughly planar, so O is 180deg from N
+            # across the C-CA bond.
+            o_dihedral = current_psi + 180.0
             o_coord = _place_atom_with_dihedral(
                 n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
             )
