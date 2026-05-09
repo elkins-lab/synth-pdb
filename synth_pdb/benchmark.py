@@ -78,7 +78,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, cast
 
 import numpy as np
 
@@ -447,10 +447,13 @@ def run_benchmark(
             # ── 1. Generate ground-truth structure ─────────────────────
             # We skip energy minimisation to ensure the ground truth is
             # mathematically perfect (exactly at Ramachandran centres).
-            ref_pdb = generate_pdb_content(
-                length=length,
-                conformation=conformation,
-                minimize_energy=False,
+            ref_pdb = cast(
+                str,
+                generate_pdb_content(
+                    length=length,
+                    conformation=conformation,
+                    minimize_energy=False,
+                ),
             )
 
             # ── 2. Extract sequence ────────────────────────────────────

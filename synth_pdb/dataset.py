@@ -4,7 +4,7 @@ import io
 import logging
 import random
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import biotite.structure.io.pdb as pdb
 import numpy as np
@@ -39,8 +39,9 @@ def _generate_single_sample_task(args: tuple) -> dict[str, Any]:
     try:
         # 1. Generate Structure
         # optimize_sidechains=False for speed in bulk generation
-        pdb_content = generate_pdb_content(
-            length=length, conformation=conf_type, optimize_sidechains=False
+        pdb_content = cast(
+            str,
+            generate_pdb_content(length=length, conformation=conf_type, optimize_sidechains=False),
         )
 
         # 2. Calculate Contact Map
@@ -277,8 +278,9 @@ def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
 
     try:
         # 1. Generate Structure (in-memory string)
-        pdb_content = generate_pdb_content(
-            length=length, conformation=conf_type, optimize_sidechains=False
+        pdb_content = cast(
+            str,
+            generate_pdb_content(length=length, conformation=conf_type, optimize_sidechains=False),
         )
 
         # 2. Parse to Biotite Structure

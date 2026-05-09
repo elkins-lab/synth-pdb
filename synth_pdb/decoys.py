@@ -1,5 +1,6 @@
 import io
 import logging
+from typing import Any, cast
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -124,26 +125,32 @@ class DecoyGenerator:
                 # Handling Threading (Hard Decoy)
                 if hard_mode and template_sequence:
                     # Generate a template-fold structure first
-                    template_pdb = generate_pdb_content(
-                        sequence_str=template_sequence,
-                        conformation="random",
-                        seed=attempts + (seed if seed else 0),
+                    template_pdb = cast(
+                        str,
+                        generate_pdb_content(
+                            sequence_str=template_sequence,
+                            conformation="random",
+                            seed=attempts + (seed if seed else 0),
+                        ),
                     )
                     phi_list, psi_list, omega_list = self._extract_backbone_dihedrals(template_pdb)
                     # We thread 'sequence' on this fold
                     gen_sequence = sequence
 
-                pdb_content = generate_pdb_content(
-                    sequence_str=gen_sequence,
-                    conformation="random",
-                    optimize_sidechains=optimize,
-                    minimize_energy=minimize,
-                    forcefield=forcefield,
-                    seed=attempts + (seed if seed else 0),
-                    drift=drift,
-                    phi_list=phi_list,
-                    psi_list=psi_list,
-                    omega_list=omega_list,
+                pdb_content = cast(
+                    str,
+                    generate_pdb_content(
+                        sequence_str=gen_sequence,
+                        conformation="random",
+                        optimize_sidechains=optimize,
+                        minimize_energy=minimize,
+                        forcefield=forcefield,
+                        seed=attempts + (seed if seed else 0),
+                        drift=drift,
+                        phi_list=phi_list,
+                        psi_list=psi_list,
+                        omega_list=omega_list,
+                    ),
                 )
 
                 # Handling Shuffling (Hard Decoy)
