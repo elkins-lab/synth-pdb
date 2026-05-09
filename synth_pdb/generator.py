@@ -2214,7 +2214,8 @@ class PeptideResult:
         the intermediate representation, we ensure that converting a PDB to
         an mmCIF does not lose scientific metadata (like occupancies or
         residue numbering) which often happens with simple text-to-text
-        converters.
+        converters. This architecture is future-proofed for the PDBx transition.
+
         """
         if target_format == self.format:
             return self.content
