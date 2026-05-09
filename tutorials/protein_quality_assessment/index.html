@@ -5470,7 +5470,15 @@ print("📦 All imports successful!")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate a Good Structure (with minimization)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating GOOD structure (with energy minimization)..."</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">IS_CI</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'GITHUB_ACTIONS'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'true'</span>
+<span class="n">do_minimize</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">IS_CI</span>
+
+<span class="k">if</span> <span class="n">IS_CI</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 [CI MODE] Generating GOOD structure (Skipping minimization for speed)..."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating GOOD structure (with energy minimization)..."</span><span class="p">)</span>
+
 <span class="n">sequence</span> <span class="o">=</span> <span class="s2">"MKFLKFSLLTAVLLSVVFAFSSCGDDDDAK"</span>
 <span class="n">structure_def</span> <span class="o">=</span> <span class="s2">"1-10:alpha,11-20:beta,21-30:random"</span>
 
@@ -5478,15 +5486,23 @@ print("📦 All imports successful!")</div>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
     <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># KEY: Energy minimization ON</span>
-    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>  <span class="c1"># CI Optimization</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="n">do_minimize</span><span class="p">,</span>  <span class="c1"># KEY: Energy minimization ON (unless in CI)</span>
+    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Good structure ready!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">good_pdb</span><span class="p">)</span><span class="si">}</span><span class="s2"> characters"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Generate a Good Structure (with minimization)
-print("🧬 Generating GOOD structure (with energy minimization)...")
+import os
+IS_CI = os.getenv('GITHUB_ACTIONS') == 'true'
+do_minimize = not IS_CI
+
+if IS_CI:
+    print("🧬 [CI MODE] Generating GOOD structure (Skipping minimization for speed)...")
+else:
+    print("🧬 Generating GOOD structure (with energy minimization)...")
+
 sequence = "MKFLKFSLLTAVLLSVVFAFSSCGDDDDAK"
 structure_def = "1-10:alpha,11-20:beta,21-30:random"
 
@@ -5494,8 +5510,8 @@ good_pdb = generate_pdb_content(
     sequence_str=sequence,
     structure=structure_def,
     optimize_sidechains=True,
-    minimize_energy=True,  # KEY: Energy minimization ON
-    minimization_max_iter=200  # CI Optimization
+    minimize_energy=do_minimize,  # KEY: Energy minimization ON (unless in CI)
+    minimization_max_iter=200
 )
 
 print("✅ Good structure ready!")
