@@ -1431,38 +1431,54 @@ class EnergyMinimizer:
             logger.debug(f"Using Cached OpenMM Platform: {platform.getName()}")
         else:
             # Fallback auto-detection logic
-            for name in ["CUDA", "Metal", "OpenCL", "CPU"]:
+            # CI Optimization: Bypass hardware probing on headless runners to prevent hangs
+            if os.getenv("GITHUB_ACTIONS") == "true":
                 try:
-                    temp_platform = mm.Platform.getPlatformByName(name)
-                    temp_props = {}
-                    if name in ["CUDA", "OpenCL"]:
-                        temp_props["Precision"] = "mixed"
-
-                    # Try to initialize a tiny dummy simulation to verify functionality
-                    # This prevents caching a 'broken' platform (like OpenCL without drivers)
-                    dummy_sys = mm.System()
-                    dummy_sys.addParticle(1.0 * unit.amu)
-                    dummy_int = mm.LangevinIntegrator(
-                        300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
-                    )
-                    # This call validates the platform/driver stack
-                    dummy_context = None
-                    try:
-                        dummy_context = mm.Context(dummy_sys, dummy_int, temp_platform, temp_props)
-                    finally:
-                        if dummy_context:
-                            del dummy_context
-                        del dummy_int
-                        del dummy_sys
-
-                    platform = temp_platform
-                    props = temp_props
+                    platform = mm.Platform.getPlatformByName("Reference")
+                    props = {}
                     _BEST_PLATFORM_CACHE["platform"] = platform
                     _BEST_PLATFORM_CACHE["props"] = props.copy()
-                    logger.info(f"Using Auto-detected OpenMM Platform: {name}")
-                    break
+                    logger.info(
+                        "CI Environment Detected: Defaulting to OpenMM 'Reference' platform."
+                    )
                 except Exception:
-                    continue
+                    pass
+
+            if platform is None:
+                for name in ["CUDA", "Metal", "OpenCL", "CPU"]:
+                    try:
+                        temp_platform = mm.Platform.getPlatformByName(name)
+                        temp_props = {}
+                        if name in ["CUDA", "OpenCL"]:
+                            temp_props["Precision"] = "mixed"
+
+                        # Try to initialize a tiny dummy simulation to verify functionality
+                        # This prevents caching a 'broken' platform (like OpenCL without drivers)
+                        dummy_sys = mm.System()
+                        dummy_sys.addParticle(1.0 * unit.amu)
+                        dummy_int = mm.LangevinIntegrator(
+                            300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                        )
+                        # This call validates the platform/driver stack
+                        dummy_context = None
+                        try:
+                            dummy_context = mm.Context(
+                                dummy_sys, dummy_int, temp_platform, temp_props
+                            )
+                        finally:
+                            if dummy_context:
+                                del dummy_context
+                            del dummy_int
+                            del dummy_sys
+
+                        platform = temp_platform
+                        props = temp_props
+                        _BEST_PLATFORM_CACHE["platform"] = platform
+                        _BEST_PLATFORM_CACHE["props"] = props.copy()
+                        logger.info(f"Using Auto-detected OpenMM Platform: {name}")
+                        break
+                    except Exception:
+                        continue
 
             if platform is None:
                 try:
