@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Optional
 
+import biotite.structure as struc
 import numpy as np
 
 from .data import (
@@ -42,9 +43,22 @@ class PDBValidator:
     violations: list[str]
 
     def __init__(
-        self, pdb_content: str | None = None, parsed_atoms: list[dict[str, Any]] | None = None
+        self,
+        pdb_content: str | None = None,
+        parsed_atoms: list[dict[str, Any]] | None = None,
     ) -> None:
-        if pdb_content:
+        """Initialize the validator with structure data.
+
+        Supports legacy PDB strings, pre-parsed atom dictionaries, or
+        modern Biotite AtomArray objects.
+        """
+        import biotite.structure as struc
+
+        if isinstance(pdb_content, struc.AtomArray):
+            # Support direct AtomArray input (Polyglot update)
+            self.atoms = self._parse_atom_array(pdb_content)
+            self.pdb_content = None
+        elif pdb_content:
             self.pdb_content = pdb_content
             self.atoms = self._parse_pdb_atoms(pdb_content)
         elif parsed_atoms is not None:
@@ -55,11 +69,29 @@ class PDBValidator:
             self.atoms = parsed_atoms
             self.pdb_content = None  # Lazily generated if needed
         else:
-            raise ValueError("Either pdb_content or parsed_atoms must be provided.")
+            raise ValueError("Either pdb_content, AtomArray, or parsed_atoms must be provided.")
 
         self.grouped_atoms = self._group_atoms_by_residue()
         self.sequences_by_chain = self._get_sequences_by_chain()
         self.violations = []  # Stores detected violations
+
+    @staticmethod
+    def _parse_atom_array(array: "struc.AtomArray") -> list[dict[str, Any]]:
+        """Converts a Biotite AtomArray into the validator's internal list-of-dicts format."""
+        parsed_atoms = []
+        for i in range(array.array_length()):
+            atom = {
+                "record_name": "HETATM" if array.hetero[i] else "ATOM",
+                "atom_number": i + 1,
+                "atom_name": array.atom_name[i],
+                "residue_name": array.res_name[i],
+                "chain_id": array.chain_id[i],
+                "residue_number": array.res_id[i],
+                "coords": array.coord[i],
+                "element": array.element[i],
+            }
+            parsed_atoms.append(atom)
+        return parsed_atoms
 
     def get_pdb_content(self) -> str:
         """Returns the PDB content string, generating it if it hasn't been already."""

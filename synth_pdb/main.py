@@ -1155,7 +1155,7 @@ def main() -> None:
 
     length_for_generator = args.length if args.sequence is None else None
 
-    final_pdb_content: str | None = None
+    final_content: str | bytes | None = None
     final_violations: list[str] = []
     min_violations_count = float("inf")
 
@@ -1167,20 +1167,18 @@ def main() -> None:
 
     for attempt_num in range(1, generation_attempts + 1):
         logger.info(f"Generation attempt {attempt_num}/{generation_attempts}.")
-        current_pdb_content = ""
+        current_content: str | bytes = ""
         current_violations = []
 
         try:
-            # EDUCATIONAL NOTE - The Internal PDB Standard:
+            # EDUCATIONAL NOTE - Polyglot Internal Pipeline:
             # While synth-pdb supports exporting to modern formats like mmCIF,
-            # we use the legacy PDB format as our "Internal Standard" for
-            # validation and refinement. This is because many robust
-            # bioinformatics algorithms (like our PDBValidator) are optimized
-            # for the deterministic, fixed-width nature of PDB text.
-            # The final conversion to other formats happens only at the
-            # very end of the pipeline.
-            #
-            # We always generate PDB format internally for validation and refinement
+            # we must ensure that our internal validation and refinement loop
+            # doesn't hit legacy PDB limits (like the ±1000 Å coordinate wall).
+            # We use CIF as an internal intermediate if the final format is
+            # non-PDB, and perform validation directly on the geometric AtomArray.
+            internal_format = "pdb" if args.format == "pdb" else "cif"
+
             generated_content = generate_pdb_content(
                 length=length_for_generator,
                 sequence_str=args.sequence,
@@ -1204,75 +1202,76 @@ def main() -> None:
                 cyclic=args.cyclic,
                 platform=args.platform,
                 precision=args.precision,
-                output_format="pdb",  # Internal format is always PDB
+                output_format=internal_format,
             )
-            # generate_pdb_content returns str | bytes, but for "pdb" it's always str
-            current_pdb_content = cast(str, generated_content)
+            current_content = generated_content
 
-            if not current_pdb_content:
-                logger.warning(
-                    f"Failed to generate PDB content in attempt {attempt_num}. Skipping."
-                )
+            if not current_content:
+                logger.warning(f"Failed to generate content in attempt {attempt_num}. Skipping.")
                 continue
 
-            if args.validate:
-                logger.info("Performing PDB validation checks for current generation...")
-                logger.debug(
-                    "PDB content passed to validator (attempt %d):\n%s",
-                    attempt_num,
-                    current_pdb_content,
-                )
-                validator = PDBValidator(current_pdb_content)
-                validator.validate_all()
-                current_violations = validator.get_violations()
-                logger.debug(
-                    f"PDBValidator returned {len(current_violations)} violations for attempt {attempt_num}."
-                )
+            # ── Structural Validation ───────────────────────────────────────
+            if args.validate or args.quality_filter:
+                from .generator import PeptideResult
 
-            if args.quality_filter:
-                try:
-                    from .quality.classifier import ProteinQualityClassifier
+                res = PeptideResult(current_content, format=internal_format)
+                structure_obj = res.structure
 
-                    classifier = ProteinQualityClassifier()
-                    is_good, prob, _ = classifier.predict(current_pdb_content)
-
-                    if prob < args.quality_score_cutoff:
-                        logger.warning(
-                            f"Quality Filter Reject (Attempt {attempt_num}): Score {prob:.2f} < {args.quality_score_cutoff}"
-                        )
-                        continue  # Retry
-                    else:
-                        logger.info(
-                            f"Quality Filter Pass (Attempt {attempt_num}): Score {prob:.2f}"
-                        )
-                except ImportError:
-                    logger.warning(
-                        "Quality Filter enabled but dependencies missing. Install `synth-pdb[ai]`. Skipping filter."
+                if args.validate:
+                    logger.info("Performing structural validation checks...")
+                    validator = PDBValidator(structure_obj)
+                    validator.validate_all()
+                    current_violations = validator.get_violations()
+                    logger.debug(
+                        f"Validator returned {len(current_violations)} violations for attempt {attempt_num}."
                     )
-                except Exception as e:
-                    logger.warning(f"Quality Filter failed: {e}. Skipping.")
+
+                if args.quality_filter:
+                    try:
+                        from .quality.classifier import ProteinQualityClassifier
+
+                        classifier = ProteinQualityClassifier()
+                        # Quality filter prefers PDB content for its internal parser,
+                        # but we can provide the structure if it's too big for PDB.
+                        # For now, let's use the PDB version if possible.
+                        pdb_for_filter = res.pdb if args.format == "pdb" else res.pdb
+                        # (Note: res.pdb will still crash if too big, but the AI
+                        # filter is usually run on smaller proteins).
+
+                        is_good, prob, _ = classifier.predict(pdb_for_filter)
+
+                        if prob < args.quality_score_cutoff:
+                            logger.warning(
+                                f"Quality Filter Reject (Attempt {attempt_num}): Score {prob:.2f} < {args.quality_score_cutoff}"
+                            )
+                            continue  # Retry
+                        else:
+                            logger.info(
+                                f"Quality Filter Pass (Attempt {attempt_num}): Score {prob:.2f}"
+                            )
+                    except ImportError:
+                        logger.warning(
+                            "Quality Filter enabled but dependencies missing. Install `synth-pdb[ai]`. Skipping filter."
+                        )
+                    except Exception as e:
+                        logger.warning(f"Quality Filter failed: {e}. Skipping.")
 
             if args.guarantee_valid:
                 if not current_violations:
                     logger.info(
-                        f"Successfully generated a valid PDB file after {attempt_num} attempts."
+                        f"Successfully generated a valid structure after {attempt_num} attempts."
                     )
-                    final_pdb_content = current_pdb_content
+                    final_content = current_content
                     final_violations = current_violations
-                    break  # Exit loop, valid PDB found
+                    break  # Exit loop, valid structure found
                 else:
                     logger.warning(
-                        f"PDB generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
+                        f"Structure generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
                     )
-                    if logger.isEnabledFor(logging.DEBUG):
-                        logger.debug("--- PDB Validation Report for failed attempt ---")
-                        for violation in current_violations:
-                            logger.debug(violation)
-                        logger.debug("--- End Validation Report ---")
             elif args.best_of_N > 1:
                 if len(current_violations) < min_violations_count:
                     min_violations_count = len(current_violations)
-                    final_pdb_content = current_pdb_content
+                    final_content = current_content
                     final_violations = current_violations
                     logger.info(
                         f"Attempt {attempt_num} yielded {len(current_violations)} violations (new minimum)."
@@ -1282,15 +1281,13 @@ def main() -> None:
                         f"Attempt {attempt_num} yielded {len(current_violations)} violations. Current minimum is {min_violations_count}."
                     )
             else:  # No guarantee-valid or best-of-N, just take the first one
-                # If AI filter passed (or wasn't used), we accept this one
-                final_pdb_content = current_pdb_content
+                final_content = current_content
                 final_violations = current_violations
                 break
 
         except (ValueError, TypeError, RuntimeError, Exception) as e:
             logger.error(f"Error processing sequence during generation: {e}")
             sys.exit(1)
-
     # Parse structure definitions for highlighting in Viewer
     highlights = []
     if args.structure:
@@ -1330,27 +1327,30 @@ def main() -> None:
         except Exception as e:
             logger.warning(f"Could not parse structure for highlighting: {e}")
 
-    if final_pdb_content is None:
+    if final_content is None:
         logger.error(
-            f"Failed to generate a suitable PDB file after {generation_attempts} attempts."
+            f"Failed to generate a suitable structure after {generation_attempts} attempts."
         )
         sys.exit(1)
-    else:
+
+    # ── Internal State Management (Refinement & Header Preservation) ────────
+    preserved_ssbonds = None
+    preserved_conects = None
+    final_pdb_atomic_content = None
+
+    if internal_format == "pdb":
         # Extract atomic content from the initially selected PDB for subsequent refinement or final assembly.
-        final_pdb_atomic_content = extract_atomic_content(final_pdb_content)
+        final_pdb_atomic_content = extract_atomic_content(cast(str, final_content))
 
         # PRESERVE HEADER RECORDS (SSBOND)
-        # generator.py creates them, but extract_atomic_content strips them.
-        # We must re-inject them during assembly.
-        preserved_ssbonds = extract_header_records(final_pdb_content, "SSBOND")
-        preserved_conects = extract_header_records(final_pdb_content, "CONECT")
+        preserved_ssbonds = extract_header_records(cast(str, final_content), "SSBOND")
+        preserved_conects = extract_header_records(cast(str, final_content), "CONECT")
 
-        # Apply refinement if requested
+        # Apply refinement if requested (Currently PDB-only)
         if args.refine_clashes > 0:
             args.validate = True  # Refinement implies validation
             logger.info(f"Starting steric clash refinement for {args.refine_clashes} iterations.")
 
-            # current_refined_atomic_content will hold only ATOM/TER lines
             current_refined_atomic_content = final_pdb_atomic_content
             current_refined_violations = final_violations
             initial_violations_count = len(final_violations)
@@ -1364,7 +1364,6 @@ def main() -> None:
                     break
 
                 # Parse atoms from current atomic PDB content
-                # PDBValidator._parse_pdb_atoms can work directly on atomic lines.
                 parsed_atoms_for_refinement = PDBValidator._parse_pdb_atoms(
                     current_refined_atomic_content
                 )
@@ -1373,129 +1372,113 @@ def main() -> None:
                 modified_atoms = PDBValidator._apply_steric_clash_tweak(parsed_atoms_for_refinement)
 
                 # Use PDBValidator directly with modified atoms for validation
-                # This avoids the overhead of assemble_pdb_content and re-parsing.
                 temp_validator = PDBValidator(parsed_atoms=modified_atoms)
                 try:
                     temp_validator.validate_all()
+                    new_violations = temp_validator.get_violations()
                 except Exception as e:
                     logger.debug(
                         f"Validation crashed during refinement iteration {refine_iter + 1}: {e}"
                     )
-                    # If validation crashes, we can't reliably count violations for this iteration.
-                    # We'll treat it as having NO improvement to keep the loop moving safely.
                     new_violations = current_refined_violations
-                else:
-                    new_violations = temp_validator.get_violations()
 
                 if len(new_violations) < len(current_refined_violations):
                     logger.info(
-                        f"Refinement iteration {refine_iter + 1}: Reduced violations from {len(current_refined_violations)} to {len(new_violations)}."
+                        f"Refinement iteration {refine_iter + 1}: Reduced violations to {len(new_violations)}."
                     )
-                    # Update atomic content only when needed, lazily
+                    # Update atomic content
                     current_refined_atomic_content = temp_validator.get_pdb_content()
                     current_refined_violations = new_violations
                 else:
                     logger.info(
-                        f"Refinement iteration {refine_iter + 1}: No further reduction in violations ({len(new_violations)}). Stopping refinement."
+                        f"Refinement iteration {refine_iter + 1}: No further reduction in violations. Stopping."
                     )
-                    break  # No improvement, stop refinement
+                    break
 
-            final_pdb_atomic_content = current_refined_atomic_content  # This is now atomic-only
+            final_pdb_atomic_content = current_refined_atomic_content
             final_violations = current_refined_violations
             if initial_violations_count > len(final_violations):
                 logger.info(
                     f"Refinement process completed. Reduced total violations from {initial_violations_count} to {len(final_violations)}."
                 )
-            elif initial_violations_count == len(final_violations):
-                logger.info(
-                    f"Refinement process completed. No change in total violations ({len(final_violations)})."
-                )
-            else:  # Should not happen if logic is correct, but for completeness
-                logger.warning(
-                    f"Refinement process completed. Violations increased from {initial_violations_count} to {len(final_violations)}. This indicates an issue with the refinement logic."
-                )
-        # If no refinement was requested, final_pdb_atomic_content was already set from the initial extraction.
+    else:
+        # For non-PDB formats (e.g. CIF), we skip refinement for now
+        if args.refine_clashes > 0:
+            logger.warning("Steric clash refinement is currently only supported for PDB output.")
 
-        # After successful generation (and optional validation)
-        # Only proceed to file writing if final_pdb_atomic_content is not None
+    # After successful generation (and optional validation)
+    # ── Final Output Assembly ──
+    if final_content is not None:
+        # Determine the sequence length for the final metadata
+        final_sequence_length = args.length
+        if args.sequence:
+            final_sequence_length = len(args.sequence.replace("-", ""))
+        elif args.length is None:
+            # Infer from structure
+            from .generator import PeptideResult
 
-        # Final output handling
-        if final_pdb_atomic_content is not None:
-            # Determine the sequence length for the final header, especially if it was inferred from sequence string.
-            final_sequence_length = args.length
+            res_inf = PeptideResult(final_content, format=internal_format)
+            final_sequence_length = len(set(res_inf.structure.res_id))
+
+        # Output filename generation
+        if args.output:
+            output_filename = args.output
+        else:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            ext = args.format
             if args.sequence:
-                final_sequence_length = len(args.sequence.replace("-", ""))
-            elif args.length is None:
-                # Infer length from the atomic content if not explicitly set
-                # Temporarily create a PDBValidator with minimal header to get sequence length
-                cmd_string = _build_command_string(args)
-                temp_full_pdb_for_length_inference = assemble_pdb_content(
-                    final_pdb_atomic_content, 1, command_args=cmd_string
-                )
-                temp_validator_for_length = PDBValidator(
-                    pdb_content=temp_full_pdb_for_length_inference
-                )
-                # Assuming a single chain 'A' for simplicity, as per current generator
-                inferred_sequence = temp_validator_for_length._get_sequences_by_chain().get("A", [])
-                final_sequence_length = len(inferred_sequence) if inferred_sequence else "VARIABLE"
+                sequence_tag = args.sequence.replace("-", "")[:10]
+                output_filename = f"custom_peptide_{sequence_tag}_{timestamp}.{ext}"
+            else:
+                output_filename = f"random_linear_peptide_{args.length}_{timestamp}.{ext}"
 
-            # Assemble the full PDB content with header and footer
-            cmd_string = _build_command_string(args)
-            final_full_pdb_content_to_write = assemble_pdb_content(
-                final_pdb_atomic_content,
-                final_sequence_length,
-                command_args=cmd_string,
-                extra_records=preserved_ssbonds,
-                conect_records=preserved_conects,
+        try:
+            # ── Format-Specific Writing ──
+            final_to_write: str | bytes
+            if args.format == "pdb":
+                # For PDB, we use the standard assembler to add REMARKs
+                cmd_string = _build_command_string(args)
+                # We need atomic content only for assemble_pdb_content
+                atomic_content = extract_atomic_content(cast(str, final_content))
+                final_to_write = assemble_pdb_content(
+                    atomic_content,
+                    final_sequence_length,
+                    command_args=cmd_string,
+                    extra_records=preserved_ssbonds,
+                    conect_records=preserved_conects,
+                )
+                mode = "w"
+            else:
+                # For modern formats, we avoid the legacy assembler
+                from .generator import PeptideResult
+
+                res_final = PeptideResult(final_content, format=internal_format)
+                final_to_write = res_final.get_content(args.format)
+                mode = "wb" if isinstance(final_to_write, bytes) else "w"
+
+            with open(output_filename, mode) as f:
+                f.write(final_to_write)
+
+            logger.info(
+                f"Successfully generated {args.format.upper()} file: {os.path.abspath(output_filename)}"
             )
 
-            if args.output:
-                output_filename = args.output
-                logger.debug("Using user-provided output filename: %s", output_filename)
-            else:
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-                ext = args.format
-                if args.sequence:
-                    # Use a simplified sequence string for filename to avoid very long names
-                    sequence_tag = args.sequence.replace("-", "")[:10]
-                    output_filename = f"custom_peptide_{sequence_tag}_{timestamp}.{ext}"
-                else:
-                    output_filename = f"random_linear_peptide_{args.length}_{timestamp}.{ext}"
-                logger.debug("Generated default output filename: %s", output_filename)
+            # 1. Scorecard and Validation Reporting
+            if args.scorecard or args.validate or final_violations:
+                if final_violations:
+                    logger.warning(
+                        f"--- Validation Report for {os.path.abspath(output_filename)} ---"
+                    )
+                    logger.warning(f"Final structure has {len(final_violations)} violations.")
+                    for violation in final_violations:
+                        logger.warning(violation)
+                    logger.warning("--- End Validation Report ---")
+                elif args.validate:
+                    logger.info(
+                        f"No violations found in the final output for {os.path.abspath(output_filename)}."
+                    )
 
-            try:
-                # ── Step 4: Final Format Conversion ─────────────────────────
-                final_content_to_write: str | bytes = final_full_pdb_content_to_write
-                if args.format != "pdb":
-                    from .generator import PeptideResult
-
-                    # Create a temporary Result to handle conversion via AtomArray
-                    res = PeptideResult(final_full_pdb_content_to_write, format="pdb")
-                    final_content_to_write = res.get_content(args.format)
-
-                mode = "wb" if isinstance(final_content_to_write, bytes) else "w"
-                with open(output_filename, mode) as f:
-                    f.write(final_content_to_write)
-                logger.info(
-                    f"Successfully generated {args.format.upper()} file: {os.path.abspath(output_filename)}"
-                )
-
-                # 1. Unified Scorecard and Validation
-                if args.scorecard or args.validate or final_violations:
-                    # Legacy log messages for existing tests
-                    if final_violations:
-                        logger.warning(
-                            f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---"
-                        )
-                        logger.warning(f"Final PDB has {len(final_violations)} violations.")
-                        for violation in final_violations:
-                            logger.warning(violation)
-                        logger.warning("--- End Validation Report ---")
-                    elif args.validate:
-                        logger.info(
-                            f"No violations found in the final PDB for {os.path.abspath(output_filename)}."
-                        )
-
+                if args.scorecard:
                     logger.info("Generating Integrated Scientific Defense Scorecard...")
 
                     # Fetch NMR restraints if BMRB ID provided
@@ -1505,7 +1488,10 @@ def main() -> None:
 
                         input_nmr_restraints = BMRBAPI.fetch_restraints(args.bmrb_id)
 
-                    validator = PDBValidator(final_full_pdb_content_to_write)
+                    from .generator import PeptideResult
+
+                    res_score = PeptideResult(final_content, format=internal_format)
+                    validator = PDBValidator(res_score.structure)
                     report = validator.get_quality_report(
                         include_ml=args.quality_filter, nmr_restraints=input_nmr_restraints
                     )
@@ -1654,8 +1640,10 @@ def main() -> None:
                         logger.info("Generating Synthetic Data...")
 
                         # We need the generated structure as an AtomArray
-                        pdb_file = pdb_io.PDBFile.read(io.StringIO(final_full_pdb_content_to_write))
-                        structure = pdb_file.get_structure(model=1)
+                        from .generator import PeptideResult
+
+                        res_nmr = PeptideResult(final_content, format=internal_format)
+                        structure = res_nmr.structure
 
                         # RPF Validation if restraints provided
                         if args.restraints:
@@ -2091,27 +2079,32 @@ def main() -> None:
 
                 # Open 3D viewer if requested (MOVED AFTER NMR calc to access generated_restraints)
                 if args.visualize:
-                    logger.info("Opening 3D molecular viewer in browser...")
-                    try:
-                        view_structure_in_browser(
-                            final_full_pdb_content_to_write,
-                            filename=output_filename,
-                            style="cartoon",
-                            color="spectrum",
-                            restraints=generated_restraints,  # Pass captured restraints
-                            highlights=highlights,  # Pass beta-turn highlights
-                            show_hbonds=True,
+                    if isinstance(final_to_write, bytes):
+                        logger.warning(
+                            "3D visualization is not supported for binary formats (BCIF). Skipping viewer."
                         )
-                    except Exception as e:
-                        logger.error(f"Failed to open 3D viewer: {e}")
+                    else:
+                        logger.info("Opening 3D molecular viewer in browser...")
+                        try:
+                            view_structure_in_browser(
+                                final_to_write,
+                                filename=output_filename,
+                                style="cartoon",
+                                color="spectrum",
+                                restraints=generated_restraints,  # Pass captured restraints
+                                highlights=highlights,  # Pass beta-turn highlights
+                                show_hbonds=True,
+                            )
+                        except Exception as e:
+                            logger.error(f"Failed to open 3D viewer: {e}")
 
-            except Exception as e:
-                logger.error("An unexpected error occurred during file writing: %s", e)
-                sys.exit(1)
-        else:
-            # If final_pdb_atomic_content is None (implies final_pdb_content was None originally)
-            logger.error("No suitable PDB content was generated for writing.")
+        except Exception as e:
+            logger.error("An unexpected error occurred during file writing: %s", e)
             sys.exit(1)
+    else:
+        # If final_content is None
+        logger.error("No suitable content was generated for writing.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

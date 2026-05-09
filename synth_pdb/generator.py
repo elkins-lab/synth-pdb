@@ -1556,19 +1556,7 @@ def _assemble_output(
     Returns:
         Complete structure file as a string (pdb/cif) or bytes (bcif).
     """
-    # ── Step 1: Initialize Atomic Block ─────────────────────────────────────
-    # If no minimization was performed, we convert the AtomArray directly to PDB format.
-    # This provides a baseline set of ATOM records that we can then post-process.
-    if atomic_and_ter_content is None:
-        # Ensure atom_id is sequential for the initial PDB dump.
-        peptide.atom_id = np.arange(1, peptide.array_length() + 1)
-        pdb_file_out = pdb.PDBFile()
-        pdb_file_out.set_structure(peptide)
-        string_io = io.StringIO()
-        pdb_file_out.write(string_io)
-        atomic_and_ter_content = string_io.getvalue()
-
-    # BIOPHYSICAL ANALYSIS: Identifying protein atoms for ATOM vs HETATM tagging.
+    # ── Step 1: Initialize Metadata & Atom IDs ──────────────────────────────
     # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
     is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
     protein_res_ids = peptide.res_id[is_protein]
@@ -1576,9 +1564,16 @@ def _assemble_output(
     max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
     total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
 
+    # DATA INTEGRITY: Ensure peptide has all required annotation categories.
+    if "b_factor" not in peptide.get_annotation_categories():
+        peptide.set_annotation("b_factor", np.zeros(peptide.array_length()))
+    if "occupancy" not in peptide.get_annotation_categories():
+        peptide.set_annotation("occupancy", np.ones(peptide.array_length()))
+    if "atom_id" not in peptide.get_annotation_categories():
+        peptide.set_annotation("atom_id", np.arange(1, peptide.array_length() + 1))
+
+    # ── Step 2: Biophysical Calculations (AtomArray level) ───────────────────
     # GEOMETRIC FLEXIBILITY: Predict Order Parameters (S2) to derive B-factors.
-    # The S2 parameter (0.0 to 1.0) represents the degree of spatial restriction
-    # of a chemical bond. We use it here to simulate realistic thermal motion.
     sec_mask = peptide.res_name == "SEC"
     se_mask = (peptide.atom_name == "SE") & sec_mask
 
@@ -1598,101 +1593,22 @@ def _assemble_output(
             peptide.atom_name[se_mask] = "SE"
             peptide.element[se_mask] = "SE"
 
-    # DATA INTEGRITY: Ensure peptide has b_factor and occupancy annotations.
-    # These are required for modern formats like CIF and BCIF where annotations
-    # are stored as explicit columns rather than fixed-width text fields.
-    if "b_factor" not in peptide.get_annotation_categories():
-        peptide.set_annotation("b_factor", np.zeros(peptide.array_length()))
-    if "occupancy" not in peptide.get_annotation_categories():
-        peptide.set_annotation("occupancy", np.ones(peptide.array_length()))
-    if "atom_id" not in peptide.get_annotation_categories():
-        peptide.set_annotation("atom_id", np.arange(1, peptide.array_length() + 1))
+    # Iterate over atoms to calculate realistic B-factors and occupancies.
+    for i in range(peptide.array_length()):
+        atom_name = peptide.atom_name[i]
+        res_num = peptide.res_id[i]
+        res_name = peptide.res_name[i]
 
-    # EDUCATIONAL NOTE - Adding Realistic B-factors:
-    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
-    # (or the AtomArray for CIF) to replace these with realistic values based on
-    # atom type, position, and residue type. This makes the output look more professional.
+        current_s2 = s2_map.get(res_num, 0.85)
+        bfactor = _calculate_bfactor(
+            atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
+        )
+        occupancy = _calculate_occupancy(
+            atom_name, res_num, total_residues, res_name, bfactor, rng=rng
+        )
 
-    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
-    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
-    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
-
-    # Sanitize: Extract only atomic content to prevent header duplication during assembly.
-    atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
-
-    processed_lines = []
-    n_term_serial = None
-    c_term_serial = None
-    sg_serials: dict[int, int] = {}
-    serial = 0
-    last_atom_serial = 0
-    last_protein_atom_line: str | None = None
-
-    # EFFICIENT MAPPING: Index atom_ids for fast lookup during annotation updates.
-    atom_id_to_idx = {aid: i for i, aid in enumerate(peptide.atom_id)}
-
-    # ── Step 2: Metadata Calculation ───────────────────────────────────────
-    # We iterate over every ATOM line to apply biophysical metadata.
-    # This pass ensures that the floating-point values for occupancy and
-    # B-factors match the calculated S2 order parameters.
-    for line in atomic_and_ter_content.splitlines():
-        if line.startswith("ATOM") or line.startswith("HETATM"):
-            try:
-                res_num = int(line[22:26].strip())
-            except ValueError:
-                # Alphanumeric residue ID handling for massive systems.
-                res_num_str = line[22:26].strip()
-                import re
-
-                match = re.search(r"\d+", res_num_str)
-                res_num = int(match.group()) if match else 9999
-
-            # EDUCATIONAL NOTE - HETATM vs ATOM:
-            # OpenMM's PDB writer may output non-standard amino acids (like PTMs)
-            # as HETATM. We forcefully convert them back to ATOM if they are part
-            # of the main polymer chain to ensure compatibility with standard viewers.
-            if res_num in protein_res_ids_set and line.startswith("HETATM"):
-                line = "ATOM  " + line[6:]
-
-            serial = int(line[6:11].strip())
-            if line.startswith("ATOM"):
-                last_atom_serial = serial
-                last_protein_atom_line = line
-            atom_name = line[12:16].strip()
-            res_name = line[17:20].strip()
-
-            # TOPOLOGY TRACKING: Identify terminals for CONECT record generation.
-            if cyclic:
-                if res_num == 1 and atom_name == "N":
-                    n_term_serial = serial
-                if res_num == max_protein_res_id and atom_name == "C":
-                    c_term_serial = serial
-
-            # COVALENT BONDING: Track sulfurs for disulfide bridge annotation.
-            if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
-                sg_serials[res_num] = serial
-
-            # BIOPHYSICAL DERIVATION: Convert S2 to B-factor and Occupancy.
-            current_s2 = s2_map.get(res_num, 0.85)
-            bfactor = _calculate_bfactor(
-                atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
-            )
-            occupancy = _calculate_occupancy(
-                atom_name, res_num, total_residues, res_name, bfactor, rng=rng
-            )
-
-            # ANNOTATION UPDATE: Persist values back to the AtomArray for non-PDB formats.
-            if serial in atom_id_to_idx:
-                idx = atom_id_to_idx[serial]
-                peptide.b_factor[idx] = bfactor
-                peptide.occupancy[idx] = occupancy
-
-            # STRING PATCHING: Inject values into the fixed-width PDB line.
-            line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
-
-        processed_lines.append(line)
-
-    atomic_and_ter_content = "\n".join(processed_lines) + "\n"
+        peptide.b_factor[i] = bfactor
+        peptide.occupancy[i] = occupancy
 
     # ── Step 3: Format-Specific Export ─────────────────────────────────────
     if output_format in ["cif", "bcif"]:
@@ -1709,14 +1625,56 @@ def _assemble_output(
             cif_file.write(out_str)
             return out_str.getvalue()
 
-    # Default PDB Path
-    # ── Step 4: PDB Termination (TER) ──────────────────────────────────────
-    # EDUCATIONAL NOTE - PDB Termination (TER):
-    # Ensure a proper TER record exists to separate polymer from ligands/solvent.
-    # PDB standard: TER follows the last atom of the polymer chain.
+    # ── Step 4: PDB Standard Assembly ──────────────────────────────────────
+    # If no minimization was performed, we convert the AtomArray to PDB format.
+    if atomic_and_ter_content is None:
+        pdb_file_out = pdb.PDBFile()
+        pdb_file_out.set_structure(peptide)
+        string_io = io.StringIO()
+        pdb_file_out.write(string_io)
+        atomic_and_ter_content = string_io.getvalue()
+    else:
+        # Patch the existing PDB string from OpenMM with updated B-factors/Occupancies.
+        # This ensures consistency even if OpenMM provided its own PDB output.
+        atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
+        processed_lines = []
+        atom_id_to_idx = {aid: i for i, aid in enumerate(peptide.atom_id)}
+
+        for line in atomic_and_ter_content.splitlines():
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                serial = int(line[6:11].strip())
+                if serial in atom_id_to_idx:
+                    idx = atom_id_to_idx[serial]
+                    bf = peptide.b_factor[idx]
+                    occ = peptide.occupancy[idx]
+                    line = line[:54] + f"{occ:6.2f}{bf:6.2f}" + line[66:]
+
+                    # Ensure HETATM vs ATOM tagging is correct for protein residues
+                    res_num = int(line[22:26].strip())
+                    if res_num in protein_res_ids_set and line.startswith("HETATM"):
+                        line = "ATOM  " + line[6:]
+
+            processed_lines.append(line)
+        atomic_and_ter_content = "\n".join(processed_lines) + "\n"
+
+    # Sanitize and add PDB markers (TER, CONECT)
     lines = atomic_and_ter_content.strip().splitlines()
     if not lines:
         return atomic_and_ter_content
+
+    # Find the last protein atom to insert TER
+    last_atom_serial = 0
+    last_protein_atom_line: str | None = None
+    for line in lines:
+        if line.startswith("ATOM"):
+            serial_str = line[6:11].strip()
+            try:
+                serial = int(serial_str)
+                if serial > last_atom_serial:
+                    last_atom_serial = serial
+                    last_protein_atom_line = line
+            except ValueError:
+                continue
 
     has_ter = any(line_str.startswith("TER") for line_str in lines)
     if not has_ter and last_protein_atom_line is not None:
@@ -1730,20 +1688,35 @@ def _assemble_output(
             f"{ter_chain_id: <1}{ter_res_num: >4}"
         ).ljust(80)
 
-        insert_lines = atomic_and_ter_content.strip().splitlines()
-        last_atom_idx = max(
-            i for i, line_str in enumerate(insert_lines) if line_str.startswith("ATOM")
-        )
-        insert_lines.insert(last_atom_idx + 1, ter_record)
-        atomic_and_ter_content = "\n".join(insert_lines) + "\n"
+        # Standard insertion after last ATOM
+        last_atom_idx = -1
+        for idx, line_str in enumerate(lines):
+            if line_str.startswith("ATOM"):
+                last_atom_idx = idx
+
+        if last_atom_idx != -1:
+            lines.insert(last_atom_idx + 1, ter_record)
+            atomic_and_ter_content = "\n".join(lines) + "\n"
 
     padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]
     final_atomic_content_block = "\n".join(padded_lines).strip()
 
-    # ── Step 5: Connectivity (CONECT & SSBOND) ─────────────────────────────
-    # EDUCATIONAL NOTE - Connectivity (CONECT & SSBOND):
-    # Generate records for cyclic peptides and disulfide bonds.
-    # SSBOND records specifically annotate covalent sulfur-sulfur bridges.
+    # Connectivity (CONECT & SSBOND)
+    n_term_serial = None
+    c_term_serial = None
+    sg_serials: dict[int, int] = {}
+    for i in range(peptide.array_length()):
+        res_num = peptide.res_id[i]
+        atom_name = peptide.atom_name[i]
+        serial = peptide.atom_id[i]
+        if cyclic:
+            if res_num == 1 and atom_name == "N":
+                n_term_serial = serial
+            if res_num == max_protein_res_id and atom_name == "C":
+                c_term_serial = serial
+        if (peptide.res_name[i] == "CYS" or peptide.res_name[i] == "CYX") and atom_name == "SG":
+            sg_serials[res_num] = serial
+
     conect_records = []
     if cyclic and n_term_serial and c_term_serial:
         conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
