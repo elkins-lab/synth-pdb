@@ -2215,7 +2215,8 @@ class PeptideResult:
         an mmCIF does not lose scientific metadata (like occupancies or
         residue numbering) which often happens with simple text-to-text
         converters. This architecture is future-proofed for the PDBx transition
-        by maintaining scientific fidelity at the AtomArray level.
+        by maintaining scientific fidelity at the AtomArray level, preserving
+        all biophysical annotations during format translation.
 
         """
         if target_format == self.format:
