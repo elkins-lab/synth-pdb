@@ -13,9 +13,24 @@ logger = logging.getLogger(__name__)
 
 
 class DecoyGenerator:
-    """Generates ensembles of protein structures (decoys) with specific properties."""
+    """Generates ensembles of protein structures (decoys) with specific properties.
+
+    BIOPHYSICAL RATIONALE:
+    Decoy generation is a cornerstone of structural biology validation. By creating
+    a large population of non-native but physically plausible structures, we can
+    statistically evaluate the energy gap between the true native state and the
+    conformational noise. In the context of synth-pdb, these decoys serve as
+    stress-tests for NMR predictors, GNN scoring functions, and docking pipelines.
+
+    TECHNICAL ARCHITECTURE:
+    This class orchestrates multiple calls to the NeRF generator, applying
+    stochastic perturbations (drift) and threading logic to create structural
+    diversity. It implements the Kabsch algorithm for optimal superposition,
+    allowing for precise RMSD-based filtering of the resulting ensemble.
+    """
 
     def __init__(self) -> None:
+        """Initialize the decoy generator engine."""
         pass
 
     def generate_ensemble(

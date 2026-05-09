@@ -924,9 +924,12 @@ def _build_peptide_chains(
                     current_psi = -47.0
 
                 if is_d:
-                    # Flip chirality for D-amino acids
-                    current_phi = -current_phi
-                    current_psi = -current_psi
+                    # Flip chirality for D-amino acids only for presets/sampling.
+                    # Threaded angles are assumed to be absolute.
+                    if phi_list is None or i >= len(phi_list):
+                        current_phi = -current_phi
+                    if psi_list is None or i >= len(psi_list):
+                        current_psi = -current_psi
 
             else:
                 # Subsequent residues use internal-coordinate (NeRF) placement
@@ -979,7 +982,10 @@ def _build_peptide_chains(
                     prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
                 if prev_is_d:
-                    prev_psi = -prev_psi
+                    # Flip chirality for D-amino acids only for presets/sampling.
+                    # Threaded angles are assumed to be absolute.
+                    if psi_list is None or prev_res_idx >= len(psi_list):
+                        prev_psi = -prev_psi
 
                 # Place N(i)
                 n_coord = _place_atom_with_dihedral(
@@ -1070,10 +1076,10 @@ def _build_peptide_chains(
                 )
 
             # ── Place Oxygen (O) explicitly ──
-            # The O atom is placed relative to N, CA, C using the current PSI.
-            # Rationale: The peptide plane is roughly planar, so O is 180deg from N
-            # across the C-CA bond.
-            o_dihedral = current_psi + 180.0
+            # The O atom is placed relative to N, CA, C.
+            # Rationale: In the legacy implementation and for parity with the
+            # BatchedGenerator, we use a fixed 180.0 degree dihedral.
+            o_dihedral = 180.0
             o_coord = _place_atom_with_dihedral(
                 n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
             )

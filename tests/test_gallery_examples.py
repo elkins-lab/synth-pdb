@@ -94,6 +94,8 @@ class TestGalleryExamples:
             "random",
             "--metal-ions",
             "auto",
+            "--seed",
+            "42",
             "--minimize",
             "--output",
             str(output_file),
