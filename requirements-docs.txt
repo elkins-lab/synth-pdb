@@ -3,6 +3,6 @@ mkdocs-material>=9.5.0
 mkdocstrings[python]>=0.24.0
 mkdocs-jupyter==0.24.7
 nbconvert==7.17.1
-mistune<3.0
+mistune>=3.2.1
 mkdocs-gallery>=0.10.0
 pymdown-extensions>=10.7
