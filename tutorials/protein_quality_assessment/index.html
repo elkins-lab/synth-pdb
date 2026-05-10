@@ -2242,34 +2242,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../modern_formats_lab/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    📦 Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../ubiquitin_chemical_shift_validation/" class="md-nav__link">
         
   
@@ -5470,48 +5442,30 @@ print("📦 All imports successful!")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate a Good Structure (with minimization)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">IS_CI</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'GITHUB_ACTIONS'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'true'</span>
-<span class="n">do_minimize</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">IS_CI</span>
-
-<span class="k">if</span> <span class="n">IS_CI</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 [CI MODE] Generating GOOD structure (Skipping minimization for speed)..."</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating GOOD structure (with energy minimization)..."</span><span class="p">)</span>
-
-<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"MKFLKFSLLTAVLLSVVFAFSSCGDDDDAK"</span>
-<span class="n">structure_def</span> <span class="o">=</span> <span class="s2">"1-10:alpha,11-20:beta,21-30:random"</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating GOOD structure (with energy minimization)..."</span><span class="p">)</span>
+<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"MKFLKFSLLTAVLLSVVFAFSSCGDDDDAKAAAKAAAKAAAKEAAAKEAAAKA"</span>
+<span class="n">structure_def</span> <span class="o">=</span> <span class="s2">"1-10:alpha,11-20:beta,21-25:random,26-35:alpha,36-45:beta,46-53:alpha"</span>
 
 <span class="n">good_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
     <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="n">do_minimize</span><span class="p">,</span>  <span class="c1"># KEY: Energy minimization ON (unless in CI)</span>
-    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># KEY: Energy minimization ON</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Good structure ready!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">good_pdb</span><span class="p">)</span><span class="si">}</span><span class="s2"> characters"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Generate a Good Structure (with minimization)
-import os
-IS_CI = os.getenv('GITHUB_ACTIONS') == 'true'
-do_minimize = not IS_CI
-
-if IS_CI:
-    print("🧬 [CI MODE] Generating GOOD structure (Skipping minimization for speed)...")
-else:
-    print("🧬 Generating GOOD structure (with energy minimization)...")
-
-sequence = "MKFLKFSLLTAVLLSVVFAFSSCGDDDDAK"
-structure_def = "1-10:alpha,11-20:beta,21-30:random"
+print("🧬 Generating GOOD structure (with energy minimization)...")
+sequence = "MKFLKFSLLTAVLLSVVFAFSSCGDDDDAKAAAKAAAKAAAKEAAAKEAAAKA"
+structure_def = "1-10:alpha,11-20:beta,21-25:random,26-35:alpha,36-45:beta,46-53:alpha"
 
 good_pdb = generate_pdb_content(
     sequence_str=sequence,
     structure=structure_def,
     optimize_sidechains=True,
-    minimize_energy=do_minimize,  # KEY: Energy minimization ON (unless in CI)
-    minimization_max_iter=200
+    minimize_energy=True  # KEY: Energy minimization ON
 )
 
 print("✅ Good structure ready!")
@@ -6406,26 +6360,7 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_scorecard</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">pdb_content</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Run get_quality_report() and render a pass/fail scorecard."""</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">PDBValidator</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
-    
-    <span class="c1"># CI Optimization: Skip energy calc if in CI to prevent timeouts</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'GITHUB_ACTIONS'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'true'</span><span class="p">:</span>
-        <span class="c1"># Use cached stats but mock the expensive parts if needed</span>
-        <span class="c1"># Actually, get_quality_report() is the one that's slow.</span>
-        <span class="c1"># We'll just run the basics.</span>
-        <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">"geometric_z_scores"</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get_geometric_z_scores</span><span class="p">(),</span>
-            <span class="s2">"ramachandran_stats"</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get_ramachandran_statistics</span><span class="p">(),</span>
-            <span class="s2">"rotamer_stats"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"favored_rotamers_pct"</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">},</span>
-            <span class="s2">"potential_energy_kj_mol"</span><span class="p">:</span> <span class="mf">5000.0</span><span class="p">,</span>
-            <span class="s2">"is_physically_plausible"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">"hydrophobic_burial_ratio"</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
-            <span class="s2">"is_biophysically_plausible"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s2">"is_overall_scientifically_defensible"</span><span class="p">:</span> <span class="kc">True</span>
-        <span class="p">}</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️  [CI MODE] Skipping full energy/SASA validation for speed."</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">report</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_quality_report</span><span class="p">()</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_quality_report</span><span class="p">()</span>
 
     <span class="n">criteria</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">"Bond Z-score &lt; 3.0"</span><span class="p">,</span>
@@ -6475,26 +6410,7 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
 <div class="clipboard-copy-txt" id="cell-12">def print_scorecard(label, pdb_content):
     """Run get_quality_report() and render a pass/fail scorecard."""
     v = PDBValidator(pdb_content)
-    
-    # CI Optimization: Skip energy calc if in CI to prevent timeouts
-    import os
-    if os.getenv('GITHUB_ACTIONS') == 'true':
-        # Use cached stats but mock the expensive parts if needed
-        # Actually, get_quality_report() is the one that's slow.
-        # We'll just run the basics.
-        report = {
-            "geometric_z_scores": v.get_geometric_z_scores(),
-            "ramachandran_stats": v.get_ramachandran_statistics(),
-            "rotamer_stats": {"favored_rotamers_pct": 90.0},
-            "potential_energy_kj_mol": 5000.0,
-            "is_physically_plausible": True,
-            "hydrophobic_burial_ratio": 0.85,
-            "is_biophysically_plausible": True,
-            "is_overall_scientifically_defensible": True
-        }
-        print("⚠️  [CI MODE] Skipping full energy/SASA validation for speed.")
-    else:
-        report = v.get_quality_report()
+    report = v.get_quality_report()
 
     criteria = [
         ("Bond Z-score &lt; 3.0",

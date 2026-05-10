@@ -73,11 +73,6 @@ Sorted by **High-Value / Low-Risk** first.
 *   **Key Features**: `--drift`, `dihedral_backbone`, and `BatchedGenerator`.
 *   **Value**: Useful for researchers testing the robustness of their GNNs (Graph Neural Networks) to small backbone perturbations.
 
-### 6. PDBx/mmCIF & BinaryCIF Support 📦 (High Value / Low Risk)
-*   **Concept**: Transition from legacy 80-column PDB format to modern mmCIF and binary-compressed BCIF.
-*   **Why**: Required for structures > 99k atoms, 12-character PDB IDs, and high-performance visualization in Mol*.
-*   **Implementation**: Add `--format [pdb|cif|bcif]` to the CLI and integrate Biotite's `PDBxFile` API.
-
 ---
 
 ## 📉 Long-Term / High Risk
