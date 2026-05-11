@@ -69,7 +69,7 @@ class PDBValidator:
             self.atoms = parsed_atoms
             self.pdb_content = None  # Lazily generated if needed
         else:
-            raise ValueError("Either pdb_content, AtomArray, or parsed_atoms must be provided.")
+            raise ValueError("Either pdb_content or parsed_atoms must be provided")
 
         self.grouped_atoms = self._group_atoms_by_residue()
         self.sequences_by_chain = self._get_sequences_by_chain()

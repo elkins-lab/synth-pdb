@@ -364,7 +364,7 @@ class EnergyMinimizer:
 
     def add_hydrogens_and_minimize(
         self,
-        pdb_file_path: str,
+        input_path: str,
         output_path: str,
         max_iterations: int = 0,
         tolerance: float = 10.0,
@@ -373,6 +373,12 @@ class EnergyMinimizer:
         coordination: list | None = None,
     ) -> bool:
         """Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
+
+        TECHNICAL NOTE - Format Awareness:
+        ----------------------------------
+        This method automatically detects the input format by file extension.
+        If '.cif' is provided, it uses OpenMM's PDBxFile parser to handle massive
+        protein structures that exceed PDB limits. Output will match the input format.
 
         ### Why Add Hydrogens?
         X-ray crystallography often doesn't resolve hydrogen atoms because they have very few electrons.
@@ -386,8 +392,8 @@ class EnergyMinimizer:
         We use `app.Modeller` to "guess" the standard positions of hydrogens at specific pH (7.0).
 
         Args:
-            pdb_file_path: Input PDB path.
-            output_path: Output PDB path.
+            input_path: Input file path (PDB or mmCIF).
+            output_path: Output file path (PDB or mmCIF).
             max_iterations: Limit steps (0 = until convergence).
             tolerance: Target energy convergence threshold (kJ/mol).
             cyclic: Whether to apply head-to-tail peptide bond constraints.
@@ -402,7 +408,7 @@ class EnergyMinimizer:
             logger.error("Cannot add hydrogens: OpenMM not found.")
             return False
         res = self._run_simulation(
-            pdb_file_path,
+            input_path,
             output_path,
             add_hydrogens=True,
             max_iterations=max_iterations,
@@ -567,6 +573,8 @@ class EnergyMinimizer:
         import os
         import tempfile
 
+        is_cif = input_path.lower().endswith(".cif")
+
         # EDUCATIONAL NOTE - PDB PRE-PROCESSING (OpenMM Template Fix):
         # -----------------------------------------------------------
         # OpenMM's standard forcefields (amber14-all) are highly optimized for wild-type
@@ -614,6 +622,24 @@ class EnergyMinimizer:
         last_res_key = None
         first_res_id = None
         last_res_id = None
+
+        if is_cif:
+            # TECHNICAL NOTE - mmCIF Loading:
+            # We use OpenMM's PDBxFile parser for robust handling of massive proteins.
+            pdbx = app.PDBxFile(input_path)
+            topology = pdbx.topology
+            positions = pdbx.positions
+
+            # Pre-populate metadata for restoration
+            for res in topology.residues():
+                res_key = (str(res.id).strip(), res.chain.id)
+                original_metadata[res_key] = {"name": res.name, "id": res.id}
+
+                # Rename to standard counterparts in topology object
+                if res.name in ptm_map:
+                    res.name = ptm_map[res.name]
+
+            return topology, positions, [], original_metadata
 
         if os.path.exists(input_path):
             with open(input_path) as f:
@@ -1666,68 +1692,75 @@ class EnergyMinimizer:
             # (and visualizers like PyMOL) know that the SG atoms are covalently linked,
             # rather than just displaying them as physically close.
 
-            # Build PDB buffer
-            # EDUCATIONAL NOTE - PDB Atom Sorting:
-            # ------------------------------------
-            # The Protein Data Bank (PDB) format is heavily standardized. Many parsers
-            # will crash if atoms are out of order, or if CONECT records reference
-            # non-existent serial numbers. We use a precise formatting string to ensure
-            # the output precisely matches the PDB v3.3 spec.
+            # Build output buffer
+            is_cif = output_path.lower().endswith(".cif")
             pdb_buffer = _io.StringIO()
-            app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
-            pdb_lines = pdb_buffer.getvalue().split("\n")
+            if is_cif:
+                app.PDBxFile.writeFile(final_topology, final_positions, pdb_buffer)
+                with open(output_path, "w") as f:
+                    f.write(pdb_buffer.getvalue())
+            else:
+                # EDUCATIONAL NOTE - PDB Atom Sorting:
+                # ------------------------------------
+                # The Protein Data Bank (PDB) format is heavily standardized. Many parsers
+                # will crash if atoms are out of order, or if CONECT records reference
+                # non-existent serial numbers. We use a precise formatting string to ensure
+                # the output precisely matches the PDB v3.3 spec.
+                app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
+                pdb_lines = pdb_buffer.getvalue().split("\n")
 
-            # EDUCATIONAL NOTE - CONECT Records & Visualization:
-            # CONECT records are critical for molecular viewers (PyMOL, Chimera)
-            # to draw covalent bonds that OpenMM's PDB writer may not emit
-            # automatically for non-standard connections (SS bonds, metal–ligand).
-            # We enumerate them from the final topology and write both directions.
-            # Force CONECT for disulfides
-            extra_conects = []
-            for bond in final_topology.bonds():
-                a1, a2 = bond.atom1, bond.atom2
-                if a1.name == "SG" and a2.name == "SG":
-                    extra_conects.append((a1.index + 1, a2.index + 1))
-            for id1, id2 in coordination_restraints:
-                extra_conects.append((id1 + 1, id2 + 1))
+                # EDUCATIONAL NOTE - CONECT Records & Visualization:
+                # CONECT records are critical for molecular viewers (PyMOL, Chimera)
+                # to draw covalent bonds that OpenMM's PDB writer may not emit
+                # automatically for non-standard connections (SS bonds, metal–ligand).
+                # We enumerate them from the final topology and write both directions.
+                # Force CONECT for disulfides
+                extra_conects = []
+                for bond in final_topology.bonds():
+                    a1, a2 = bond.atom1, bond.atom2
+                    if a1.name == "SG" and a2.name == "SG":
+                        extra_conects.append((a1.index + 1, a2.index + 1))
+                for id1, id2 in coordination_restraints:
+                    extra_conects.append((id1 + 1, id2 + 1))
 
-            final_lines = []
-            for line in pdb_lines:
-                if line.startswith("END") or line.startswith("CONECT"):
-                    continue
-                if line.strip():
-                    final_lines.append(line)
+                final_lines = []
+                for line in pdb_lines:
+                    if line.startswith("END") or line.startswith("CONECT"):
+                        continue
+                    if line.strip():
+                        final_lines.append(line)
 
-            for ci1, ci2 in extra_conects:
-                final_lines.append(f"CONECT{ci1:5d}{ci2:5d}")
-                final_lines.append(f"CONECT{ci2:5d}{ci1:5d}")
+                for ci1, ci2 in extra_conects:
+                    final_lines.append(f"CONECT{ci1:5d}{ci2:5d}")
+                    final_lines.append(f"CONECT{ci2:5d}{ci1:5d}")
 
-            # Restore SSBOND records (after HEADER/TITLE)
-            if added_bonds:
-                insert_idx = 0
-                for idx, line in enumerate(final_lines):
-                    if line.startswith(("HEADER", "TITLE", "COMPND")):
-                        insert_idx = idx + 1
-                for s, (id1, id2) in enumerate(added_bonds, 1):
-                    final_lines.insert(
-                        insert_idx,
-                        f"SSBOND{s:4d} CYS A {int(id1):4d}    "
-                        f"CYS A {int(id2):4d}                          ",
-                    )
+                # Restore SSBOND records (after HEADER/TITLE)
+                if added_bonds:
+                    insert_idx = 0
+                    for idx, line in enumerate(final_lines):
+                        if line.startswith(("HEADER", "TITLE", "COMPND")):
+                            insert_idx = idx + 1
+                    for s, (id1, id2) in enumerate(added_bonds, 1):
+                        final_lines.insert(
+                            insert_idx,
+                            f"SSBOND{s:4d} CYS A {int(id1):4d}    "
+                            f"CYS A {int(id2):4d}                          ",
+                        )
 
-            # EDUCATIONAL NOTE - HETATM Restoration:
-            # Metal ions were stripped before addHydrogens() (they crash it).
-            # Re-append them verbatim at the end of the PDB file so downstream
-            # tools (viewers, NMR shift predictors) can see them correctly.
-            # Restore stripped ions
-            if hetatm_lines:
-                for line in hetatm_lines:
-                    res_name = line[17:20].strip().upper()
-                    logger.debug(f"Appending restored HETATM: {res_name}")
-                    final_lines.append(line.strip())
+                # EDUCATIONAL NOTE - HETATM Restoration:
+                # Metal ions were stripped before addHydrogens() (they crash it).
+                # Re-append them verbatim at the end of the PDB file so downstream
+                # tools (viewers, NMR shift predictors) can see them correctly.
+                # Restore stripped ions
+                if hetatm_lines:
+                    for line in hetatm_lines:
+                        res_name = line[17:20].strip().upper()
+                        logger.debug(f"Appending restored HETATM: {res_name}")
+                        final_lines.append(line.strip())
 
-            final_lines.append("END")
-            f.write("\n".join(final_lines) + "\n")
+                final_lines.append("END")
+                with open(output_path, "w") as f:
+                    f.write("\n".join(final_lines) + "\n")
 
         # Explicitly delete OpenMM State to free memory
         del state

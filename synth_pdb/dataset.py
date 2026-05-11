@@ -143,9 +143,14 @@ class DatasetGenerator:
         self.max_length = max_length
         self.train_ratio = train_ratio
         self.max_workers = max_workers
+        self.seed = seed
 
+        # EDUCATIONAL NOTE - Local Randomness:
+        # We use a local random.Random instance instead of the global random module.
+        # This ensures that dataset generation is deterministic and does not
+        # interfere with (or be affected by) other parts of the application.
+        self.rng = random.Random(seed)
         if seed is not None:
-            random.seed(seed)
             np.random.seed(seed)
 
         self.dataset_format = dataset_format.lower() if dataset_format else "pdb"
@@ -170,13 +175,55 @@ class DatasetGenerator:
                         ["id", "length", "conformation", "split", "pdb_path", "cmap_path"]
                     )
 
+    def _write_result_to_manifest(self, writer: Any, result: dict[str, Any]) -> bool:
+        """Helper to write a single task result to the manifest CSV.
+
+        Args:
+            writer: CSV writer object.
+            result: Task result dictionary.
+
+        Returns:
+            bool: True if result was successful and written, False otherwise.
+        """
+        if not result["success"]:
+            logger.error(
+                f"Failed to generate {result.get('sample_id', 'unknown')}: {result.get('error')}"
+            )
+            return False
+
+        if self.dataset_format == "npz":
+            writer.writerow(
+                [
+                    result["sample_id"],
+                    result["length"],
+                    result["conformation"],
+                    result["split"],
+                    result["npz_path"],
+                ]
+            )
+        else:
+            writer.writerow(
+                [
+                    result["sample_id"],
+                    result["length"],
+                    result["conformation"],
+                    result["split"],
+                    result["pdb_path"],
+                    result["cmap_path"],
+                ]
+            )
+        return True
+
     def generate(self) -> None:
         """Run the generation loop using multiprocessing."""
         import multiprocessing
 
         # Determine CPUs
         if self.max_workers is None:
-            self.max_workers = max(1, multiprocessing.cpu_count() - 1)
+            try:
+                self.max_workers = max(1, multiprocessing.cpu_count() - 1)
+            except NotImplementedError:
+                self.max_workers = 1
 
         logger.info(
             f"Starting bulk generation of {self.num_samples} samples using {self.max_workers} cores..."
@@ -191,14 +238,15 @@ class DatasetGenerator:
             sample_id = f"synth_{i:06d}"
 
             # 1. Randomize Parameters (in main process for determinism with seed)
-            length = random.randint(self.min_length, self.max_length)
+            # Use local RNG for robustness
+            length = self.rng.randint(self.min_length, self.max_length)
 
             # weighted choice for conformation complexity
-            conf_type = random.choices(
+            conf_type = self.rng.choices(
                 ["alpha", "beta", "random", "ppii", "extended"], weights=[0.3, 0.3, 0.3, 0.05, 0.05]
             )[0]
 
-            is_train = random.random() < self.train_ratio
+            is_train = self.rng.random() < self.train_ratio
             split = "train" if is_train else "test"
 
             # Pass format-specific args
@@ -219,52 +267,71 @@ class DatasetGenerator:
         with open(manifest_path, "a", newline="") as f:
             writer = csv.writer(f)
 
-            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_workers) as executor:
-                # Submit all tasks
-                future_to_id = {executor.submit(task_func, task): task[0] for task in tasks}
-
-                for future in concurrent.futures.as_completed(future_to_id):
-                    sample_id = future_to_id[future]
+            # EDUCATIONAL NOTE - Sequential Fallback:
+            # Multi-processing can fail in restricted environments (e.g., Apple sandbox,
+            # AWS Lambda, or some CI runners) due to 'PermissionError' on semaphores.
+            # We provide a robust fallback to sequential execution if max_workers=1
+            # or if the executor fails to initialize.
+            if self.max_workers == 1:
+                logger.info("Running generation sequentially (max_workers=1).")
+                for task in tasks:
                     try:
-                        result = future.result()
-                        if result["success"]:
-                            if self.dataset_format == "npz":
-                                writer.writerow(
-                                    [
-                                        result["sample_id"],
-                                        result["length"],
-                                        result["conformation"],
-                                        result["split"],
-                                        result["npz_path"],
-                                    ]
-                                )
-                            else:
-                                writer.writerow(
-                                    [
-                                        result["sample_id"],
-                                        result["length"],
-                                        result["conformation"],
-                                        result["split"],
-                                        result["pdb_path"],
-                                        result["cmap_path"],
-                                    ]
-                                )
+                        result = task_func(task)
+                        if self._write_result_to_manifest(writer, result):
                             completed_count += 1
-                        else:
-                            logger.error(f"Failed to generate {sample_id}: {result.get('error')}")
-
-                        # Logging progress
-                        if completed_count % 100 == 0:
-                            logger.info(
-                                f"Progress: {completed_count}/{self.num_samples} ({completed_count / self.num_samples * 100:.1f}%)"
-                            )
-
                     except Exception as exc:
-                        logger.error(f"Generate task generated an exception: {exc}")
+                        logger.error(f"Generate task {task[0]} generated an exception: {exc}")
+            else:
+                try:
+                    with concurrent.futures.ProcessPoolExecutor(
+                        max_workers=self.max_workers
+                    ) as executor:
+                        # Submit all tasks
+                        future_to_id = {executor.submit(task_func, task): task[0] for task in tasks}
+
+                        for future in concurrent.futures.as_completed(future_to_id):
+                            try:
+                                result = future.result()
+                                if self._write_result_to_manifest(writer, result):
+                                    completed_count += 1
+
+                                # Logging progress
+                                if completed_count % 100 == 0:
+                                    logger.info(
+                                        f"Progress: {completed_count}/{self.num_samples} ({completed_count / self.num_samples * 100:.1f}%)"
+                                    )
+
+                            except Exception as exc:
+                                logger.error(f"Generate task generated an exception: {exc}")
+                except (PermissionError, RuntimeError) as e:
+                    logger.warning(
+                        f"Multiprocessing initialization failed ({e}). Falling back to sequential."
+                    )
+                    # Re-run sequentially
+                    for task in tasks:
+                        try:
+                            result = task_func(task)
+                            if self._write_result_to_manifest(writer, result):
+                                completed_count += 1
+                        except Exception as exc:
+                            logger.error(f"Fallback generate task {task[0]} failed: {exc}")
 
         logger.info(
             f"Bulk generation complete. Generated {completed_count}/{self.num_samples} samples."
         )
+
+        # EDUCATIONAL NOTE - Manifest Determinism:
+        # Parallel execution means samples finish in non-deterministic order.
+        # We sort the manifest at the end to ensure reproducibility of the CSV file itself.
+        try:
+            import pandas as pd
+
+            df = pd.read_csv(manifest_path)
+            df = df.sort_values("id")
+            df.to_csv(manifest_path, index=False)
+            logger.debug("Sorted dataset manifest for determinism.")
+        except Exception as e:
+            logger.warning(f"Could not sort manifest: {e}")
 
 
 def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
@@ -386,3 +453,41 @@ def _generate_single_sample_npz_task(args: tuple) -> dict[str, Any]:
     except Exception as e:
         logger.error(f"Error in {sample_id}: {e}")
         return {"success": False, "sample_id": sample_id, "error": str(e)}
+
+
+def generate_balanced_dataset(
+    num_samples: int = 100,
+    min_length: int = 10,
+    max_length: int = 50,
+    output_dir: str = "synth_dataset",
+    train_ratio: float = 0.8,
+    output_format: str = "pdb",
+    seed: int | None = None,
+) -> None:
+    """Wrapper function to generate a balanced dataset using DatasetGenerator.
+
+    TECHNICAL NOTE - Scientific Reproducibility:
+    --------------------------------------------
+    By passing a seed to this function, we ensure that the entire dataset
+    (sequences, conformations, and splits) is generated deterministically.
+    This is essential for reproducible research and debugging AI models.
+
+    Args:
+        num_samples: Total number of structures to generate.
+        min_length: Minimum sequence length.
+        max_length: Maximum sequence length.
+        output_dir: Directory where the dataset will be saved.
+        train_ratio: Fraction of data assigned to the training set (0.0-1.0).
+        output_format: Structure file format ('pdb', 'cif', 'bcif').
+        seed: Random seed for reproducibility.
+    """
+    generator = DatasetGenerator(
+        output_dir=output_dir,
+        num_samples=num_samples,
+        min_length=min_length,
+        max_length=max_length,
+        train_ratio=train_ratio,
+        dataset_format=output_format,
+        seed=seed,
+    )
+    generator.generate()

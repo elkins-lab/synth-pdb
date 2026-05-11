@@ -57,6 +57,45 @@ class TestOutputFormats(unittest.TestCase):
         bcif_content = res.get_content("bcif")
         self.assertIsInstance(bcif_content, bytes)
 
+    def test_bcif_after_minimization(self):
+        """Verify that BinaryCIF output works correctly after energy minimization."""
+        content = generate_pdb_content(
+            sequence_str="ALA-GLY", minimize_energy=True, output_format="bcif"
+        )
+        self.assertIsInstance(content, bytes)
+
+        # Re-parse
+        res = PeptideResult(content, format="bcif")
+        self.assertTrue(res.structure.array_length() >= 17)  # ALA + GLY + protons
+        self.assertTrue(np.any(res.structure.b_factor > 0))
+
+    def test_massive_coordinate_overflow(self):
+        """Verify that mmCIF/BCIF handle coordinates > 1000A (PDB overflow)."""
+        # Create a tiny AtomArray but with massive coordinates
+        array = struc.AtomArray(1)
+        array.res_name = np.array(["ALA"])
+        array.atom_name = np.array(["CA"])
+        array.res_id = np.array([1])
+        array.chain_id = np.array(["A"])
+        array.coord = np.array([[1234.567, 2345.678, 3456.789]])
+        array.hetero = np.array([False])
+        array.element = np.array(["C"])
+
+        # Directly use PeptideResult with the array
+        res = PeptideResult("DUMMY", format="pdb")
+        res._structure = array
+
+        # mmCIF should work and contain the full coordinate
+        cif = res.get_content("cif")
+        self.assertIn("1234.567", cif)
+        self.assertIn("2345.678", cif)
+        self.assertIn("3456.789", cif)
+
+        # BinaryCIF should work and be re-parsable
+        bcif = res.get_content("bcif")
+        res_back = PeptideResult(bcif, format="bcif")
+        np.testing.assert_allclose(res_back.structure.coord, array.coord)
+
 
 if __name__ == "__main__":
     unittest.main()

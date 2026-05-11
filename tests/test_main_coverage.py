@@ -237,8 +237,10 @@ def test_main_rmsd_range_invalid():
             ["synth-pdb", "--mode", "decoys", "--length", "2", "--rmsd-range", "invalid"],
         ),
         patch("synth_pdb.main.DecoyGenerator.generate_ensemble"),
+        patch("sys.exit") as mock_exit,
     ):
         main()
+        mock_exit.assert_called_with(1)
 
 
 def test_main_structure_highlight_failure():

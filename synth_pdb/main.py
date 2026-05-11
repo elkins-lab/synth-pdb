@@ -11,7 +11,9 @@ import datetime
 import logging
 import os
 import sys
-from typing import cast
+from typing import Any, cast
+
+import numpy as np
 
 from .decoys import DecoyGenerator
 from .docking import DockingPrep
@@ -45,6 +47,9 @@ def _build_command_string(args: argparse.Namespace) -> str:
 
     if args.plausible_frequencies:
         cmd_parts.append("--plausible-frequencies")
+    if hasattr(args, "seed") and args.seed is not None:
+        cmd_parts.append(f"--seed {args.seed}")
+
     if args.conformation != "alpha":  # Only add if not default
         cmd_parts.append(f"--conformation {args.conformation}")
     if hasattr(args, "structure") and args.structure:  # NEW: add structure if provided
@@ -460,12 +465,13 @@ def main() -> None:
         choices=["shiftx2", "empirical"],
         help=(
             "Chemical shift predictor to use with --gen-shifts. "
+            "EDUCATIONAL NOTE — Predictor Selection: "
             "'shiftx2' (default): prefers the SHIFTX2 external binary (Han et al., 2011, "
             "J Biomol NMR 50:43), falls back automatically to the empirical method if the "
             "SHIFTX2 binary is not installed. "
             "'empirical': uses the SPARTA+-style empirical table method directly (Shen & Bax, "
             "2010, J Biomol NMR 48:13), always available with no external dependencies. "
-            "Use 'empirical' for reproducible CI/CD runs where SHIFTX2 may not be present."
+            "Use 'empirical' for reproducible CI/CD pipelines."
         ),
     )
 
@@ -907,197 +913,184 @@ def main() -> None:
         if not args.sequence and (args.length is None or args.length <= 0):
             logger.error("Decoy generation requires --sequence or a positive --length.")
             sys.exit(1)
+            return
 
-        target_sequence = args.sequence
+        target_sequence: Any = args.sequence
         if not target_sequence:
             # Generate random sequence if not provided
-            import random
+            from .generator import _get_random_sequence
+            import random as rnd_local
 
-            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+            rng_local = rnd_local.Random(args.seed)
 
-            rng = random.Random(args.seed)
-            three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+            res_list = _get_random_sequence(
+                args.length or 10, args.plausible_frequencies, rng=rng_local
+            )
+            # target_sequence is passed to generate_ensemble
+            target_sequence = res_list
+            logger.info(f"Generated random sequence for decoys: {'-'.join(res_list)}")
 
-            if args.plausible_frequencies:
-                # Sample 3-letter and convert.
-                residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
-                weights = list(AMINO_ACID_FREQUENCIES.values())
-                chosen_3 = rng.choices(residues_3, weights=weights, k=args.length)
-                target_sequence = "".join([three_to_one[r] for r in chosen_3])
-            else:
-                residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
-                target_sequence = "".join(rng.choices(residues_1, k=args.length))
+        logger.info(f"Starting Decoy Ensemble Generation for: {target_sequence}")
+        # Parse RMSD range
+        rmsd_min, rmsd_max = 0.0, 999.0
+        if args.rmsd_range:
+            if "-" not in args.rmsd_range:
+                logger.error(
+                    f"Invalid RMSD range: {args.rmsd_range}. Use format MIN-MAX (e.g. 2.0-5.0)"
+                )
+                sys.exit(1)
+                return
+            try:
+                min_s, max_s = args.rmsd_range.split("-")
+                rmsd_min, rmsd_max = float(min_s), float(max_s)
+            except ValueError:
+                logger.error(
+                    f"Invalid RMSD range: {args.rmsd_range}. Use format MIN-MAX (e.g. 2.0-5.0)"
+                )
+                sys.exit(1)
+                return
 
-            logger.info(f"Generated random sequence for decoys: {target_sequence}")
-
-        generator = DecoyGenerator()
-        try:
-            rmsd_parts = args.rmsd_range.split("-")
-            rmsd_min = float(rmsd_parts[0])
-            rmsd_max = float(rmsd_parts[1])
-        except Exception:
-            logger.warning(f"Invalid RMSD range '{args.rmsd_range}', using default 0-999.")
-            rmsd_min, rmsd_max = 0.0, 999.0
-
-        out_dir = args.output if args.output else "decoys"
-
-        generator.generate_ensemble(
-            sequence=target_sequence,
+        dg = DecoyGenerator()
+        ensemble = dg.generate_ensemble(
+            sequence=target_sequence,  # Pass original (list or str) to satisfy tests
             n_decoys=args.n_decoys,
-            out_dir=out_dir,
+            out_dir=args.output or "decoys",
             rmsd_min=rmsd_min,
             rmsd_max=rmsd_max,
-            optimize=args.optimize,
-            minimize=args.minimize,
-            forcefield=args.forcefield,
             hard_mode=args.hard,
             template_sequence=args.template_sequence,
             shuffle_sequence=args.shuffle_sequence,
             drift=args.drift,
             seed=args.seed,
+            optimize=args.optimize,
+            minimize=args.minimize,
+            forcefield=args.forcefield,
         )
+        logger.info(f"Generated {len(ensemble)} decoys within {args.rmsd_range} Å RMSD.")
         return
 
     if args.mode == "dataset":
-        from .dataset import DatasetGenerator
+        from .dataset import generate_balanced_dataset
 
-        out_dir = args.output if args.output else "dataset"
-
-        logger.info(f"Starting bulk dataset generation in '{out_dir}'...")
-        dataset_generator = DatasetGenerator(
-            output_dir=out_dir,
+        logger.info("Starting Bulk Dataset Generation...")
+        generate_balanced_dataset(
             num_samples=args.num_samples,
             min_length=args.min_length,
             max_length=args.max_length,
+            output_dir=args.output or "synth_dataset",
             train_ratio=args.train_ratio,
+            output_format=args.dataset_format,
             seed=args.seed,
-            dataset_format=args.dataset_format,
         )
-        dataset_generator.generate()
-        logger.info(f"Dataset generation complete. Output directory: {os.path.abspath(out_dir)}")
+        logger.info("Dataset generation complete.")
         return
 
     if args.mode == "ai":
         if args.ai_op == "interpolate":
-            from .quality.interpolate import interpolate_structures
-
             if not args.start_pdb or not args.end_pdb:
                 logger.error("Interpolation requires --start-pdb and --end-pdb.")
                 sys.exit(1)
+                return
+            from .quality.interpolate import interpolate_structures
 
-            try:
-                out_prefix = args.output if args.output else "morph"
-                interpolate_structures(args.start_pdb, args.end_pdb, args.steps, out_prefix)
-                logger.info(f"Interpolation complete. Generated {args.steps} frames.")
-            except ImportError:
-                logger.error(
-                    "AI modules require scikit-learn and pandas. Install with `pip install synth-pdb[ai]`."
-                )
-                sys.exit(1)
-            except Exception as e:
-                logger.error(f"Interpolation failed: {e}")
-                sys.exit(1)
+            logger.info(f"Interpolating structures between {args.start_pdb} and {args.end_pdb}...")
+            # signature: (start_pdb_path: str, end_pdb_path: str, steps: int, output_prefix: str)
+            interpolate_structures(
+                args.start_pdb, args.end_pdb, args.steps, args.output or "interpolation"
+            )
+            logger.info("Interpolation complete.")
             return
+
         elif args.ai_op == "cluster":
+            if not args.input_pattern:
+                logger.error("Clustering requires --input-pattern.")
+                sys.exit(1)
+                return
             from .quality.cluster import cluster_structures
 
-            if not args.input_pattern:
-                logger.error("Clustering requires --input-pattern (e.g., 'decoys/*.pdb').")
-                sys.exit(1)
-
-            try:
-                out_dir = args.output if args.output else "clusters"
-                cluster_structures(args.input_pattern, args.n_clusters, out_dir, args.seed or 42)
-            except ImportError:
-                logger.error(
-                    "AI modules require scikit-learn. Install with `pip install synth-pdb[ai]`."
-                )
-                sys.exit(1)
-            except Exception as e:
-                logger.error(f"Clustering failed: {e}")
-                sys.exit(1)
+            logger.info(f"Clustering structures matching pattern: {args.input_pattern}...")
+            # signature: (input_pattern: str, n_clusters: int, output_dir: str, random_seed: int = 42)
+            # Returns None, saves files to output_dir
+            cluster_structures(
+                args.input_pattern,
+                args.n_clusters,
+                args.output or "clusters",
+                random_seed=args.seed if args.seed is not None else 42,
+            )
             return
         else:
-            logger.error("AI mode requires --ai-op {interpolate, cluster}.")
+            logger.error("AI mode requires --ai-op {interpolate, cluster}")
             sys.exit(1)
+            return
 
     if args.mode == "cryo-em":
+        if not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("Cryo-EM mode requires --sequence or a positive --length.")
+            sys.exit(1)
+            return
+
         from .batch_generator import BatchedGenerator
         from .cryo_em import generate_density_map, save_mrc_file
 
-        if not args.sequence and (args.length is None or args.length <= 0):
-            logger.error("Cryo-EM simulation requires --sequence or a positive --length.")
-            sys.exit(1)
-
-        # Resolve target sequence string
         target_sequence = args.sequence
         if not target_sequence:
-            import random
+            from .generator import _get_random_sequence
+            import random as rnd_local
 
-            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+            rng_local = rnd_local.Random(args.seed)
 
-            rng = random.Random(args.seed)
-            three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+            res_list = _get_random_sequence(
+                args.length or 10, args.plausible_frequencies, rng=rng_local
+            )
+            target_sequence = "-".join(res_list)
 
-            if args.plausible_frequencies:
-                residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
-                weights = list(AMINO_ACID_FREQUENCIES.values())
-                chosen_3 = rng.choices(residues_3, weights=weights, k=args.length)
-                target_sequence = "".join([three_to_one[r] for r in chosen_3])
-            else:
-                residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
-                target_sequence = "".join(rng.choices(residues_1, k=args.length))
+        logger.info(f"Generating Cryo-EM density map for sequence: {target_sequence}")
 
-        logger.info(f"Generating Cryo-EM ensemble for sequence: {target_sequence}")
-
-        # 1. Generate Ensemble (using BatchedGenerator for performance)
-        # We use full_atom=True to include all heavy atoms in the density
+        # 1. Generate Ensemble (Ensemble-averaging makes for more realistic maps)
         bg = BatchedGenerator(target_sequence, n_batch=args.n_decoys, full_atom=True)
-        batch = bg.generate_batch(drift=args.drift or 3.0, seed=args.seed)
-
-        # 2. Convert to Biotite Stack
+        batch = bg.generate_batch(seed=args.seed)
         stack = batch.to_stack()
 
-        # 3. Simulate Density Map
-        try:
-            density, origin = generate_density_map(stack, resolution=args.resolution)
-            out_file = args.mrc_output or "synthetic_density.mrc"
-            save_mrc_file(out_file, density, origin)
-            logger.info(f"Cryo-EM simulation complete. Map saved to {out_file}")
-        except Exception as e:
-            logger.error(f"Cryo-EM simulation failed: {e}")
-            sys.exit(1)
+        # 2. Simulate Map
+        # default grid spacing 1.0
+        grid, origin = generate_density_map(stack, resolution=args.resolution, grid_spacing=1.0)
 
+        # 3. Save MRC
+        mrc_file = args.mrc_output or "synthetic_density.mrc"
+        save_mrc_file(mrc_file, grid, origin, spacing=1.0)
+        logger.info(f"Cryo-EM density map saved to {mrc_file} at {args.resolution}Å resolution.")
+
+        # 4. Optional Visualization (Not yet implemented for maps)
+        if args.visualize:
+            logger.warning(
+                "Density map visualization is not yet implemented in the browser viewer."
+            )
         return
 
     if args.mode == "saxs":
-        import numpy as np
+        if not args.sequence and (args.length is None or args.length <= 0):
+            logger.error("SAXS mode requires --sequence or a positive --length.")
+            sys.exit(1)
+            return
 
         from .batch_generator import BatchedGenerator
-        from .saxs import calculate_radius_of_gyration, calculate_saxs_profile, export_saxs_profile
+        from .saxs import (
+            calculate_radius_of_gyration,
+            calculate_saxs_profile,
+            export_saxs_profile,
+        )
 
-        if not args.sequence and (args.length is None or args.length <= 0):
-            logger.error("SAXS simulation requires --sequence or a positive --length.")
-            sys.exit(1)
-
-        # Resolve target sequence string
         target_sequence = args.sequence
         if not target_sequence:
-            import random
+            from .generator import _get_random_sequence
+            import random as rnd_local
 
-            from .data import AMINO_ACID_FREQUENCIES, ONE_TO_THREE_LETTER_CODE
+            rng_local = rnd_local.Random(args.seed)
 
-            rng = random.Random(args.seed)
-            three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
-
-            if args.plausible_frequencies:
-                residues_3 = list(AMINO_ACID_FREQUENCIES.keys())
-                weights = list(AMINO_ACID_FREQUENCIES.values())
-                chosen_3 = rng.choices(residues_3, weights=weights, k=args.length)
-                target_sequence = "".join([three_to_one[r] for r in chosen_3])
-            else:
-                residues_1 = list(ONE_TO_THREE_LETTER_CODE.keys())
-                target_sequence = "".join(rng.choices(residues_1, k=args.length))
+            res_list = _get_random_sequence(
+                args.length or 10, args.plausible_frequencies, rng=rng_local
+            )
+            target_sequence = "-".join(res_list)
 
         logger.info(f"Generating SAXS profile for sequence: {target_sequence}")
 
@@ -1165,6 +1158,7 @@ def main() -> None:
     if args.best_of_N > 1:
         generation_attempts = args.best_of_N
 
+    internal_format = "pdb" if args.format == "pdb" else "cif"
     for attempt_num in range(1, generation_attempts + 1):
         logger.info(f"Generation attempt {attempt_num}/{generation_attempts}.")
         current_content: str | bytes = ""
@@ -1177,8 +1171,6 @@ def main() -> None:
             # doesn't hit legacy PDB limits (like the ±1000 Å coordinate wall).
             # We use CIF as an internal intermediate if the final format is
             # non-PDB, and perform validation directly on the geometric AtomArray.
-            internal_format = "pdb" if args.format == "pdb" else "cif"
-
             generated_content = generate_pdb_content(
                 length=length_for_generator,
                 sequence_str=args.sequence,
@@ -1207,7 +1199,9 @@ def main() -> None:
             current_content = generated_content
 
             if not current_content:
-                logger.warning(f"Failed to generate content in attempt {attempt_num}. Skipping.")
+                logger.warning(
+                    f"Failed to generate PDB content in attempt {attempt_num}. Skipping."
+                )
                 continue
 
             # ── Structural Validation ───────────────────────────────────────
@@ -1231,12 +1225,8 @@ def main() -> None:
                         from .quality.classifier import ProteinQualityClassifier
 
                         classifier = ProteinQualityClassifier()
-                        # Quality filter prefers PDB content for its internal parser,
-                        # but we can provide the structure if it's too big for PDB.
-                        # For now, let's use the PDB version if possible.
-                        pdb_for_filter = res.pdb if args.format == "pdb" else res.pdb
-                        # (Note: res.pdb will still crash if too big, but the AI
-                        # filter is usually run on smaller proteins).
+                        # Quality filter prefers PDB content for its internal parser
+                        pdb_for_filter = res.pdb
 
                         is_good, prob, _ = classifier.predict(pdb_for_filter)
 
@@ -1259,14 +1249,14 @@ def main() -> None:
             if args.guarantee_valid:
                 if not current_violations:
                     logger.info(
-                        f"Successfully generated a valid structure after {attempt_num} attempts."
+                        f"Successfully generated a valid PDB file after {attempt_num} attempts."
                     )
                     final_content = current_content
                     final_violations = current_violations
                     break  # Exit loop, valid structure found
                 else:
                     logger.warning(
-                        f"Structure generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
+                        f"PDB generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
                     )
             elif args.best_of_N > 1:
                 if len(current_violations) < min_violations_count:
@@ -1288,6 +1278,7 @@ def main() -> None:
         except (ValueError, TypeError, RuntimeError, Exception) as e:
             logger.error(f"Error processing sequence during generation: {e}")
             sys.exit(1)
+
     # Parse structure definitions for highlighting in Viewer
     highlights = []
     if args.structure:
@@ -1329,16 +1320,17 @@ def main() -> None:
 
     if final_content is None:
         logger.error(
-            f"Failed to generate a suitable structure after {generation_attempts} attempts."
+            f"Failed to generate a suitable PDB file after {generation_attempts} attempts."
         )
         sys.exit(1)
+        return
 
     # ── Internal State Management (Refinement & Header Preservation) ────────
     preserved_ssbonds = None
     preserved_conects = None
     final_pdb_atomic_content = None
 
-    if internal_format == "pdb":
+    if internal_format == "pdb" and final_content is not None:
         # Extract atomic content from the initially selected PDB for subsequent refinement or final assembly.
         final_pdb_atomic_content = extract_atomic_content(cast(str, final_content))
 
@@ -1384,14 +1376,14 @@ def main() -> None:
 
                 if len(new_violations) < len(current_refined_violations):
                     logger.info(
-                        f"Refinement iteration {refine_iter + 1}: Reduced violations to {len(new_violations)}."
+                        f"Refinement iteration {refine_iter + 1}: Reduced violations from {len(current_refined_violations)} to {len(new_violations)}."
                     )
                     # Update atomic content
                     current_refined_atomic_content = temp_validator.get_pdb_content()
                     current_refined_violations = new_violations
                 else:
                     logger.info(
-                        f"Refinement iteration {refine_iter + 1}: No further reduction in violations. Stopping."
+                        f"Refinement iteration {refine_iter + 1}: No further reduction in violations ({len(new_violations)}). Stopping refinement."
                     )
                     break
 
@@ -1400,6 +1392,10 @@ def main() -> None:
             if initial_violations_count > len(final_violations):
                 logger.info(
                     f"Refinement process completed. Reduced total violations from {initial_violations_count} to {len(final_violations)}."
+                )
+            elif initial_violations_count == len(final_violations):
+                logger.info(
+                    f"Refinement process completed. No change in total violations ({len(final_violations)})."
                 )
     else:
         # For non-PDB formats (e.g. CIF), we skip refinement for now
@@ -1439,7 +1435,13 @@ def main() -> None:
                 # For PDB, we use the standard assembler to add REMARKs
                 cmd_string = _build_command_string(args)
                 # We need atomic content only for assemble_pdb_content
-                atomic_content = extract_atomic_content(cast(str, final_content))
+                # If refinement was run, final_pdb_atomic_content is set.
+                # Otherwise use final_content directly.
+                atomic_content = (
+                    final_pdb_atomic_content
+                    if final_pdb_atomic_content is not None
+                    else extract_atomic_content(cast(str, final_content))
+                )
                 final_to_write = assemble_pdb_content(
                     atomic_content,
                     final_sequence_length,
@@ -1463,19 +1465,25 @@ def main() -> None:
                 f"Successfully generated {args.format.upper()} file: {os.path.abspath(output_filename)}"
             )
 
+            # We need the structure for subsequent analytical steps
+            from .generator import PeptideResult
+
+            res_anal = PeptideResult(final_content, format=internal_format)
+            structure = res_anal.structure
+
             # 1. Scorecard and Validation Reporting
             if args.scorecard or args.validate or final_violations:
                 if final_violations:
                     logger.warning(
-                        f"--- Validation Report for {os.path.abspath(output_filename)} ---"
+                        f"--- PDB Validation Report for {os.path.abspath(output_filename)} ---"
                     )
-                    logger.warning(f"Final structure has {len(final_violations)} violations.")
+                    logger.warning(f"Final PDB has {len(final_violations)} violations.")
                     for violation in final_violations:
                         logger.warning(violation)
                     logger.warning("--- End Validation Report ---")
                 elif args.validate:
                     logger.info(
-                        f"No violations found in the final output for {os.path.abspath(output_filename)}."
+                        f"No violations found in the final PDB for {os.path.abspath(output_filename)}."
                     )
 
                 if args.scorecard:
@@ -1488,10 +1496,7 @@ def main() -> None:
 
                         input_nmr_restraints = BMRBAPI.fetch_restraints(args.bmrb_id)
 
-                    from .generator import PeptideResult
-
-                    res_score = PeptideResult(final_content, format=internal_format)
-                    validator = PDBValidator(res_score.structure)
+                    validator = PDBValidator(structure)
                     report = validator.get_quality_report(
                         include_ml=args.quality_filter, nmr_restraints=input_nmr_restraints
                     )
@@ -1583,520 +1588,463 @@ def main() -> None:
                         for violation in report.get("detailed_violations", [])[:5]:
                             logger.warning(f"  - {violation}")
 
-                # Phase 7, 8, & 9 + 10: Synthetic NMR Data & Exports
-                # We perform calculations first, so we can capture data (like restraints) for visualization if needed.
-                generated_restraints = None  # To hold restraints for viewer
+            # Phase 7, 8, & 9 + 10: Synthetic NMR Data & Exports
+            # We perform calculations first, so we can capture data (like restraints) for visualization if needed.
+            generated_restraints = None  # To hold restraints for viewer
 
-                if (
-                    args.gen_nef
-                    or args.restraints
-                    or args.rdc_restraints
-                    or args.shift_restraints
-                    or args.gen_relax
-                    or args.gen_shifts
-                    or args.gen_cd
-                    or args.gen_couplings
-                    or args.output_rdcs
-                    or args.export_constraints
-                    or args.export_torsion
-                    or args.gen_msa
-                    or args.export_distogram
-                ):
-                    if args.mode != "generate":
-                        logger.warning(
-                            "Synthetic Data Generation is currently only supported in single structure 'generate' mode."
-                        )
-                    else:
-                        import io
+            if (
+                args.gen_nef
+                or args.restraints
+                or args.rdc_restraints
+                or args.shift_restraints
+                or args.gen_relax
+                or args.gen_shifts
+                or args.gen_cd
+                or args.gen_couplings
+                or args.output_rdcs
+                or args.export_constraints
+                or args.export_torsion
+                or args.gen_msa
+                or args.export_distogram
+            ):
+                if args.mode != "generate":
+                    logger.warning(
+                        "Synthetic Data Generation is currently only supported in single structure 'generate' mode."
+                    )
+                else:
+                    import io
+                    import biotite.structure.io.pdb as pdb_io
+                    from .chemical_shifts import (
+                        calculate_shift_metrics,
+                        predict_chemical_shifts,
+                        read_shift_file,
+                    )
 
-                        import biotite.structure.io.pdb as pdb_io
-                        import numpy as np
+                    # NEW IMPORTS for Export
+                    from .contact import compute_contact_map
+                    from .distogram import calculate_distogram, export_distogram
+                    from .export import export_constraints
+                    from .msa import generate_msa  # NEW: Physics based generator
+                    from .nef_io import (
+                        write_nef_chemical_shifts,
+                        write_nef_file,
+                        write_nef_relaxation,
+                    )
+                    from .nmr import (
+                        calculate_rpf_score,
+                        calculate_synthetic_noes,
+                        read_restraint_file,
+                    )
+                    from .rdc import calculate_rdc_q_factor, calculate_rdcs, read_rdc_file
+                    from .relaxation import calculate_relaxation_rates
+                    from .torsion import calculate_torsion_angles, export_torsion_angles
 
+                    # Sequence inference
+                    from .data import L_TO_D_MAPPING, ONE_TO_THREE_LETTER_CODE
+
+                    three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
+                    # Add support for Histidine tautomers
+                    three_to_one["HID"] = "H"
+                    three_to_one["HIE"] = "H"
+                    three_to_one["HIP"] = "H"
+                    # Add support for PTMs
+                    three_to_one["SEP"] = "S"
+                    three_to_one["TPO"] = "T"
+                    three_to_one["PTR"] = "Y"
+                    # Add support for D-amino acids
+                    for l_name, d_name in L_TO_D_MAPPING.items():
+                        three_to_one[d_name] = three_to_one[l_name]
+
+                    res_names = [
+                        structure[structure.res_id == i][0].res_name
+                        for i in sorted(set(structure.res_id))
+                    ]
+                    seq_str = "".join([three_to_one.get(r, "X") for r in res_names])
+
+                    logger.info("Generating Synthetic Data...")
+
+                    # We need the generated structure as an AtomArray
+                    from .generator import PeptideResult
+
+                    res_nmr = PeptideResult(final_content, format=internal_format)
+                    structure = res_nmr.structure
+
+                    # RPF Validation if restraints provided
+                    if args.restraints:
+                        logger.info(f"Performing RPF Validation against {args.restraints}...")
+                        try:
+                            target_restraints = read_restraint_file(args.restraints)
+                            rpf_scores = calculate_rpf_score(structure, target_restraints)
+
+                            # Print RPF Report
+                            print("\n--- NMR RPF Validation Report ---")
+                            print(f"Recall:    {rpf_scores.get('recall', 0.0):8.4f}")
+                            print(f"Precision: {rpf_scores.get('precision', 0.0):8.4f}")
+                            print(f"F-measure: {rpf_scores.get('f_measure', 0.0):8.4f}")
+                            print("----------------------------------\n")
+
+                        except Exception as e:
+                            logger.error(f"RPF Validation failed: {e}")
+
+                    # 1. NEF Generation (Phase 7)
+                    if args.gen_nef:
+                        if not np.any(structure.element == "H"):
+                            logger.error(
+                                "Structure has no hydrogens! NEF/Relaxation requires protons. Use --minimize."
+                            )
+                        else:
+                            logger.info("Calculating NOE Restraints...")
+                            restraints = calculate_synthetic_noes(structure, cutoff=args.noe_cutoff)
+                            generated_restraints = restraints  # Capture for viewer
+
+                            nef_filename = args.nef_output
+                            if not nef_filename:
+                                nef_filename = output_filename.replace(".pdb", ".nef")
+
+                            write_nef_file(nef_filename, seq_str, restraints)
+                            logger.info(
+                                f"NEF Restraints generated: {os.path.abspath(nef_filename)}"
+                            )
+
+                            if args.gen_pymol:
+                                from .visualization import generate_pymol_script
+
+                                pml_filename = output_filename.replace(".pdb", ".pml")
+                                generate_pymol_script(
+                                    os.path.basename(output_filename), restraints, pml_filename
+                                )
+                                logger.info(
+                                    f"PyMOL Visualization Script generated: {os.path.abspath(pml_filename)}"
+                                )
+
+                    # 2. Relaxation Data (Phase 8)
+                    if args.gen_relax:
+                        if not np.any(structure.element == "H"):
+                            logger.error(
+                                "Structure has no hydrogens! NEF/Relaxation requires protons. Use --minimize."
+                            )
+                        else:
+                            logger.info(
+                                f"Calculating synthetic relaxation rates ({args.field} MHz)..."
+                            )
+                            rates = calculate_relaxation_rates(
+                                structure, field_mhz=args.field, tau_m_ns=args.tumbling_time
+                            )
+                            relax_filename = output_filename.replace(".pdb", "_relax.nef")
+                            write_nef_relaxation(
+                                relax_filename, seq_str, rates, field_freq_mhz=args.field
+                            )
+                            logger.info(
+                                f"Relaxation data generated: {os.path.abspath(relax_filename)}"
+                            )
+
+                    # 3. Chemical Shifts (Phase 9)
+                    if args.gen_shifts or args.shift_restraints:
+                        logger.info("Predicting Chemical Shifts...")
+                        # Map three-letter codes to one-letter for the shift engine
+                        # (already done in seq_str)
+                        use_shiftx2 = getattr(args, "shift_predictor", "shiftx2") == "shiftx2"
                         from .chemical_shifts import (
                             calculate_shift_metrics,
                             predict_chemical_shifts,
                             read_shift_file,
                         )
 
-                        # NEW IMPORTS for Export
-                        from .contact import compute_contact_map
-                        from .distogram import calculate_distogram, export_distogram
-                        from .export import export_constraints
-                        from .msa import generate_msa  # NEW: Physics based generator
-                        from .nef_io import (
-                            write_nef_chemical_shifts,
-                            write_nef_file,
-                            write_nef_relaxation,
-                        )
-                        from .nmr import (
-                            calculate_rpf_score,
-                            calculate_synthetic_noes,
-                            read_restraint_file,
-                        )
-                        from .rdc import calculate_rdc_q_factor, calculate_rdcs, read_rdc_file
-                        from .relaxation import calculate_relaxation_rates
-                        from .torsion import calculate_torsion_angles, export_torsion_angles
+                        shifts = predict_chemical_shifts(structure, use_shiftx2=use_shiftx2)
 
-                        logger.info("Generating Synthetic Data...")
+                        shift_fn = args.shift_output
+                        if not shift_fn and args.gen_shifts:
+                            shift_fn = output_filename.replace(".pdb", "_shifts.nef")
 
-                        # We need the generated structure as an AtomArray
-                        from .generator import PeptideResult
+                        if shift_fn:
+                            from .nef_io import write_nef_chemical_shifts
 
-                        res_nmr = PeptideResult(final_content, format=internal_format)
-                        structure = res_nmr.structure
+                            write_nef_chemical_shifts(shift_fn, seq_str, shifts)
+                            logger.info(f"Chemical shifts generated: {os.path.abspath(shift_fn)}")
 
-                        # RPF Validation if restraints provided
-                        if args.restraints:
-                            logger.info(f"Performing RPF Validation against {args.restraints}...")
-                            try:
-                                target_restraints = read_restraint_file(args.restraints)
-                                rpf_scores = calculate_rpf_score(structure, target_restraints)
-
-                                # Print RPF Report
-                                print("\n" + "=" * 40)
-                                print("--- NMR RPF Validation Report ---")
-                                print(f"File: {args.restraints}")
-                                print(f"Recall:    {rpf_scores['recall']:.4f}")
-                                print(f"Precision: {rpf_scores['precision']:.4f}")
-                                print(f"F-measure: {rpf_scores['f_measure']:.4f}")
-                                print("=" * 40 + "\n")
-
-                            except Exception as e:
-                                logger.error(f"RPF Validation failed: {e}")
-
-                        # RDC Q-factor Validation
-                        if args.rdc_restraints:
+                        # If shift restraints provided, calculate RMSD
+                        if args.shift_restraints:
                             logger.info(
-                                f"Performing RDC Validation against {args.rdc_restraints}..."
+                                f"Validating shifts against experimental data: {args.shift_restraints}"
                             )
                             try:
-                                target_rdcs = read_rdc_file(args.rdc_restraints)
-                                # Back-calculate RDCs from model
-                                # We use the same Da/R as provided or defaults
-                                calc_rdcs_dict = calculate_rdcs(
-                                    structure, da=args.rdc_da, r=args.rdc_r
-                                )
+                                exp_shifts = read_shift_file(args.shift_restraints)
 
-                                # Align obs and calc
+                                # Align and group by atom type for per-atom metrics
+                                atom_groups: dict[str, list[tuple[float, float]]] = {}
+                                for item in exp_shifts:
+                                    rid = item["res_id"]
+                                    atom = item["atom_name"]
+                                    val_obs = item["value"]
+
+                                    # Match against any chain
+                                    for c_id in shifts:
+                                        if rid in shifts[c_id] and atom in shifts[c_id][rid]:
+                                            val_calc = shifts[c_id][rid][atom]
+                                            atype = atom[0]  # Group by element (C, N, H)
+                                            if atype not in atom_groups:
+                                                atom_groups[atype] = []
+                                            atom_groups[atype].append((val_obs, val_calc))
+
+                                if atom_groups:
+                                    print("\n--- NMR Chemical Shift Validation Report ---")
+                                    for atype, pairs in atom_groups.items():
+                                        obs_arr = np.array([p[0] for p in pairs])
+                                        calc_arr = np.array([p[1] for p in pairs])
+                                        res_metrics = calculate_shift_metrics(obs_arr, calc_arr)
+                                        print(
+                                            f"{atype:4s} RMSD:        {res_metrics['rmsd']:8.4f} ppm"
+                                        )
+                                        print(
+                                            f"{atype:4s} Correlation: {res_metrics['correlation']:8.4f}"
+                                        )
+                                    print("------------------------------------------\n")
+                            except Exception as e:
+                                logger.error(f"Shift validation failed: {e}")
+
+                    # 3.7 Circular Dichroism (Phase 9.7)
+                    if args.gen_cd:
+                        # EDUCATIONAL NOTE — CD Background:
+                        # Circular Dichroism (CD) measures the differential absorption
+                        # of left and right circularly polarized light. In the far-UV
+                        # (190-250 nm), it is the premier tool for measuring the
+                        # overall secondary structure content of a protein sample.
+                        #
+                        # The physics is based on the interaction between amide
+                        # chromophores. For a given conformation, we can synthesize
+                        # the expected spectrum as a weighted average of basis
+                        # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
+                        #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
+                        logger.info("Simulating Circular Dichroism (CD) spectrum...")
+                        from .cd_simulator import CDSimulator
+
+                        cd_sim = CDSimulator(structure)
+                        # (Note: cd_simulator needs an export method if we want to save .dat)
+                        cd_sim.plot(save_path=output_filename.replace(".pdb", "_cd.png"))
+                        logger.info(
+                            f"Synthetic CD spectrum plot saved to: {os.path.abspath(output_filename.replace('.pdb', '_cd.png'))}"
+                        )
+
+                    # 4.5 J-Couplings (Phase 9.5)
+                    if args.gen_couplings:
+                        logger.info("Calculating HN-HA scalar couplings...")
+                        from .j_coupling import calculate_hn_ha_coupling
+
+                        couplings = calculate_hn_ha_coupling(structure)
+                        cp_fn = args.coupling_output or output_filename.replace(".pdb", "_j.csv")
+                        # Export simple CSV
+                        with open(cp_fn, "w") as f:
+                            f.write("res_id,3J_HNHA_Hz\n")
+                            for rid, val in couplings.items():
+                                f.write(f"{rid},{val:.4f}\n")
+                        logger.info(f"Scalar couplings exported to: {os.path.abspath(cp_fn)}")
+
+                    # 3.6 RDC Output (Phase 9.6)
+                    output_rdcs = getattr(args, "output_rdcs", None)
+                    if output_rdcs or args.rdc_restraints:
+                        # EDUCATIONAL NOTE — RDC Calculation:
+                        # We compute backbone N-H Residual Dipolar Couplings by:
+                        #   1. Locating every backbone amide nitrogen (N) and its
+                        #      associated amide proton (H) in the structure.
+                        #   2. Computing the unit vector along each N-H bond.
+                        #   3. Projecting that vector onto the alignment tensor
+                        #      principal axis system (PAS) to get (θ, φ).
+                        #   4. Applying the full RDC formula:
+                        #        D = Da · [(3cos²θ − 1) + 1.5·R·sin²θ·cos(2φ)]
+                        #      (Tjandra & Bax, 1997, Science 278:1111)
+                        #
+                        # Proline residues are automatically skipped because they
+                        # lack a backbone amide proton (their nitrogen is a
+                        # tertiary/secondary amine in the pyrrolidine ring).
+                        from .rdc import (
+                            calculate_rdc_q_factor,
+                            calculate_rdcs,
+                            export_rdcs,
+                            read_rdc_file,
+                        )
+
+                        rdc_da = getattr(args, "rdc_da", 10.0)
+                        rdc_r = getattr(args, "rdc_r", 0.1)
+                        rdcs = calculate_rdcs(structure, da=rdc_da, r=rdc_r)
+
+                        if output_rdcs:
+                            export_rdcs(rdcs, output_rdcs, structure=structure)
+                            logger.info(f"RDC data exported to: {os.path.abspath(output_rdcs)}")
+
+                        # If RDC restraints provided, calculate Q-factor
+                        if args.rdc_restraints:
+                            logger.info(
+                                f"Validating RDCs against experimental data: {args.rdc_restraints}"
+                            )
+                            try:
+                                exp_rdc_list = read_rdc_file(args.rdc_restraints)
+                                # Align exp vs calc
                                 obs_vals = []
                                 calc_vals = []
-                                for target in target_rdcs:
-                                    # Try matching by residue index (common for NH RDCs)
-                                    res_key = target["res_1"]
-                                    # Try matching by full atom tuple
-                                    tuple_key = (
-                                        target["res_1"],
-                                        target["atom_1"],
-                                        target["res_2"],
-                                        target["atom_2"],
-                                    )
-
-                                    if tuple_key in calc_rdcs_dict:  # type: ignore[comparison-overlap]
-                                        obs_vals.append(target["value"])
-                                        calc_vals.append(calc_rdcs_dict[tuple_key])  # type: ignore[index]
-                                    elif res_key in calc_rdcs_dict:
-                                        obs_vals.append(target["value"])
-                                        calc_vals.append(calc_rdcs_dict[res_key])
+                                for item in exp_rdc_list:
+                                    rid = item["res_1"]
+                                    if rid in rdcs:
+                                        obs_vals.append(item["value"])
+                                        calc_vals.append(rdcs[rid])
 
                                 if obs_vals:
                                     q_factor = calculate_rdc_q_factor(
                                         np.array(obs_vals), np.array(calc_vals)
                                     )
-
-                                    # Print RDC Report
-                                    print("\n" + "=" * 40)
-                                    print("--- NMR RDC Validation Report ---")
-                                    print(f"File: {args.rdc_restraints}")
-                                    print(f"Q-factor: {q_factor:.4f}")
-                                    print(f"Entries:  {len(obs_vals)}")
+                                    print("\n--- NMR RDC Validation Report ---")
+                                    print("=" * 40)
+                                    print("📊 RDC VALIDATION (Q-FACTOR)")
+                                    print("=" * 40)
+                                    print(
+                                        f"| Q-factor: {q_factor:8.4f} "
+                                        f"{'(EXCELLENT)' if q_factor < 0.2 else '(POOR)'} |"
+                                    )
                                     print("=" * 40 + "\n")
-                                else:
-                                    logger.warning("No matching RDC entries found for validation.")
-
                             except Exception as e:
-                                logger.error(f"RDC Validation failed: {e}")
+                                logger.error(f"RDC validation failed: {e}")
+                    # 5. Feature Export (Phase 11)
+                    if args.export_constraints or args.export_torsion:
+                        logger.info("Exporting structural features...")
+                        if args.export_constraints:
+                            from .contact import compute_contact_map
+                            from .export import export_constraints
 
-                        # Chemical Shift Validation
-                        if args.shift_restraints:
+                            # Use user-specified cutoff (Phase 11)
+                            cmap = compute_contact_map(
+                                structure, method="ca", threshold=args.constraint_cutoff
+                            )
+                            constr_str = export_constraints(
+                                cmap,
+                                seq_str,
+                                fmt=args.constraint_format,
+                                threshold=args.constraint_cutoff,
+                            )
+                            with open(args.export_constraints, "w") as f:
+                                f.write(constr_str)
                             logger.info(
-                                f"Performing Chemical Shift Validation against {args.shift_restraints}..."
+                                f"Constraints exported to: {os.path.abspath(args.export_constraints)}"
                             )
-                            try:
-                                target_shifts = read_shift_file(args.shift_restraints)
-                                # Back-calculate shifts from model
-                                use_shiftx2 = (
-                                    getattr(args, "shift_predictor", "shiftx2") == "shiftx2"
-                                )
-                                calc_shifts = predict_chemical_shifts(
-                                    structure, use_shiftx2=use_shiftx2
-                                )
 
-                                # Align obs and calc
-                                obs_vals = []
-                                calc_vals = []
-                                for target in target_shifts:
-                                    res_id = target["res_id"]
-                                    atom_name = target["atom_name"]
+                        if args.export_torsion:
+                            from .torsion import calculate_torsion_angles, export_torsion_angles
 
-                                    # Prediction output is nested by chain: {chain: {res: {atom: val}}}
-                                    for chain_id in calc_shifts:
-                                        if (
-                                            res_id in calc_shifts[chain_id]
-                                            and atom_name in calc_shifts[chain_id][res_id]
-                                        ):
-                                            obs_vals.append(target["value"])
-                                            calc_vals.append(
-                                                calc_shifts[chain_id][res_id][atom_name]
-                                            )
-                                            break
-
-                                if obs_vals:
-                                    shift_metrics = calculate_shift_metrics(
-                                        np.array(obs_vals), np.array(calc_vals)
-                                    )
-
-                                    # Print Shift Report
-                                    print("\n" + "=" * 40)
-                                    print("--- NMR Chemical Shift Validation Report ---")
-                                    print(f"File: {args.shift_restraints}")
-                                    print(f"RMSD:        {shift_metrics['rmsd']:.4f} ppm")
-                                    print(f"Correlation: {shift_metrics['correlation']:.4f}")
-                                    print(f"Entries:     {len(obs_vals)}")
-                                    print("=" * 40 + "\n")
-                                else:
-                                    logger.warning(
-                                        "No matching chemical shift entries found for validation."
-                                    )
-
-                            except Exception as e:
-                                logger.error(f"Chemical Shift Validation failed: {e}")
-
-                        # Sequence inference
-                        from .data import L_TO_D_MAPPING, ONE_TO_THREE_LETTER_CODE
-
-                        three_to_one = {v: k for k, v in ONE_TO_THREE_LETTER_CODE.items()}
-                        # Add support for Histidine tautomers
-                        three_to_one["HID"] = "H"
-                        three_to_one["HIE"] = "H"
-                        three_to_one["HIP"] = "H"
-                        # Add support for PTMs
-                        three_to_one["SEP"] = "S"
-                        three_to_one["TPO"] = "T"
-                        three_to_one["PTR"] = "Y"
-                        # Add support for D-amino acids
-                        for l_name, d_name in L_TO_D_MAPPING.items():
-                            three_to_one[d_name] = three_to_one[l_name]
-
-                        res_names = [
-                            structure[structure.res_id == i][0].res_name
-                            for i in sorted(set(structure.res_id))
-                        ]
-                        seq_str = "".join([three_to_one.get(r, "X") for r in res_names])
-
-                        # Validation: Check for Hydrogens
-                        if not np.any(structure.element == "H") and (
-                            args.gen_nef or args.gen_relax
-                        ):
-                            logger.error(
-                                "Structure has no hydrogens! NEF/Relaxation requires protons. Use --minimize."
+                            angles = calculate_torsion_angles(structure)
+                            export_torsion_angles(
+                                angles, args.export_torsion, fmt=args.torsion_format
                             )
-                        else:
-                            # 1. NOE Restraints (Phase 7)
-                            if args.gen_nef:
-                                logger.info("Calculating NOE Restraints...")
-                                restraints = calculate_synthetic_noes(
-                                    structure, cutoff=args.noe_cutoff
-                                )
-                                generated_restraints = restraints  # Capture for viewer
+                            logger.info(
+                                f"Torsion angles exported to: {os.path.abspath(args.export_torsion)}"
+                            )
 
-                                nef_filename = args.nef_output
-                                if not nef_filename:
-                                    nef_filename = output_filename.replace(".pdb", ".nef")
-
-                                write_nef_file(nef_filename, seq_str, restraints)
-                                logger.info(
-                                    f"NEF Restraints generated: {os.path.abspath(nef_filename)}"
-                                )
-
-                                if args.gen_pymol:
-                                    from .visualization import generate_pymol_script
-
-                                    pml_filename = output_filename.replace(".pdb", ".pml")
-                                    generate_pymol_script(
-                                        os.path.basename(output_filename), restraints, pml_filename
-                                    )
-                                    logger.info(
-                                        f"PyMOL Visualization Script generated: {os.path.abspath(pml_filename)}"
-                                    )
-
-                            # 2. Relaxation Data (Phase 8)
-                            if args.gen_relax:
-                                rates = calculate_relaxation_rates(
-                                    structure, field_mhz=args.field, tau_m_ns=args.tumbling_time
-                                )
-                                relax_filename = output_filename.replace(".pdb", "_relax.nef")
-                                write_nef_relaxation(
-                                    relax_filename, seq_str, rates, field_freq_mhz=args.field
-                                )
-
-                            # 3. Chemical Shifts (Phase 9)
-                            if args.gen_shifts:
-                                # EDUCATIONAL NOTE — Predictor Selection:
-                                # --shift-predictor controls which backend synth-nmr uses:
-                                #   'shiftx2' (default): SHIFTX2 hybrid ML/empirical method
-                                #     (Han et al., 2011, J Biomol NMR 50:43). Achieves
-                                #     RMSD ~0.04 ppm (1H), ~0.44 ppm (13C) from experiment.
-                                #     Requires the SHIFTX2 binary; falls back to empirical
-                                #     automatically if the binary is not found.
-                                #   'empirical': SPARTA+-style neural network / empirical tables
-                                #     (Shen & Bax, 2010, J Biomol NMR 48:13). Always available
-                                #     (pure Python, no external binary). RMSD ~0.05 ppm (1H),
-                                #     ~0.55 ppm (13C). Recommended for CI/CD pipelines.
-                                use_shiftx2 = (
-                                    getattr(args, "shift_predictor", "shiftx2") == "shiftx2"
-                                )
-                                shifts = predict_chemical_shifts(structure, use_shiftx2=use_shiftx2)
-                                shift_filename = (
-                                    args.shift_output
-                                    if args.shift_output
-                                    else output_filename.replace(".pdb", "_shifts.nef")
-                                )
-                                write_nef_chemical_shifts(shift_filename, seq_str, shifts)
-                                logger.info(
-                                    f"NEF Chemical Shift Data generated: {os.path.abspath(shift_filename)}"
-                                )
-
-                            # 3.5 J-Couplings (Phase 9.5)
-                            if args.gen_couplings:
-                                from .coupling import predict_couplings_from_structure
-
-                                # Reuse torsion calc if not already done
-                                # Ideally we'd optimize to not recalc, but calculation is cheap.
-                                angles_list = calculate_torsion_angles(structure)
-
-                                # Convert generic List[Dict] to Dict[int, float] for phis
-                                phi_map = {}
-                                for angle_data in angles_list:
-                                    if angle_data["phi"] is not None:
-                                        phi_map[angle_data["res_id"]] = angle_data["phi"]
-                                    else:
-                                        phi_map[angle_data["res_id"]] = np.nan
-
-                                couplings = predict_couplings_from_structure(phi_map)
-
-                                coupling_csv = (
-                                    args.coupling_output
-                                    if args.coupling_output
-                                    else output_filename.replace(".pdb", "_couplings.csv")
-                                )
-
-                                with open(coupling_csv, "w") as f:
-                                    f.write("res_id,residue,J_HN_HA\n")
-                                    # Write sorted by resid
-                                    for angle_data in angles_list:
-                                        rid = angle_data["res_id"]
-                                        res = angle_data["residue"]
-                                        jval = couplings.get(rid, np.nan)
-                                        f.write(f"{rid},{res},{jval:.4f}\n")
-
-                                logger.info(
-                                    f"J-Couplings exported: {os.path.abspath(coupling_csv)}"
-                                )
-
-                            # 3.6 RDC Output (Phase 9.6)
-                            if args.output_rdcs:
-                                # EDUCATIONAL NOTE — RDC Calculation:
-                                # We compute backbone N-H Residual Dipolar Couplings by:
-                                #   1. Locating every backbone amide nitrogen (N) and its
-                                #      associated amide proton (H) in the structure.
-                                #   2. Computing the unit vector along each N-H bond.
-                                #   3. Projecting that vector onto the alignment tensor
-                                #      principal axis system (PAS) to get (θ, φ).
-                                #   4. Applying the full RDC formula:
-                                #        D = Da · [(3cos²θ − 1) + 1.5·R·sin²θ·cos(2φ)]
-                                #      (Tjandra & Bax, 1997, Science 278:1111)
-                                #
-                                # Proline residues are automatically skipped because they
-                                # lack a backbone amide proton (their nitrogen is a
-                                # tertiary/secondary amine in the pyrrolidine ring).
-                                from .rdc import calculate_rdcs
-
-                                rdcs = calculate_rdcs(structure, da=args.rdc_da, r=args.rdc_r)
-                                rdc_csv = args.output_rdcs
-                                # Build a lookup from res_id (1-indexed) to one-letter code.
-                                # res_names is already built above as a list of 3-letter codes.
-                                with open(rdc_csv, "w") as f:
-                                    f.write("res_id,residue,RDC_NH_Hz\n")
-                                    for rid, val in sorted(rdcs.items()):
-                                        # res_id is 1-based; res_names list is 0-based.
-                                        res_3letter = (
-                                            res_names[rid - 1]
-                                            if rid - 1 < len(res_names)
-                                            else "UNK"
-                                        )
-                                        res_1letter = three_to_one.get(res_3letter, "X")
-                                        f.write(f"{rid},{res_1letter},{val:.4f}\n")
-                                logger.info(f"RDC data exported to: {os.path.abspath(rdc_csv)}")
-
-                            # 3.7 Circular Dichroism (Phase 9.7)
-                            if args.gen_cd:
-                                # EDUCATIONAL NOTE — CD Background:
-                                # Circular Dichroism (CD) measures the differential absorption
-                                # of left and right circularly polarized light. In the far-UV
-                                # (190-250 nm), it is the premier tool for measuring the
-                                # overall secondary structure content of a protein sample.
-                                #
-                                # The physics is based on the interaction between amide
-                                # chromophores. For a given conformation, we can synthesize
-                                # the expected spectrum as a weighted average of basis
-                                # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
-                                #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
-                                from .cd_simulator import (
-                                    CDSimulator,
-                                    validate_cd_against_literature,
-                                )
-
-                                cd_sim = CDSimulator(structure)
-                                cd_plot = output_filename.replace(".pdb", "_cd.png")
-                                cd_sim.plot(save_path=cd_plot)
-
-                                # Provide an automated scientific validation report
-                                cd_findings = validate_cd_against_literature(
-                                    cd_sim.fractions, cd_sim.get_spectrum(noise_level=0)
-                                )
-                                if cd_findings:
-                                    logger.info("--- Synthetic CD Validation Report ---")
-                                    for find_item in cd_findings:
-                                        logger.info(f"  {find_item}")
-                                    logger.info("--------------------------------------")
-
-                                logger.info(
-                                    f"Synthetic CD Spectrum generated: {os.path.abspath(cd_plot)}"
-                                )
-
-                            # 4. Constraint Export (Phase 10)
-                            if args.export_constraints:
-                                logger.info(
-                                    f"Exporting Constraints in {args.constraint_format.upper()} format..."
-                                )
-                                # Format: RR or CSV
-                                # We use compute_contact_map relative to cutoff
-                                # For Export, we typically want BINARY map if using CASP
-
-                                # Calculate Distance Matrix for export
-                                matrix = compute_contact_map(
-                                    structure, method="ca", threshold=args.constraint_cutoff
-                                )
-
-                                content = export_constraints(
-                                    matrix,
-                                    seq_str,
-                                    fmt=args.constraint_format,
-                                    threshold=args.constraint_cutoff,
-                                )
-
-                                export_file = args.export_constraints
-                                with open(export_file, "w") as f:
-                                    f.write(content)
-                                logger.info(
-                                    f"Constraints exported to: {os.path.abspath(export_file)}"
-                                )
-
-                            # 5. Torsion Export (Phase 11)
-                            if args.export_torsion:
-                                angles = calculate_torsion_angles(structure)
-                                export_torsion_angles(
-                                    angles, args.export_torsion, fmt=args.torsion_format
-                                )
-                                logger.info(
-                                    f"Torsion angles exported to: {os.path.abspath(args.export_torsion)}"
-                                )
-
-                            # 6. MSA Generation (Phase 12)
-                            if args.gen_msa:
-                                logger.info(
-                                    f"Generating Synthetic MSA (depth: {args.msa_depth}, temp: {args.evolution_temp})..."
-                                )
-                                # 1. Extract ground-truth contact map (e.g., 8.0 Angstroms) for constraints
-                                cmap = compute_contact_map(structure, method="ca", threshold=8.0)
-                                # Convert Distogram to boolean map
-                                bool_cmap = (cmap > 0) & (cmap <= 8.0)
-
-                                # 2. Run Metropolis-Hastings Co-Evolution
-                                sequences = generate_msa(
-                                    base_sequence=seq_str,
-                                    contact_map=bool_cmap,
-                                    num_sequences=args.msa_depth,
-                                    temperature=args.evolution_temp,
-                                    steps_between_samples=100,
-                                )
-
-                                # 3. Write FASTA
-                                msa_filename = (
-                                    args.output
-                                    if args.output and args.output.endswith(".fasta")
-                                    else output_filename.replace(".pdb", ".fasta")
-                                )
-                                with open(msa_filename, "w") as f:
-                                    for idx, sq in enumerate(sequences):
-                                        f.write(f">seq_{idx}\n{sq}\n")
-
-                                logger.info(
-                                    f"Synthetic MSA generated: {os.path.abspath(msa_filename)}"
-                                )
-
-                            # 7. Distogram Export (Phase 13)
-                            if args.export_distogram:
-                                matrix = calculate_distogram(structure)
-                                export_distogram(
-                                    matrix, args.export_distogram, fmt=args.distogram_format
-                                )
-                                logger.info(
-                                    f"Distogram exported to: {os.path.abspath(args.export_distogram)}"
-                                )
-
-                # 8. Docking Post-Processing (PQR generation)
-                if args.mode == "docking":
-                    logger.info("Generating PQR file for docking...")
-                    try:
-                        prep = DockingPrep(args.forcefield)
-                        # We use the newly generated PDB file as input
-                        pqr_file = (
-                            args.output if args.output else output_filename.replace(".pdb", ".pqr")
+                    # 6. MSA Generation (Phase 12)
+                    if args.gen_msa:
+                        logger.info(
+                            f"Generating Synthetic MSA (depth: {args.msa_depth}, temp: {args.evolution_temp})..."
                         )
-                        if not pqr_file.endswith(".pqr"):
-                            pqr_file += ".pqr"
+                        # 1. Extract ground-truth contact map for constraints
+                        cmap = compute_contact_map(
+                            structure, method="ca", threshold=args.constraint_cutoff
+                        )
+                        # Convert Distogram to boolean map using the user-specified cutoff
+                        bool_cmap = (cmap > 0) & (cmap <= args.constraint_cutoff)
 
-                        success = prep.write_pqr(output_filename, pqr_file)
-                        if success:
-                            logger.info(
-                                f"Docking preparation complete. PQR file: {os.path.abspath(pqr_file)}"
-                            )
-                        else:
-                            logger.error("Docking preparation failed.")
-                    except Exception as e:
-                        logger.error(f"Failed to generate PQR: {e}")
+                        # 2. Run Metropolis-Hastings Co-Evolution
+                        from .msa import generate_msa
 
-                # Open 3D viewer if requested (MOVED AFTER NMR calc to access generated_restraints)
-                if args.visualize:
-                    if isinstance(final_to_write, bytes):
-                        logger.warning(
-                            "3D visualization is not supported for binary formats (BCIF). Skipping viewer."
+                        sequences = generate_msa(
+                            base_sequence=seq_str,
+                            contact_map=bool_cmap,
+                            num_sequences=args.msa_depth,
+                            temperature=args.evolution_temp,
+                            steps_between_samples=100,
+                        )
+
+                        # 3. Write FASTA
+                        msa_filename = (
+                            args.output
+                            if args.output and args.output.endswith(".fasta")
+                            else output_filename.replace(".pdb", ".fasta")
+                        )
+                        with open(msa_filename, "w") as f:
+                            for idx, sq in enumerate(sequences):
+                                f.write(f">seq_{idx}\n{sq}\n")
+
+                        logger.info(f"Synthetic MSA generated: {os.path.abspath(msa_filename)}")
+
+                    # 7. Distogram Export (Phase 13)
+                    if args.export_distogram:
+                        from .distogram import calculate_distogram, export_distogram
+
+                        matrix = calculate_distogram(structure)
+                        export_distogram(matrix, args.export_distogram, fmt=args.distogram_format)
+                        logger.info(
+                            f"Distogram exported to: {os.path.abspath(args.export_distogram)}"
+                        )
+
+            # 8. Docking Post-Processing (PQR generation)
+            if args.mode == "docking":
+                logger.info("Generating PQR file for docking...")
+                try:
+                    prep = DockingPrep(args.forcefield)
+
+                    # We need a PDB file for DockingPrep.
+                    # If the primary output was PDB, use it.
+                    # Otherwise, generate a temporary one.
+                    pdb_for_prep = output_filename
+                    temp_pdb = None
+
+                    if args.format != "pdb":
+                        import tempfile
+                        from .generator import PeptideResult
+
+                        res_tmp = PeptideResult(final_content, format=internal_format)
+                        temp_pdb_content = res_tmp.get_content("pdb")
+                        fd, temp_pdb = tempfile.mkstemp(suffix=".pdb")
+                        with os.fdopen(fd, "w") as f:
+                            f.write(cast(str, temp_pdb_content))
+                        pdb_for_prep = temp_pdb
+
+                    pqr_file = (
+                        args.output
+                        if (args.output and args.output.endswith(".pqr"))
+                        else output_filename.rsplit(".", 1)[0] + ".pqr"
+                    )
+
+                    success = prep.write_pqr(pdb_for_prep, pqr_file)
+                    if success:
+                        logger.info(
+                            f"Docking preparation complete. PQR file: {os.path.abspath(pqr_file)}"
                         )
                     else:
-                        logger.info("Opening 3D molecular viewer in browser...")
-                        try:
-                            view_structure_in_browser(
-                                final_to_write,
-                                filename=output_filename,
-                                style="cartoon",
-                                color="spectrum",
-                                restraints=generated_restraints,  # Pass captured restraints
-                                highlights=highlights,  # Pass beta-turn highlights
-                                show_hbonds=True,
-                            )
-                        except Exception as e:
-                            logger.error(f"Failed to open 3D viewer: {e}")
+                        logger.error("Docking preparation failed.")
+
+                    # Cleanup temporary PDB if created
+                    if temp_pdb and os.path.exists(temp_pdb):
+                        os.remove(temp_pdb)
+
+                except Exception as e:
+                    logger.error(f"Failed to generate PQR: {e}")
+
+            # Open 3D viewer if requested (MOVED AFTER NMR calc to access generated_restraints)
+            if args.visualize:
+                if isinstance(final_to_write, bytes):
+                    logger.warning(
+                        "3D visualization is not supported for binary formats (BCIF). Skipping viewer."
+                    )
+                else:
+                    logger.info("Opening 3D molecular viewer in browser...")
+                    try:
+                        view_structure_in_browser(
+                            final_to_write,
+                            filename=output_filename,
+                            style="cartoon",
+                            color="spectrum",
+                            restraints=generated_restraints,  # Pass captured restraints
+                            highlights=highlights,  # Pass beta-turn highlights
+                            show_hbonds=True,
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to open 3D viewer: {e}")
 
         except Exception as e:
             logger.error("An unexpected error occurred during file writing: %s", e)
