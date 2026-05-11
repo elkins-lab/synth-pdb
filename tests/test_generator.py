@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import biotite.structure as struc
 import biotite.structure.io as strucio  # Use this for load_structure
@@ -108,6 +109,28 @@ class TestGenerator(unittest.TestCase):
             # self.assertAlmostEqual(angle_ca_c_o, ANGLE_CA_C_O, places=1, msg="CA-C-O angle mismatch")
         finally:
             os.remove(temp_file_path)  # Clean up the temporary file
+
+    def test_minimization_forwards_explicit_solvent_padding(self):
+        """Regression test: --solvent-padding must configure the OpenMM box size."""
+        minimizer_kwargs = []
+
+        class FakeMinimizer:
+            def __init__(self, **kwargs):
+                minimizer_kwargs.append(kwargs)
+
+            def add_hydrogens_and_minimize(self, input_path, output_path, **kwargs):
+                return False
+
+        with patch("synth_pdb.generator.EnergyMinimizer", FakeMinimizer):
+            generate_pdb_content(
+                sequence_str="ALA-ALA",
+                minimize_energy=True,
+                solvent_model="explicit",
+                solvent_padding=2.5,
+            )
+
+        self.assertEqual(minimizer_kwargs[0]["solvent_model"], "explicit")
+        self.assertEqual(minimizer_kwargs[0]["box_size"], 2.5)
 
     def test_get_sequence_random_empty(self):
         """Test random empty sequence request."""

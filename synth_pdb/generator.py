@@ -1449,6 +1449,7 @@ def _do_energy_minimization(
             minimizer = EnergyMinimizer(
                 forcefield_name=forcefield,
                 solvent_model=solvent_model,
+                box_size=solvent_padding,
                 platform_name=platform,
                 precision=precision,
             )
