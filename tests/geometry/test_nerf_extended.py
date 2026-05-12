@@ -81,11 +81,17 @@ def test_nerf_translation_invariance(p1, p2, p3, length, angle, dihedral):
     """
     Property: Placing P4 should be invariant to global translation.
     """
+
     # Avoid degenerate/collinear p1, p2, p3
+    #if np.linalg.norm(p1 - p2) < 1e-3 or np.linalg.norm(p2 - p3) < 1e-3:
+    #    return
     assume(np.linalg.norm(p1 - p2) > 1e-3)
     assume(np.linalg.norm(p2 - p3) > 1e-3)
     v1 = p1 - p2
     v2 = p3 - p2
+
+    #if abs(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))) > 0.99:
+    #    return
     assume(abs(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))) < 0.99)
 
     shift = np.array([10.0, -5.0, 2.5])
