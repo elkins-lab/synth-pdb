@@ -1108,10 +1108,14 @@ def main() -> None:
                 _, intensity = calculate_saxs_profile(stack[i], q_max=args.q_max)
                 all_intensities.append(intensity)
 
-            avg_intensity = np.mean(all_intensities, axis=0)
-            out_file = args.saxs_output or "synthetic_saxs.dat"
-            export_saxs_profile(q_vals, avg_intensity, out_file)
-            logger.info(f"SAXS simulation complete. Profile saved to {out_file}")
+            if all_intensities:
+                avg_intensity = np.mean(all_intensities, axis=0)
+                out_file = args.saxs_output or "synthetic_saxs.dat"
+                export_saxs_profile(q_vals, avg_intensity, out_file)
+                logger.info(f"SAXS simulation complete. Profile saved to {out_file}")
+            else:
+                logger.error("SAXS simulation failed: No intensities calculated.")
+                sys.exit(1)
 
             # 3. Optional Visualization
             if args.visualize:

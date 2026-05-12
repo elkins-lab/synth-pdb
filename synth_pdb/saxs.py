@@ -219,7 +219,13 @@ class SaxsSimulator:
                 )
                 all_intensities.append(intensity)
 
-            return cast(np.ndarray, np.mean(all_intensities, axis=0))
+            if all_intensities:
+                return cast(np.ndarray, np.mean(all_intensities, axis=0))
+            return np.zeros(self.n_points)
+
+        if isinstance(structure, struc.AtomArrayStack) and structure.stack_depth() == 0:
+            logger.warning("Attempted to simulate SAXS on an empty ensemble.")
+            return np.zeros(self.n_points)
 
         # Single structure
         _, intensity = calculate_saxs_profile(

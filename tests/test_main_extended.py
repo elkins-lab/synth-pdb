@@ -65,10 +65,15 @@ def test_main_saxs_seed_propagation() -> None:
     with (
         patch("sys.argv", ["synth-pdb", "--mode", "saxs", "--length", "5", "--seed", "42"]),
         patch("synth_pdb.generator._get_random_sequence", return_value=["ALA"]) as mock_get_seq,
-        patch("synth_pdb.batch_generator.BatchedGenerator"),
+        patch("synth_pdb.batch_generator.BatchedGenerator") as mock_bg_class,
         patch("synth_pdb.saxs.calculate_saxs_profile", return_value=(np.zeros(1), np.zeros(1))),
         patch("synth_pdb.saxs.export_saxs_profile"),
     ):
+        mock_batch = MagicMock()
+        mock_stack = [MagicMock()]
+        mock_batch.to_stack.return_value = mock_stack
+        mock_bg_class.return_value.generate_batch.return_value = mock_batch
+
         main()
         assert mock_get_seq.called
         _, kwargs = mock_get_seq.call_args
