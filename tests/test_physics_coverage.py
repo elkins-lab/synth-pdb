@@ -245,10 +245,11 @@ class TestPhysicsCoverage:
                 "out.pdb",
                 max_iterations=50,
                 tolerance=5.0,
-                add_hydrogens=False,
+                add_hydrogens=True,
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
@@ -429,6 +430,7 @@ class TestPhysicsCoverage:
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
         # Test equilibrate with steps
@@ -445,6 +447,7 @@ class TestPhysicsCoverage:
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)

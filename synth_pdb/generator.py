@@ -83,6 +83,10 @@ from .pdb_utils import (
 from .physics import EnergyMinimizer
 from .relaxation import predict_order_parameters
 
+# Global cache for residue templates to prevent repeated expensive calls to
+# struc.info.residue(), which parses internal XML/CIF databases on every call.
+_RESIDUE_TEMPLATE_CACHE: dict[str, struc.AtomArray] = {}
+
 # Used in _build_peptide_chain to orient the first residue's C atom
 ANGLE_N_CA_C_RAD = np.deg2rad(ANGLE_N_CA_C)
 
@@ -1113,11 +1117,21 @@ def _build_peptide_chains(
                 d_to_l = {v: k for k, v in L_TO_D_MAPPING.items()}
                 template_res_name = d_to_l[res_name]
 
-            try:
-                ref_res_template = struc.info.residue(template_res_name).copy()
-            except KeyError:
-                logger.warning(f"Residue {res_name} not found in Biotite info, skipping.")
-                continue
+            # DATA INTEGRITY - Template Caching:
+            # Fetching residue templates via struc.info.residue() is expensive.
+            # We use a global cache to avoid parsing Biotite's internal databases
+            # for every residue in every chain.
+            if template_res_name in _RESIDUE_TEMPLATE_CACHE:
+                ref_res_template = _RESIDUE_TEMPLATE_CACHE[template_res_name].copy()
+            else:
+                try:
+                    # Parse once and cache
+                    fresh_template = struc.info.residue(template_res_name)
+                    _RESIDUE_TEMPLATE_CACHE[template_res_name] = fresh_template
+                    ref_res_template = fresh_template.copy()
+                except KeyError:
+                    logger.warning(f"Residue {res_name} not found in Biotite info, skipping.")
+                    continue
 
             # Remove terminal atoms
             if i < sequence_length - 1 or (cyclic and len(chain_sequences) == 1):
@@ -1435,15 +1449,21 @@ def _do_energy_minimization(
             output_path = os.path.join(tmpdir, f"post_min{bridge_ext}")
 
             # Prepare bridge file
+            # EDUCATIONAL NOTE - Hydrogen Stripping:
+            # We strip existing hydrogens before minimization to allow OpenMM
+            # to place them according to the forcefield's ideal geometry.
+            # This prevents clashes between NeRF-placed and OpenMM-placed hydrogens.
+            peptide_to_save = peptide[peptide.element != "H"]
+
             if is_massive:
                 from biotite.structure.io.pdbx import CIFFile, set_structure
 
                 cif_tmp = CIFFile()
-                set_structure(cif_tmp, peptide)
+                set_structure(cif_tmp, peptide_to_save)
                 cif_tmp.write(input_path)
             else:
                 pdb_file_out = pdb.PDBFile()
-                pdb_file_out.set_structure(peptide)
+                pdb_file_out.set_structure(peptide_to_save)
                 pdb_file_out.write(input_path)
 
             minimizer = EnergyMinimizer(
@@ -1465,6 +1485,7 @@ def _do_energy_minimization(
                     steps=equilibrate_steps,
                     cyclic=cyclic,
                     disulfides=current_disulfides,
+                    coordination=coordination,
                 )
             else:
                 success = minimizer.add_hydrogens_and_minimize(
@@ -1475,6 +1496,7 @@ def _do_energy_minimization(
                     cyclic=cyclic,
                     disulfides=current_disulfides,
                     coordination=coordination,
+                    structure=peptide,
                 )
 
             if not success:
@@ -1658,22 +1680,58 @@ def _assemble_output(
             peptide.atom_name[se_mask] = "SE"
             peptide.element[se_mask] = "SE"
 
-    # Iterate over atoms to calculate realistic B-factors and occupancies.
-    for i in range(peptide.array_length()):
-        atom_name = peptide.atom_name[i]
-        res_num = peptide.res_id[i]
-        res_name = peptide.res_name[i]
+    # PERFORMANCE OPTIMIZATION - Vectorized Metadata Calculation:
+    # Instead of a Python loop over every atom, we use NumPy vectorized
+    # operations to calculate B-factors and occupancies.
+    backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
+    backbone_mask = np.isin(peptide.atom_name, list(backbone_atoms))
 
-        current_s2 = s2_map.get(res_num, 0.85)
-        bfactor = _calculate_bfactor(
-            atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
-        )
-        occupancy = _calculate_occupancy(
-            atom_name, res_num, total_residues, res_name, bfactor, rng=rng
-        )
+    # 1. Map S2 values to all atoms
+    unique_res_ids = np.unique(peptide.res_id)
+    max_res_id = int(np.max(unique_res_ids))
+    s2_lookup = np.full(max_res_id + 1, 0.85)
+    for rid, val in s2_map.items():
+        if rid <= max_res_id:
+            s2_lookup[int(rid)] = val
 
-        peptide.b_factor[i] = bfactor
-        peptide.occupancy[i] = occupancy
+    s2_values = s2_lookup[peptide.res_id.astype(int)]
+
+    # 2. Vectorized B-factor calculation
+    b_factors = 100.0 * (1.0 - s2_values) + 5.0
+    b_factors[~backbone_mask] *= 1.5
+    b_factors[peptide.res_name == "GLY"] += 5.0
+    b_factors[peptide.res_name == "PRO"] -= 3.0
+    # Use localized rng if provided, otherwise numpy's global random
+    if rng:
+        noise_bf = np.array([rng.uniform(-2.0, 2.0) for _ in range(len(b_factors))])
+    else:
+        noise_bf = np.random.uniform(-2.0, 2.0, len(b_factors))
+    b_factors += noise_bf
+    b_factors = np.clip(b_factors, 5.0, 99.0)
+    peptide.b_factor = np.round(b_factors, 2)
+
+    # 3. Vectorized Occupancy calculation
+    occupancies = np.where(backbone_mask, 0.98, 0.95)
+    norm_res_id = (peptide.res_id.astype(float) - 1.0) / max(total_residues - 1, 1)
+    dist_from_term = np.minimum(
+        norm_res_id, (total_residues - peptide.res_id.astype(float)) / max(total_residues - 1, 1)
+    )
+    occupancies -= 0.10 * (1.0 - dist_from_term)
+
+    res_mask_1 = np.isin(peptide.res_name, ["GLY", "SER", "ASN", "GLN"])
+    res_mask_2 = np.isin(peptide.res_name, ["PRO", "TRP", "PHE"])
+    occupancies[res_mask_1] -= 0.03
+    occupancies[res_mask_2] += 0.02
+
+    norm_bf = (b_factors - 5.0) / 55.0
+    occupancies -= 0.08 * norm_bf
+    if rng:
+        noise_occ = np.array([rng.uniform(-0.01, 0.01) for _ in range(len(occupancies))])
+    else:
+        noise_occ = np.random.uniform(-0.01, 0.01, len(occupancies))
+    occupancies += noise_occ
+    occupancies = np.clip(occupancies, 0.85, 1.00)
+    peptide.occupancy = np.round(occupancies, 2)
 
     # ── Step 3: Format-Specific Export ─────────────────────────────────────
     if output_format in ["cif", "bcif"]:

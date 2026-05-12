@@ -240,6 +240,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Run energy minimization to regularize geometry and resolve clashes.
 
@@ -302,12 +303,13 @@ class EnergyMinimizer:
         res = self._run_simulation(
             pdb_file_path,
             output_path,
-            add_hydrogens=False,
+            add_hydrogens=True,
             max_iterations=max_iterations,
             tolerance=tolerance,
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
@@ -319,6 +321,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Run Thermal Equilibration (MD) at 300K.
 
@@ -359,6 +362,7 @@ class EnergyMinimizer:
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
@@ -371,6 +375,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
 
@@ -416,6 +421,7 @@ class EnergyMinimizer:
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
@@ -794,6 +800,7 @@ class EnergyMinimizer:
         cyclic: bool,
         coordination_param: list | None,
         atom_list: list[Any],
+        structure: Any | None = None,
     ) -> tuple[Any, list, list, list, list[Any]]:
         """Build the OpenMM Modeller, apply H handling, detect disulfides and salt bridges.
 
@@ -960,51 +967,46 @@ class EnergyMinimizer:
                 b_struc = None
 
             if b_struc is not None:
-                # We use BOTH caller-supplied sites (if any) and internally detected ones.
-                # Convert caller-supplied site dictionaries into the list of atom-index pairs
-                # that _build_simulation_context expects.
+                # PERFORMANCE OPTIMIZATION - Lookup Indexing:
+                # We build a mapping of (res_id, atom_name) -> atom_index to avoid
+                # O(N) searching for every ligand in every coordination site.
+                atom_lookup = {(str(a.residue.id).strip(), a.name): a.index for a in atom_list}
 
                 # 1. Process caller sites (from generator)
                 if coordination_param:
                     for site in coordination_param:
+                        i_type = site["type"]
                         i_idx_at = -1
                         # Find the ion atom index in the topology
                         for atom in atom_list:
-                            if atom.residue.name == site["type"]:
+                            if atom.residue.name == i_type:
                                 i_idx_at = atom.index
                                 break
                         if i_idx_at != -1:
                             # Map ligand indices from b_struc to topology
                             for l_idx in site["ligand_indices"]:
                                 l_at = b_struc[l_idx]
-                                for atom in atom_list:
-                                    if (
-                                        int(atom.residue.id) == int(l_at.res_id)
-                                        and atom.name == l_at.atom_name
-                                    ):
-                                        coordination_restraints.append((i_idx_at, atom.index))
-                                        break
+                                l_key = (str(l_at.res_id).strip(), l_at.atom_name)
+                                if l_key in atom_lookup:
+                                    coordination_restraints.append((i_idx_at, atom_lookup[l_key]))
 
                 # 2. Add internally detected sites (if not already covered)
                 internal_sites = find_metal_binding_sites(b_struc)
                 for site in internal_sites:
+                    i_type = site["type"]
                     i_idx_at = -1
                     for atom in atom_list:
-                        if atom.residue.name == site["type"]:
+                        if atom.residue.name == i_type:
                             i_idx_at = atom.index
                             break
                     if i_idx_at != -1:
                         for l_idx in site["ligand_indices"]:
                             l_at = b_struc[l_idx]
-                            for atom in atom_list:
-                                if (
-                                    int(atom.residue.id) == int(l_at.res_id)
-                                    and atom.name == l_at.atom_name
-                                ):
-                                    pair = (i_idx_at, atom.index)
-                                    if pair not in coordination_restraints:
-                                        coordination_restraints.append(pair)
-                                    break
+                            l_key = (str(l_at.res_id).strip(), l_at.atom_name)
+                            if l_key in atom_lookup:
+                                pair = (i_idx_at, atom_lookup[l_key])
+                                if pair not in coordination_restraints:
+                                    coordination_restraints.append(pair)
 
                 # Salt bridges
                 try:
@@ -1013,22 +1015,13 @@ class EnergyMinimizer:
                         f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges"
                     )
                     if salt_bridges:
-                        current_atoms = list(modeller.topology.atoms())
                         for br in salt_bridges:
-                            ia, ib = -1, -1
-                            for atom in current_atoms:
-                                if (
-                                    str(atom.residue.id).strip() == str(br["res_ia"]).strip()
-                                    and atom.name == br["atom_a"]
-                                ):
-                                    ia = atom.index
-                                if (
-                                    str(atom.residue.id).strip() == str(br["res_ib"]).strip()
-                                    and atom.name == br["atom_b"]
-                                ):
-                                    ib = atom.index
-                            if ia != -1 and ib != -1:
-                                salt_bridge_restraints.append((ia, ib, br["distance"] / 10.0))
+                            key_a = (str(br["res_ia"]).strip(), br["atom_a"])
+                            key_b = (str(br["res_ib"]).strip(), br["atom_b"])
+                            if key_a in atom_lookup and key_b in atom_lookup:
+                                salt_bridge_restraints.append(
+                                    (atom_lookup[key_a], atom_lookup[key_b], br["distance"] / 10.0)
+                                )
                 except Exception as e:
                     logger.debug(f"Internal salt bridge detection failed: {e}")
         except Exception as e:
@@ -1777,6 +1770,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> float | None:
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
@@ -1869,20 +1863,20 @@ class EnergyMinimizer:
                     )
                     sb_force.addPerBondParameter("r0")
                     new_ats = list(topology.atoms())
+                    # PERFORMANCE OPTIMIZATION - Lookup Indexing:
+                    # Build a map for the post-modeller topology to quickly find atom indices.
+                    new_atom_lookup = {
+                        (str(a.residue.id).strip(), a.name): a.index for a in new_ats
+                    }
+
                     for ao, bo, r0 in salt_bridge_restraints:
                         oa, ob = atom_list[ao], atom_list[bo]
-                        na, nb = -1, -1
-                        for a in new_ats:
-                            if (
-                                str(a.residue.id).strip() == str(oa.residue.id).strip()
-                                and a.name == oa.name
-                            ):
-                                na = a.index
-                            if (
-                                str(a.residue.id).strip() == str(ob.residue.id).strip()
-                                and a.name == ob.name
-                            ):
-                                nb = a.index
+                        key_a = (str(oa.residue.id).strip(), oa.name)
+                        key_b = (str(ob.residue.id).strip(), ob.name)
+
+                        na = new_atom_lookup.get(key_a, -1)
+                        nb = new_atom_lookup.get(key_b, -1)
+
                         if na != -1 and nb != -1:
                             sb_force.addBond(na, nb, [r0 * unit.nanometers])
                     system.addForce(sb_force)
