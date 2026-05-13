@@ -1450,63 +1450,48 @@ class EnergyMinimizer:
             logger.debug(f"Using Cached OpenMM Platform: {platform.getName()}")
         else:
             # Fallback auto-detection logic
-            # CI Optimization: Bypass hardware probing on headless runners to prevent hangs
-            if os.getenv("GITHUB_ACTIONS") == "true":
+            #
+            # We probe accelerated platforms only. CPU and Reference are intentionally
+            # NOT probed — when no GPU platform validates here, we leave ``platform=None``
+            # so OpenMM's built-in selector picks the fastest available platform by its
+            # registered speed (CPU=10.0, Reference=1.0). Explicitly probing CPU here
+            # caused it to be cached on hosts where the dummy GPU probe spuriously fails
+            # (e.g. mixed-precision OpenCL on macOS), even though OpenMM would happily
+            # use OpenCL/CUDA when called without explicit platform/props. Pinning the
+            # Reference platform in CI similarly cost ~50x — Reference is the
+            # single-threaded correctness implementation, not a fast fallback.
+            for name in ["CUDA", "Metal", "OpenCL"]:
                 try:
-                    platform = mm.Platform.getPlatformByName("Reference")
-                    props = {}
+                    temp_platform = mm.Platform.getPlatformByName(name)
+                    temp_props = {}
+                    if name in ["CUDA", "OpenCL"]:
+                        temp_props["Precision"] = "mixed"
+
+                    # Try to initialize a tiny dummy simulation to verify functionality
+                    # This prevents caching a 'broken' platform (like OpenCL without drivers)
+                    dummy_sys = mm.System()
+                    dummy_sys.addParticle(1.0 * unit.amu)
+                    dummy_int = mm.LangevinIntegrator(
+                        300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
+                    )
+                    # This call validates the platform/driver stack
+                    dummy_context = None
+                    try:
+                        dummy_context = mm.Context(dummy_sys, dummy_int, temp_platform, temp_props)
+                    finally:
+                        if dummy_context:
+                            del dummy_context
+                        del dummy_int
+                        del dummy_sys
+
+                    platform = temp_platform
+                    props = temp_props
                     _BEST_PLATFORM_CACHE["platform"] = platform
                     _BEST_PLATFORM_CACHE["props"] = props.copy()
-                    logger.info(
-                        "CI Environment Detected: Defaulting to OpenMM 'Reference' platform."
-                    )
+                    logger.info(f"Using Auto-detected OpenMM Platform: {name}")
+                    break
                 except Exception:
-                    pass
-
-            if platform is None:
-                for name in ["CUDA", "Metal", "OpenCL", "CPU"]:
-                    try:
-                        temp_platform = mm.Platform.getPlatformByName(name)
-                        temp_props = {}
-                        if name in ["CUDA", "OpenCL"]:
-                            temp_props["Precision"] = "mixed"
-
-                        # Try to initialize a tiny dummy simulation to verify functionality
-                        # This prevents caching a 'broken' platform (like OpenCL without drivers)
-                        dummy_sys = mm.System()
-                        dummy_sys.addParticle(1.0 * unit.amu)
-                        dummy_int = mm.LangevinIntegrator(
-                            300 * unit.kelvin, 1.0 / unit.picosecond, 2.0 * unit.femtoseconds
-                        )
-                        # This call validates the platform/driver stack
-                        dummy_context = None
-                        try:
-                            dummy_context = mm.Context(
-                                dummy_sys, dummy_int, temp_platform, temp_props
-                            )
-                        finally:
-                            if dummy_context:
-                                del dummy_context
-                            del dummy_int
-                            del dummy_sys
-
-                        platform = temp_platform
-                        props = temp_props
-                        _BEST_PLATFORM_CACHE["platform"] = platform
-                        _BEST_PLATFORM_CACHE["props"] = props.copy()
-                        logger.info(f"Using Auto-detected OpenMM Platform: {name}")
-                        break
-                    except Exception:
-                        continue
-
-            if platform is None:
-                try:
-                    platform = mm.Platform.getPlatformByName("Reference")
-                    logger.warning(
-                        "No accelerated OpenMM platform found. Falling back to 'Reference' (slow)."
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to initialize even the Reference platform: {e}")
+                    continue
 
         if platform:
             try:

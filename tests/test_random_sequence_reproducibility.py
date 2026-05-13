@@ -25,7 +25,7 @@ def test_decoy_sequence_reproducibility(tmp_path: Path):
     ]
 
     # Run once
-    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result1.returncode == 0, f"Command failed: {result1.stderr}"
     # The sequence is logged at the end of a line containing "sequence"
     match1 = re.search(r"sequence:?\s+([\w-]+)", result1.stderr)
@@ -34,7 +34,7 @@ def test_decoy_sequence_reproducibility(tmp_path: Path):
     seq1 = match1.group(1)
 
     # Run again
-    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result2.returncode == 0, f"Command failed: {result2.stderr}"
     match2 = re.search(r"sequence:?\s+([\w-]+)", result2.stderr)
     if not match2:
@@ -65,7 +65,7 @@ def test_cryo_em_sequence_reproducibility(tmp_path: Path):
     ]
 
     # Run once
-    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result1.returncode == 0, f"Command failed: {result1.stderr}"
     match1 = re.search(r"sequence:\s+([\w-]+)", result1.stderr)
     if not match1:
@@ -73,7 +73,7 @@ def test_cryo_em_sequence_reproducibility(tmp_path: Path):
     seq1 = match1.group(1)
 
     # Run again
-    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result2.returncode == 0, f"Command failed: {result2.stderr}"
     match2 = re.search(r"sequence:\s+([\w-]+)", result2.stderr)
     if not match2:
@@ -104,7 +104,7 @@ def test_saxs_sequence_reproducibility(tmp_path: Path):
     ]
 
     # Run once
-    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result1 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result1.returncode == 0, f"Command failed: {result1.stderr}"
     match1 = re.search(r"sequence:\s+([\w-]+)", result1.stderr)
     if not match1:
@@ -112,7 +112,7 @@ def test_saxs_sequence_reproducibility(tmp_path: Path):
     seq1 = match1.group(1)
 
     # Run again
-    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path)
+    result2 = subprocess.run(cmd, capture_output=True, text=True, cwd=tmp_path, encoding="utf-8")
     assert result2.returncode == 0, f"Command failed: {result2.stderr}"
     match2 = re.search(r"sequence:\s+([\w-]+)", result2.stderr)
     if not match2:

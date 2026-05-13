@@ -35,7 +35,7 @@ def test_main_rdc_validation_cli(tmp_path: Path, monkeypatch: Any) -> None:
         str(rdc_path),
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env, encoding="utf-8")
 
     # 3. Verify Output
     assert (
