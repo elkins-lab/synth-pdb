@@ -734,7 +734,15 @@ class EnergyMinimizer:
                         insert_idx = idx + 1
                 if insert_idx != -1 and c_coords is not None:
                     x, y, z = c_coords
-                    res_name_c = c_line_template[17:20]
+                    # c_line_template was captured in the first pass, before PTM
+                    # renaming. Apply ptm_map here so the dummy OXT carries the
+                    # same residue name as the renamed residue atoms it joins —
+                    # otherwise OpenMM's PDB reader sees two residues with the
+                    # same (chain, id) but different names (e.g. HIE vs HIS) and
+                    # emits a "two consecutive residues with same number" warning.
+                    raw_res_name_c = c_line_template[17:20].strip()
+                    renamed_c = ptm_map.get(raw_res_name_c, raw_res_name_c)
+                    res_name_c = f"{renamed_c: >3}"
                     res_id_full = c_line_template[21:26]
                     oxt_line = (
                         f"ATOM   9999  OXT {res_name_c} {res_id_full}    "
