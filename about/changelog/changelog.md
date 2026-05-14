@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.37.0] - 2026-05-14
+
+### Added
+- **Modern Formats Support**: Native support for mmCIF (PDBx) and BinaryCIF (BCIF) output via the `--format` flag.
+- **Massive Protein Support**: Ability to generate structures with over 99,999 atoms and 62 chains using the CIF format.
+- **BinaryCIF Export**: High-performance binary format for AI pipelines and web-based visualization (Mol*).
+- **Interactive Tutorials**: Restored and improved interactive Jupyter Notebooks for NeRF geometry and protein quality assessment.
+- **ASCII-Only Standard**: Package-wide migration to ASCII-safe strings to prevent encoding crashes in restricted terminal environments.
+
+### Fixed
+- **Core Performance**: Vectorized B-factor and occupancy calculations using NumPy, resulting in >10x speedup for large protein generation.
+- **Validator Optimization**: Significant performance improvements to `PDBValidator` for large structures.
+- **Reproducibility**: Restored strict seed propagation for all generation modes and formats.
+
 ## [1.36.0] - 2026-05-04
 
 ### Added
@@ -102,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **New Documentation Pages**:
-  - `docs/api/rdc.md`: Full API reference for `synth_pdb.rdc` — Saupe-matrix RDC back-calculation, Q-factor interpretation table, alignment media comparison, and complete workflow example.
+  - `docs/api/rdc.md`: Full API reference for `synth_pdb.rdc` — Saupe-matrix RDC back-calculation, Q-factor interpretation table, alignment media comparison and complete workflow example.
   - `docs/api/ensemble.md`: Full API reference for `synth_pdb.ensemble` — `DAOPCalculator`, `EnsembleStatistics`, and `QualityAssessment` with Tejero 2013 quality thresholds.
   - `docs/science/ensemble-analysis.md`: Science background page explaining DAOP circular statistics, coordinate RMSD/RMSF, medoid selection, and IDP ensemble caveats.
 - **Documentation Expansions**:
@@ -116,7 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added 11 new references (Engh & Huber 1991, Hyberts 1992, Tejero 2013, Tjandra & Bax 1997, Saupe 1968, Morcos 2011, Lin 2023, Jumper 2021, Ruff & Pappu 2021, Clore & Iwahara 2009, Cornilescu 1998).
 
 ### Fixed
-- **Docs site badges**: Replaced broken `Open in Colab` badge (pointed to non-existent `demo.ipynb`) with correct link to `docs/tutorials/virtual_nmr_spectrometer.ipynb`.
+- **Docs site badges**: Replaced broken `Open in Colab` badge (pointed to non-existent `demo.ipynb`) with correct link to `examples/interactive_tutorials/virtual_nmr_spectrometer.ipynb`.
 - **PyPI badge**: Replaced unreliable `badge.fury.io` endpoint with live `shields.io/pypi/v` badge.
 - **mkdocs.yml**: Added `api/rdc.md` and `api/ensemble.md` to the API Reference nav; added `science/ensemble-analysis.md` to the Scientific Background nav.
 
@@ -155,6 +169,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`QualityAssessment`** (`synth_pdb.ensemble.statistics`): Lightweight typed
   dataclass for the precision/overall-quality assessment pair.
 
+---
+
 ## [1.27.0] - 2026-03-30
 
 ### Added
@@ -169,6 +185,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Dependency Update**: Bumped `synth-nmr` dependency to `>=0.9.0` for improved physical validation and J-coupling support.
 - **CI/CD Stabilization**: Hard-pinned documentation dependencies (`mkdocstrings`, `mkdocstrings-python`, and `pygments`) to ensure build site reproducibility and resolve `NoneType` errors in the MkDocs pipeline.
+
+---
 
 ## [1.26.0] - 2026-03-29
 
@@ -197,3 +215,217 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Synthetic MSA Generation with Co-Evolution** (`synth_pdb/msa.py`): New generative workflow simulating Markov Chain Monte Carlo (MCMC) evolution over a 3D structural Potts Model, enabling zero-shot generation of deep multiple sequence alignments to test DCA/AlphaFold inputs.
 - **MSA Mutual Information Tutorial** (`examples/interactive_tutorials/coevolution_msa_factory.ipynb`): New interactive Jupyter notebook visually demonstrating how the physics-based MCMC sampler enforces co-evolution signals that recover the 3D contact map.
 - **High-Density Physics Documentation Suite**: Massively expanded the inline educational docstrings across `synth_pdb/physics.py` (>60% line density), exposing the physical rationale behind NVT Langevin dynamics, Amber forcefields, implicit solvents, and metadata restoration strategies.
+
+## [1.23.0] - 2026-03-07
+
+### Added
+
+- **IDP Conformational Ensembles Tutorial** (`examples/interactive_tutorials/idp_ensemble_validation.ipynb`): New interactive notebook validating synthetic IDP ensembles mathematically and visually against $1/r^6$ Paramagnetic Relaxation Enhancement (PRE) NMR phenomena.
+- **AlphaFold pLDDT vs NMR S² Tutorial** (`examples/interactive_tutorials/alphafold_vs_nmr_dynamics.ipynb`): New interactive notebook modeling an unstructured loop to demonstrate the inverse correlation between static AI prediction confidence (pLDDT) and physical NMR flexibility.
+- **IDP Theoretical Physics Documentation** (`docs/science/idp-dynamics.md`): Added comprehensive biophysical theory documentation explaining how the `BatchedGenerator` successfully handles intrinsically disordered regions compared to rigid crystalline tools.
+
+### Fixed
+
+- **Py3Dmol Widget Crash on Local Jupyter**: Replaced IPyWidgets `HBox` layout with Py3Dmol's native `viewergrid=(1,2)` API across tutorials. This stops localized browser javascript injection blocks from breaking dual-viewer structures (fixing "3Dmol.js failed to load" spam).
+- **GitHub Actions Formatting CI**: Ran `ruff check --fix .` across the codebase, fixing un-sorted imports and line-length breakages introduced by `physics.py` trajectory logging features, restoring a completely 'green' `test.yml` CI workflow.
+
+---
+
+## [1.22.0] - 2026-03-05
+
+### Added
+
+- **Residual Dipolar Coupling (RDC) module** (`synth_pdb/rdc.py`): New `calculate_rdcs()`
+  function implementing the Saupe-matrix formalism for computing backbone N–H RDCs given
+  an alignment tensor defined by axial component `Da` and rhombicity `R`.
+- **RDC tutorial notebook** (`examples/interactive_tutorials/rdc_alignment_explorer.ipynb`):
+  Standalone Colab-compatible notebook demonstrating RDC calculation, Q-factor
+  validation against published ubiquitin data (1D3Z), and interactive alignment-tensor
+  exploration.
+- **Virtual NMR Spectrometer — RDC section** (`virtual_nmr_spectrometer.ipynb` cells
+  13–14): Interactive RDC fingerprint panel with `ipywidgets` sliders for `Da` and `R`,
+  and a `py3Dmol` 3D view coloured by RDC sign and magnitude.
+- **Virtual NMR Spectrometer — Shift Predictor Comparison** (cells 15–16): Side-by-side
+  HSQC scatter plots (empirical vs SHIFTX2), per-residue Δδ(¹H) bar chart, and a
+  summary statistics table with literature RMSD benchmarks. Graceful fallback when
+  SHIFTX2 is not installed.
+
+### Fixed
+
+- **`synth_pdb/physics.py` — `EnergyMinimizer`**: Eliminated a spurious
+  `WARNING: Forcefield does not support implicitSolvent` log message that fired on
+  every run. Root cause: the OBC2 implicit-solvent XML was correctly loaded at
+  construction time, but `_create_system_robust` also passed `implicitSolvent=app.OBC2`
+  as a `createSystem()` kwarg — which modern OpenMM rejects as unused. Fix: clear
+  `self.implicit_solvent_enum` after the XML is appended so the kwarg path is never
+  exercised.
+- **`synth_pdb/relaxation.py` (via `synth-nmr>=0.7.2`)**: Heteronuclear NOE values
+  were identical for every residue (a flat horizontal line) because S² cancelled
+  exactly in the ratio cross-relaxation/R₁ when `tau_f=0`. Fix in `synth-nmr 0.7.2`:
+  a per-residue fast internal motion timescale `tau_f = (1−S²)×500 ps + 50 ps` now
+  breaks the cancellation. Flexible termini correctly give low/negative HetNOE; rigid
+  helices give HetNOE ≈ 0.5–0.8. Ref: Lipari & Szabo (1982) *J Am Chem Soc* 104:4546.
+- **`virtual_nmr_spectrometer.ipynb` Colab setup**: Added explicit
+  `pip install synth-nmr>=0.7.2` to the setup cell (was silently skipped because
+  `synth-pdb` was installed with `--no-deps`), fixing a `ModuleNotFoundError: No module named 'synth_nmr'` crash on every fresh Colab runtime.
+- **`virtual_nmr_spectrometer.ipynb` Neural Shift cell**: Added a `torch_geometric`
+  availability check with a clear install hint (`pip install synth-nmr[ml]`). Previously
+  the cell crashed with `ImportError: torch_geometric is required` when the ML extras
+  were absent (the default in Colab).
+
+### Changed
+
+- **Dependency**: Tightened `synth-nmr` lower bound from `>=0.6.1` to `>=0.7.2` to
+  ensure the HetNOE bug fix and all NMR accuracy improvements are always present.
+
+---
+
+## [1.20.0] - 2026-02-21
+
+
+### Changed
+- **Numpy Compatibility**: Relaxed numpy dependency pin to `<3.0.0` to resolve binary incompatibility errors (`numpy.dtype size changed`) in Google Colab and other environments using `numpy 2.x`.
+- **Dependency Update**: Bumped `synth-nmr` dependency to `>=0.6.1` to incorporate upstream numpy compatibility fixes.
+
+---
+
+## [1.19.1] - 2026-02-19
+
+### Fixed
+- **PLM Tutorial Bug**: Fixed a `TypeError` in `examples/ml_integration/plm_embeddings.ipynb` where an obsolete `ss_type` argument was used instead of `conformation` for `generate_pdb_content()`.
+
+### Changed
+- **Educational Enhancements**: Significantly expanded the PLM tutorial notebook (`plm_embeddings.ipynb`) with plain-language explanations of Protein Language Models, embeddings, similarity metrics, and UMAP clustering for chemists and biologists without machine learning backgrounds.
+
+---
+
+## [1.19.0] - 2026-02-19
+
+### Added
+- **PLM Embeddings**: Integrated ESM-2 protein language model support via `synth_pdb.quality.plm`. Generates per-residue and pooled embeddings from generated structures, enabling zero-shot quality scoring and downstream ML tasks.
+- **PLM Tutorial**: Added `examples/ml_integration/plm_embeddings.ipynb` Colab-compatible notebook demonstrating ESM-2 embedding extraction and visualization.
+- New optional dependency group `[plm]` (`torch>=2.0.0`, `transformers>=4.30.0`).
+
+---
+
+## [1.18.0] - 2026-02-19
+
+### Added
+- **GNN Quality Scorer**: New `synth_pdb.quality.gnn` module with a Graph Neural Network model for protein structure quality assessment. Nodes represent residues; edges encode sequence proximity and spatial contacts.
+- **GNN Training Script**: `scripts/train_gnn_quality.py` for training the GNN on labelled structure datasets.
+- **Random Forest Baseline**: Included alongside GNN as an interpretable quality-filter baseline (`synth_pdb.quality.rf_model`).
+- New optional dependency group `[gnn]` (`torch>=2.0.0`, `torch_geometric>=2.4.0`, `scikit-learn`, `joblib`).
+
+### Changed
+- `[ai]` optional-dependency group now covers the Random Forest model; `[gnn]` covers the full GNN stack.
+
+---
+
+## [1.17.0] - 2026-02-11
+
+### Changed
+- **NMR Package Integration**: NMR functionality now provided by the [`synth-nmr`](https://github.com/elkins/synth-nmr) package
+- Maintained 100% backward compatibility via compatibility shims
+- All existing code continues to work without changes
+
+### Added
+- Dependency on `synth-nmr>=0.1.0`
+
+### Removed
+- ~1,200 lines of duplicate NMR code (now imported from synth-nmr)
+
+## [1.15.0] - 2026-02-02
+### Added
+- **ML Handover Notebooks**: Added zero-copy handover examples for **JAX**, **MLX**, and **PyTorch** in `examples/ml_loading/`.
+- **Vectorized Batch Generation**: Exposed `BatchedGenerator` and `BatchedPeptide` via `synth_pdb.generator` for high-performance AI training pipelines.
+- **Salt Bridge Consolidation**: Unified salt bridge force parameters to prevent global parameter conflicts in complex structures.
+
+### Fixed
+- **Cyclic Peptide Physics**: Refined covalent ring closure using a surgical linear-to-cyclic conversion strategy, bypassing OpenMM template matching limitations.
+- **Physics Preprocessing**: Resolved an `UnboundLocalError` in the simulation engine that caused crashes in specific edge-case topologies.
+- **Notebook Robustness**: Added graceful dependency checks and precision-safe assertions (`assert_allclose`) to ML handover notebooks.
+- **Test Stability**: Suppressed verbose Numba debug logging and fixed mock assertion failures in the physics test suite.
+
+## [1.14.0] - 2026-01-31
+### Added
+- **D-Amino Acid Support**: Support for generating and validating peptides with D-amino acids using the `D-` prefix in sequences.
+- **PDB Compatibility**: Automatic conversion of D-amino acids to standard 3-letter codes (e.g., `DAL`, `DPH`).
+- **Educational Enhancements**: Detailed comments explaining chiral mirroring and stereochemistry.
+- **New Tests**: Comprehensive TDD suite for D-amino acid generation and validation.
+
+
+## [1.13.1] - 2026-01-30
+
+### Added
+- **EGF Generation Example**: Added a new example script `examples/generate_egf.py` demonstrating the generation of a complex 53-residue protein with disarmament minimization and synthetic NMR data.
+
+### Fixed
+- **Validator Stability**: Fixed a critical `TypeError` in `validator.py` where terminal caps or incomplete backbone atoms could cause a crash during bond angle validation.
+- **Regression Testing**: Added automated regression tests for the validator crash to prevent future regressions.
+
+## [1.13.0] - 2026-01-30
+
+### Added
+- **Cyclic Peptide Support**: Implemented head-to-tail macrocyclization with automated terminal atom removal (OXT/H1-3) and physics-based bond closure.
+- **Numba JIT Acceleration**: Integrated `@njit` compilation for NeRF geometry engines, Lipari-Szabo spectral density, and Ring Current calculations, achieving **50-100x speedups**.
+- **Visual Connectivity**: Automated `CONECT` record generation for cyclic bonds and disulfide bridges to ensure seamless representation in the 3D viewer.
+- **Educational References**: Added seminal scientific citations for macrocyclization (Horton, Craik) and deep-dive biophysical commentary to the codebase and README.
+
+### Fixed
+- **Proline Minimization**: Resolved a bug where Proline residues in cyclic peptides caused OpenMM template errors by stripping illegal amide hydrogens.
+- **Metadata Persistence**: Fixed an issue where PTM residue names (SEP, TPO, PTR) were lost during the minimization-to-assembly pipeline.
+
+## [1.12.0] - 2026-01-29
+
+### Added
+- **Beta-Turn Geometries**: Implemented physics-based construction for Type I, II, I', II', and VIII beta-turns. Added `--structure` CLI argument (e.g., `'3-6:typeII'`) for precise loop modeling.
+- **J-Coupling Prediction**: Added generation of $^3J_{H_NH_\alpha}$ scalar couplings using the Karplus equation ($A \cos^2\phi + B \cos\phi + C$). Output available via `main.py` (CSV export).
+- **Cis-Proline Isomerization**: Added `--cis-proline-frequency` to simulate biologically realistic non-canonical conformations (~5% frequency).
+- **Post-Translational Modifications (PTMs)**: Added `--phosphorylation-rate` to simulate Ser/Thr/Tyr phosphorylation, converting residues to SEP/TPO/PTR for downstream MD/NMR analysis.
+- **Performance**: Vectorized geometry kernels and improved OpenMM platform selection (CUDA/Metal preference with CPU fallback).
+
+### Fixed
+- **CLI Regressions**: Fixed `AttributeError` caused by missing CLI arguments for new biophysics features.
+- **Variable Scoping**: Resolved `NameError` in `generator.py` related to rotamer selection aliases.
+## [1.11.0] - 2026-01-29
+
+### Added
+- **Pre-Proline Backbone Realism**: Implemented specific conformational sampling for residues preceding Proline (favoring Extended/Beta, restricting Alpha). This significantly reduces steric clashes.
+- **Biophysical Efficiency**: Validated that improving backbone realism reduces energy minimization time by **>60%** (2.42s -> 0.91s) by providing physically sound starting structures.
+- **Advanced Chemical Shifts**: Added **Ring Current Effects** (Haigh-Mallion point-dipole model) to chemical shift prediction. Protons above aromatic rings are now correctly shielded, and in-plane protons deshielded.
+- **SASA-Modulated Relaxation**: Implemented Solvent Accessible Surface Area (SASA) calculation to modulate Order Parameters ($S^2$). Buried residues are now modeled as more rigid than exposed ones.
+- **SSBOND Robustness**: Enhanced disulfide bond detection with strict 1-to-1 pairing logic and a defined capture radius (8.0 Å) to prevent multi-bond artifacts in dense structures.
+
+### Fixed
+- **SSBOND Regression**: Fixed an issue where single Cysteines could form multiple disulfide bonds.
+- **SASA Calculations**: Added robust handling for `NaN` values in SASA calculation for small/mock structures.
+
+## [1.10.0] - 2026-01-28
+
+### Added
+- **Full Rotamer Library**: Expanded backbone-dependent rotamer library to support **All 20 Standard Amino Acids** (previously limited). Includes charged (ARG, LYS, GLU, ASP) and aromatic residues with biophysically accurate probabilities.
+- **Side-Chain Validation**: Implemented `validate_side_chain_rotamers()` in `PDBValidator`. It now checks if generated Chi1/Chi2 angles conform to the library distributions (with configurable tolerance).
+- **Chirality Validation**: Added `validate_chirality()` to ensure L-amino acid stereochemistry (checking improper dihedrals).
+- **Validation Integration**: Updated CLI (`main.py`) to run the full suite of validation checks (including rotamers and chirality) whenever `--validate`, `--best-of-N`, or `--guarantee-valid` is used.
+- **Educational Notes**: Added extensive comments explaining Rotamer libraries, Staggered conformations, and Validation logic.
+
+### Changed
+- **CLI Robustness**: Refactored `main.py` validation calls to use `validator.validate_all()`, ensuring no checks are silently skipped in the future.
+- **Tests**: Replaced incomplete mocks with robust TDD cases for rotamer violations.
+- **Project Config**: Updated `pyproject.toml` to fix `setuptools` deprecation warnings (retaining backward compatibility).
+
+### Fixed
+- **Missing Validation**: Fixed an issue where `main.py` was selectively running only some validation checks, ignoring newly added ones.
+
+## [1.9.0] - 2026-01-27
+
+### Added
+- **Feature**: Metal Ion Coordination (Zinc detection and injection).
+- **Feature**: Disulfide Bond detection (SSBOND records).
+- **Feature**: Salt Bridge stabilization in Energy Minimization.
+
+## [1.8.0] - 2026-01-20
+
+### Added
+- **Feature**: NEF (NMR Exchange Format) IO support.
+- **Feature**: Chemical Shift Prediction (SPARTA+ style logic).
