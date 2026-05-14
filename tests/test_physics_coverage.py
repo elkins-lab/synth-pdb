@@ -489,7 +489,7 @@ class TestPhysicsCoverage:
             result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
 
         assert result is not None
-        # With the fix, the solvent is configured via XML — createSystem() is called
+        # With the fix, the solvent is configured via XML - createSystem() is called
         # exactly once (no retry needed) and never receives implicitSolvent= as a kwarg.
         assert minimizer.forcefield.createSystem.call_count == 1
         called_kwargs = minimizer.forcefield.createSystem.call_args[1]

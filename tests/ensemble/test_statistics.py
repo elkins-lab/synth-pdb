@@ -1,5 +1,5 @@
 """
-Tests for synth_pdb.ensemble.statistics — EnsembleStatistics & QualityAssessment.
+Tests for synth_pdb.ensemble.statistics - EnsembleStatistics & QualityAssessment.
 
 Coverage target:
     - EnsembleStatistics field defaults and required fields
@@ -29,7 +29,7 @@ def minimal_stats() -> EnsembleStatistics:
 
 @pytest.fixture()
 def high_quality_stats() -> EnsembleStatistics:
-    """HIGH precision ensemble — RMSD < 1.0 and well-defined > 80%."""
+    """HIGH precision ensemble - RMSD < 1.0 and well-defined > 80%."""
     return EnsembleStatistics(
         n_models=20,
         n_residues=91,
@@ -42,7 +42,7 @@ def high_quality_stats() -> EnsembleStatistics:
 
 @pytest.fixture()
 def good_quality_stats() -> EnsembleStatistics:
-    """GOOD precision ensemble — 1.0 ≤ RMSD < 2.0."""
+    """GOOD precision ensemble - 1.0 <= RMSD < 2.0."""
     return EnsembleStatistics(
         n_models=10,
         n_residues=60,
@@ -55,7 +55,7 @@ def good_quality_stats() -> EnsembleStatistics:
 
 @pytest.fixture()
 def moderate_quality_stats() -> EnsembleStatistics:
-    """MODERATE precision ensemble — RMSD ≥ 2.0."""
+    """MODERATE precision ensemble - RMSD >= 2.0."""
     return EnsembleStatistics(
         n_models=8,
         n_residues=50,
@@ -161,14 +161,14 @@ class TestEnsembleStatisticsPrecision:
         assert moderate_quality_stats.precision == "MODERATE"
 
     def test_precision_at_high_boundary(self) -> None:
-        """rmsd_to_mean = 0.999… → HIGH; = 1.0 → GOOD."""
+        """rmsd_to_mean = 0.999... -> HIGH; = 1.0 -> GOOD."""
         just_below = EnsembleStatistics(n_models=5, n_residues=10, rmsd_to_mean=0.9999)
         at_boundary = EnsembleStatistics(n_models=5, n_residues=10, rmsd_to_mean=1.0)
         assert just_below.precision == "HIGH"
         assert at_boundary.precision == "GOOD"
 
     def test_precision_at_good_boundary(self) -> None:
-        """rmsd_to_mean = 1.999… → GOOD; = 2.0 → MODERATE."""
+        """rmsd_to_mean = 1.999... -> GOOD; = 2.0 -> MODERATE."""
         just_below = EnsembleStatistics(n_models=5, n_residues=10, rmsd_to_mean=1.9999)
         at_boundary = EnsembleStatistics(n_models=5, n_residues=10, rmsd_to_mean=2.0)
         assert just_below.precision == "GOOD"
@@ -199,23 +199,23 @@ class TestEnsembleStatisticsOverallQuality:
         assert moderate_quality_stats.overall_quality == "Acceptable quality NMR ensemble"
 
     def test_may_need_refinement(self) -> None:
-        """HIGH precision but low well-defined % → may need refinement."""
+        """HIGH precision but low well-defined % -> may need refinement."""
         stats = EnsembleStatistics(
             n_models=10,
             n_residues=100,
             rmsd_to_mean=0.5,  # HIGH precision
-            pct_well_defined=40.0,  # < 80% → not "Excellent"
+            pct_well_defined=40.0,  # < 80% -> not "Excellent"
         )
-        # precision="HIGH" but pct_well_defined <= 60 → "may need refinement"
+        # precision="HIGH" but pct_well_defined <= 60 -> "may need refinement"
         assert stats.overall_quality == "Ensemble may need refinement"
 
     def test_acceptable_via_well_defined_pct(self) -> None:
-        """GOOD precision but pct_well_defined > 60 → Acceptable."""
+        """GOOD precision but pct_well_defined > 60 -> Acceptable."""
         stats = EnsembleStatistics(
             n_models=10,
             n_residues=100,
             rmsd_to_mean=2.5,  # MODERATE precision
-            pct_well_defined=65.0,  # > 60 → Acceptable
+            pct_well_defined=65.0,  # > 60 -> Acceptable
         )
         assert stats.overall_quality == "Acceptable quality NMR ensemble"
 
@@ -276,7 +276,7 @@ class TestEnsembleStatisticsSerialisation:
         assert stats.n_models == 5
 
     def test_from_dict_raises_on_missing_required_key(self) -> None:
-        """Missing required key → KeyError."""
+        """Missing required key -> KeyError."""
         with pytest.raises(KeyError):
             EnsembleStatistics.from_dict({"n_models": 5})  # n_residues missing
 

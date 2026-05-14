@@ -193,7 +193,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
             "EDUCATIONAL NOTE - CONECT Records & Visualization:",
             "EDUCATIONAL NOTE - HETATM Restoration:",
             "EDUCATIONAL NOTE: Gradient Descent (L-BFGS)",
-            "Limited-memory Broyden–Fletcher–Goldfarb–Shanno",
+            "Limited-memory Broyden-Fletcher-Goldfarb-Shanno",
             "quasi-Newton method",
             "approximates the second derivative (Hessian)",
             "store the full Hessian matrix",
@@ -310,7 +310,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Ensure generator.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - B-factors (Temperature Factors)",
-            "B = 8π²<u²>",  # Physics formula
+            "B = 8pi^2<u^2>",  # Physics formula
             "Lipari-Szabo",
             "EDUCATIONAL NOTE - Hard Decoy Support (AI Training):",
             "Torsion Drift",
@@ -423,7 +423,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_rdc_educational_notes(self) -> None:
         """Ensure rdc.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — What are Residual Dipolar Couplings (RDCs)?",
+            "EDUCATIONAL NOTE - What are Residual Dipolar Couplings (RDCs)?",
         ]
         self._check_file_contains(self.rdc_path, required_notes)
 
@@ -437,11 +437,11 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_main_educational_notes(self) -> None:
         """Ensure main.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — Scientific Reproducibility:",
-            "EDUCATIONAL NOTE — RDC Background:",
-            "EDUCATIONAL NOTE — Predictor Selection:",
-            "EDUCATIONAL NOTE — RDC Calculation:",
-            "EDUCATIONAL NOTE — CD Background:",
+            "EDUCATIONAL NOTE - Scientific Reproducibility:",
+            "EDUCATIONAL NOTE - RDC Background:",
+            "EDUCATIONAL NOTE - Predictor Selection:",
+            "EDUCATIONAL NOTE - RDC Calculation:",
+            "EDUCATIONAL NOTE - CD Background:",
             "Circular Dichroism (CD) measures the differential absorption",
             "weighted average of basis",
             "spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):",
@@ -498,7 +498,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_chemical_shifts_educational_notes(self) -> None:
         """Ensure chemical_shifts.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — Chemical Shifts in Structural Biology",
+            "EDUCATIONAL NOTE - Chemical Shifts in Structural Biology",
             "EDUCATIONAL NOTE - Approximation via Parent Mapping:",
         ]
         self._check_file_contains(self.chemical_shifts_path, required_notes)
@@ -506,7 +506,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_cd_simulator_educational_notes(self) -> None:
         """Ensure cd_simulator.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — CD Background:",
+            "EDUCATIONAL NOTE - CD Background:",
             "Circular Dichroism (CD) measures the differential absorption",
             "premier tool for measuring the",
             "overall secondary structure",
@@ -521,37 +521,37 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_relaxation_educational_notes(self) -> None:
         """Ensure relaxation.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — NMR Relaxation and the Lipari-Szabo Model",
+            "EDUCATIONAL NOTE - NMR Relaxation and the Lipari-Szabo Model",
         ]
         self._check_file_contains(self.relaxation_path, required_notes)
 
     def test_nmr_educational_notes(self) -> None:
         """Ensure nmr.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — The Nuclear Overhauser Effect (NOE)",
+            "EDUCATIONAL NOTE - The Nuclear Overhauser Effect (NOE)",
         ]
         self._check_file_contains(self.nmr_path, required_notes)
 
     def test_coupling_educational_notes(self) -> None:
         """Ensure coupling.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings",
-            "EDUCATIONAL NOTE — Proline and Secondary Amines",
-            "EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry",
+            "EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings",
+            "EDUCATIONAL NOTE - Proline and Secondary Amines",
+            "EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry",
         ]
         self._check_file_contains(self.coupling_path, required_notes)
 
     def test_structure_utils_educational_notes(self) -> None:
         """Ensure structure_utils.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — NMR Structure Utilities and RMSD",
+            "EDUCATIONAL NOTE - NMR Structure Utilities and RMSD",
         ]
         self._check_file_contains(self.structure_utils_path, required_notes)
 
     def test_j_coupling_educational_notes(self) -> None:
         """Ensure j_coupling.py retains key educational blocks."""
         required_notes = [
-            "EDUCATIONAL NOTE — Scalar J-Couplings and Karplus Equations",
+            "EDUCATIONAL NOTE - Scalar J-Couplings and Karplus Equations",
         ]
         self._check_file_contains(self.j_coupling_path, required_notes)
 
@@ -559,8 +559,8 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Ensure benchmark.py retains key structural biology and AI notes."""
         required_notes = [
             "The benchmark asks a simple but powerful question:",
-            "SCIENTIFIC RATIONALE — Why benchmark against synthetic structures?",
-            "METRICS EXPLAINED — The Structural Biology Toolkit",
+            "SCIENTIFIC RATIONALE - Why benchmark against synthetic structures?",
+            "METRICS EXPLAINED - The Structural Biology Toolkit",
             "Metrics computed",
             "BENCHMARK LIFECYCLE",
             "Generates ``n_structures`` synthetic protein structures",
@@ -570,17 +570,17 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_gnn_library_educational_notes(self) -> None:
         """Ensure GNN library files retain key educational blocks."""
         graph_notes = [
-            "EDUCATIONAL BACKGROUND — Why represent a protein as a graph?",
-            "GEOMETRIC VECTORIZATION — Why skip PDB parsing?",
-            "TOPOLOGY VS CARTESIAN — Why Graphs Win",
+            "EDUCATIONAL BACKGROUND - Why represent a protein as a graph?",
+            "GEOMETRIC VECTORIZATION - Why skip PDB parsing?",
+            "TOPOLOGY VS CARTESIAN - Why Graphs Win",
             "GRAPH STRUCTURE",
         ]
         self._check_file_contains(self.gnn_graph_path, graph_notes)
 
         classifier_notes = [
-            "DESIGN CONTRACT — Same API as ProteinQualityClassifier (RF)",
+            "DESIGN CONTRACT - Same API as ProteinQualityClassifier (RF)",
             "CHECKPOINT FORMAT (.pt)",
-            "HIGH-THROUGHPUT AUDITING — Vectorized Ensemble Scoring",
+            "HIGH-THROUGHPUT AUDITING - Vectorized Ensemble Scoring",
             "VECTORIZED ENSEMBLE AUDITING",
         ]
         self._check_file_contains(self.gnn_classifier_path, classifier_notes)
@@ -588,11 +588,11 @@ class TestDocumentationIntegrity(unittest.TestCase):
     def test_gnn_scripts_educational_notes(self) -> None:
         """Ensure GNN training and benchmark scripts retain key educational blocks."""
         train_notes = [
-            "STRUCTURAL BIOLOGY CONTEXT — Why this multi-task approach?",
-            "Educational note — Ramachandran Z-score and Steric Constraints",
+            "STRUCTURAL BIOLOGY CONTEXT - Why this multi-task approach?",
+            "Educational note - Ramachandran Z-score and Steric Constraints",
             "Why these four classes?",
-            "Good — idealized backbone geometry with physical 'wobble'",
-            'High Torsion Drift (40-60°) — Marginal "Bad"',
+            "Good - idealized backbone geometry with physical 'wobble'",
+            'High Torsion Drift (40-60deg) - Marginal "Bad"',
             "Surgical Torsion Corruption (1-2 bad residues in good backbone)",
         ]
         self._check_file_contains(self.train_gnn_path, train_notes)
@@ -617,9 +617,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self._check_file_contains(
             self.test_main_rdc_path,
             [
-                "EDUCATIONAL NOTE — Synthetic RDCs in AI Training:",
-                "EDUCATIONAL NOTE — Chemical Shift Prediction Methods:",
-                "EDUCATIONAL NOTE — Provenance in PDB Headers:",
+                "EDUCATIONAL NOTE - Synthetic RDCs in AI Training:",
+                "EDUCATIONAL NOTE - Chemical Shift Prediction Methods:",
+                "EDUCATIONAL NOTE - Provenance in PDB Headers:",
             ],
         )
         self._check_file_contains(
@@ -644,8 +644,8 @@ class TestDocumentationIntegrity(unittest.TestCase):
         self._check_file_contains(
             self.test_rdc_shim_path,
             [
-                "EDUCATIONAL NOTE — Why shims?",
-                "EDUCATIONAL NOTE — Proline as a secondary amine:",
+                "EDUCATIONAL NOTE - Why shims?",
+                "EDUCATIONAL NOTE - Proline as a secondary amine:",
             ],
         )
         self._check_file_contains(

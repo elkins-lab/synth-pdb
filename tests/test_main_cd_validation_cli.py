@@ -22,7 +22,7 @@ def test_gen_cd_logs_validation_report(tmp_path: Path, caplog: pytest.LogCapture
 
     We force ``--conformation alpha`` so the helix fraction is high enough that
     ``validate_cd_against_literature`` actually emits a finding rather than an
-    empty list — that way we test both the wrapper logs *and* the per-finding loop.
+    empty list - that way we test both the wrapper logs *and* the per-finding loop.
     """
     caplog.set_level(logging.INFO)
 
@@ -42,7 +42,7 @@ def test_gen_cd_logs_validation_report(tmp_path: Path, caplog: pytest.LogCapture
 
     assert (
         "Synthetic CD Validation Report" in caplog.text
-    ), "CD validation report header missing from logs — was validate_cd_against_literature called?"
+    ), "CD validation report header missing from logs - was validate_cd_against_literature called?"
     # At least one finding line for a helical signature must be logged.
     assert "Helix" in caplog.text or "helix" in caplog.text, (
         "No helix-related CD finding logged. Either the validator returned no findings "

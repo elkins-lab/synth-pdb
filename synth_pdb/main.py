@@ -94,7 +94,7 @@ def _build_command_string(args: argparse.Namespace) -> str:
         if args.shift_output:
             cmd_parts.append(f"--shift-output {args.shift_output}")
         # Record the chosen predictor so the REMARK block captures it for reproducibility.
-        # EDUCATIONAL NOTE — Scientific Reproducibility:
+        # EDUCATIONAL NOTE - Scientific Reproducibility:
         # The PDB REMARK 3 block records all generation parameters.
         # Researchers reading a synth-pdb file can therefore re-run the exact same
         # command and obtain an identical structure, satisfying the FAIR data principles
@@ -319,7 +319,7 @@ def main() -> None:
         "--resolution",
         type=float,
         default=3.0,
-        help="Target resolution (Angstroms) for Cryo-EM density maps (for --mode cryo-em). Default 3.0Å.",
+        help="Target resolution (Angstroms) for Cryo-EM density maps (for --mode cryo-em). Default 3.0A.",
     )
     parser.add_argument(
         "--mrc-output",
@@ -465,7 +465,7 @@ def main() -> None:
         choices=["shiftx2", "empirical"],
         help=(
             "Chemical shift predictor to use with --gen-shifts. "
-            "EDUCATIONAL NOTE — Predictor Selection: "
+            "EDUCATIONAL NOTE - Predictor Selection: "
             "'shiftx2' (default): prefers the SHIFTX2 external binary (Han et al., 2011, "
             "J Biomol NMR 50:43), falls back automatically to the empirical method if the "
             "SHIFTX2 binary is not installed. "
@@ -488,18 +488,18 @@ def main() -> None:
     )
 
     # Phase 9.6: Residual Dipolar Couplings (RDCs)
-    # EDUCATIONAL NOTE — RDC Background:
+    # EDUCATIONAL NOTE - RDC Background:
     # RDCs encode the orientation of bondvectors (e.g., backbone N-H) relative to a
     # global alignment frame. They are fundamentally different from NOE distance
     # restraints: NOEs are local (short-range r^-6 distance contacts) while RDCs are
     # global (orientational information vs. the alignment tensor). The two observables
-    # are therefore complementary — combining them dramatically improves NMR structure
+    # are therefore complementary - combining them dramatically improves NMR structure
     # accuracy. A groundbreaking study showed RDC-constrained calculations refined a
-    # 100-ns MD ensemble to within 0.4 Å of the crystal structure without additional NOEs
+    # 100-ns MD ensemble to within 0.4 A of the crystal structure without additional NOEs
     # (Bewley & Clore, 2000, J Am Chem Soc, 122, 6009).
     #
     # The RDC formula (Tjandra & Bax, 1997, Science 278:1111):
-    #   D(θ, φ) = Da · [(3cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
+    #   D(theta, phi) = Da * [(3cos^2theta - 1) + (3/2)*R*sin^2theta*cos(2phi)]
     # where Da is the axial component and R is the rhombicity of the alignment tensor.
     parser.add_argument(
         "--output-rdcs",
@@ -507,7 +507,7 @@ def main() -> None:
         help=(
             "Generate synthetic backbone N-H Residual Dipolar Coupling (RDC) data and "
             "export to a CSV file (columns: res_id, residue, RDC_NH_Hz). "
-            "The structure must contain amide H atoms — use --minimize to add protons "
+            "The structure must contain amide H atoms - use --minimize to add protons "
             "via OpenMM. Alignment tensor defaults: Da=10 Hz, R=0.1. "
             "Based on: Tjandra & Bax (1997), Science 278:1111."
         ),
@@ -519,7 +519,7 @@ def main() -> None:
         help=(
             "Axial component of the alignment tensor Da in Hz (default: 10.0). "
             "Da controls the overall magnitude of the RDC values. "
-            "Typical experimental range: 5–25 Hz for dilute liquid crystal or "
+            "Typical experimental range: 5-25 Hz for dilute liquid crystal or "
             "phage-based alignment media (Tjandra & Bax, 1997; Hansen et al., 2000, "
             "J Biomol NMR 14:85)."
         ),
@@ -529,12 +529,12 @@ def main() -> None:
         type=float,
         default=0.1,
         help=(
-            "Rhombicity R of the alignment tensor, 0 ≤ R ≤ 2/3 (default: 0.1). "
+            "Rhombicity R of the alignment tensor, 0 <= R <= 2/3 (default: 0.1). "
             "R=0 = axially symmetric tensor (simplest case; measurement in rod-like media). "
             "R=2/3 = maximum rhombicity. "
             "Increasing R breaks the degeneracy between bond vectors related by rotation "
             "about the tensor Z-axis, providing additional orientational information. "
-            "Reference: Clore et al. (1998), J Magn Reson, 133, 216–221."
+            "Reference: Clore et al. (1998), J Magn Reson, 133, 216-221."
         ),
     )
 
@@ -966,7 +966,7 @@ def main() -> None:
             minimize=args.minimize,
             forcefield=args.forcefield,
         )
-        logger.info(f"Generated {len(ensemble)} decoys within {args.rmsd_range} Å RMSD.")
+        logger.info(f"Generated {len(ensemble)} decoys within {args.rmsd_range} A RMSD.")
         return
 
     if args.mode == "dataset":
@@ -1058,7 +1058,7 @@ def main() -> None:
         # 3. Save MRC
         mrc_file = args.mrc_output or "synthetic_density.mrc"
         save_mrc_file(mrc_file, grid, origin, spacing=1.0)
-        logger.info(f"Cryo-EM density map saved to {mrc_file} at {args.resolution}Å resolution.")
+        logger.info(f"Cryo-EM density map saved to {mrc_file} at {args.resolution}A resolution.")
 
         # 4. Optional Visualization (Not yet implemented for maps)
         if args.visualize:
@@ -1172,7 +1172,7 @@ def main() -> None:
             # EDUCATIONAL NOTE - Polyglot Internal Pipeline:
             # While synth-pdb supports exporting to modern formats like mmCIF,
             # we must ensure that our internal validation and refinement loop
-            # doesn't hit legacy PDB limits (like the ±1000 Å coordinate wall).
+            # doesn't hit legacy PDB limits (like the +/-1000 A coordinate wall).
             # We use CIF as an internal intermediate if the final format is
             # non-PDB, and perform validation directly on the geometric AtomArray.
             generated_content = generate_pdb_content(
@@ -1208,7 +1208,7 @@ def main() -> None:
                 )
                 continue
 
-            # ── Structural Validation ───────────────────────────────────────
+            # -- Structural Validation ---------------------------------------
             if args.validate or args.quality_filter:
                 from .generator import PeptideResult
 
@@ -1334,7 +1334,7 @@ def main() -> None:
         sys.exit(1)
         return
 
-    # ── Internal State Management (Refinement & Header Preservation) ────────
+    # -- Internal State Management (Refinement & Header Preservation) --------
     preserved_ssbonds = None
     preserved_conects = None
     final_pdb_atomic_content = None
@@ -1412,7 +1412,7 @@ def main() -> None:
             logger.warning("Steric clash refinement is currently only supported for PDB output.")
 
     # After successful generation (and optional validation)
-    # ── Final Output Assembly ──
+    # -- Final Output Assembly --
     if final_content is not None:
         # Determine the sequence length for the final metadata
         final_sequence_length = args.length
@@ -1438,7 +1438,7 @@ def main() -> None:
                 output_filename = f"random_linear_peptide_{args.length}_{timestamp}.{ext}"
 
         try:
-            # ── Format-Specific Writing ──
+            # -- Format-Specific Writing --
             final_to_write: str | bytes
             if args.format == "pdb":
                 # For PDB, we use the standard assembler to add REMARKs
@@ -1511,32 +1511,34 @@ def main() -> None:
                     )
 
                     print("\n" + "=" * 60)
-                    print("🛡️  INTEGRATED SCIENTIFIC DEFENSE SCORECARD")
+                    print("[INFO]  INTEGRATED SCIENTIFIC DEFENSE SCORECARD")
                     print("=" * 60)
 
                     # Layer 1: Physics & Geometry
                     print(f"| {'PHYSICS & GEOMETRY':<35} | {'STATUS':<18} |")
                     print("-" * 60)
-                    e_status = "✅ PASS" if report["is_physically_plausible"] else "❌ FAIL"
+                    e_status = "[OK] PASS" if report["is_physically_plausible"] else "[FAIL] FAIL"
                     print(
                         f"| Potential Energy: {report['potential_energy_kj_mol']:>15.1f} kJ/mol | {e_status:<18} |"
                     )
 
                     z_val = report["geometric_z_scores"]["mean_bond_zscore"]
-                    z_status = "✅ PASS" if z_val < 3.0 else "❌ FAIL"
+                    z_status = "[OK] PASS" if z_val < 3.0 else "[FAIL] FAIL"
                     print(f"| Mean Bond Z-Score: {z_val:>18.2f} | {z_status:<18} |")
 
                     ram_val = report["ramachandran_stats"]["favored_pct"]
-                    ram_status = "✅ PASS" if ram_val > 90.0 else "⚠️ WARN"
+                    ram_status = "[OK] PASS" if ram_val > 90.0 else "[WARN] WARN"
                     print(f"| Ramachandran Favored: {ram_val:>15.1f}% | {ram_status:<18} |")
 
                     rot_val = report["rotamer_stats"]["favored_rotamers_pct"]
-                    rot_status = "✅ PASS" if rot_val > 80.0 else "⚠️ WARN"
+                    rot_status = "[OK] PASS" if rot_val > 80.0 else "[WARN] WARN"
                     print(f"| Favored Rotamers: {rot_val:>19.1f}% | {rot_status:<18} |")
 
                     c_val = report["chirality_stats"]["l_amino_acid_pct"]
                     c_status = (
-                        "✅ PASS" if report["chirality_stats"]["is_standard_biology"] else "👽 ALIEN"
+                        "[OK] PASS"
+                        if report["chirality_stats"]["is_standard_biology"]
+                        else "[ALIEN] ALIEN"
                     )
                     print(f"| Chirality (L-Biology): {c_val:>12.1f}% | {c_status:<18} |")
 
@@ -1544,7 +1546,9 @@ def main() -> None:
                     print("-" * 60)
                     print(f"| {'BIOPHYSICAL REALISM':<35} | {'STATUS':<18} |")
                     print("-" * 60)
-                    b_status = "✅ PASS" if report["is_biophysically_plausible"] else "❌ FAIL"
+                    b_status = (
+                        "[OK] PASS" if report["is_biophysically_plausible"] else "[FAIL] FAIL"
+                    )
                     print(
                         f"| Hydrophobic Burial Ratio: {report['hydrophobic_burial_ratio']:>11.2f} | {b_status:<18} |"
                     )
@@ -1555,7 +1559,9 @@ def main() -> None:
                         print(f"| {'NMR SPECTROSCOPIC FIDELITY':<35} | {'STATUS':<18} |")
                         print("-" * 60)
                         nmr = report["nmr_stats"]
-                        n_status = "✅ PASS" if nmr["noe_satisfaction_pct"] >= 90.0 else "❌ FAIL"
+                        n_status = (
+                            "[OK] PASS" if nmr["noe_satisfaction_pct"] >= 90.0 else "[FAIL] FAIL"
+                        )
                         print(
                             f"| NOE Satisfaction: {nmr['noe_satisfaction_pct']:>19.1f}% | {n_status:<18} |"
                         )
@@ -1565,7 +1571,7 @@ def main() -> None:
                         print("-" * 60)
                         print(f"| {'AI/GNN QUALITY FILTER':<35} | {'STATUS':<18} |")
                         print("-" * 60)
-                        ml_status = "✅ PASS" if report["ml_is_plausible"] else "❌ FAIL"
+                        ml_status = "[OK] PASS" if report["ml_is_plausible"] else "[FAIL] FAIL"
                         print(
                             f"| ML Confidence Score: {report['ml_score']:>17.2f} | {ml_status:<18} |"
                         )
@@ -1577,16 +1583,18 @@ def main() -> None:
                         print("-" * 60)
                         int_m = report["interface_metrics"]
                         i_status = (
-                            "✅ PASS" if int_m["is_interface_physically_plausible"] else "❌ FAIL"
+                            "[OK] PASS"
+                            if int_m["is_interface_physically_plausible"]
+                            else "[FAIL] FAIL"
                         )
                         print(
-                            f"| Buried Surface Area: {int_m['buried_surface_area']:>15.1f} Å² | {i_status:<18} |"
+                            f"| Buried Surface Area: {int_m['buried_surface_area']:>15.1f} A^2 | {i_status:<18} |"
                         )
 
                     print("=" * 60)
                     final_def = report["is_overall_scientifically_defensible"]
                     overall_status = (
-                        "✅ SCIENTIFICALLY DEFENSIBLE" if final_def else "❌ NOT DEFENSIBLE"
+                        "[OK] SCIENTIFICALLY DEFENSIBLE" if final_def else "[FAIL] NOT DEFENSIBLE"
                     )
                     print(f"| OVERALL: {overall_status:^47} |")
                     print("=" * 60 + "\n")
@@ -1813,7 +1821,7 @@ def main() -> None:
 
                     # 3.7 Circular Dichroism (Phase 9.7)
                     if args.gen_cd:
-                        # EDUCATIONAL NOTE — CD Background:
+                        # EDUCATIONAL NOTE - CD Background:
                         # Circular Dichroism (CD) measures the differential absorption
                         # of left and right circularly polarized light. In the far-UV
                         # (190-250 nm), it is the premier tool for measuring the
@@ -1823,7 +1831,7 @@ def main() -> None:
                         # chromophores. For a given conformation, we can synthesize
                         # the expected spectrum as a weighted average of basis
                         # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
-                        #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
+                        #   [theta]total = f_helix * [theta]helix + f_sheet * [theta]sheet + f_coil * [theta]coil
                         logger.info("Simulating Circular Dichroism (CD) spectrum...")
                         from .cd_simulator import CDSimulator, validate_cd_against_literature
 
@@ -1855,7 +1863,7 @@ def main() -> None:
                         # {chain_id: {res_id: J_value}} with prolines stripped and
                         # D-amino acids phase-corrected. We iterate over the full
                         # residue list (from calculate_torsion_angles) so the CSV
-                        # has one row per residue — prolines/N-term get NaN rather
+                        # has one row per residue - prolines/N-term get NaN rather
                         # than being silently absent, which keeps the schema
                         # fixed-width for downstream consumers.
                         couplings_by_chain = predict_couplings_from_structure(structure)
@@ -1877,15 +1885,15 @@ def main() -> None:
                     # 3.6 RDC Output (Phase 9.6)
                     output_rdcs = getattr(args, "output_rdcs", None)
                     if output_rdcs or args.rdc_restraints:
-                        # EDUCATIONAL NOTE — RDC Calculation:
+                        # EDUCATIONAL NOTE - RDC Calculation:
                         # We compute backbone N-H Residual Dipolar Couplings by:
                         #   1. Locating every backbone amide nitrogen (N) and its
                         #      associated amide proton (H) in the structure.
                         #   2. Computing the unit vector along each N-H bond.
                         #   3. Projecting that vector onto the alignment tensor
-                        #      principal axis system (PAS) to get (θ, φ).
+                        #      principal axis system (PAS) to get (theta, phi).
                         #   4. Applying the full RDC formula:
-                        #        D = Da · [(3cos²θ − 1) + 1.5·R·sin²θ·cos(2φ)]
+                        #        D = Da * [(3cos^2theta - 1) + 1.5*R*sin^2theta*cos(2phi)]
                         #      (Tjandra & Bax, 1997, Science 278:1111)
                         #
                         # Proline residues are automatically skipped because they
@@ -1928,7 +1936,7 @@ def main() -> None:
                                     )
                                     print("\n--- NMR RDC Validation Report ---")
                                     print("=" * 40)
-                                    print("📊 RDC VALIDATION (Q-FACTOR)")
+                                    print("[CD] RDC VALIDATION (Q-FACTOR)")
                                     print("=" * 40)
                                     print(
                                         f"| Q-factor: {q_factor:8.4f} "

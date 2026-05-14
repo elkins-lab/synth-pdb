@@ -6,17 +6,17 @@ The benchmark asks a simple but powerful question:
   "Can AI structure prediction models predict synth-pdb synthetic structures?"
 
 Because synth-pdb controls the ground-truth structure and its NMR chemical
-shifts, the benchmark is perfectly objective — no ambiguity about which
+shifts, the benchmark is perfectly objective - no ambiguity about which
 experimental structure is "correct".
 
-─────────────────────────────────────────────────────────────────────────────
-SCIENTIFIC RATIONALE — Why benchmark against synthetic structures?
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
+SCIENTIFIC RATIONALE - Why benchmark against synthetic structures?
+-----------------------------------------------------------------------------
 Standard benchmarks for protein structure prediction (like CASP or CAMEO) rely
 on experimental structures from the PDB. While essential, these have noise:
-  • Resolution limits and refinement errors.
-  • Conformational ensemble averaging in crystals/cryo-EM.
-  • Missing loops or disordered regions.
+  * Resolution limits and refinement errors.
+  * Conformational ensemble averaging in crystals/cryo-EM.
+  * Missing loops or disordered regions.
 
 The `synth-pdb` benchmark provides a **Perfect Control Group**:
   1. **Objective Truth**: We control every atomic coordinate exactly.
@@ -25,16 +25,16 @@ The `synth-pdb` benchmark provides a **Perfect Control Group**:
   3. **Targeted Stress**: We can generate structures that specifically
      challenge AI models (e.g., extremely long helices or unusual linkers).
 
-─────────────────────────────────────────────────────────────────────────────
-METRICS EXPLAINED — The Structural Biology Toolkit
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
+METRICS EXPLAINED - The Structural Biology Toolkit
+-----------------------------------------------------------------------------
 We use the same standards used to judge AlphaFold in CASP competitions:
 
-  • **TM-score** (Template Modeling score): Measures global topology overlap.
+  * **TM-score** (Template Modeling score): Measures global topology overlap.
     Ranges [0, 1]. >0.5 typically means the "same fold."
-  • **GDT-TS** (Global Distance Test Total Score): Percentage of residues
-    whose Cα positions are within 1, 2, 4, or 8 Å of the target.
-  • **lDDT** (Local Distance Difference Test): Measures how well the local
+  * **GDT-TS** (Global Distance Test Total Score): Percentage of residues
+    whose Calpha positions are within 1, 2, 4, or 8 A of the target.
+  * **lDDT** (Local Distance Difference Test): Measures how well the local
     inter-atomic distances are preserved. Unlike RMSD, it doesn't require
     superposition, making it robust to hinge motions.
 
@@ -55,18 +55,18 @@ Supported predictors
 - **ESMFold** (default): Meta's sequence-to-structure model via HuggingFace
   ``transformers`` library.  No API key required.  ~700 MB model download on
   first use.  ``pip install transformers accelerate``
-- **Custom callable**: Pass any ``predictor_fn(sequence: str) → pdb_str`` for
+- **Custom callable**: Pass any ``predictor_fn(sequence: str) -> pdb_str`` for
   full flexibility with any model (ColabFold, OmegaFold, RoseTTAFold, etc.)
 
 Metrics computed
 ----------------
 For each generated structure:
 
-  - ``tm_score``   TM-score between ground-truth and predicted Cα trace
+  - ``tm_score``   TM-score between ground-truth and predicted Calpha trace
   - ``gdt_ts``     GDT-TS score
   - ``lddt``       Mean lDDT across all residues
-  - ``rmsd``       Cα-RMSD after Kabsch superposition (Å)
-  - ``shift_rmsd`` Chemical shift RMSD (ppm) — compares shifts predicted from
+  - ``rmsd``       Calpha-RMSD after Kabsch superposition (A)
+  - ``shift_rmsd`` Chemical shift RMSD (ppm) - compares shifts predicted from
                    ground-truth structure vs. from the AI-predicted structure
   - ``gnn_score_ref``  GNN pLDDT of the ground-truth structure
   - ``gnn_score_pred`` GNN pLDDT of the AI-predicted structure
@@ -85,9 +85,9 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Result containers
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 @dataclass
@@ -103,10 +103,10 @@ class StructureResult:
     sequence        : str    Amino acid sequence (single-letter).
     length          : int    Number of residues.
     conformation    : str    Ground-truth conformation type (e.g. "alpha").
-    tm_score        : float  TM-score ∈ [0, 1]. High values indicate correct fold.
-    gdt_ts          : float  GDT-TS ∈ [0, 1]. Captures global Cα trace fidelity.
-    lddt_mean       : float  Mean lDDT ∈ [0, 1]. Captures local geometric accuracy.
-    rmsd            : float  Cα-RMSD in Å after superposition.
+    tm_score        : float  TM-score in [0, 1]. High values indicate correct fold.
+    gdt_ts          : float  GDT-TS in [0, 1]. Captures global Calpha trace fidelity.
+    lddt_mean       : float  Mean lDDT in [0, 1]. Captures local geometric accuracy.
+    rmsd            : float  Calpha-RMSD in A after superposition.
     shift_rmsd      : float  NMR Chemical shift RMSD in ppm. A "Physical Audit":
                              measures if the AI-predicted structure "sounds" like
                               the ground truth structure under a virtual spectrometer.
@@ -161,11 +161,11 @@ class BenchmarkResults:
         gnn_pred = [r.gnn_score_pred for r in good if np.isfinite(r.gnn_score_pred)]
 
         lines = [
-            f"━━ Benchmark: {self.predictor} ({self.n_success}/{self.n_structures} structures) ━━",
+            f"== Benchmark: {self.predictor} ({self.n_success}/{self.n_structures} structures) ==",
             f"  TM-score   mean={np.mean(tm_scores):.3f}  std={np.std(tm_scores):.3f}  min={np.min(tm_scores):.3f}  max={np.max(tm_scores):.3f}",
             f"  GDT-TS     mean={np.mean(gdt):.3f}  std={np.std(gdt):.3f}",
             f"  lDDT       mean={np.mean(lddts):.3f}  std={np.std(lddts):.3f}",
-            f"  Cα-RMSD    mean={np.mean(rmsds):.2f} Å  std={np.std(rmsds):.2f} Å",
+            f"  Calpha-RMSD    mean={np.mean(rmsds):.2f} A  std={np.std(rmsds):.2f} A",
         ]
         if shift:
             lines.append(f"  Shift RMSD mean={np.mean(shift):.3f} ppm  std={np.std(shift):.3f} ppm")
@@ -217,17 +217,17 @@ class BenchmarkResults:
         )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Predictor backends
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 def _load_esmfold_predictor() -> Callable[[str], str]:
     """Return a callable that runs ESMFold inference via HuggingFace transformers.
 
-    ─────────────────────────────────────────────────────────────────────────────
-    AI ARCHITECTURE — What is ESMFold?
-    ─────────────────────────────────────────────────────────────────────────────
+    -----------------------------------------------------------------------------
+    AI ARCHITECTURE - What is ESMFold?
+    -----------------------------------------------------------------------------
     Unlike AlphaFold 2, which uses a multiple sequence alignment (MSA) and a
     folding trunk, ESMFold is an **"End-to-End" language model**. It uses the
     internal representations of the ESM-2 protein language model to predict 3D
@@ -241,7 +241,7 @@ def _load_esmfold_predictor() -> Callable[[str], str]:
 
     Returns
     -------
-    callable : str → str
+    callable : str -> str
         Accepts an amino acid sequence, returns a PDB-format string.
 
     Raises
@@ -300,9 +300,9 @@ def _load_esmfold_predictor() -> Callable[[str], str]:
     return predict
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Core benchmark engine
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 def run_benchmark(
@@ -320,12 +320,12 @@ def run_benchmark(
     Generates ``n_structures`` synthetic protein structures of varying length
     and secondary structure content, then asks the specified predictor to
     reconstruct each structure from sequence alone.  The prediction is
-    evaluated against the ground-truth on TM-score, GDT-TS, lDDT, Cα-RMSD,
+    evaluated against the ground-truth on TM-score, GDT-TS, lDDT, Calpha-RMSD,
     and (optionally) NMR chemical shift RMSD.
 
-    ─────────────────────────────────────────────────────────────────────────────
+    -----------------------------------------------------------------------------
     BENCHMARK LIFECYCLE
-    ─────────────────────────────────────────────────────────────────────────────
+    -----------------------------------------------------------------------------
     For each structure in the trial:
       1. **Generate**: Create a ground-truth PDB with specific geometry.
       2. **Extract**: Convert the 3D structure to its 1D amino acid sequence.
@@ -347,7 +347,7 @@ def run_benchmark(
         Pool of conformations to sample from (default: ["alpha", "beta"]).
     predictor : str or callable
         "esmfold" to use the bundled ESMFold backend, or any callable
-        ``predictor_fn(sequence: str) → pdb_str``.
+        ``predictor_fn(sequence: str) -> pdb_str``.
     compute_shifts : bool
         Whether to compute NMR chemical shift RMSD (requires ``synth_pdb``
         chemical_shifts module).  Default True.
@@ -385,7 +385,7 @@ def run_benchmark(
     if conformations is None:
         conformations = ["alpha", "beta"]
 
-    # ── Load predictor ─────────────────────────────────────────────────
+    # -- Load predictor -------------------------------------------------
     predictor_name: str
     predictor_fn: Callable[[str], str]
     if callable(predictor):
@@ -397,7 +397,7 @@ def run_benchmark(
     else:
         raise ValueError(f"Unknown predictor: {predictor!r}. Use 'esmfold' or a callable.")
 
-    # ── Optional GNN scorer ────────────────────────────────────────────
+    # -- Optional GNN scorer --------------------------------------------
     # The GNN scorer provides an independent physical audit of both the
     # reference and predicted structures. It requires torch and torch_geometric.
     gnn_clf = None
@@ -408,11 +408,11 @@ def run_benchmark(
             gnn_clf = GNNQualityClassifier()
         except ImportError:
             logger.warning(
-                "torch/torch_geometric not available — GNN scoring disabled. "
+                "torch/torch_geometric not available - GNN scoring disabled. "
                 "Install with: pip install synth-pdb[gnn]"
             )
 
-    # ── Optional chemical shift predictor ─────────────────────────────
+    # -- Optional chemical shift predictor -----------------------------
     # This is the "Gold Standard" of structural validation in synth-pdb.
     # If the AI model predicts a structure with a high TM-score but a bad
     # Shift RMSD, it implies the global fold is correct but the local
@@ -424,9 +424,9 @@ def run_benchmark(
 
             shift_fn = _predict_shifts
         except ImportError:
-            logger.warning("chemical_shifts module not available — shift RMSD disabled.")
+            logger.warning("chemical_shifts module not available - shift RMSD disabled.")
 
-    # ── Generate and evaluate ──────────────────────────────────────────
+    # -- Generate and evaluate ------------------------------------------
     rng = np.random.default_rng(random_state)
     benchmark_results = BenchmarkResults(predictor=predictor_name, n_structures=n_structures)
 
@@ -444,7 +444,7 @@ def run_benchmark(
         )
 
         try:
-            # ── 1. Generate ground-truth structure ─────────────────────
+            # -- 1. Generate ground-truth structure ---------------------
             # We skip energy minimisation to ensure the ground truth is
             # mathematically perfect (exactly at Ramachandran centres).
             ref_pdb = cast(
@@ -456,18 +456,18 @@ def run_benchmark(
                 ),
             )
 
-            # ── 2. Extract sequence ────────────────────────────────────
-            # The AI models only get the sequence — no coordinate hints allowed!
+            # -- 2. Extract sequence ------------------------------------
+            # The AI models only get the sequence - no coordinate hints allowed!
             sequence = _extract_sequence(ref_pdb)
             result.sequence = sequence
 
-            # ── 3. Run predictor ───────────────────────────────────────
+            # -- 3. Run predictor ---------------------------------------
             t0 = time.perf_counter()
             pred_pdb = predictor_fn(sequence)
             result.predictor_time_s = time.perf_counter() - t0
 
-            # ── 4. Structural metrics ──────────────────────────────────
-            # We extract Cα coordinates (the "backbone trace") to compute
+            # -- 4. Structural metrics ----------------------------------
+            # We extract Calpha coordinates (the "backbone trace") to compute
             # global alignment metrics.
             ca_ref = extract_ca_coords(ref_pdb)
             ca_pred = extract_ca_coords(pred_pdb)
@@ -486,19 +486,19 @@ def run_benchmark(
             # RMSD after optimal Kabsch superposition (rigid-body alignment)
             _, result.rmsd = superpose_kabsch(ca_pred_a, ca_ref_a)
 
-            # ── 5. Chemical shift RMSD ─────────────────────────────────
+            # -- 5. Chemical shift RMSD ---------------------------------
             if shift_fn is not None:
                 try:
                     ref_shifts_raw = shift_fn(ref_pdb)
                     pred_shifts_raw = shift_fn(pred_pdb)
-                    # Convert to nucleus → np.array format
+                    # Convert to nucleus -> np.array format
                     ref_shifts = _shifts_to_arrays(ref_shifts_raw)
                     pred_shifts = _shifts_to_arrays(pred_shifts_raw)
                     result.shift_rmsd = _shift_rmsd(pred_shifts, ref_shifts)
                 except Exception as se:
                     logger.warning("Shift RMSD failed for structure %d: %s", i, se)
 
-            # ── 6. GNN quality scores ──────────────────────────────────
+            # -- 6. GNN quality scores ----------------------------------
             if gnn_clf is not None:
                 try:
                     ref_score = gnn_clf.score(ref_pdb)
@@ -519,9 +519,9 @@ def run_benchmark(
     return benchmark_results
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Internal helpers
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 _THREE_TO_ONE = {
     "ALA": "A",
@@ -544,7 +544,7 @@ _THREE_TO_ONE = {
     "TRP": "W",
     "TYR": "Y",
     "VAL": "V",
-    # Common non-standard → map to nearest standard
+    # Common non-standard -> map to nearest standard
     "HIE": "H",
     "HID": "H",
     "HIP": "H",
@@ -557,7 +557,7 @@ _THREE_TO_ONE = {
 def _extract_sequence(pdb_content: str) -> str:
     """Extract one-letter amino acid sequence from PDB ATOM records.
 
-    We only look at Cα atoms to avoid duplicate residues from multiple
+    We only look at Calpha atoms to avoid duplicate residues from multiple
     atom records.  We use a dictionary keyed by (chain, res_num) to
     robustly handle non-sequential residue numbers in the PDB file.
     """
@@ -583,7 +583,7 @@ def _extract_sequence(pdb_content: str) -> str:
 
 
 def _shifts_to_arrays(shifts_data: object) -> dict[str, np.ndarray]:
-    """Convert predict_shifts() output to nucleus → np.ndarray format.
+    """Convert predict_shifts() output to nucleus -> np.ndarray format.
 
     The ``synth_pdb.chemical_shifts.predict_shifts()`` function returns a
     dict or list of per-residue dicts.  This helper normalises it into the
@@ -593,11 +593,11 @@ def _shifts_to_arrays(shifts_data: object) -> dict[str, np.ndarray]:
     (SPARTA+, SHIFTX2) return data in different shapes.
     """
     if isinstance(shifts_data, dict):
-        # Already in nucleus → array format
+        # Already in nucleus -> array format
         return {k: np.asarray(v, dtype=np.float32) for k, v in shifts_data.items()}
 
     if isinstance(shifts_data, list | np.ndarray):
-        # List of per-residue dicts — extract H, C, N columns
+        # List of per-residue dicts - extract H, C, N columns
         h_vals, c_vals, n_vals = [], [], []
         for res in shifts_data:
             if isinstance(res, dict):

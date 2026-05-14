@@ -100,7 +100,7 @@ MODIFIED_AMINO_ACIDS: list[str] = [
 # processing (which reverts them to their parent L-amino acid names).
 # Includes PTMs, histidine tautomers, and D-amino acids.
 # D-amino acids are currently generated without OpenMM (no AMBER parameters),
-# so the D-name entries have no runtime effect today — but they future-proof
+# so the D-name entries have no runtime effect today - but they future-proof
 # the restoration logic if D-amino acid forcefield support is added later.
 NON_STANDARD_RESIDUES: set[str] = (
     set(MODIFIED_AMINO_ACIDS)
@@ -373,7 +373,7 @@ RAMACHANDRAN_POLYGONS: dict[str, dict[str, list[list[tuple[float, float]]]]] = {
 # Significance:
 # 1. Foundation of Crystallography: Almost all protein structure refinement
 #    software (like Phenix or CCP4) uses these targets as "restraints." If a
-#    structure deviates too far from 1.458Ą for an N-CA bond, it's flagged.
+#    structure deviates too far from 1.458A for an N-CA bond, it's flagged.
 # 2. Physics-Informed: By assuming these bond lengths are fixed (rigid), we
 #    reduce the complexity of protein simulation from thousands of variables
 #    down to just a few torsion angles (Phi, Psi, Chi).

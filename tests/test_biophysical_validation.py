@@ -74,7 +74,7 @@ def test_validate_distance_restraints_violation() -> None:
     violations = validator.get_violations()
     assert len(violations) == 1
     assert "NMR Restraint violation" in violations[0]
-    assert "Measured effective distance: 8.00Å" in violations[0]
+    assert "Measured effective distance: 8.00A" in violations[0]
 
 
 def test_validate_distance_restraints_pseudo_atoms() -> None:

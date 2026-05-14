@@ -22,7 +22,7 @@ pytestmark = pytest.mark.gnn
 
 @pytest.fixture(scope="module")
 def helix_pdb():
-    """A 20-residue alpha-helix — should score as High Quality."""
+    """A 20-residue alpha-helix - should score as High Quality."""
     from synth_pdb.generator import generate_pdb_content
 
     return generate_pdb_content(length=20, conformation="alpha", minimize_energy=False)
@@ -30,15 +30,15 @@ def helix_pdb():
 
 @pytest.fixture(scope="module")
 def random_pdb():
-    """A 20-residue random coil — should score as Low Quality."""
+    """A 20-residue random coil - should score as Low Quality."""
     from synth_pdb.generator import generate_pdb_content
 
     return generate_pdb_content(length=20, conformation="random", minimize_energy=False)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# score_structure() — single-structure API
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
+# score_structure() - single-structure API
+# -----------------------------------------------------------------------------
 
 
 class TestScoreStructure:
@@ -46,7 +46,7 @@ class TestScoreStructure:
         from synth_pdb.score import _get_classifier, score_structure
 
         if not _get_classifier().is_pretrained:
-            pytest.skip("No pre-trained model found — skipping accuracy assertion")
+            pytest.skip("No pre-trained model found - skipping accuracy assertion")
 
         result = score_structure(helix_pdb)
         assert result.label == "High Quality", (
@@ -59,7 +59,7 @@ class TestScoreStructure:
         from synth_pdb.score import _get_classifier, score_structure
 
         if not _get_classifier().is_pretrained:
-            pytest.skip("No pre-trained model found — skipping accuracy assertion")
+            pytest.skip("No pre-trained model found - skipping accuracy assertion")
 
         result = score_structure(random_pdb)
         assert result.label == "Low Quality", (
@@ -81,7 +81,7 @@ class TestScoreStructure:
         from synth_pdb.score import _get_classifier, score_structure
 
         if not _get_classifier().is_pretrained:
-            pytest.skip("No pre-trained model found — skipping accuracy assertion")
+            pytest.skip("No pre-trained model found - skipping accuracy assertion")
 
         helix_result = score_structure(helix_pdb)
         random_result = score_structure(random_pdb)
@@ -110,9 +110,9 @@ class TestScoreStructure:
             score_structure("/nonexistent/path/protein.pdb")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Per-residue pLDDT output
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestPerResiduePLDDT:
@@ -150,7 +150,7 @@ class TestPerResiduePLDDT:
         from synth_pdb.score import _get_classifier, score_structure
 
         if not _get_classifier().is_pretrained:
-            pytest.skip("No pre-trained model found — skipping accuracy assertion")
+            pytest.skip("No pre-trained model found - skipping accuracy assertion")
 
         result = score_structure(helix_pdb)
         very_high_count = result.residue_labels.count("Very High")
@@ -161,9 +161,9 @@ class TestPerResiduePLDDT:
         )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# score_batch() — batch API
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
+# score_batch() - batch API
+# -----------------------------------------------------------------------------
 
 
 class TestScoreBatch:
@@ -190,9 +190,9 @@ class TestScoreBatch:
         assert score_batch([]) == []
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # QualityScore dataclass
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestQualityScoreDataclass:
@@ -224,9 +224,9 @@ class TestQualityScoreDataclass:
         assert set(result.features.keys()) == expected_keys
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Import convenience
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestImports:

@@ -80,7 +80,7 @@ class TestRFHyperparameters(unittest.TestCase):
         value_node = _get_rf_keyword(tree, "max_features")
 
         if value_node is None:
-            # Keyword absent → sklearn uses its default which is "sqrt" for classifiers.
+            # Keyword absent -> sklearn uses its default which is "sqrt" for classifiers.
             # This is acceptable, but we prefer explicit.
             return
 
@@ -166,7 +166,7 @@ class TestFeatureSeparability(unittest.TestCase):
         from synth_pdb.generator import generate_pdb_content
         from synth_pdb.quality.features import extract_quality_features
 
-        n_each = 5  # Small — this is a unit test, not a training run
+        n_each = 5  # Small - this is a unit test, not a training run
         good_rama = []
         bad_rama = []
 

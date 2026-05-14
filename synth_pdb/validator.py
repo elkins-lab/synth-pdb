@@ -321,7 +321,7 @@ class PDBValidator:
         EDUCATIONAL NOTE - The Shrake-Rupley Algorithm:
         ----------------------------------------------
         SASA is calculated by "rolling a sphere" (representing a water molecule,
-        radius ~1.4Å) over the protein surface.
+        radius ~1.4A) over the protein surface.
 
         This implementation uses the Shrake-Rupley algorithm which places points
         on a sphere around each atom and checks how many are not occluded by
@@ -716,8 +716,8 @@ class PDBValidator:
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
                             f"Bond length violation: Chain {chain_id}, Residue {res_num} {n_atom['residue_name']} "
-                            f"N-CA bond ({actual_length:.2f}Å) deviates from standard ({expected_length:.2f}Å) "
-                            f"by more than {tolerance}Å. Actual: {actual_length:.2f}"
+                            f"N-CA bond ({actual_length:.2f}A) deviates from standard ({expected_length:.2f}A) "
+                            f"by more than {tolerance}A. Actual: {actual_length:.2f}"
                         )
 
                 # Check CA-C bond
@@ -727,8 +727,8 @@ class PDBValidator:
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
                             f"Bond length violation: Chain {chain_id}, Residue {res_num} {ca_atom['residue_name']} "
-                            f"CA-C bond ({actual_length:.2f}Å) deviates from standard ({expected_length:.2f}Å) "
-                            f"by more than {tolerance}Å. Actual: {actual_length:.2f}"
+                            f"CA-C bond ({actual_length:.2f}A) deviates from standard ({expected_length:.2f}A) "
+                            f"by more than {tolerance}A. Actual: {actual_length:.2f}"
                         )
 
                 # Check C-O bond
@@ -738,8 +738,8 @@ class PDBValidator:
                     if abs(actual_length - expected_length) > tolerance:
                         self.violations.append(
                             f"Bond length violation: Chain {chain_id}, Residue {res_num} {c_atom['residue_name']} "
-                            f"C-O bond ({actual_length:.2f}Å) deviates from standard ({expected_length:.2f}Å) "
-                            f"by more than {tolerance}Å. Actual: {actual_length:.2f}"
+                            f"C-O bond ({actual_length:.2f}A) deviates from standard ({expected_length:.2f}A) "
+                            f"by more than {tolerance}A. Actual: {actual_length:.2f}"
                         )
 
                 # Check C (current) - N (next) peptide bond
@@ -756,8 +756,8 @@ class PDBValidator:
                         if abs(actual_length - expected_length) > tolerance:
                             self.violations.append(
                                 f"Bond length violation: Chain {chain_id}, Residue {res_num} {c_atom['residue_name']}-"
-                                f"Residue {next_res_num} {next_n_atom['residue_name']} peptide bond ({actual_length:.2f}Å) "
-                                f"deviates from standard ({expected_length:.2f}Å) by more than {tolerance}Å. Actual: {actual_length:.2f}"
+                                f"Residue {next_res_num} {next_n_atom['residue_name']} peptide bond ({actual_length:.2f}A) "
+                                f"deviates from standard ({expected_length:.2f}A) by more than {tolerance}A. Actual: {actual_length:.2f}"
                             )
 
     def validate_bond_angles(self, tolerance: float = 5.0) -> None:
@@ -789,8 +789,8 @@ class PDBValidator:
                     if abs(actual_angle - expected_angle) > tolerance:
                         self.violations.append(
                             f"Bond angle violation: Chain {chain_id}, Residue {res_num} {ca_atom['residue_name']} "
-                            f"N-CA-C angle ({actual_angle:.2f}°) deviates from standard ({expected_angle:.2f}°) "
-                            f"by more than {tolerance}°. Actual: {actual_angle:.2f}"
+                            f"N-CA-C angle ({actual_angle:.2f}deg) deviates from standard ({expected_angle:.2f}deg) "
+                            f"by more than {tolerance}deg. Actual: {actual_angle:.2f}"
                         )
 
                 # Check CA-C-O angle
@@ -802,8 +802,8 @@ class PDBValidator:
                     if abs(actual_angle - expected_angle) > tolerance:
                         self.violations.append(
                             f"Bond angle violation: Chain {chain_id}, Residue {res_num} {c_atom['residue_name']} "
-                            f"CA-C-O angle ({actual_angle:.2f}°) deviates from standard ({expected_angle:.2f}°) "
-                            f"by more than {tolerance}°. Actual: {actual_angle:.2f}"
+                            f"CA-C-O angle ({actual_angle:.2f}deg) deviates from standard ({expected_angle:.2f}deg) "
+                            f"by more than {tolerance}deg. Actual: {actual_angle:.2f}"
                         )
 
                 # Check CA(i)-C(i)-N(i+1) angle (part of peptide bond)
@@ -836,8 +836,8 @@ class PDBValidator:
                             self.violations.append(
                                 f"Bond angle violation: Chain {chain_id}, Residue {res_num} {c_atom['residue_name']}-"
                                 f"Residue {next_res_num} {next_n_atom['residue_name']} "
-                                f"C-N-CA angle ({actual_angle:.2f}°) deviates from standard ({expected_angle:.2f}°) "
-                                f"by more than {tolerance}°. Actual: {actual_angle:.2f}"
+                                f"C-N-CA angle ({actual_angle:.2f}deg) deviates from standard ({expected_angle:.2f}deg) "
+                                f"by more than {tolerance}deg. Actual: {actual_angle:.2f}"
                             )
 
     @staticmethod
@@ -882,7 +882,7 @@ class PDBValidator:
                 phi = None
                 psi = None
 
-                # Calculate Phi (Φ): C(i-1) - N(i) - CA(i) - C(i)
+                # Calculate Phi (Phi): C(i-1) - N(i) - CA(i) - C(i)
                 if i > 0:
                     prev_res_num = sorted_res_numbers[i - 1]
                     prev_res_atoms = residues_in_chain.get(prev_res_num)
@@ -893,7 +893,7 @@ class PDBValidator:
                         p4 = current_res_atoms["C"]["coords"]
                         phi = self._calculate_dihedral_angle(p1, p2, p3, p4)
 
-                # Calculate Psi (Ψ): N(i) - CA(i) - C(i) - N(i+1)
+                # Calculate Psi (Psi): N(i) - CA(i) - C(i) - N(i+1)
                 if i < len(sorted_res_numbers) - 1:
                     next_res_num = sorted_res_numbers[i + 1]
                     next_res_atoms = residues_in_chain.get(next_res_num)
@@ -914,7 +914,7 @@ class PDBValidator:
 
         ### Educational Note - Computational Efficiency & Convergence:
         -----------------------------------------------
-        Checking Ramachandran angles isn't just about "correctness" — it's a critical
+        Checking Ramachandran angles isn't just about "correctness" - it's a critical
         performance optimization for Energy Minimization (OpenMM).
 
         1. **Better Starting Points**: A structure with valid angles is much closer
@@ -945,7 +945,7 @@ class PDBValidator:
                 phi = None
                 psi = None
 
-                # Calculate Phi (Φ): C(i-1) - N(i) - CA(i) - C(i)
+                # Calculate Phi (Phi): C(i-1) - N(i) - CA(i) - C(i)
                 if i > 0:
                     prev_res_num = sorted_res_numbers[i - 1]
                     prev_res_atoms = residues_in_chain.get(prev_res_num)
@@ -956,7 +956,7 @@ class PDBValidator:
                         p4 = current_res_atoms["C"]["coords"]
                         phi = self._calculate_dihedral_angle(p1, p2, p3, p4)
 
-                # Calculate Psi (Ψ): N(i) - CA(i) - C(i) - N(i+1)
+                # Calculate Psi (Psi): N(i) - CA(i) - C(i) - N(i+1)
                 if i < len(sorted_res_numbers) - 1:
                     next_res_num = sorted_res_numbers[i + 1]
                     next_res_atoms = residues_in_chain.get(next_res_num)
@@ -1009,7 +1009,7 @@ class PDBValidator:
                     if status == "Outlier":
                         self.violations.append(
                             f"Ramachandran violation: Chain {chain_id}, Residue {res_num} {res_name} "
-                            f"(Phi={phi_str}°, Psi={psi_str}°) is an Outlier for '{category}' category."
+                            f"(Phi={phi_str}deg, Psi={psi_str}deg) is an Outlier for '{category}' category."
                         )
 
     def validate_steric_clashes(
@@ -1146,15 +1146,15 @@ class PDBValidator:
 
                 distance = self._calculate_distance(atom1["coords"], atom2["coords"])
                 logger.debug(
-                    f"Steric clash check between atom {atom1['atom_number']} and {atom2['atom_number']}. Distance: {distance:.2f}Å"
+                    f"Steric clash check between atom {atom1['atom_number']} and {atom2['atom_number']}. Distance: {distance:.2f}A"
                 )
 
                 # General atom-atom minimum distance check
                 if distance < min_atom_distance:
                     self.violations.append(
                         f"Steric clash (min distance): Atoms {atom1['atom_name']}-{atom1['residue_number']}-{atom1['chain_id']} "
-                        f"and {atom2['atom_name']}-{atom2['residue_number']}-{atom2['chain_id']} are too close ({distance:.2f}Å). "
-                        f"Minimum allowed: {min_atom_distance:.2f}Å."
+                        f"and {atom2['atom_name']}-{atom2['residue_number']}-{atom2['chain_id']} are too close ({distance:.2f}A). "
+                        f"Minimum allowed: {min_atom_distance:.2f}A."
                     )
                     logger.debug(f"Added violation: {self.violations[-1]}")
 
@@ -1170,8 +1170,8 @@ class PDBValidator:
                             f"Steric clash (CA-CA distance): Calpha atoms in "
                             f"Residue {atom1['residue_number']} ({atom1['residue_name']}) and "
                             f"Residue {atom2['residue_number']} ({atom2['residue_name']}) "
-                            f"in chain {atom1['chain_id']} are too close ({distance:.2f}Å). "
-                            f"Minimum allowed for non-adjacent: {min_ca_distance:.2f}Å."
+                            f"in chain {atom1['chain_id']} are too close ({distance:.2f}A). "
+                            f"Minimum allowed for non-adjacent: {min_ca_distance:.2f}A."
                         )
                         logger.debug(f"Added violation: {self.violations[-1]}")
 
@@ -1188,13 +1188,13 @@ class PDBValidator:
                     logger.debug(
                         f"Steric clash (VdW overlap): Atoms {atom1['atom_name']}-{atom1['residue_number']}-{atom1['chain_id']} "
                         f"({atom1['element']}) and {atom2['atom_name']}-{atom2['residue_number']}-{atom2['chain_id']} "
-                        f"({atom2['element']}) overlap significantly ({distance:.2f}Å). "
-                        f"Expected minimum vdW distance: {expected_min_vdw_distance:.2f}Å (radii sum: {vdw1 + vdw2:.2f}Å)."
+                        f"({atom2['element']}) overlap significantly ({distance:.2f}A). "
+                        f"Expected minimum vdW distance: {expected_min_vdw_distance:.2f}A (radii sum: {vdw1 + vdw2:.2f}A)."
                     )
                     # self.violations.append(...) - DISABLED
 
     def validate_peptide_plane(self, tolerance_deg: float = 30.0) -> None:
-        """Validates peptide bond planarity by checking the omega (ω) dihedral angle.
+        """Validates peptide bond planarity by checking the omega (omega) dihedral angle.
         The omega angle is defined by N(i-1) - CA(i-1) - C(i-1) - N(i).
         Ideal trans-peptide omega is ~180 degrees, cis-peptide is ~0 degrees.
         A violation is flagged if the angle deviates significantly from these values.
@@ -1232,7 +1232,7 @@ class PDBValidator:
                             p3_n_curr["coords"],  # P3 = N(i)
                             p4_ca_curr["coords"],  # P4 = CA(i)
                         )
-                        logger.debug(f"  Calculated Omega Angle: {omega_angle:.2f}°")
+                        logger.debug(f"  Calculated Omega Angle: {omega_angle:.2f}deg")
 
                         # Check for planarity (close to 180 or 0 degrees)
                         is_trans = abs(abs(omega_angle) - 180.0) < tolerance_deg
@@ -1243,11 +1243,11 @@ class PDBValidator:
                                 f"Peptide plane violation: Chain {chain_id}, "
                                 f"Peptide bond between Residue {prev_res_num} ({p2_c_prev['residue_name']}) and "
                                 f"Residue {current_res_num} ({p3_n_curr['residue_name']}). "
-                                f"Omega angle ({omega_angle:.2f}°) deviates significantly from ideal trans/cis planarity."
+                                f"Omega angle ({omega_angle:.2f}deg) deviates significantly from ideal trans/cis planarity."
                             )
                         else:
                             logger.debug(
-                                f"Peptide bond between {prev_res_num}-{p2_c_prev['residue_name']} and {current_res_num}-{p3_n_curr['residue_name']}: Omega={omega_angle:.2f}° (planar)"
+                                f"Peptide bond between {prev_res_num}-{p2_c_prev['residue_name']} and {current_res_num}-{p3_n_curr['residue_name']}: Omega={omega_angle:.2f}deg (planar)"
                             )
 
     def validate_sequence_improbabilities(
@@ -1666,18 +1666,18 @@ class PDBValidator:
                 if not match_found:
                     # Construct nice error message with measured vs closest allowed?
                     # For brevity, just listing measured.
-                    chi_str = ", ".join([f"{k}={v:.1f}°" for k, v in measured_chis.items()])
+                    chi_str = ", ".join([f"{k}={v:.1f}deg" for k, v in measured_chis.items()])
                     self.violations.append(
                         f"Rotamer violation: Chain {chain_id}, Residue {res_num} {res_name} "
                         f"({backbone_type}-backbone). Side-chain conformation ({chi_str}) "
-                        f"is an Outlier (does not match any allowed {res_name} rotamers within {tolerance}° tolerance)."
+                        f"is an Outlier (does not match any allowed {res_name} rotamers within {tolerance}deg tolerance)."
                     )
 
     def validate_chirality(self) -> None:
         """Validate L-amino acid chirality at C-alpha.
 
         Uses improper dihedral N-CA-C-CB to check stereochemistry.
-        L-amino acids should have negative improper dihedral (~-120° to -60°).
+        L-amino acids should have negative improper dihedral (~-120deg to -60deg).
 
         Glycine is exempt (no CB atom, therefore no chirality).
         """
@@ -1721,8 +1721,8 @@ class PDBValidator:
                 # (N - CA) x (C - CA) . (CB - CA)
 
                 # Calculate improper dihedral N-CA-C-CB
-                # For L-amino acids, this should be negative (~-120° to -60°)
-                # NOTE: Current generator produces positive values (~+60°) due to coordinate system
+                # For L-amino acids, this should be negative (~-120deg to -60deg)
+                # NOTE: Current generator produces positive values (~+60deg) due to coordinate system
                 # For D-amino acids, the sign will be inverted.
                 improper = self._calculate_dihedral_angle(
                     n_atom["coords"], ca_atom["coords"], c_atom["coords"], cb_atom["coords"]
@@ -1740,9 +1740,9 @@ class PDBValidator:
                 check_val = -improper if is_d else improper
 
                 # Check for reasonable improper dihedral values
-                # Accept both negative (standard L-amino acids: -150° to -30°)
-                # and positive (current generator output: +30° to +150°)
-                # The key is that it should be in one of these ranges, not near 0° or ±180°
+                # Accept both negative (standard L-amino acids: -150deg to -30deg)
+                # and positive (current generator output: +30deg to +150deg)
+                # The key is that it should be in one of these ranges, not near 0deg or +/-180deg
 
                 # For D-amino acids, we invert the value for comparison with L-ranges
                 is_valid_l = -150.0 <= check_val <= -30.0
@@ -1752,13 +1752,13 @@ class PDBValidator:
                 if not (is_valid_l or is_valid_positive):
                     self.violations.append(
                         f"Chirality violation: Chain {chain_id}, Residue {res_num} {res_name} "
-                        f"has improper dihedral N-CA-C-CB = {improper:.1f}° "
+                        f"has improper dihedral N-CA-C-CB = {improper:.1f}deg "
                         f"(expected {expected_desc} chirality)"
                     )
                 else:
                     logger.debug(
                         f"Chirality OK: Chain {chain_id}, Residue {res_num} {res_name} "
-                        f"improper dihedral = {improper:.1f}° ({expected_desc})"
+                        f"improper dihedral = {improper:.1f}deg ({expected_desc})"
                     )
 
     def validate_distance_restraints(
@@ -1856,8 +1856,8 @@ class PDBValidator:
             if d_eff > upper_limit + tolerance:
                 self.violations.append(
                     f"NMR Restraint violation: {res1_id}{atom1_name} to {res2_id}{atom2_name}. "
-                    f"Measured effective distance: {d_eff:.2f}Å. Experimental limit: {upper_limit:.2f}Å "
-                    f"(+{tolerance}Å tolerance)."
+                    f"Measured effective distance: {d_eff:.2f}A. Experimental limit: {upper_limit:.2f}A "
+                    f"(+{tolerance}A tolerance)."
                 )
 
     def calculate_interface_metrics(self) -> dict[str, Any]:
@@ -1872,7 +1872,7 @@ class PDBValidator:
         1. Buried Surface Area (BSA): Measures the amount of surface area that
            is shielded from solvent upon complex formation.
            BSA = SASA_chainA + SASA_chainB - SASA_complex.
-           A BSA > 1000 Å² typically indicates a stable, biologically relevant interface (Levy, 2010).
+           A BSA > 1000 A^2 typically indicates a stable, biologically relevant interface (Levy, 2010).
 
         2. Inter-chain Clashes: Steric overlaps between different chains are a
            common failure mode in AI-predicted complexes (e.g., AlphaFold-Multimer).
@@ -1933,7 +1933,7 @@ class PDBValidator:
                     inter_chain_clashes.append(
                         f"Inter-chain clash: {a1['atom_name']}-{a1['residue_number']}(Chain {a1['chain_id']}) "
                         f"and {a2['atom_name']}-{a2['residue_number']}(Chain {a2['chain_id']}) "
-                        f"are too close ({dist:.2f}Å)."
+                        f"are too close ({dist:.2f}A)."
                     )
 
         # 3. Inter-Chain Salt Bridges

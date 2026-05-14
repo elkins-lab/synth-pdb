@@ -2,9 +2,9 @@
 ~~~~~~~~~~~~~
 Protein Language Model (PLM) embeddings via ESM-2.
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 WHAT IS A PROTEIN LANGUAGE MODEL?
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
 A protein language model (PLM) is a transformer neural network pre-trained on
 hundreds of millions of protein sequences by masked-language-modelling (MLM):
@@ -14,91 +14,91 @@ from context.
 After pre-training, the *internal activations* at the last hidden layer form
 per-residue embedding vectors.  These representations encode:
 
-  • Evolutionary information  — which positions co-vary across species
-  • Structural context        — buried vs. solvent-exposed residues
-  • Chemical environment      — polar / charged / hydrophobic neighbourhoods
-  • Functional signals        — active-site residues vs. scaffold
+  * Evolutionary information  - which positions co-vary across species
+  * Structural context        - buried vs. solvent-exposed residues
+  * Chemical environment      - polar / charged / hydrophobic neighbourhoods
+  * Functional signals        - active-site residues vs. scaffold
 
-All of this is learned from **sequence alone** — no 3D coordinates are used
+All of this is learned from **sequence alone** - no 3D coordinates are used
 during training.  Yet ESM-2 embeddings predict secondary structure, solvent
 accessibility, and contact maps at near-state-of-the-art accuracy with zero
 fine-tuning.  ESMFold, built on these representations, predicts full 3D
 structure in milliseconds.
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 MODEL: facebook/esm2_t6_8M_UR50D
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
 ESM-2 is a family of transformer models from Meta AI, trained on UniRef50
 (~250M non-redundant protein sequences).  We use the smallest variant:
 
   Model          Params   Embed dim   File    Best for
-  t6_8M          8M       320         ~30 MB  Education / fast experiments ← THIS
+  t6_8M          8M       320         ~30 MB  Education / fast experiments <- THIS
   t12_35M        35M      480         ~140 MB Better structure prediction
   t30_150M       150M     640         ~580 MB Near production quality
   t33_650M       650M     1280        ~2.5 GB AlphaFold-rivalling quality
 
-All variants use the same API — change only the `model_name` argument.
+All variants use the same API - change only the `model_name` argument.
 
 Reference:
   Lin et al. (2023) "Evolutionary-scale prediction of atomic-level protein
-  structure with a language model." Science 379, 1123–1130.
+  structure with a language model." Science 379, 1123-1130.
   https://doi.org/10.1126/science.ade2574
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 ARCHITECTURE INSIDE ESM-2
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
   Input sequence: "MQIFVKTLTG..."
-       ↓
-  Tokenization: each AA → integer token + [CLS] prefix, [EOS] suffix
-       ↓
+       |
+  Tokenization: each AA -> integer token + [CLS] prefix, [EOS] suffix
+       |
   Token embeddings: (L+2, 320) learnable lookup table
-       ↓
+       |
   Rotary Position Embedding (RoPE): encodes token position without absolute PEs
-       ↓
-  6 × Transformer encoder layers:
+       |
+  6 x Transformer encoder layers:
       Multi-Head Self-Attention (10 heads)
       LayerNorm + residual connection
       FFN (1280-dim hidden) + LayerNorm + residual
-       ↓
+       |
   Last hidden state: (L+2, 320)
-  Slice off [CLS] and [EOS]: → (L, 320)
-       ↓
+  Slice off [CLS] and [EOS]: -> (L, 320)
+       |
   Return per-residue embedding matrix
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 WHAT TO DO WITH THE EMBEDDINGS
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
-Per-residue embeddings (L, 320) — downstream uses:
-  • GNN node features:       enrich the quality GNN with evolutionary context
-  • Secondary structure:     simple linear probe on each residue
-  • Contact prediction:      outer product → (L, L, 640) → CNN → contact map
-  • Disorder prediction:     linear probe per residue
-  • Site annotation:         active sites, binding sites, PTM sites
+Per-residue embeddings (L, 320) - downstream uses:
+  * GNN node features:       enrich the quality GNN with evolutionary context
+  * Secondary structure:     simple linear probe on each residue
+  * Contact prediction:      outer product -> (L, L, 640) -> CNN -> contact map
+  * Disorder prediction:     linear probe per residue
+  * Site annotation:         active sites, binding sites, PTM sites
 
-Mean embedding (320,) — downstream uses:
-  • Sequence similarity search
-  • Clustering protein families
-  • Retrieval by function similarity
+Mean embedding (320,) - downstream uses:
+  * Sequence similarity search
+  * Clustering protein families
+  * Retrieval by function similarity
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 USAGE
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
     pip install synth-pdb[plm]
 
     from synth_pdb.plm import ESM2Embedder
 
-    embedder = ESM2Embedder()                               # lazy — nothing loaded yet
+    embedder = ESM2Embedder()                               # lazy - nothing loaded yet
     emb = embedder.embed("MQIFVKTLTG")                     # (10, 320) float32
     emb = embedder.embed_structure(atom_array)             # extract seq, then embed
     sim = embedder.sequence_similarity("ACDEF", "VWLYG")  # cosine sim of mean embeddings
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 BENCHMARK (measured 2026-02-19, CPU, esm2_t6_8M_UR50D)
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
   Protein length   First call (load + embed)   Subsequent calls
   50 residues      ~5 s (model download+load)   ~8 ms
@@ -153,11 +153,11 @@ _THREE_TO_ONE = {
 class ESM2Embedder:
     """Per-residue protein language model embeddings from ESM-2.
 
-    The model is loaded **lazily** on the first call to embed() — not at
+    The model is loaded **lazily** on the first call to embed() - not at
     __init__ time.  This means:
-      • `import synth_pdb.plm` is always safe with no torch/transformers installed
-      • `ESM2Embedder()` is instantaneous
-      • The ~5-second model load occurs once, then is cached in self._model
+      * `import synth_pdb.plm` is always safe with no torch/transformers installed
+      * `ESM2Embedder()` is instantaneous
+      * The ~5-second model load occurs once, then is cached in self._model
 
     Args:
         model_name: HuggingFace model ID.  Default: "facebook/esm2_t6_8M_UR50D".
@@ -174,13 +174,13 @@ class ESM2Embedder:
     ):
         self.model_name = model_name
         self._device_str = device  # resolved lazily
-        self._model = None  # EsmModel — loaded on first embed()
-        self._tokenizer = None  # EsmTokenizer — loaded on first embed()
+        self._model = None  # EsmModel - loaded on first embed()
+        self._tokenizer = None  # EsmTokenizer - loaded on first embed()
         self._embedding_dim: int | None = None
 
-    # ──────────────────────────────────────────────────────────────────────
+    # ----------------------------------------------------------------------
     # Public API
-    # ──────────────────────────────────────────────────────────────────────
+    # ----------------------------------------------------------------------
 
     @property
     def embedding_dim(self) -> int:
@@ -201,7 +201,7 @@ class ESM2Embedder:
         }
         if self.model_name in known:
             return known[self.model_name]
-        # Unknown model — must load to inspect
+        # Unknown model - must load to inspect
         self._load_model()
         return self._embedding_dim  # type: ignore[return-value]
 
@@ -214,7 +214,7 @@ class ESM2Embedder:
 
         Args:
             sequence: Single-letter amino acid string, e.g. "MQIFVKTLTG".
-                      Standard 20 amino acids only.  Unknown residues → 'X'.
+                      Standard 20 amino acids only.  Unknown residues -> 'X'.
 
         Returns:
             np.ndarray of shape (L, D) and dtype float32.
@@ -240,7 +240,7 @@ class ESM2Embedder:
         Extracts the amino acid sequence from the structure (using residue
         names in the AtomArray), then delegates to embed().
 
-        This is a convenience method — the embeddings are purely sequence-based
+        This is a convenience method - the embeddings are purely sequence-based
         and do not use any 3D coordinate information.
 
         Args:
@@ -266,7 +266,7 @@ class ESM2Embedder:
         """Return the mean-pooled sequence-level embedding.
 
         Mean pooling averages the per-residue vectors:
-            mean_embed(seq) = (1/L) Σ embed(seq)[i]    for i in 0..L-1
+            mean_embed(seq) = (1/L) Sum embed(seq)[i]    for i in 0..L-1
 
         This gives a single D-dim vector representing the whole sequence.
         Loses positional information but enables fast sequence comparison.
@@ -281,13 +281,13 @@ class ESM2Embedder:
         """Cosine similarity between the mean embeddings of two sequences.
 
         Returns a value in [-1, 1]:
-          •  1.0  — identical embeddings (same sequence)
-          •  0.0  — orthogonal (no similarity)
-          • -1.0  — opposite (very unlikely for protein embeddings)
+          *  1.0  - identical embeddings (same sequence)
+          *  0.0  - orthogonal (no similarity)
+          * -1.0  - opposite (very unlikely for protein embeddings)
 
         WHY COSINE, NOT L2?
         -------------------
-        Cosine similarity is magnitude-invariant — it measures the *angle*
+        Cosine similarity is magnitude-invariant - it measures the *angle*
         between vectors, not their length.  Longer proteins have higher-norm
         embeddings simply because there are more residues, not because they
         are more similar.  Cosine corrects for this.
@@ -297,13 +297,13 @@ class ESM2Embedder:
             seq_b: Second single-letter amino acid string.
 
         Returns:
-            float — cosine similarity of mean embeddings.
+            float - cosine similarity of mean embeddings.
 
         Example:
             >>> embedder.sequence_similarity("AAAAAAA", "VIVIVIV")
-            0.832...   # high — both are simple repetitive peptides
+            0.832...   # high - both are simple repetitive peptides
             >>> embedder.sequence_similarity("ACDEFGHIK", "WQMPLRNTS")
-            0.71...    # lower — very different character
+            0.71...    # lower - very different character
 
         """
         ea = self.mean_embed(seq_a)
@@ -314,9 +314,9 @@ class ESM2Embedder:
             return 0.0
         return float(np.dot(ea, eb) / (norm_a * norm_b))
 
-    # ──────────────────────────────────────────────────────────────────────
+    # ----------------------------------------------------------------------
     # Internal
-    # ──────────────────────────────────────────────────────────────────────
+    # ----------------------------------------------------------------------
 
     def _load_model(self) -> None:
         """Lazily import torch + transformers and load the ESM-2 model.
@@ -335,9 +335,9 @@ class ESM2Embedder:
         same problem for its NeuralShiftPredictor.
         """
         if self._model is not None:
-            return  # Already loaded — fast path
+            return  # Already loaded - fast path
 
-        # ── Import check ──────────────────────────────────────────────────
+        # -- Import check --------------------------------------------------
         try:
             import torch  # noqa: F401
         except ImportError as exc:
@@ -353,7 +353,7 @@ class ESM2Embedder:
                 "Install with: pip install synth-pdb[plm]"
             ) from exc
 
-        # ── Device selection ──────────────────────────────────────────────
+        # -- Device selection ----------------------------------------------
         # Priority: explicit override > MPS (Apple Silicon) > CUDA > CPU
         if self._device_str:
             device = torch.device(self._device_str)
@@ -365,9 +365,9 @@ class ESM2Embedder:
             device = torch.device("cpu")
 
         self._device = device
-        logger.info("Loading ESM-2 model '%s' on %s …", self.model_name, device)
+        logger.info("Loading ESM-2 model '%s' on %s ...", self.model_name, device)
 
-        # ── Load tokenizer + model ────────────────────────────────────────
+        # -- Load tokenizer + model ----------------------------------------
         # HuggingFace caches the weights at ~/.cache/huggingface/ after the
         # first download (~30 MB for t6_8M).
         self._tokenizer = EsmTokenizer.from_pretrained(self.model_name)
@@ -377,7 +377,7 @@ class ESM2Embedder:
         assert self._model is not None
 
         self._model = self._model.to(device)
-        self._model.eval()  # Disable dropout — we need deterministic inference
+        self._model.eval()  # Disable dropout - we need deterministic inference
 
         # Record the embedding dim from the model config
         self._embedding_dim = self._model.config.hidden_size
@@ -392,7 +392,7 @@ class ESM2Embedder:
 
         Tokenization adds [CLS] at position 0 and [EOS] at position L+1.
         We slice these off so the output aligns 1-to-1 with the input residues:
-            last_hidden_state[:, 1:-1, :]  →  (L, D)
+            last_hidden_state[:, 1:-1, :]  ->  (L, D)
 
         Gradient computation is disabled (torch.no_grad) for speed and memory.
         """
@@ -401,7 +401,7 @@ class ESM2Embedder:
         assert self._tokenizer is not None, "Tokenizer not loaded"
         assert self._model is not None, "Model not loaded"
 
-        # Tokenize: "ACDEF" → tensor of integer token IDs, shape (1, L+2)
+        # Tokenize: "ACDEF" -> tensor of integer token IDs, shape (1, L+2)
         inputs = self._tokenizer(
             sequence,
             return_tensors="pt",
@@ -413,16 +413,16 @@ class ESM2Embedder:
             outputs = self._model(**inputs)
 
         # last_hidden_state: (batch=1, L+2, D)
-        # Slice off [CLS] (index 0) and [EOS] (index -1) → (1, L, D)
+        # Slice off [CLS] (index 0) and [EOS] (index -1) -> (1, L, D)
         hidden = outputs.last_hidden_state[:, 1:-1, :]  # remove special tokens
         embeddings = hidden.squeeze(0)  # (L, D)
 
         return cast(np.ndarray, embeddings.cpu().numpy().astype(np.float32))
 
 
-# ──────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------
 # Utility: sequence extraction from AtomArray
-# ──────────────────────────────────────────────────────────────────────────
+# --------------------------------------------------------------------------
 
 
 def _extract_sequence(structure: Any) -> str:
@@ -436,7 +436,7 @@ def _extract_sequence(structure: Any) -> str:
         structure: biotite.structure.AtomArray.
 
     Returns:
-        str — single-letter sequence, e.g. "MQIFVKTLTG".
+        str - single-letter sequence, e.g. "MQIFVKTLTG".
 
     """
     import biotite.structure as struc
@@ -450,7 +450,7 @@ def _extract_sequence(structure: Any) -> str:
             sequence.append(one_letter)
         else:
             logger.debug(
-                "Unknown residue '%s' at position %d → 'X'", res_name, structure.res_id[start]
+                "Unknown residue '%s' at position %d -> 'X'", res_name, structure.res_id[start]
             )
             sequence.append("X")
 

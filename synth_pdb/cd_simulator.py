@@ -51,7 +51,7 @@ BASIS_SPECTRA = {
 class CDSimulator:
     """Simulates Circular Dichroism spectra from structural data.
 
-    ### EDUCATIONAL NOTE — CD Background:
+    ### EDUCATIONAL NOTE - CD Background:
     # Circular Dichroism (CD) measures the differential absorption
     # of left and right circularly polarized light. In the far-UV
     # (190-250 nm), it is the premier tool for measuring the
@@ -61,7 +61,7 @@ class CDSimulator:
     # chromophores. For a given conformation, we can synthesize
     # the expected spectrum as a weighted average of basis
     # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
-    #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
+    #   [theta]total = f_helix * [theta]helix + f_sheet * [theta]sheet + f_coil * [theta]coil
     """
 
     def __init__(self, structure: struc.AtomArray):
@@ -156,20 +156,22 @@ def validate_cd_against_literature(fractions: dict[str, float], spectrum: np.nda
     if fractions["H"] > 0.8:
         val_222 = spectrum[WAVELENGTHS == 222][0]
         if -42000 < val_222 < -30000:
-            findings.append(f"✓ Helix 222nm peak ({val_222:.0f}) matches literature (~ -36,000)")
+            findings.append(f"[OK] Helix 222nm peak ({val_222:.0f}) matches literature (~ -36,000)")
         else:
-            findings.append(f"⚠ Helix 222nm peak ({val_222:.0f}) deviates from standard helix.")
+            findings.append(
+                f"[WARN] Helix 222nm peak ({val_222:.0f}) deviates from standard helix."
+            )
 
     # Sheet check
     if fractions["E"] > 0.8:
         val_217 = spectrum[WAVELENGTHS == 217][0]
         if -22000 < val_217 < -14000:
             findings.append(
-                f"✓ Beta Sheet 217nm peak ({val_217:.0f}) matches literature (~ -18,000)"
+                f"[OK] Beta Sheet 217nm peak ({val_217:.0f}) matches literature (~ -18,000)"
             )
         else:
             findings.append(
-                f"⚠ Beta Sheet 217nm peak ({val_217:.0f}) deviates from standard sheet."
+                f"[WARN] Beta Sheet 217nm peak ({val_217:.0f}) deviates from standard sheet."
             )
 
     return findings

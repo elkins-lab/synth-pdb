@@ -23,7 +23,7 @@ Design goals
 2. **Single import**: ``from synth_pdb.score import score_structure`` is all
    a user ever needs.
 3. **Lazy loading**: PyTorch and torch_geometric are imported only when a
-   scoring function is called — users without GPU/torch can still import
+   scoring function is called - users without GPU/torch can still import
    the rest of synth_pdb.
 4. **Backward compatibility**: the underlying ``GNNQualityClassifier`` is
    still available for users who need lower-level access.
@@ -70,8 +70,8 @@ def score_structure(
     ----------
     source : str or path-like
         Either:
-        • A file path ending in ``.pdb`` — the file is read automatically.
-        • A raw PDB-format string (must start with ``ATOM`` or ``REMARK``).
+        * A file path ending in ``.pdb`` - the file is read automatically.
+        * A raw PDB-format string (must start with ``ATOM`` or ``REMARK``).
     model_path : str, optional
         Path to a custom ``.pt`` checkpoint.  Defaults to the bundled
         pre-trained weights (``gnn_quality_v2.pt``).
@@ -80,9 +80,9 @@ def score_structure(
     -------
     QualityScore
         Dataclass with:
-        ``global_score`` (float ∈ [0, 1]),
+        ``global_score`` (float in [0, 1]),
         ``label`` ("High Quality" / "Low Quality"),
-        ``per_residue`` (list of per-residue pLDDT scores ∈ [0, 1]),
+        ``per_residue`` (list of per-residue pLDDT scores in [0, 1]),
         ``residue_labels`` (list of "Very High"/"High"/"Uncertain"/"Low"),
         ``n_residues`` (int),
         ``features`` (dict of mean input features, for debugging).
@@ -94,7 +94,7 @@ def score_structure(
     ImportError
         If ``torch`` or ``torch_geometric`` are not installed.
     ValueError
-        If the PDB content has fewer than 2 residues with Cα atoms.
+        If the PDB content has fewer than 2 residues with Calpha atoms.
 
     Examples
     --------
@@ -107,7 +107,7 @@ def score_structure(
     Low-confidence residues: []
 
     """
-    # ── Resolve source → PDB string ────────────────────────────────────
+    # -- Resolve source -> PDB string ------------------------------------
     source_str = os.fspath(source) if not isinstance(source, str) else source
 
     if source_str.strip().startswith(("ATOM", "REMARK", "HEADER", "MODEL")):
@@ -121,7 +121,7 @@ def score_structure(
         with open(path) as fh:
             pdb_content = fh.read()
 
-    # ── Load classifier (singleton) ────────────────────────────────────
+    # -- Load classifier (singleton) ------------------------------------
     if model_path:
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
 

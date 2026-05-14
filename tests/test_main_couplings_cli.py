@@ -48,14 +48,14 @@ def test_gen_couplings_csv_is_written(tmp_path: Path) -> None:
 
 
 def test_gen_couplings_csv_header_schema(tmp_path: Path) -> None:
-    """Schema must be res_id,residue,J_HN_HA — third column is the floating point value."""
+    """Schema must be res_id,residue,J_HN_HA - third column is the floating point value."""
     csv_path = _run_gen_couplings(tmp_path)
     header = csv_path.read_text().splitlines()[0]
     assert header == "res_id,residue,J_HN_HA", f"Unexpected header: {header!r}"
 
 
 def test_gen_couplings_one_row_per_residue(tmp_path: Path) -> None:
-    """One data row per input residue — prolines and N-term must not be silently skipped."""
+    """One data row per input residue - prolines and N-term must not be silently skipped."""
     csv_path = _run_gen_couplings(tmp_path)
     data_rows = csv_path.read_text().splitlines()[1:]
     assert len(data_rows) == len(
@@ -74,14 +74,14 @@ def test_gen_couplings_first_residue_is_nan(tmp_path: Path) -> None:
 
 
 def test_gen_couplings_proline_is_nan(tmp_path: Path) -> None:
-    """Proline has no backbone amide proton — must appear in CSV as NaN, not be omitted."""
+    """Proline has no backbone amide proton - must appear in CSV as NaN, not be omitted."""
     csv_path = _run_gen_couplings(tmp_path)
     rows = [r.split(",") for r in csv_path.read_text().splitlines()[1:]]
     pro_rows = [r for r in rows if r[1] == "PRO"]
-    assert pro_rows, "PRO row missing from CSV — proline was silently dropped"
+    assert pro_rows, "PRO row missing from CSV - proline was silently dropped"
     for rid, _res, jval in pro_rows:
         assert math.isnan(float(jval)), (
-            f"PRO at residue {rid} should be NaN, got {jval!r} — "
+            f"PRO at residue {rid} should be NaN, got {jval!r} - "
             "proline lacks backbone amide proton so 3J(HN-HA) is physically undefined"
         )
 
@@ -90,7 +90,7 @@ def test_gen_couplings_interior_residue_is_finite(tmp_path: Path) -> None:
     """A non-proline interior residue must produce a finite, plausible J value."""
     csv_path = _run_gen_couplings(tmp_path)
     rows = [r.split(",") for r in csv_path.read_text().splitlines()[1:]]
-    # PHE at residue 4 — has phi (not first), not proline
+    # PHE at residue 4 - has phi (not first), not proline
     phe_rows = [r for r in rows if r[1] == "PHE"]
     assert phe_rows, "PHE row missing"
     jval = float(phe_rows[0][2])

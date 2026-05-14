@@ -77,7 +77,7 @@ class TestBurialRatioFormula:
     burial_ratio = mean_polar / (mean_hydro + 1e-6)
 
     Key invariants:
-      - All-polar sequence  -> mean_hydro ≈ 0  -> ratio >> 1  (high)
+      - All-polar sequence  -> mean_hydro ~ 0  -> ratio >> 1  (high)
       - All-hydrophobic     -> mean_polar = 1.0 (div-by-zero guard) -> ratio low
       - Mixed sequence      -> ratio somewhere in between
     """
@@ -86,11 +86,11 @@ class TestBurialRatioFormula:
     # Polar residues: everything else (GLY ALA SER ASP LYS ARG GLN ASN etc.)
 
     def test_all_polar_gives_high_burial_ratio(self) -> None:
-        """A pure polar chain has mean_hydro≈0, so burial_ratio should be large."""
+        """A pure polar chain has mean_hydro~0, so burial_ratio should be large."""
         # GLY and ALA are both classified as polar (not in hydrophobic_res list)
         v = _make_validator("GGGGGGGGG")
         result = v.calculate_residue_sasa()
-        # With mean_hydro ≈ 0, ratio = mean_polar / 1e-6 which is very large
+        # With mean_hydro ~ 0, ratio = mean_polar / 1e-6 which is very large
         # In the else-branch mean_polar defaults to 1.0 when polar_vals is empty,
         # but here GLY IS polar so polar_vals will be populated.
         assert (
@@ -99,8 +99,8 @@ class TestBurialRatioFormula:
 
     def test_all_hydrophobic_gives_lower_burial_ratio_than_all_polar(self) -> None:
         """A pure hydrophobic chain should have a lower burial ratio than a polar chain."""
-        v_polar = _make_validator("GGGGGGGGG")  # all GLY  → polar
-        v_hydro = _make_validator("VVVVVVVVV")  # all VAL  → hydrophobic
+        v_polar = _make_validator("GGGGGGGGG")  # all GLY  -> polar
+        v_hydro = _make_validator("VVVVVVVVV")  # all VAL  -> hydrophobic
 
         ratio_polar = v_polar.calculate_residue_sasa()["burial_ratio"]
         ratio_hydro = v_hydro.calculate_residue_sasa()["burial_ratio"]
@@ -170,7 +170,7 @@ class TestHydrophobicClassification:
         ), f"{three_letter} was not classified as hydrophobic (mean_hydrophobic_sasa=0)"
 
     def test_gly_ala_ser_classified_as_polar(self) -> None:
-        """GLY, ALA, SER should NOT appear in hydro_vals — only in polar."""
+        """GLY, ALA, SER should NOT appear in hydro_vals - only in polar."""
         v = _make_validator("GASGAS")
         result = v.calculate_residue_sasa()
         # Because no hydrophobic residues: mean_hydrophobic_sasa must be 0
@@ -246,7 +246,7 @@ class TestBurialRatioInQualityReport:
     def test_is_biophysically_plausible_reflects_burial_ratio_threshold(self) -> None:
         """
         is_biophysically_plausible = burial_ratio >= 0.8
-        We verify this is consistent — not that a specific value passes,
+        We verify this is consistent - not that a specific value passes,
         since linear peptides may not reach 0.8.
         """
         v = _make_validator("ALALALA")

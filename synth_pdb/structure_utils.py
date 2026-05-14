@@ -7,7 +7,7 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
 
 See: https://github.com/elkins/synth-nmr
 
-EDUCATIONAL NOTE — NMR Structure Utilities and RMSD
+EDUCATIONAL NOTE - NMR Structure Utilities and RMSD
 ====================================================
 Structural determination via NMR often involves generating an ensemble of
 possible conformations (e.g., 20 models) rather than a single crystal-like
@@ -19,7 +19,7 @@ superimposed structures. For an NMR ensemble, the "ensemble RMSD" is the
 average pairwise RMSD between all models, or the RMSD of each model to the
 mean coordinate set.
 
-    RMSD = √[ (1/N) * Σ (r_i,1 - r_i,2)² ]
+    RMSD = sqrt[ (1/N) * Sum (r_i,1 - r_i,2)^2 ]
 
 where N is the number of atoms, and r_i,1 and r_i,2 are the coordinates of
 the corresponding atom in the two structures after optimal superposition.

@@ -1,4 +1,4 @@
-"""Tests for synth_pdb/quality/gnn/gnn_classifier.py — targeting uncovered lines:
+"""Tests for synth_pdb/quality/gnn/gnn_classifier.py - targeting uncovered lines:
 - Lines 185-186: predict() ImportError when torch is absent
 - Lines 240-241: save() path (writes a checkpoint to disk)
 - Lines 280-281: load() ImportError when torch is absent
@@ -22,7 +22,7 @@ def _make_fresh_classifier():
     """Return a GNNQualityClassifier with a randomly-initialized model (no checkpoint)."""
     from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
 
-    return GNNQualityClassifier()  # no checkpoint → uses _init_fresh_model()
+    return GNNQualityClassifier()  # no checkpoint -> uses _init_fresh_model()
 
 
 def _make_helix_pdb(length: int = 12) -> str:
@@ -32,7 +32,7 @@ def _make_helix_pdb(length: int = 12) -> str:
 
 
 # ---------------------------------------------------------------------------
-# predict() — torch ImportError (lines 185-186)
+# predict() - torch ImportError (lines 185-186)
 # ---------------------------------------------------------------------------
 
 
@@ -119,7 +119,7 @@ class TestGNNSaveLoad:
 
 
 # ---------------------------------------------------------------------------
-# predict() — happy path with fresh (untrained) model
+# predict() - happy path with fresh (untrained) model
 # ---------------------------------------------------------------------------
 
 

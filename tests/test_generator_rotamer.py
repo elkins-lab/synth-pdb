@@ -39,8 +39,8 @@ class TestGeneratorWithRotamers(unittest.TestCase):
         is_trans = chi1_angle > 100 or chi1_angle < -100  # Around 180 degrees (or -180)
         self.assertTrue(
             is_gauche_minus or is_trans,
-            f"Chi-1 angle for LEU is {chi1_angle:.1f}°, expected rotamer ranges: "
-            f"-100° to -20° (gauche-) or ±100° to ±180° (trans)",
+            f"Chi-1 angle for LEU is {chi1_angle:.1f}deg, expected rotamer ranges: "
+            f"-100deg to -20deg (gauche-) or +/-100deg to +/-180deg (trans)",
         )
 
 

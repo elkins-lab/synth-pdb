@@ -63,12 +63,12 @@ def extract_quality_features(pdb_content: str) -> np.ndarray:
         )
         clash_count = len(validator.violations) - initial_violations
 
-        # --- Bond Lengths (0.1 Å tolerance) ---
+        # --- Bond Lengths (0.1 A tolerance) ---
         initial_violations = len(validator.violations)
         validator.validate_bond_lengths(tolerance=0.1)
         bond_len_count = len(validator.violations) - initial_violations
 
-        # --- Bond Angles (10° tolerance) ---
+        # --- Bond Angles (10deg tolerance) ---
         initial_violations = len(validator.violations)
         validator.validate_bond_angles(tolerance=10.0)
         bond_ang_count = len(validator.violations) - initial_violations

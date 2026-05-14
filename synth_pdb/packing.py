@@ -7,7 +7,7 @@ from .data import ROTAMER_LIBRARY
 from .geometry import reconstruct_sidechain
 from .scoring import calculate_clash_score
 
-# ── LOGGING SETUP ─────────────────────────────────────────────────────────────
+# -- LOGGING SETUP -------------------------------------------------------------
 # We initialize a logger for this module to provide transparent feedback during
 # long-running optimization tasks.
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class SideChainPacker:
     # How do we find the best shape for a protein?
     #
     # We could try every combination of rotamers, but with 10 options per residue
-    # and 100 residues, that's 10^100 combinations—impossible (Combinatorial Explosion).
+    # and 100 residues, that's 10^100 combinations-impossible (Combinatorial Explosion).
     #
     # Instead, we use "Monte Carlo" simulation, specifically the Metropolis-Hastings
     # algorithm. This mirrors how physical systems find minima:
@@ -86,14 +86,14 @@ class SideChainPacker:
         # Log the start of the optimization process.
         logger.info(f"Starting side-chain packing optimization ({self.steps} steps)...")
 
-        # ── LOCAL DETERMINISM ──────────────────────────────────────────────────
+        # -- LOCAL DETERMINISM --------------------------------------------------
         # We use a localized random generator to ensure that results are
         # reproducible across platforms while maintaining thread-safety.
         # This prevents 'stochastic drift' in scientific datasets.
         # We use a fixed seed (42) for pedagogical consistency.
         rng = np.random.default_rng(42)
 
-        # ── INITIALIZATION ─────────────────────────────────────────────────────
+        # -- INITIALIZATION -----------------------------------------------------
         # Identify residues that we are capable of optimizing.
         # Standard residues (ALA, GLY) are skipped as they lack side-chain torsions.
         residue_ids = sorted(set(peptide.res_id))
@@ -118,7 +118,7 @@ class SideChainPacker:
             logger.info("No optimizable residues found.")
             return peptide
 
-        # ── BASELINE SCORING ───────────────────────────────────────────────────
+        # -- BASELINE SCORING ---------------------------------------------------
         # We measure the starting state to set the initial bar for 'Best'.
         # The clash score is our objective function (potential energy).
         current_score = calculate_clash_score(peptide)
@@ -137,7 +137,7 @@ class SideChainPacker:
         # Keep track of how many moves were actually accepted.
         accepted_moves = 0
 
-        # ── MAIN MONTE CARLO LOOP ──────────────────────────────────────────────
+        # -- MAIN MONTE CARLO LOOP ----------------------------------------------
         for _step in range(self.steps):
             # STEP A: Selection
             # Randomly select a residue to mutate. Uniform sampling ensures
@@ -218,7 +218,7 @@ class SideChainPacker:
                 # MOVE REJECTED: Restore the previous coordinates for this residue.
                 peptide.coord[indices] = old_coords
 
-        # ── FINALIZATION ───────────────────────────────────────────────────────
+        # -- FINALIZATION -------------------------------------------------------
         # Ensure we return the absolute best configuration found during the
         # entire search, not just the state of the final iteration.
         # This is a critical architectural guarantee for structural quality.

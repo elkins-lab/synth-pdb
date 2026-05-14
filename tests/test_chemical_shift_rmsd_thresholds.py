@@ -53,8 +53,8 @@ RANDOM_COIL_CA: dict[str, float] = {
 }
 
 # Alanine-rich helical test sequence (strongly helix-forming)
-HELIX_SEQ = "AAAAAAAAAA"  # 10 alanines — canonical alpha-helix
-SHEET_SEQ = "VVVVVVVVVV"  # 10 valines — strongly beta-sheet-forming
+HELIX_SEQ = "AAAAAAAAAA"  # 10 alanines - canonical alpha-helix
+SHEET_SEQ = "VVVVVVVVVV"  # 10 valines - strongly beta-sheet-forming
 
 
 @pytest.fixture(scope="module")
@@ -150,10 +150,10 @@ def test_helical_ca_exceeds_sheet_ca_for_alanine(helix_shifts, sheet_shifts):
     ala_random_coil = RANDOM_COIL_CA["A"]
 
     print(f"\n  Helical Ala mean CA = {mean_helix_ca:.2f} ppm  (RC = {ala_random_coil:.1f})")
-    # Helical CA should be within ±5 ppm of the alanine random-coil value
+    # Helical CA should be within +/-5 ppm of the alanine random-coil value
     assert abs(mean_helix_ca - ala_random_coil) < 10.0, (
         f"Helical Ala mean CA ({mean_helix_ca:.2f} ppm) too far from Ala random coil "
-        f"({ala_random_coil:.1f} ppm) — suggests predictor is not residue-type aware"
+        f"({ala_random_coil:.1f} ppm) - suggests predictor is not residue-type aware"
     )
 
 
@@ -161,7 +161,7 @@ def test_calculate_shift_metrics_rmsd_is_zero_for_identical(helix_shifts):
     """calculate_shift_metrics must return RMSD=0 when obs==pred.
 
     SCIENTIFIC BASIS:
-    This is a unit test for the metrics calculator itself — if we feed it
+    This is a unit test for the metrics calculator itself - if we feed it
     identical arrays, the RMSD must be exactly 0 and correlation must be 1
     (or NaN for constant arrays, which we handle gracefully).
     """

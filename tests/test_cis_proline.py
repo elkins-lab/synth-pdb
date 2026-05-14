@@ -11,13 +11,13 @@ class TestCisProline:
     EDUCATIONAL NOTE - Peptide Bond Isomerism (Cis vs Trans)
     --------------------------------------------------------
     The peptide bond (C-N) has partial double-bond character, restricting rotation.
-    This leads to two planar isomers defined by the Omega (ω) angle:
+    This leads to two planar isomers defined by the Omega (omega) angle:
 
-    1. Trans (ω ≈ 180°):
+    1. Trans (omega ~ 180deg):
        The side chains of adjacent residues are on opposite sides.
        This is energetically favored (~99.7% of bonds) because it minimizes steric clashes.
 
-    2. Cis (ω ≈ 0°):
+    2. Cis (omega ~ 0deg):
        The side chains are on the same side. This creates significant steric clash
        for most amino acids, so it is extremely rare.
 

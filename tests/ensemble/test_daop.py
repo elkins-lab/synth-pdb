@@ -1,5 +1,5 @@
 """
-Tests for synth_pdb.ensemble.daop — Dihedral Angle Order Parameters.
+Tests for synth_pdb.ensemble.daop - Dihedral Angle Order Parameters.
 
 Coverage target:
     - calculate_order_parameter  (unit + scientific validation)
@@ -35,17 +35,17 @@ class TestCalculateOrderParameter:
     """Unit tests for calculate_order_parameter."""
 
     def test_empty_angles_returns_zero(self) -> None:
-        """Empty input → S = 0.0."""
+        """Empty input -> S = 0.0."""
         result = DAOPCalculator.calculate_order_parameter(np.array([]))
         assert result == pytest.approx(0.0)
 
     def test_single_angle_returns_one(self) -> None:
-        """A single angle is perfectly ordered → S = 1.0."""
+        """A single angle is perfectly ordered -> S = 1.0."""
         result = DAOPCalculator.calculate_order_parameter(np.array([1.23]))
         assert result == pytest.approx(1.0)
 
     def test_identical_angles_returns_one(self) -> None:
-        """Identical angles at any value → S = 1.0."""
+        """Identical angles at any value -> S = 1.0."""
         for angle in [0.0, np.pi / 3, -np.pi / 2, np.pi]:
             angles = np.full(50, angle)
             result = DAOPCalculator.calculate_order_parameter(angles)
@@ -54,14 +54,14 @@ class TestCalculateOrderParameter:
             ), f"Expected S=1.0 for uniform angle {angle:.3f}, got {result:.6f}"
 
     def test_opposite_angles_returns_zero(self) -> None:
-        """Two angles exactly 180° apart cancel each other → S ≈ 0."""
-        # π and -π are equivalent; use well-separated pairs
-        angles = np.array([0.0, np.pi])  # sin(0)+sin(π)≈0, cos(0)+cos(π)=0
+        """Two angles exactly 180deg apart cancel each other -> S ~ 0."""
+        # pi and -pi are equivalent; use well-separated pairs
+        angles = np.array([0.0, np.pi])  # sin(0)+sin(pi)~0, cos(0)+cos(pi)=0
         result = DAOPCalculator.calculate_order_parameter(angles)
         assert result == pytest.approx(0.0, abs=1e-10)
 
     def test_random_uniform_approaches_zero(self) -> None:
-        """Uniformly random angles over [0, 2π) → S ≈ 0 for large N."""
+        """Uniformly random angles over [0, 2pi) -> S ~ 0 for large N."""
         rng = np.random.default_rng(seed=0)
         angles = rng.uniform(0, 2 * np.pi, 50_000)
         result = DAOPCalculator.calculate_order_parameter(angles)
@@ -76,11 +76,11 @@ class TestCalculateOrderParameter:
             assert 0.0 <= result <= 1.0 + 1e-12
 
     def test_well_ordered_threshold(self) -> None:
-        """Angles with σ ≲ 24° should give S ≥ 0.9 (Hyberts 1992 convention)."""
-        sigma_rad = np.radians(20.0)  # comfortably below ±24° threshold
+        """Angles with sigma <~ 24deg should give S >= 0.9 (Hyberts 1992 convention)."""
+        sigma_rad = np.radians(20.0)  # comfortably below +/-24deg threshold
         angles = _make_ordered_angles(n_models=100, center=-np.pi / 3, sigma=sigma_rad)
         result = DAOPCalculator.calculate_order_parameter(angles)
-        assert result >= 0.9, f"Expected S≥0.9 for σ=20°, got {result:.4f}"
+        assert result >= 0.9, f"Expected S>=0.9 for sigma=20deg, got {result:.4f}"
 
     def test_disordered_threshold(self) -> None:
         """Angles with large spread should give S < 0.9."""
@@ -97,9 +97,9 @@ class TestCalculateOrderParameter:
 
     def test_known_formula_value(self) -> None:
         """Verify the Hyberts formula directly for a two-angle case."""
-        # Two angles: 0 and π/2
-        # sin_sum = sin(0) + sin(π/2) = 0 + 1 = 1
-        # cos_sum = cos(0) + cos(π/2) = 1 + 0 = 1
+        # Two angles: 0 and pi/2
+        # sin_sum = sin(0) + sin(pi/2) = 0 + 1 = 1
+        # cos_sum = cos(0) + cos(pi/2) = 1 + 0 = 1
         # S = (1/2) * sqrt(1^2 + 1^2) = (1/2) * sqrt(2)
         angles = np.array([0.0, np.pi / 2])
         expected = 0.5 * np.sqrt(2)
@@ -116,7 +116,7 @@ class TestFindWellDefinedResidues:
     """Unit tests for find_well_defined_residues."""
 
     def test_all_ordered_residues_marked_well_defined(self) -> None:
-        """Tightly clustered angles → all residues well-defined."""
+        """Tightly clustered angles -> all residues well-defined."""
         rng = np.random.default_rng(42)
         n_res, n_models = 10, 20
         phi = rng.normal(-np.pi / 3, np.radians(10), (n_res, n_models))
@@ -126,7 +126,7 @@ class TestFindWellDefinedResidues:
         assert result.all(), "Expected all residues well-defined for tight angle distribution"
 
     def test_all_disordered_residues_not_well_defined(self) -> None:
-        """Uniformly random angles → no residues well-defined (threshold=1.8)."""
+        """Uniformly random angles -> no residues well-defined (threshold=1.8)."""
         rng = np.random.default_rng(7)
         n_res, n_models = 10, 200
         phi = rng.uniform(-np.pi, np.pi, (n_res, n_models))
@@ -159,7 +159,7 @@ class TestFindWellDefinedResidues:
         """Custom threshold changes the cutoff."""
         rng = np.random.default_rng(3)
         n_res, n_models = 5, 50
-        # Moderate spread: S≈0.8 each → sum≈1.6; above 1.4 but below 1.8
+        # Moderate spread: S~0.8 each -> sum~1.6; above 1.4 but below 1.8
         phi = rng.normal(-np.pi / 3, np.radians(30), (n_res, n_models))
         psi = rng.normal(np.pi / 3, np.radians(30), (n_res, n_models))
 
@@ -202,7 +202,7 @@ class TestCalculateBackboneDaop:
         assert s_psi.shape == (n_res,)
 
     def test_ordered_input_gives_high_s(self) -> None:
-        """Tightly clustered angles → S ≥ 0.9 for all residues."""
+        """Tightly clustered angles -> S >= 0.9 for all residues."""
         n_res, n_models = 5, 30
         phi = np.full((n_res, n_models), -np.pi / 3)
         psi = np.full((n_res, n_models), np.pi / 3)
@@ -235,7 +235,7 @@ class TestCalculateBackboneDaop:
             assert s_psi_batch[i] == pytest.approx(s_psi_i, rel=1e-12)
 
     def test_independent_phi_psi(self) -> None:
-        """φ and ψ order parameters are computed independently."""
+        """phi and psi order parameters are computed independently."""
         n_res, n_models = 3, 50
         # Ordered phi, random psi
         phi = np.full((n_res, n_models), -np.pi / 3)
@@ -243,7 +243,7 @@ class TestCalculateBackboneDaop:
         psi = rng.uniform(-np.pi, np.pi, (n_res, n_models))
 
         s_phi, s_psi = DAOPCalculator.calculate_backbone_daop(phi, psi)
-        assert (s_phi >= 0.99).all(), "Perfectly ordered phi should give S≈1"
+        assert (s_phi >= 0.99).all(), "Perfectly ordered phi should give S~1"
         assert (s_psi < 0.5).all(), "Random psi should give low S"
 
 
@@ -275,7 +275,7 @@ class TestDAOPImports:
 
 
 # ===========================================================================
-# TestDAOPScientificValidation — Hyberts (1992) formula correctness
+# TestDAOPScientificValidation - Hyberts (1992) formula correctness
 # ===========================================================================
 
 
@@ -287,14 +287,14 @@ class TestDAOPScientificValidation:
     """
 
     def test_formula_with_four_evenly_spaced_angles(self) -> None:
-        """Four angles at 0, π/2, π, 3π/2 → vector sum cancels → S = 0."""
+        """Four angles at 0, pi/2, pi, 3pi/2 -> vector sum cancels -> S = 0."""
         angles = np.array([0.0, np.pi / 2, np.pi, 3 * np.pi / 2])
         # sin_sum = 0+1+0-1 = 0,  cos_sum = 1+0-1+0 = 0
         result = DAOPCalculator.calculate_order_parameter(angles)
         assert result == pytest.approx(0.0, abs=1e-12)
 
     def test_formula_with_three_equal_angles(self) -> None:
-        """Three identical angles at π/6 → S = 1."""
+        """Three identical angles at pi/6 -> S = 1."""
         angles = np.full(3, np.pi / 6)
         result = DAOPCalculator.calculate_order_parameter(angles)
         assert result == pytest.approx(1.0, abs=1e-12)
@@ -311,22 +311,24 @@ class TestDAOPScientificValidation:
 
     def test_24_degree_std_gives_s_near_0_9(self) -> None:
         """
-        A von Mises distribution with σ ≈ 24° should give S ≈ 0.9.
+        A von Mises distribution with sigma ~ 24deg should give S ~ 0.9.
 
         This is the stated boundary in Hyberts (1992): residues with
-        σ ≤ 24° are conventionally considered 'well-ordered'.
+        sigma <= 24deg are conventionally considered 'well-ordered'.
         """
         rng = np.random.default_rng(7)
-        # Von Mises κ ≈ 1/σ² for small σ; σ=24° ≈ 0.419 rad → κ ≈ 5.7
+        # Von Mises [0x3ba] ~ 1/sigma^2 for small sigma; sigma=24deg ~ 0.419 rad -> [0x3ba] ~ 5.7
         kappa = 5.7
         angles = rng.vonmises(0.0, kappa, 10_000)
         result = DAOPCalculator.calculate_order_parameter(angles)
-        # Allow ±0.05 tolerance due to finite sample
-        assert 0.85 <= result <= 0.95, f"Expected S≈0.9 for κ={kappa} (σ≈24°), got {result:.4f}"
+        # Allow +/-0.05 tolerance due to finite sample
+        assert (
+            0.85 <= result <= 0.95
+        ), f"Expected S~0.9 for [0x3ba]={kappa} (sigma~24deg), got {result:.4f}"
 
     def test_sum_phi_psi_criterion_matches_pdbstat_convention(self) -> None:
         """
-        Verify the PDBStat S(φ)+S(ψ) ≥ 1.8 well-defined criterion is
+        Verify the PDBStat S(phi)+S(psi) >= 1.8 well-defined criterion is
         equivalent to applying the threshold on the sum of two independent
         order parameters.
         """

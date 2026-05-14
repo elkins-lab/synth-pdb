@@ -479,7 +479,7 @@ def _create_3dmol_html(
 </head>
 <body>
     <div id="header">
-        <h1>🧬 synth-pdb 3D Molecular Viewer</h1>
+        <h1>[DNA] synth-pdb 3D Molecular Viewer</h1>
         <p>{filename}</p>
     </div>
 
@@ -502,29 +502,29 @@ def _create_3dmol_html(
 
         <div class="control-group">
             <label>Options:</label>
-            <button id="btn-ghost" onclick="toggleGhost()">👻 Ghost Mode</button>
-            <button id="btn-restraints" onclick="toggleRestraints()">🔴 Restraints</button>
+            <button id="btn-ghost" onclick="toggleGhost()">[GHOST] Ghost Mode</button>
+            <button id="btn-restraints" onclick="toggleRestraints()">[RESTRAINTS] Restraints</button>
         </div>
 
         <div class="control-group">
-            <button onclick="resetView()">🔄 Reset View</button>
-            <button onclick="toggleSpin()">🔄 Toggle Spin</button>
+            <button onclick="resetView()">[RESET] Reset View</button>
+            <button onclick="toggleSpin()">[RESET] Toggle Spin</button>
         </div>
     </div>
 
     <div id="viewer">
         <div id="loading-msg" style="color: #6b7280; font-style: italic;">
-            🚀 Initializing 3D Engine...
+            [INIT] Initializing 3D Engine...
         </div>
         <div id="error-overlay">
-            <h3 style="margin-top:0">⚠️ Viewer Error</h3>
+            <h3 style="margin-top:0">[WARN] Viewer Error</h3>
             <p id="error-text">Unexpected error</p>
             <p style="font-size: 12px; margin-bottom:0">Check your internet connection or try a different browser.</p>
         </div>
     </div>
 
     <div id="instructions">
-        <span class="emoji">🖱️</span> Left-click + drag to rotate | Scroll to zoom | Right-click + drag to pan
+        <span class="emoji">[MOUSE]</span> Left-click + drag to rotate | Scroll to zoom | Right-click + drag to pan
     </div>
 
     <script>

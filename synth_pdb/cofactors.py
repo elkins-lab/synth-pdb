@@ -54,7 +54,7 @@ def find_metal_binding_sites(
     sites = []
     assigned_residues: set[tuple[str, int]] = set()
 
-    # ── Iterative Motif Detection (Tightest-Cluster First) ──────────────────
+    # -- Iterative Motif Detection (Tightest-Cluster First) ------------------
     # Unlike a simple greedy search which might pick arbitrary nearby atoms,
     # we iteratively identify the "best" coordination sites.
     #

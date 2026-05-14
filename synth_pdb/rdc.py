@@ -13,53 +13,53 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
 
 See: https://github.com/elkins/synth-nmr
 
-EDUCATIONAL NOTE — What are Residual Dipolar Couplings (RDCs)?
+EDUCATIONAL NOTE - What are Residual Dipolar Couplings (RDCs)?
 ================================================================
 In solution NMR, molecules tumble rapidly in all orientations. This isotropic
-tumbling averages the large through-space magnetic dipole–dipole interactions
-between nuclear spin pairs (e.g., backbone N–H) to exactly zero — which is why
+tumbling averages the large through-space magnetic dipole-dipole interactions
+between nuclear spin pairs (e.g., backbone N-H) to exactly zero - which is why
 solution NMR spectra are so sharp compared to solid-state.
 
-However, if molecules are placed in an anisotropic medium — such as a dilute
+However, if molecules are placed in an anisotropic medium - such as a dilute
 suspension of rod-like liquid crystals (Tjandra & Bax, 1997), filamentous
 phage particles (Hansen et al., 2000), or a strained polyacrylamide gel
-(Tycko et al., 2000) — they develop a slight statistical preference for a
+(Tycko et al., 2000) - they develop a slight statistical preference for a
 particular orientation. This partial alignment is described by the
-"alignment tensor" A, a symmetric 3×3 matrix.
+"alignment tensor" A, a symmetric 3x3 matrix.
 
 Because the tumbling is no longer fully isotropic, the dipolar coupling no
 longer averages to zero: a small "residual" coupling remains. For a backbone
-N–H bond vector, the RDC value is:
+N-H bond vector, the RDC value is:
 
-    D(θ, φ) = Da · [(3·cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
+    D(theta, phi) = Da * [(3*cos^2theta - 1) + (3/2)*R*sin^2theta*cos(2phi)]
 
 where:
-  θ   = polar angle of the N–H unit vector with respect to the principal
+  theta   = polar angle of the N-H unit vector with respect to the principal
         (Z) axis of the alignment tensor
-  φ   = azimuthal angle of the N–H unit vector in the XY plane of the tensor
+  phi   = azimuthal angle of the N-H unit vector in the XY plane of the tensor
   Da  = axial component of the alignment tensor in Hz
-        (typical values for proteins: 5–25 Hz; Tjandra & Bax, 1997)
-  R   = rhombicity of the tensor, 0 ≤ R ≤ 2/3; R=0 gives axially symmetric
+        (typical values for proteins: 5-25 Hz; Tjandra & Bax, 1997)
+  R   = rhombicity of the tensor, 0 <= R <= 2/3; R=0 gives axially symmetric
         alignment; R=2/3 is the maximum rhombicity
 
 WHY ARE RDCs USEFUL FOR STRUCTURE DETERMINATION?
 RDCs encode the orientation of individual bond vectors relative to a shared
-global frame — the alignment tensor. This is fundamentally different from NOE
+global frame - the alignment tensor. This is fundamentally different from NOE
 distance restraints, which are purely local. Because of this:
-  • NOEs constrain local folding (secondary structure)
-  • RDCs constrain global fold topology (tertiary structure)
+  * NOEs constrain local folding (secondary structure)
+  * RDCs constrain global fold topology (tertiary structure)
 
 The two observables are thus complementary: combining them dramatically
 improves the accuracy of NMR-derived protein structures. A landmark study
 (Bewley & Clore, 2000) demonstrated that RDC-constrained calculations refined
-a 100-ns MD ensemble of HIV-1 protease to within 0.4 Å RMSD of the crystal
+a 100-ns MD ensemble of HIV-1 protease to within 0.4 A RMSD of the crystal
 structure, without any additional NOE data.
 
 VALIDATION VIA THE Q-FACTOR:
 How do we know if a structure is "correct" relative to the RDC data? The standard
 metric is the Q-factor (Cornilescu et al., 1998):
 
-    Q = sqrt[ Σ (D_obs - D_calc)² / Σ D_obs² ]
+    Q = sqrt[ Sum (D_obs - D_calc)^2 / Sum D_obs^2 ]
 
 A Q-factor of 0.0 indicates perfect agreement. For high-resolution NMR
 structures, a Q-factor below 0.2 is typically expected. Values above 0.5
@@ -68,11 +68,11 @@ usually indicate a significant mismatch or misfolding.
 References:
   1. Tjandra, N. & Bax, A. (1997). Direct measurement of distances and
      angles in biomolecules by NMR in a dilute liquid crystalline medium.
-     Science, 278, 1111–1114. DOI: 10.1126/science.278.5340.1111
+     Science, 278, 1111-1114. DOI: 10.1126/science.278.5340.1111
 
   2. Prestegard, J.H., Al-Hashimi, H.M. & Tolman, J.R. (2000).
      NMR structures of biomolecules using field oriented media and residual
-     dipolar couplings. Q Rev Biophys, 33, 371–424.
+     dipolar couplings. Q Rev Biophys, 33, 371-424.
      DOI: 10.1017/S0033583500003656
 
   3. Cornilescu, G. et al. (1998). Validation of protein structures
@@ -100,7 +100,7 @@ vector within the Alignment Tensor's Principal Axis System (PAS).
    The structural model's frame must be rotated into the PAS of the alignment
    tensor using a rotation matrix R_tensor (defined by Euler angles alpha,
    beta, and gamma).
-   V_pas = R_tensor · V_hat
+   V_pas = R_tensor * V_hat
 
 3. THE RDC EQUATION:
    Once V_pas is known, the coupling is calculated based on the axial (Da)
@@ -161,7 +161,7 @@ from typing import Any, cast
 import numpy as np
 import synth_nmr.rdc as _rdc
 
-# ── LOGGING CONFIGURATION ───────────────────────────────────────────────────
+# -- LOGGING CONFIGURATION ---------------------------------------------------
 # We use a dedicated logger for the RDC module to allow for granular
 # debugging of spectroscopic calculations. This follows the standard
 # Python logging pattern used throughout the synth-pdb project.
@@ -183,7 +183,7 @@ import synth_nmr.rdc as _rdc
 # This ensures that logging can be toggled on a per-module basis.
 logger = logging.getLogger(__name__)
 
-# ── MAIN PREDICTION ENGINE ───────────────────────────────────────────────────
+# -- MAIN PREDICTION ENGINE ---------------------------------------------------
 # Mapping from non-standard residues to their parent standard residues.
 #
 # EDUCATIONAL NOTE - Spectroscopic Transferability:
@@ -248,7 +248,7 @@ _PARENT_MAP: dict[str, str] = {
 }
 
 
-# ── SAUPE FORMALISM AND ALIGNMENT ──────────────────────────────────────────
+# -- SAUPE FORMALISM AND ALIGNMENT ------------------------------------------
 # The Saupe alignment tensor (Saupe, 1964) is a traceless, symmetric 3x3 matrix.
 # It describes the degree of alignment of the protein molecule's PAS axes
 # relative to the external magnetic field. The alignment is typically weak
@@ -301,7 +301,7 @@ def calculate_rdcs(structure: Any, da: float, r: float) -> dict[int, float]:
     we allow models to learn the mapping between 3D structure and spectroscopic
     observables without the noise inherent in experimental data.
     """
-    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------
     # To support synthetic motifs (D-amino acids, PTMs) we must normalize
     # nomenclature to ensure compatibility with underlying back-calc engines.
     #
@@ -386,7 +386,7 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
     Returns:
         float: The Cornilescu Q-factor (dimensionless ratio).
     """
-    # ── VALIDATE INPUT ARRAYS ────────────────────────────────────────────────
+    # -- VALIDATE INPUT ARRAYS ------------------------------------------------
     # Pairwise subtraction requires perfectly aligned input arrays.
     # This check ensures we don't return meaningless results for misaligned data.
     # Arrays must have the same length and ideally match residue-for-residue.
@@ -397,7 +397,7 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
             f"Input arrays must have same length (obs={len(observed)}, calc={len(calculated)})"
         )
 
-    # ── HANDLE EMPTY DATA ────────────────────────────────────────────────────
+    # -- HANDLE EMPTY DATA ----------------------------------------------------
     # Returning 0.0 for empty sets prevents division-by-zero errors in automated loops.
     # Logging at INFO level tracks these cases for researcher awareness.
     # This prevents the need for manual null-checks in high-throughput scripts.
@@ -405,7 +405,7 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
         logger.info("Empty RDC arrays provided; Q-factor defaulted to 0.0.")
         return 0.0
 
-    # ── NUMERICAL CALCULATION ────────────────────────────────────────────────
+    # -- NUMERICAL CALCULATION ------------------------------------------------
     # Vectorized execution path for high-throughput ensemble validation.
 
     # 1. Calculate the squared differences (the residuals)
@@ -588,7 +588,7 @@ def export_rdcs(rdc_data: dict[int, float], file_path: str, structure: Any = Non
         raise OSError(f"Failed to export RDC data to {file_path}: {e}")
 
 
-# ── MODULE EXPORTS ───────────────────────────────────────────────────────────
+# -- MODULE EXPORTS -----------------------------------------------------------
 # Explicit definition of the public API for clean imports.
 # This pattern ensures that only intended functions are exposed to the user.
 # Maintains a clean namespace for third-party library integrations.

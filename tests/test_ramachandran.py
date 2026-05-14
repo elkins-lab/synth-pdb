@@ -2,29 +2,29 @@
 
 EDUCATIONAL NOTE - The Ramachandran Plot
 ========================================
-The Ramachandran plot shows allowed combinations of phi (φ) and psi (ψ)
+The Ramachandran plot shows allowed combinations of phi (phi) and psi (psi)
 backbone dihedral angles in protein structures.
 
 What are Phi and Psi?
-- Phi (φ): Rotation around N-CA bond (C-N-CA-C dihedral)
-- Psi (ψ): Rotation around CA-C bond (N-CA-C-N dihedral)
-- Both measured in degrees (-180° to +180°)
+- Phi (phi): Rotation around N-CA bond (C-N-CA-C dihedral)
+- Psi (psi): Rotation around CA-C bond (N-CA-C-N dihedral)
+- Both measured in degrees (-180deg to +180deg)
 
 Why Only Certain Regions Are Allowed:
 - Steric clashes between backbone and side chain atoms
 - Most combinations cause atoms to overlap (forbidden)
-- Only ~30% of φ/ψ space is sterically allowed
+- Only ~30% of phi/psi space is sterically allowed
 
 Standard Allowed Regions:
-1. **Alpha helix region**: φ ≈ -60°, ψ ≈ -45°
+1. **Alpha helix region**: phi ~ -60deg, psi ~ -45deg
    - Right-handed helix
    - Most common secondary structure
 
-2. **Beta sheet region**: φ ≈ -120°, ψ ≈ +120°
+2. **Beta sheet region**: phi ~ -120deg, psi ~ +120deg
    - Extended conformation
    - Forms sheets via H-bonds
 
-3. **Left-handed alpha region**: φ ≈ +60°, ψ ≈ +45°
+3. **Left-handed alpha region**: phi ~ +60deg, psi ~ +45deg
    - FORBIDDEN for most residues (steric clash)
    - ALLOWED only for glycine!
 
@@ -34,12 +34,12 @@ Glycine has NO side chain (only H atom as "side chain").
 - No steric clashes with backbone
 - Can access left-handed alpha region
 - Much more flexible than other residues
-- Ramachandran plot: ~70% of φ/ψ space allowed (vs ~30% for others)
+- Ramachandran plot: ~70% of phi/psi space allowed (vs ~30% for others)
 
 Why Proline is Special:
 ======================
 Proline has a CYCLIC structure (side chain connects back to backbone N).
-- Restricts phi angle to ~-60° (cannot rotate freely)
+- Restricts phi angle to ~-60deg (cannot rotate freely)
 - Cannot form backbone N-H hydrogen bonds (no H on N)
 - Acts as "helix breaker" in alpha helices
 - Ramachandran plot: Very restricted, mostly beta region
@@ -95,7 +95,7 @@ class TestRamachandranDistributions:
         """Test that glycine structures can have positive phi angles.
 
         EDUCATIONAL NOTE - Left-Handed Alpha Region:
-        This region (φ ≈ +60°, ψ ≈ +45°) is FORBIDDEN for most residues
+        This region (phi ~ +60deg, psi ~ +45deg) is FORBIDDEN for most residues
         due to steric clashes between the side chain and backbone.
 
         Glycine has NO side chain (only H), so it can access this region.
@@ -149,7 +149,7 @@ class TestRamachandranDistributions:
         )
 
     def test_proline_has_restricted_phi(self):
-        """Test that proline has restricted phi angles around -60°.
+        """Test that proline has restricted phi angles around -60deg.
 
         SKIPPED (WIP):
         Geometric construction method limitations cause Proline angles to deviate
@@ -160,14 +160,14 @@ class TestRamachandranDistributions:
         backbone nitrogen, forming a 5-membered ring.
 
         Consequences:
-        1. Phi angle restricted to ~-60° (cannot rotate freely)
+        1. Phi angle restricted to ~-60deg (cannot rotate freely)
         2. No N-H hydrogen bond donor (N is part of ring)
         3. Acts as "helix breaker" in alpha helices
         4. Common in turns and loops
         5. Cis-trans isomerization possible (rare)
 
         In real structures:
-        - Proline phi: -60° ± 20° (very narrow distribution)
+        - Proline phi: -60deg +/- 20deg (very narrow distribution)
         - Other residues: Much wider phi distribution
         - Proline rarely in alpha helices (breaks H-bond pattern)
         """
@@ -192,14 +192,14 @@ class TestRamachandranDistributions:
             finally:
                 os.remove(temp_path)
 
-        # Check that proline phi angles are restricted around -60°
+        # Check that proline phi angles are restricted around -60deg
         np.mean(phi_angles)
         std_phi = np.std(phi_angles)
 
-        # Mean should be near -60°, std should be small (restricted)
+        # Mean should be near -60deg, std should be small (restricted)
         # Note: We check mainly that the distribution is restricted, the exact mean
         # might vary slightly due to geometric construction issues
-        assert std_phi < 60, f"PRO phi should be restricted (low std), but std is {std_phi:.1f}°"
+        assert std_phi < 60, f"PRO phi should be restricted (low std), but std is {std_phi:.1f}deg"
 
     def test_general_residues_avoid_left_handed_alpha(self):
         """Test that non-GLY residues avoid left-handed alpha region.
@@ -238,7 +238,7 @@ class TestRamachandranDistributions:
         # Less than 5% should have positive phi (should avoid left-handed alpha)
         assert positive_phi_count / total_angles < 0.05, (
             f"Non-GLY residues should avoid left-handed alpha, "
-            f"but {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had phi > 30°"
+            f"but {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had phi > 30deg"
         )
 
     def test_alpha_helix_conformation_uses_correct_angles(self):
@@ -273,10 +273,10 @@ class TestRamachandranDistributions:
             # Check that angles are in alpha helix region
             assert (
                 np.mean(phi_deg) < -50 and np.mean(phi_deg) > -70
-            ), f"Alpha helix phi should be ~-60°, got {np.mean(phi_deg):.1f}°"
+            ), f"Alpha helix phi should be ~-60deg, got {np.mean(phi_deg):.1f}deg"
             assert (
                 np.mean(psi_deg) < -35 and np.mean(psi_deg) > -55
-            ), f"Alpha helix psi should be ~-45°, got {np.mean(psi_deg):.1f}°"
+            ), f"Alpha helix psi should be ~-45deg, got {np.mean(psi_deg):.1f}deg"
         finally:
             os.remove(temp_path)
 
@@ -308,9 +308,9 @@ class TestRamachandranDistributions:
             # Check that angles are in beta sheet region
             assert (
                 np.mean(phi_deg) < -100 and np.mean(phi_deg) > -140
-            ), f"Beta sheet phi should be ~-120°, got {np.mean(phi_deg):.1f}°"
+            ), f"Beta sheet phi should be ~-120deg, got {np.mean(phi_deg):.1f}deg"
             assert (
                 np.mean(psi_deg) > 100 and np.mean(psi_deg) < 140
-            ), f"Beta sheet psi should be ~+120°, got {np.mean(psi_deg):.1f}°"
+            ), f"Beta sheet psi should be ~+120deg, got {np.mean(psi_deg):.1f}deg"
         finally:
             os.remove(temp_path)

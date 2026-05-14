@@ -114,23 +114,23 @@ def _calculate_bfactor(
     EDUCATIONAL NOTE - B-factors (Temperature Factors):
     ===================================================
     B-factors represent atomic displacement due to thermal motion and static disorder.
-    They are measured in Ų (square Angstroms) and indicate atomic mobility.
+    They are measured in A^2 (square Angstroms) and indicate atomic mobility.
 
     Physical Interpretation:
-    - B = 8π²<u²> where <u²> is mean square displacement
+    - B = 8pi^2<u^2> where <u^2> is mean square displacement
     - Higher B-factor = more mobile/flexible atom
     - Lower B-factor = more rigid/constrained atom
 
     Typical Patterns in Real Protein Structures:
     1. Backbone vs Side Chains:
-       - Backbone atoms (N, CA, C, O): 15-25 Ų (constrained by peptide bonds)
-       - Side chain atoms (CB, CG, etc.): 20-35 Ų (more conformational freedom)
+       - Backbone atoms (N, CA, C, O): 15-25 A^2 (constrained by peptide bonds)
+       - Side chain atoms (CB, CG, etc.): 20-35 A^2 (more conformational freedom)
 
     2. Position Along Chain:
        In this synthetic generator, we simulate B-factors that follow these
        universal patterns of rigidity vs. flexibility.
-       - Core residues: 10-20 Ų (buried, constrained)
-       - Terminal residues: 30-50 Ų ("terminal fraying" - fewer constraints)
+       - Core residues: 10-20 A^2 (buried, constrained)
+       - Terminal residues: 30-50 A^2 ("terminal fraying" - fewer constraints)
 
     3. Residue-Specific Effects:
        - Glycine: Higher (no side chain constraints, more flexible)
@@ -160,7 +160,7 @@ def _calculate_bfactor(
         s2: Lipari-Szabo Order Parameter (0.0=Random, 1.0=Rigid). Default 0.85.
 
     Returns:
-        B-factor value in Ų, rounded to 2 decimal places
+        B-factor value in A^2, rounded to 2 decimal places
 
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
@@ -197,7 +197,7 @@ def _calculate_bfactor(
     # Calculate final B-factor
     bfactor = base_bfactor + random_variation
 
-    # Clamp to realistic range (5-99 Ų)
+    # Clamp to realistic range (5-99 A^2)
     bfactor = max(5.0, min(99.0, bfactor))
 
     return round(bfactor, 2)
@@ -260,7 +260,7 @@ def create_atom_line(
     element: str,
     alt_loc: str = "",
     insertion_code: str = "",
-    temp_factor: float = 0.00,  # B-factor (temperature factor) in Ų
+    temp_factor: float = 0.00,  # B-factor (temperature factor) in A^2
     occupancy: float = 1.00,  # Occupancy (fraction of molecules)
 ) -> str:
     """Create a PDB ATOM line.
@@ -348,14 +348,14 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 
     Detection Criteria:
     - Both residues must be CYS
-    - SG-SG distance: 2.0-2.2 Å (slightly relaxed from ideal 2.0-2.1 Å)
+    - SG-SG distance: 2.0-2.2 A (slightly relaxed from ideal 2.0-2.1 A)
     - Only report each pair once (avoid duplicates)
 
     Why Distance Matters:
-    - < 2.0 Å: Too close (steric clash, not realistic)
-    - 2.0-2.1 Å: Ideal disulfide bond distance
-    - 2.1-2.2 Å: Acceptable (allows for flexibility)
-    - > 2.2 Å: Too far (no covalent bond possible)
+    - < 2.0 A: Too close (steric clash, not realistic)
+    - 2.0-2.1 A: Ideal disulfide bond distance
+    - 2.1-2.2 A: Acceptable (allows for flexibility)
+    - > 2.2 A: Too far (no covalent bond possible)
 
     Biological Context:
     - Disulfides stabilize protein structure
@@ -903,7 +903,7 @@ def _build_peptide_chains(
                 if cyclic and len(chain_sequences) == 1:
                     res_conformation = "curved"
 
-            # ── Backbone coordinate placement ───────────────────────────────────
+            # -- Backbone coordinate placement -----------------------------------
             if i == 0:
                 # First residue (N-terminus)
                 # Position N at origin, CA on X-axis, C in XY-plane
@@ -1092,7 +1092,7 @@ def _build_peptide_chains(
                     prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
                 )
 
-            # ── Place Oxygen (O) explicitly ──
+            # -- Place Oxygen (O) explicitly --
             # The O atom is placed relative to N, CA, C.
             # Rationale: In the legacy implementation and for parity with the
             # BatchedGenerator, we use a fixed 180.0 degree dihedral.
@@ -1101,7 +1101,7 @@ def _build_peptide_chains(
                 n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
             )
 
-            # ── Store coordinates for next iteration ────────────────────────────
+            # -- Store coordinates for next iteration ----------------------------
             residue_coordinates[i] = {
                 "N": n_coord,
                 "CA": ca_coord,
@@ -1109,7 +1109,7 @@ def _build_peptide_chains(
                 "O": o_coord,
             }
 
-            # ── Biotite reference template ───────────────────────────────────────
+            # -- Biotite reference template ---------------------------------------
             template_res_name = res_name
             if res_name in ["HID", "HIE", "HIP"]:
                 template_res_name = "HIS"
@@ -1194,7 +1194,7 @@ def _build_peptide_chains(
                                 )
                                 ref_res_template.coord[atom_idx] = rotated_p + ca_atom.coord
 
-            # ── Superimpose template onto constructed backbone frame ─────────────
+            # -- Superimpose template onto constructed backbone frame -------------
             template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
             template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
             template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
@@ -1263,7 +1263,7 @@ def _build_peptide_chains(
                         dist_to_plane = np.dot(w, normal)
                         transformed_res.coord[atom_idx] = p - 2 * dist_to_plane * normal
 
-            # ── Assign residue metadata ──────────────────────────────────────────
+            # -- Assign residue metadata ------------------------------------------
             transformed_res.res_id[:] = res_id
             if is_d:
                 transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)
@@ -1355,7 +1355,7 @@ def _apply_biophysical_mods(
         logger.info("Running side-chain optimization...")
         peptide = run_optimization(peptide)
 
-    # 1. Terminal Capping (ACE/NME) — cyclic peptides are naturally capped.
+    # 1. Terminal Capping (ACE/NME) - cyclic peptides are naturally capped.
     if cap_termini and not cyclic:
         peptide = biophysics.cap_termini(peptide)
 
@@ -1438,7 +1438,7 @@ def _do_energy_minimization(
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
             # TECHNICAL NOTE - Format Selection for Minimization Bridge:
-            # Standard PDB format fails at 100,000 atoms or ±1000 Å coordinates.
+            # Standard PDB format fails at 100,000 atoms or +/-1000 A coordinates.
             # We automatically switch to mmCIF (.cif) for the internal bridge
             # between our generator and the OpenMM physics engine if the structure
             # is too large for the legacy PDB format.
@@ -1543,7 +1543,7 @@ def _do_energy_minimization(
                     atomic_and_ter_content = string_io.getvalue()
 
             # RESTORE PTM AND D-AMINO ACID NAMES:
-            # OpenMM reverts SEP→SER and DAL→ALA; restore for consistency.
+            # OpenMM reverts SEP->SER and DAL->ALA; restore for consistency.
             # We map names from the original 'flat_sequence' (generated intent)
             # back to the physics-refined coordinates.
             try:
@@ -1556,7 +1556,7 @@ def _do_energy_minimization(
                     if np.any(mask_first) and peptide.res_name[mask_first][0] == "ACE":
                         start_offset = 1
 
-                # Build a mapping: PDB residue-number → target name (intent)
+                # Build a mapping: PDB residue-number -> target name (intent)
                 ptm_rename_map: dict = {}
                 if n_min >= n_seq + start_offset:
                     for idx, res_name_target in enumerate(sequence):
@@ -1629,7 +1629,7 @@ def _assemble_output(
     Returns:
         Complete structure file as a string (pdb/cif) or bytes (bcif).
     """
-    # ── Step 1: Initialize Metadata & Atom IDs ──────────────────────────────
+    # -- Step 1: Initialize Metadata & Atom IDs ------------------------------
     # BIOPHYSICAL ANALYSIS: Identifying protein atoms for ATOM vs HETATM tagging.
     # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
     is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
@@ -1657,7 +1657,7 @@ def _assemble_output(
     # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
     # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
 
-    # ── Step 2: Biophysical Calculations (AtomArray level) ───────────────────
+    # -- Step 2: Biophysical Calculations (AtomArray level) -------------------
     # GEOMETRIC FLEXIBILITY: Predict Order Parameters (S2) to derive B-factors.
     # The S2 parameter (0.0 to 1.0) represents the degree of spatial restriction
     # of a chemical bond. We use it here to simulate realistic thermal motion.
@@ -1733,7 +1733,7 @@ def _assemble_output(
     occupancies = np.clip(occupancies, 0.85, 1.00)
     peptide.occupancy = np.round(occupancies, 2)
 
-    # ── Step 3: Format-Specific Export ─────────────────────────────────────
+    # -- Step 3: Format-Specific Export -------------------------------------
     if output_format in ["cif", "bcif"]:
         if output_format == "bcif":
             # BinaryCIF export for high-performance AI and web visualization.
@@ -1750,11 +1750,11 @@ def _assemble_output(
             cif_file.write(out_str)
             return out_str.getvalue()
 
-    # ── Step 4: PDB Standard Assembly ──────────────────────────────────────
+    # -- Step 4: PDB Standard Assembly --------------------------------------
     # If no minimization was performed, we convert the AtomArray to PDB format.
     if atomic_and_ter_content is None:
         pdb_file_out = pdb.PDBFile()
-        # This call can fail if coordinates exceed ±1000A, but that is handled
+        # This call can fail if coordinates exceed +/-1000A, but that is handled
         # at the CLI level by recommending CIF format for massive proteins.
         pdb_file_out.set_structure(peptide)
         string_io = io.StringIO()
@@ -2004,7 +2004,7 @@ def generate_pdb_content(
 
     EDUCATIONAL NOTE - Multi-Chain Complex Generation (Phase 16):
     ----------------------------------------------------------
-    A major frontier in structural biology is the study of the "Interactome"—how
+    A major frontier in structural biology is the study of the "Interactome"-how
     individual proteins assemble into complexes. This generator supports the creation
     of dimers, trimers, and larger multimers by accepting multiple sequences
     separated by a colon (':').
@@ -2350,7 +2350,7 @@ class PeptideResult:
         target format.
 
         EDUCATIONAL RATIONALE - Polyglot Export Architecture:
-        In modern structural biology, tools must be "polyglot"—able to speak
+        In modern structural biology, tools must be "polyglot"-able to speak
         multiple file formats fluently. By using a high-level AtomArray as
         the intermediate representation, we ensure that converting a PDB to
         an mmCIF does not lose scientific metadata (like occupancies or

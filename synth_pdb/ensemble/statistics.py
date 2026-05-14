@@ -6,9 +6,9 @@ analysis (RMSD, RMSF, medoid, well-defined regions) and an interpretive
 quality tier drawn from the literature.
 
 Quality thresholds:
-    HIGH     : RMSD-to-mean < 1.0 Å  (Tejero et al. 2013)
-    GOOD     : RMSD-to-mean < 2.0 Å
-    MODERATE : RMSD-to-mean ≥ 2.0 Å
+    HIGH     : RMSD-to-mean < 1.0 A  (Tejero et al. 2013)
+    GOOD     : RMSD-to-mean < 2.0 A
+    MODERATE : RMSD-to-mean >= 2.0 A
 
 Reference:
     Tejero, R., Snyder, D., Mao, B., Aramini, J.M. & Montelione, G.T. (2013).
@@ -30,8 +30,8 @@ from typing import Any
 # Thresholds (Tejero et al. 2013)
 # ---------------------------------------------------------------------------
 
-_HIGH_QUALITY_RMSD = 1.0  # Å
-_GOOD_QUALITY_RMSD = 2.0  # Å
+_HIGH_QUALITY_RMSD = 1.0  # A
+_GOOD_QUALITY_RMSD = 2.0  # A
 _WELL_DEFINED_PCT_HIGH = 80.0  # %
 _WELL_DEFINED_PCT_GOOD = 70.0  # %
 _WELL_DEFINED_PCT_MODERATE = 60.0  # %
@@ -49,18 +49,18 @@ class EnsembleStatistics:
     Attributes:
         n_models: Number of models in the ensemble.
         n_residues: Number of residues per model.
-        mean_pairwise_rmsd: Mean of all pairwise RMSDs (Å).
-        median_pairwise_rmsd: Median of all pairwise RMSDs (Å).
-        std_pairwise_rmsd: Standard deviation of pairwise RMSDs (Å).
-        min_pairwise_rmsd: Minimum pairwise RMSD (Å).
-        max_pairwise_rmsd: Maximum pairwise RMSD (Å).
+        mean_pairwise_rmsd: Mean of all pairwise RMSDs (A).
+        median_pairwise_rmsd: Median of all pairwise RMSDs (A).
+        std_pairwise_rmsd: Standard deviation of pairwise RMSDs (A).
+        min_pairwise_rmsd: Minimum pairwise RMSD (A).
+        max_pairwise_rmsd: Maximum pairwise RMSD (A).
         medoid_index: 0-based index of the medoid model.
-        medoid_mean_rmsd: Mean RMSD of the medoid to all other models (Å).
-        rmsd_to_mean: Mean RMSD-to-ensemble-mean (Å).  Primary precision
+        medoid_mean_rmsd: Mean RMSD of the medoid to all other models (A).
+        rmsd_to_mean: Mean RMSD-to-ensemble-mean (A).  Primary precision
             indicator; thresholds from Tejero et al. 2013.
-        mean_rmsf: Mean per-residue RMSF (Å).
-        max_rmsf: Maximum per-residue RMSF (Å).
-        well_defined_residues: Count of residues with RMSF < 1.0 Å.
+        mean_rmsf: Mean per-residue RMSF (A).
+        max_rmsf: Maximum per-residue RMSF (A).
+        well_defined_residues: Count of residues with RMSF < 1.0 A.
         pct_well_defined: Percentage of well-defined residues (0-100).
 
     Examples:
@@ -124,8 +124,8 @@ class EnsembleStatistics:
         Precision tier based on RMSD-to-mean (Tejero et al. 2013).
 
         Returns:
-            ``"HIGH"``     if ``rmsd_to_mean < 1.0`` Å,
-            ``"GOOD"``     if ``rmsd_to_mean < 2.0`` Å,
+            ``"HIGH"``     if ``rmsd_to_mean < 1.0`` A,
+            ``"GOOD"``     if ``rmsd_to_mean < 2.0`` A,
             ``"MODERATE"`` otherwise.
         """
         if self.rmsd_to_mean < _HIGH_QUALITY_RMSD:
@@ -242,8 +242,8 @@ class EnsembleStatistics:
         lines = [
             f"Ensemble Statistics ({self.n_models} models, {self.n_residues} residues)",
             f"  Precision      : {self.precision}",
-            f"  RMSD to mean   : {self.rmsd_to_mean:.2f} Å",
-            f"  Mean pw-RMSD   : {self.mean_pairwise_rmsd:.2f} Å",
+            f"  RMSD to mean   : {self.rmsd_to_mean:.2f} A",
+            f"  Mean pw-RMSD   : {self.mean_pairwise_rmsd:.2f} A",
             f"  Well-defined   : {self.pct_well_defined:.1f}%"
             f" ({self.well_defined_residues}/{self.n_residues} residues)",
             f"  Overall quality: {self.overall_quality}",
@@ -260,7 +260,7 @@ class QualityAssessment:
     human-readable precision tier and overall quality string.
 
     Attributes:
-        precision: Precision tier — ``"HIGH"``, ``"GOOD"``, ``"MODERATE"``,
+        precision: Precision tier - ``"HIGH"``, ``"GOOD"``, ``"MODERATE"``,
             or ``"UNKNOWN"``.
         overall: Free-text overall quality description.
 

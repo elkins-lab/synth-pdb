@@ -1,7 +1,7 @@
 """Parametrized smoke tests for CLI flags that produce side-effect output files.
 
 This file deliberately does *not* assert anything about the *contents* of the
-output files — narrower regression tests live alongside it. Its job is to catch
+output files - narrower regression tests live alongside it. Its job is to catch
 the entire "schema rewrite forgot the call site" class of regression at minimal
 cost: if `--gen-X` produces no file (because the call site was deleted, or now
 raises, or no-ops silently), this fails.
@@ -37,7 +37,7 @@ CASES = [
     (
         "gen-cd",
         ["--gen-cd"],
-        # CDSimulator writes <output-base>_cd.png — base comes from --output.
+        # CDSimulator writes <output-base>_cd.png - base comes from --output.
         ["test_cd.png"],
     ),
     (
@@ -88,7 +88,7 @@ def test_side_effect_flag_produces_file(
     capsys: Any,
 ) -> None:
     """Each --gen-X / --export-X / --output-X flag must produce its named
-    output file end-to-end. Sole assertion is existence — narrower tests
+    output file end-to-end. Sole assertion is existence - narrower tests
     verify schema/content separately."""
     pdb_output = tmp_path / "test.pdb"
     formatted_extra = [a.format(tmp=str(tmp_path)) for a in extra_args]
@@ -123,8 +123,8 @@ def test_side_effect_flag_produces_file(
             f"Existing files in tmp_path: {sorted(p.name for p in tmp_path.iterdir())}"
         )
         # A 0-byte output is almost certainly a regression (the call site
-        # opened the file but never wrote — happens when an exception is
+        # opened the file but never wrote - happens when an exception is
         # swallowed mid-write).
         assert (
             out_path.stat().st_size > 0
-        ), f"{case_id!r} produced an empty {fname!r} — write path likely failed silently."
+        ), f"{case_id!r} produced an empty {fname!r} - write path likely failed silently."

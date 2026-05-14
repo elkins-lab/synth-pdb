@@ -696,7 +696,7 @@ class TestGenerator(unittest.TestCase):
                         OCC_TEMP_REGEX,
                         f"Temp factor format incorrect: '{line[60:66]}'",
                     )
-                    # B-factors should now be realistic (5-100 Ų), not 0.00
+                    # B-factors should now be realistic (5-100 A^2), not 0.00
                     # Updated for Model-Free physics (Termini can be highly flexible)
                     temp_factor = float(line[60:66])
                     self.assertGreaterEqual(temp_factor, 5.00, "B-factor should be >= 5.00")

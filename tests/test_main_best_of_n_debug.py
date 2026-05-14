@@ -36,7 +36,7 @@ def test_best_of_n_debug_enumerates_each_violation(
         "mock violation beta: peptide bond out of plane",
     ]
 
-    # Stub generate_pdb_content with two distinguishable-looking PDB strings —
+    # Stub generate_pdb_content with two distinguishable-looking PDB strings -
     # the actual content doesn't matter since we also stub the validator.
     minimal_pdb = (
         "HEADER    stub\n"
@@ -81,23 +81,23 @@ def test_best_of_n_debug_enumerates_each_violation(
     main.main()
 
     # The block must be opened, every individual violation must be present,
-    # and the block must be closed — all at DEBUG.
+    # and the block must be closed - all at DEBUG.
     assert "--- PDB Validation Report for failed attempt ---" in caplog.text, (
-        "Missing DEBUG report header — per-violation enumeration was likely "
+        "Missing DEBUG report header - per-violation enumeration was likely "
         "dropped from the --guarantee-valid retry path."
     )
     assert (
         "--- End Validation Report ---" in caplog.text
-    ), "Missing DEBUG report footer — enumeration block is unbalanced."
+    ), "Missing DEBUG report footer - enumeration block is unbalanced."
     for v in canned_violations:
         assert v in caplog.text, f"Canned violation {v!r} not enumerated at DEBUG"
 
-    # And those specific lines must have come through at DEBUG level — not at
-    # warning — so they don't spam normal runs. Check via the records, not text.
+    # And those specific lines must have come through at DEBUG level - not at
+    # warning - so they don't spam normal runs. Check via the records, not text.
     debug_messages = [r.message for r in caplog.records if r.levelno == logging.DEBUG]
     for v in canned_violations:
         assert v in debug_messages, (
-            f"Violation {v!r} appeared in logs but not at DEBUG level — "
+            f"Violation {v!r} appeared in logs but not at DEBUG level - "
             "regression: enumeration is leaking at a higher level."
         )
 
@@ -105,7 +105,7 @@ def test_best_of_n_debug_enumerates_each_violation(
 def test_best_of_n_debug_silent_at_info_level(
     mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """At INFO level, the per-violation enumeration must NOT appear — only the
+    """At INFO level, the per-violation enumeration must NOT appear - only the
     summary warning. Guards against the enumeration accidentally being logged
     above DEBUG and flooding normal output."""
     caplog.set_level(logging.INFO)

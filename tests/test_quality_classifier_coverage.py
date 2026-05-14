@@ -1,4 +1,4 @@
-"""Tests for synth_pdb/quality/classifier.py — targeting all uncovered lines:
+"""Tests for synth_pdb/quality/classifier.py - targeting all uncovered lines:
 - Line 37:  __init__ without model file (warning logged)
 - Lines 43-46: load_model when joblib is missing (ImportError)
 - Lines 51-53: load_model when joblib.load raises an exception
@@ -11,12 +11,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 # ---------------------------------------------------------------------------
-# ProteinQualityClassifier.__init__ — no model file present
+# ProteinQualityClassifier.__init__ - no model file present
 # ---------------------------------------------------------------------------
 
 
 class TestClassifierInit:
-
     @patch("synth_pdb.quality.classifier.os.path.exists", return_value=False)
     def test_no_model_file_logs_warning(self, mock_exists, tmp_path, caplog):
         """When no default model exists, __init__ should log a warning and leave
@@ -43,19 +42,18 @@ class TestClassifierInit:
 
         fake_path = str(tmp_path / "nonexistent.joblib")
 
-        # Should not raise — load_model catches exceptions
+        # Should not raise - load_model catches exceptions
         ProteinQualityClassifier(model_path=fake_path)
         # model will be None because the file doesn't exist; that's fine
         # (we just confirm it doesn't propagate an unhandled exception)
 
 
 # ---------------------------------------------------------------------------
-# ProteinQualityClassifier.load_model — joblib missing (lines 43-46)
+# ProteinQualityClassifier.load_model - joblib missing (lines 43-46)
 # ---------------------------------------------------------------------------
 
 
 class TestLoadModelImportError:
-
     def test_load_model_when_joblib_missing(self, tmp_path, caplog):
         """If joblib is not installed, load_model should log an error, set
         self.model = None, and return early (no raise).
@@ -107,12 +105,11 @@ class TestLoadModelImportError:
 
 
 # ---------------------------------------------------------------------------
-# ProteinQualityClassifier.predict — model is None (line 65)
+# ProteinQualityClassifier.predict - model is None (line 65)
 # ---------------------------------------------------------------------------
 
 
 class TestPredictNoModel:
-
     def test_predict_raises_when_model_none(self):
         """predict() must raise RuntimeError when self.model is None (line 65)."""
         from synth_pdb.quality.classifier import ProteinQualityClassifier
@@ -128,12 +125,11 @@ class TestPredictNoModel:
 
 
 # ---------------------------------------------------------------------------
-# ProteinQualityClassifier — happy path with mocked joblib
+# ProteinQualityClassifier - happy path with mocked joblib
 # ---------------------------------------------------------------------------
 
 
 class TestPredictHappyPath:
-
     def test_predict_returns_correct_types(self, tmp_path):
         """With a mocked sklearn model, predict() should return (bool, float, dict)."""
         import numpy as np

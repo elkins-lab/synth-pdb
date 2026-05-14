@@ -23,10 +23,10 @@ def calculate_clash_score(atom_array: struc.AtomArray) -> float:
     # When two atoms get too close, their electron clouds repel each other.
     #
     # The standard "Lennard-Jones Potential" models this energy as:
-    # E = 4ε [ (σ/r)^12 - (σ/r)^6 ]
+    # E = 4epsilon [ (sigma/r)^12 - (sigma/r)^6 ]
     #
-    # - (σ/r)^12 term: Repulsion. Rises steeply as atoms overlap (Pauli exclusion).
-    # - (σ/r)^6 term: Attraction. Weak "dispersion" forces that hold non-bonded atoms together.
+    # - (sigma/r)^12 term: Repulsion. Rises steeply as atoms overlap (Pauli exclusion).
+    # - (sigma/r)^6 term: Attraction. Weak "dispersion" forces that hold non-bonded atoms together.
     #
     # In this function, we use a simplified "Soft Sphere" or "Cubic Penalty" approach.
     # Instead of shooting to infinity (which breaks optimization math), we assume

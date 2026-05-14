@@ -134,13 +134,13 @@ class EnergyMinimizer:
            for better electrostatic performance.
 
         2. **Implicit Solvent (Generalized Born / OBC)**:
-           Also known as "Born Solvation". The cost of moving an ion from vacuum (ε=1)
-           to water (ε=80) is estimated by the **Born Equation**:
+           Also known as "Born Solvation". The cost of moving an ion from vacuum (epsilon=1)
+           to water (epsilon=80) is estimated by the **Born Equation**:
 
-           ΔG_solv = - (q^2 / 2r) * (1 - 1/ε)
+           DeltaG_solv = - (q^2 / 2r) * (1 - 1/epsilon)
 
            In proteins, each atom has a unique "Effective Born Radius" based on how buried
-           it is. Surface atoms feel the full ε=80, while core atoms are shielded.
+           it is. Surface atoms feel the full epsilon=80, while core atoms are shielded.
            The **OBC2 (Onufriev-Bashford-Case)** model is a refined version that
            parameterizes these radii to match explicit solvent behavior closely.
 
@@ -556,7 +556,7 @@ class EnergyMinimizer:
     ) -> tuple[Any, Any, list[str], dict[Any, Any]]:
         """Load and sanitize the input PDB for OpenMM; return OpenMM topology/positions.
 
-        Performs PTM residue renaming (SEP→SER, etc.), HETATM ion stripping,
+        Performs PTM residue renaming (SEP->SER, etc.), HETATM ion stripping,
         optional OXT dummy insertion for cyclic peptides, and cyclic CONECT
         removal.  Loads the modified PDB into OpenMM and applies standard bond
         generation and cyclic bond surgery.
@@ -659,7 +659,7 @@ class EnergyMinimizer:
             # OpenMM's PDB reader creates CONECT records for all explicit bonds.
             # For cyclic peptides, the head-to-tail bond is already encoded as
             # a CONECT (written by generator.py). We must remove it here so
-            # addHydrogens later does not see a conflicting terminal N–C bond.
+            # addHydrogens later does not see a conflicting terminal N-C bond.
             n_term_serial, c_term_serial = None, None
             c_coords, c_line_template = None, None
             has_existing_oxt = False
@@ -724,7 +724,7 @@ class EnergyMinimizer:
             # EDUCATIONAL NOTE - Dummy OXT Insertion:
             # OpenMM amber14 residue templates for C-termini require an OXT
             # oxygen to match the "C_TERM" patch. Cyclic peptides lack this atom
-            # so we add a temporary OXT positioned ~1.2 Å from the terminal C.
+            # so we add a temporary OXT positioned ~1.2 A from the terminal C.
             # physics.py _finalize_output() will delete it after minimization.
             # Add dummy OXT for cyclic peptides to satisfy C-terminal templates
             if cyclic and last_res_id and c_line_template and not has_existing_oxt:
@@ -736,7 +736,7 @@ class EnergyMinimizer:
                     x, y, z = c_coords
                     # c_line_template was captured in the first pass, before PTM
                     # renaming. Apply ptm_map here so the dummy OXT carries the
-                    # same residue name as the renamed residue atoms it joins —
+                    # same residue name as the renamed residue atoms it joins -
                     # otherwise OpenMM's PDB reader sees two residues with the
                     # same (chain, id) but different names (e.g. HIE vs HIS) and
                     # emits a "two consecutive residues with same number" warning.
@@ -814,13 +814,13 @@ class EnergyMinimizer:
 
         Steps:
         1. Optionally announce cyclic restraint intent.
-        2. Heuristic backbone stitching (missing C–N peptide bonds).
+        2. Heuristic backbone stitching (missing C-N peptide bonds).
         3. Strip existing hydrogens if ``add_hydrogens`` is True.
-        4. Detect candidate disulfide bonds by S–S proximity.
+        4. Detect candidate disulfide bonds by S-S proximity.
         5. Detect salt bridges via biotite structure analysis.
         6. Add hydrogens via ``Modeller.addHydrogens``.
         7. Weld cyclic topology (post-H) and clean up terminal atoms.
-        8. Rename bonded CYS → CYX, delete SG hydrogens.
+        8. Rename bonded CYS -> CYX, delete SG hydrogens.
 
         Args:
             topology: OpenMM :class:`Topology` from preprocessing.
@@ -905,7 +905,7 @@ class EnergyMinimizer:
         # EDUCATIONAL NOTE - The SSBOND Capture Radius:
         # ---------------------------------------------
         # Unlike distance-based bonding in simple geometry, physical disulfide
-        # formation is highly sensitive to the S-S distance (~2.03 Å).
+        # formation is highly sensitive to the S-S distance (~2.03 A).
         # We use a large "Capture Radius" (SSBOND_CAPTURE_RADIUS) to detect
         # potential pairs in un-optimized structures, then allow the "Mega-Pull"
         # to bring them into the ideal covalent distance.
@@ -1284,7 +1284,7 @@ class EnergyMinimizer:
         # EDUCATIONAL NOTE - Harmonic "Pull" Restraints & Hard Constraints:
         # -----------------------------------------------------------------
         # To bridge the gap between N and C termini, we use two levels of force:
-        # 1. Harmonic Pull: A massive "spring" (100M kJ/mol/nm²) that treats the
+        # 1. Harmonic Pull: A massive "spring" (100M kJ/mol/nm^2) that treats the
         #    termini like two magnets. It provides a global gradient that pulls
         #    the structure toward closure.
         # 2. Hard Constraint: A specialized OpenMM constraint that FIXES the
@@ -1294,7 +1294,7 @@ class EnergyMinimizer:
         #
         # EDUCATIONAL NOTE - Why we avoid adding a hard constraint initially:
         # If the termini are far apart, a hard constraint crashes the system.
-        # The 100M kJ magnet (pull_force) will get us to 1.33Å first.
+        # The 100M kJ magnet (pull_force) will get us to 1.33A first.
         # Pull forces for cyclic closure and disulfide formation
         if cyclic or added_bonds:
             pull_force = mm.CustomBondForce("0.5*k_pull*(r-r0)^2")
@@ -1460,13 +1460,13 @@ class EnergyMinimizer:
             # Fallback auto-detection logic
             #
             # We probe accelerated platforms only. CPU and Reference are intentionally
-            # NOT probed — when no GPU platform validates here, we leave ``platform=None``
+            # NOT probed - when no GPU platform validates here, we leave ``platform=None``
             # so OpenMM's built-in selector picks the fastest available platform by its
             # registered speed (CPU=10.0, Reference=1.0). Explicitly probing CPU here
             # caused it to be cached on hosts where the dummy GPU probe spuriously fails
             # (e.g. mixed-precision OpenCL on macOS), even though OpenMM would happily
             # use OpenCL/CUDA when called without explicit platform/props. Pinning the
-            # Reference platform in CI similarly cost ~50x — Reference is the
+            # Reference platform in CI similarly cost ~50x - Reference is the
             # single-threaded correctness implementation, not a fast fallback.
             for name in ["CUDA", "Metal", "OpenCL"]:
                 try:
@@ -1698,7 +1698,7 @@ class EnergyMinimizer:
                 # EDUCATIONAL NOTE - CONECT Records & Visualization:
                 # CONECT records are critical for molecular viewers (PyMOL, Chimera)
                 # to draw covalent bonds that OpenMM's PDB writer may not emit
-                # automatically for non-standard connections (SS bonds, metal–ligand).
+                # automatically for non-standard connections (SS bonds, metal-ligand).
                 # We enumerate them from the final topology and write both directions.
                 # Force CONECT for disulfides
                 extra_conects = []
@@ -1780,7 +1780,7 @@ class EnergyMinimizer:
             if HAS_OPENMM and logger.isEnabledFor(logging.DEBUG):
                 reporter = LoggingMinimizationReporter(interval=50)
 
-            # ── Stage 1: PDB preprocessing ──────────────────────────────────────
+            # -- Stage 1: PDB preprocessing --------------------------------------
             (
                 topology,
                 positions,
@@ -1789,7 +1789,7 @@ class EnergyMinimizer:
             ) = self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
             atom_list = list(topology.atoms())
 
-            # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
+            # -- Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) --
             coordination_param = coordination if coordination is not None else []
             (
                 modeller,
@@ -1806,7 +1806,7 @@ class EnergyMinimizer:
                 atom_list,
             )
 
-            # ── Stage 3: System + forces + Simulation context ───────────────
+            # -- Stage 3: System + forces + Simulation context ---------------
             n_idx: int
             c_idx: int
 
@@ -1840,7 +1840,7 @@ class EnergyMinimizer:
                 state = simulation.context.getState(getEnergy=True)
                 return float(state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole))
 
-            # ── Stage 4: Minimization / equilibration ───────────────────────
+            # -- Stage 4: Minimization / equilibration -----------------------
             logger.info(f"Minimizing (Tolerance={tolerance} kJ/mol, MaxIter={max_iterations})...")
             if cyclic or added_bonds or salt_bridge_restraints:
                 cyc_iter = 0
@@ -1939,7 +1939,7 @@ class EnergyMinimizer:
             else:
                 # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
                 # ------------------------------------------
-                # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+                # OpenMM uses the L-BFGS (Limited-memory Broyden-Fletcher-Goldfarb-Shanno)
                 # algorithm. It is a quasi-Newton method that approximates the second
                 # derivative (Hessian) of the potential energy to find the local minimum
                 # efficiently without needing to store the full Hessian matrix.
@@ -1984,7 +1984,7 @@ class EnergyMinimizer:
             if equilibration_steps > 0:
                 simulation.step(equilibration_steps)
 
-            # ── Stage 5: Write output PDB ────────────────────────────────────
+            # -- Stage 5: Write output PDB ------------------------------------
             write_ok = self._finalize_output(
                 output_path,
                 simulation,
@@ -2163,7 +2163,7 @@ def simulate_trajectory(
 
         # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
         # ------------------------------------------
-        # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+        # OpenMM uses the L-BFGS (Limited-memory Broyden-Fletcher-Goldfarb-Shanno)
         # algorithm. It is a quasi-Newton method that approximates the second
         # derivative (Hessian) of the potential energy to find the local minimum
         # efficiently without needing to store the full Hessian matrix.

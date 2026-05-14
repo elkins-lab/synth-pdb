@@ -7,10 +7,10 @@ B-factors (temperature factors) represent atomic displacement due to:
 3. Positional uncertainty
 
 Typical ranges:
-- Well-ordered atoms: 10-20 Ų
-- Average atoms: 20-30 Ų
-- Flexible regions: 30-50 Ų
-- Very disordered: >50 Ų
+- Well-ordered atoms: 10-20 A^2
+- Average atoms: 20-30 A^2
+- Flexible regions: 30-50 A^2
+- Very disordered: >50 A^2
 
 Patterns in real proteins:
 - Backbone < side chains (backbone more rigid)
@@ -119,16 +119,16 @@ class TestBfactorCalculation:
         assert pro_avg < ala_avg
 
     def test_bfactor_realistic_range(self):
-        """Test that B-factors are in realistic range (5-100 Ų).
+        """Test that B-factors are in realistic range (5-100 A^2).
 
         EDUCATIONAL NOTE:
         Typical B-factors in crystal structures:
-        - Very rigid: 5-15 Ų (Core helices/sheets)
-        - Normal: 15-30 Ų
-        - Flexible: 30-50 Ų (Loops)
-        - Highly Disordered: 50-99 Ų (Termini/Unstructured tails)
+        - Very rigid: 5-15 A^2 (Core helices/sheets)
+        - Normal: 15-30 A^2
+        - Flexible: 30-50 A^2 (Loops)
+        - Highly Disordered: 50-99 A^2 (Termini/Unstructured tails)
 
-        In our Model-Free simulation, termini with S2 ~ 0.45 can reach 60-80 Ų.
+        In our Model-Free simulation, termini with S2 ~ 0.45 can reach 60-80 A^2.
         """
         # Test various scenarios
         test_cases = [

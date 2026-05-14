@@ -1,6 +1,6 @@
-"""TDD tests for synth_pdb/quality/gnn/graph.py (PDB → PyG Data conversion).
+"""TDD tests for synth_pdb/quality/gnn/graph.py (PDB -> PyG Data conversion).
 
-Written BEFORE the implementation exists — all tests should fail initially.
+Written BEFORE the implementation exists - all tests should fail initially.
 """
 
 import unittest
@@ -46,14 +46,14 @@ class TestGraphBuilder(unittest.TestCase):
         )
 
     def test_edges_are_bidirectional(self):
-        """For every directed edge (i→j), the reverse edge (j→i) must also exist."""
+        """For every directed edge (i->j), the reverse edge (j->i) must also exist."""
         edge_index = self.data.edge_index  # shape [2, E]
         edges = set(zip(edge_index[0].tolist(), edge_index[1].tolist(), strict=False))
         for src, dst in list(edges):
             self.assertIn(
                 (dst, src),
                 edges,
-                msg=f"Edge ({src}→{dst}) exists but reverse ({dst}→{src}) is missing. "
+                msg=f"Edge ({src}->{dst}) exists but reverse ({dst}->{src}) is missing. "
                 "Graph must be undirected (bidirectional edges).",
             )
 
@@ -67,7 +67,7 @@ class TestGraphBuilder(unittest.TestCase):
         )
 
     def test_sin_cos_encoding_bounded(self):
-        """Sin/cos dihedral features (indices 0–3) must lie in [-1, 1]."""
+        """Sin/cos dihedral features (indices 0-3) must lie in [-1, 1]."""
         x = self.data.x.numpy()
         for col in range(4):  # sin(phi), cos(phi), sin(psi), cos(psi)
             col_min, col_max = x[:, col].min(), x[:, col].max()
@@ -92,13 +92,13 @@ class TestGraphBuilder(unittest.TestCase):
         )
 
     def test_ca_distance_edges_below_threshold(self):
-        """All edges must connect Cα pairs within 8 Å (the construction threshold)."""
-        distances = self.data.edge_attr[:, 0].numpy()  # first edge feature = Cα distance
+        """All edges must connect Calpha pairs within 8 A (the construction threshold)."""
+        distances = self.data.edge_attr[:, 0].numpy()  # first edge feature = Calpha distance
         max_dist = float(distances.max())
         self.assertLessEqual(
             max_dist,
             8.0 + 1e-3,
-            msg=f"Max Cα distance in edges is {max_dist:.2f} Å, exceeds 8 Å threshold",
+            msg=f"Max Calpha distance in edges is {max_dist:.2f} A, exceeds 8 A threshold",
         )
 
 

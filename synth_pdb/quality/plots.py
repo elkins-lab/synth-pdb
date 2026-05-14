@@ -68,7 +68,7 @@ def save_publication_figure(fig: Any, path: str, transparent: bool = False) -> N
 
     The output format is derived from the file extension (defaults to PDF
     when the path has no extension).  The format is passed explicitly to
-    ``fig.savefig`` so that this function never relies on — or mutates —
+    ``fig.savefig`` so that this function never relies on - or mutates -
     the global ``savefig.format`` rcParam.
     """
     ext = os.path.splitext(path)[1].lower().lstrip(".")
@@ -122,7 +122,7 @@ def plot_chemical_shift_correlation(
     # Use a professional color (Teal for synth-pdb)
     ax.scatter(x, y, s=25, alpha=0.6, edgecolors="none", color="#008080", label=f"n={len(x)}")
 
-    # Diagonal line — build axis limits as a tuple (required by matplotlib's type signature)
+    # Diagonal line - build axis limits as a tuple (required by matplotlib's type signature)
     all_data = np.concatenate([x, y])
     padding = (float(all_data.max()) - float(all_data.min())) * 0.05
     lims: tuple[float, float] = (float(all_data.min()) - padding, float(all_data.max()) + padding)
