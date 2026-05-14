@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.37.0] - 2026-05-14
+
+### Added
+- **Modern Formats Support**: Native support for mmCIF (PDBx) and BinaryCIF (BCIF) output via the `--format` flag.
+- **Massive Protein Support**: Ability to generate structures with over 99,999 atoms and 62 chains using the CIF format.
+- **BinaryCIF Export**: High-performance binary format for AI pipelines and web-based visualization (Mol*).
+- **Interactive Tutorials**: Restored and improved interactive Jupyter Notebooks for NeRF geometry and protein quality assessment.
+- **ASCII-Only Standard**: Package-wide migration to ASCII-safe strings to prevent encoding crashes in restricted terminal environments.
+
+### Fixed
+- **Core Performance**: Vectorized B-factor and occupancy calculations using NumPy, resulting in >10x speedup for large protein generation.
+- **Validator Optimization**: Significant performance improvements to `PDBValidator` for large structures.
+- **Reproducibility**: Restored strict seed propagation for all generation modes and formats.
+
 ## [1.36.0] - 2026-05-04
 
 ### Added
