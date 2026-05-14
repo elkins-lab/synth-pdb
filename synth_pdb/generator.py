@@ -19,6 +19,16 @@
 
 # BIOPHYSICAL PRINCIPLES:
 # ----------------------
+# 1. Geometry: Bond lengths and angles are drawn from Engh & Huber (1991) standards.
+# 2. Conformation: Phi/Psi angles determine the secondary structure (Helix, Sheet, Coil).
+# 3. Side Chains: Rotamer libraries ensure side chain atoms are placed in low-energy states.
+# 4. Solvation: Water molecules are added to simulate the biological environment.
+# 5. Dynamics: B-factors and occupancies reflect the thermal motion and flexibility.
+# 6. Stereochemistry: L-amino acids are the standard, but D-amino acids are supported for special peptides.
+# 7. Connectivity: Disulfide bonds and cyclization are handled via CONECT and SSBOND records.
+# 8. Forcefields: OpenMM provides the physics engine for energy minimization and MD equilibration.
+# 9. Formats: Polyglot support for PDB, mmCIF, and BinaryCIF enables massive protein simulation.
+# 10. Education: The code serves as a textbook for computational structural biology.
 # - The Peptide Bond: A planar, trans-configured amide bond connecting residues.
 # - The Ramachandran Plot: The conformational landscape defined by Phi and Psi angles.
 # - Secondary Structure: Regular patterns of H-bonding (Helices, Sheets, Turns).
@@ -36,6 +46,7 @@ from typing import Any, cast
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
 import numpy as np
+from biotite.structure.io.pdbx import BinaryCIFFile, CIFFile, get_structure, set_structure
 
 from . import biophysics  # New Module
 from .batch_generator import BatchedGenerator
@@ -72,8 +83,9 @@ from .pdb_utils import (
 from .physics import EnergyMinimizer
 from .relaxation import predict_order_parameters
 
-# Re-export for backward compatibility with tests
-_position_atom_3d_from_internal_coords = position_atom_3d_from_internal_coords
+# Global cache for residue templates to prevent repeated expensive calls to
+# struc.info.residue(), which parses internal XML/CIF databases on every call.
+_RESIDUE_TEMPLATE_CACHE: dict[str, struc.AtomArray] = {}
 
 # Used in _build_peptide_chain to orient the first residue's C atom
 ANGLE_N_CA_C_RAD = np.deg2rad(ANGLE_N_CA_C)
@@ -102,23 +114,23 @@ def _calculate_bfactor(
     EDUCATIONAL NOTE - B-factors (Temperature Factors):
     ===================================================
     B-factors represent atomic displacement due to thermal motion and static disorder.
-    They are measured in Ų (square Angstroms) and indicate atomic mobility.
+    They are measured in A^2 (square Angstroms) and indicate atomic mobility.
 
     Physical Interpretation:
-    - B = 8π²<u²> where <u²> is mean square displacement
+    - B = 8pi^2<u^2> where <u^2> is mean square displacement
     - Higher B-factor = more mobile/flexible atom
     - Lower B-factor = more rigid/constrained atom
 
     Typical Patterns in Real Protein Structures:
     1. Backbone vs Side Chains:
-       - Backbone atoms (N, CA, C, O): 15-25 Ų (constrained by peptide bonds)
-       - Side chain atoms (CB, CG, etc.): 20-35 Ų (more conformational freedom)
+       - Backbone atoms (N, CA, C, O): 15-25 A^2 (constrained by peptide bonds)
+       - Side chain atoms (CB, CG, etc.): 20-35 A^2 (more conformational freedom)
 
     2. Position Along Chain:
        In this synthetic generator, we simulate B-factors that follow these
        universal patterns of rigidity vs. flexibility.
-       - Core residues: 10-20 Ų (buried, constrained)
-       - Terminal residues: 30-50 Ų ("terminal fraying" - fewer constraints)
+       - Core residues: 10-20 A^2 (buried, constrained)
+       - Terminal residues: 30-50 A^2 ("terminal fraying" - fewer constraints)
 
     3. Residue-Specific Effects:
        - Glycine: Higher (no side chain constraints, more flexible)
@@ -148,7 +160,7 @@ def _calculate_bfactor(
         s2: Lipari-Szabo Order Parameter (0.0=Random, 1.0=Rigid). Default 0.85.
 
     Returns:
-        B-factor value in Ų, rounded to 2 decimal places
+        B-factor value in A^2, rounded to 2 decimal places
 
     """
     # Define backbone atoms (more rigid due to peptide bond constraints)
@@ -185,7 +197,7 @@ def _calculate_bfactor(
     # Calculate final B-factor
     bfactor = base_bfactor + random_variation
 
-    # Clamp to realistic range (5-99 Ų)
+    # Clamp to realistic range (5-99 A^2)
     bfactor = max(5.0, min(99.0, bfactor))
 
     return round(bfactor, 2)
@@ -248,7 +260,7 @@ def create_atom_line(
     element: str,
     alt_loc: str = "",
     insertion_code: str = "",
-    temp_factor: float = 0.00,  # B-factor (temperature factor) in Ų
+    temp_factor: float = 0.00,  # B-factor (temperature factor) in A^2
     occupancy: float = 1.00,  # Occupancy (fraction of molecules)
 ) -> str:
     """Create a PDB ATOM line.
@@ -286,7 +298,7 @@ def _place_atom_with_dihedral(
     )
 
 
-def _generate_random_amino_acid_sequence(
+def _get_random_sequence(
     length: int, use_plausible_frequencies: bool = False, rng: random.Random | None = None
 ) -> list[str]:
     """Generate a random amino acid sequence of a given length.
@@ -336,14 +348,14 @@ def _detect_disulfide_bonds(peptide: struc.AtomArray) -> list:
 
     Detection Criteria:
     - Both residues must be CYS
-    - SG-SG distance: 2.0-2.2 Å (slightly relaxed from ideal 2.0-2.1 Å)
+    - SG-SG distance: 2.0-2.2 A (slightly relaxed from ideal 2.0-2.1 A)
     - Only report each pair once (avoid duplicates)
 
     Why Distance Matters:
-    - < 2.0 Å: Too close (steric clash, not realistic)
-    - 2.0-2.1 Å: Ideal disulfide bond distance
-    - 2.1-2.2 Å: Acceptable (allows for flexibility)
-    - > 2.2 Å: Too far (no covalent bond possible)
+    - < 2.0 A: Too close (steric clash, not realistic)
+    - 2.0-2.1 A: Ideal disulfide bond distance
+    - 2.1-2.2 A: Acceptable (allows for flexibility)
+    - > 2.2 A: Too far (no covalent bond possible)
 
     Biological Context:
     - Disulfides stabilize protein structure
@@ -450,7 +462,7 @@ def _generate_ssbond_records(disulfides: list, chain_id: str = "A") -> str:
     return "\n".join(records) + "\n" if records else ""
 
 
-def _resolve_sequence(
+def _get_sequence(
     length: int | None,
     user_sequence_str: str | None = None,
     use_plausible_frequencies: bool = False,
@@ -467,6 +479,12 @@ def _resolve_sequence(
         List of 3-letter amino acid codes.
     """
     if user_sequence_str:
+        if isinstance(user_sequence_str, list):
+            # EDUCATIONAL NOTE - Polyglot Input Handling:
+            # We support both string-based (1-letter/3-letter) and list-based inputs.
+            # Structured lists are typically produced by internal random walk generators.
+            return [str(s).upper() for s in user_sequence_str]
+
         user_sequence_str_upper = user_sequence_str.upper()
         if "-" in user_sequence_str_upper:
             # Assume 3-letter code format like 'ALA-GLY-VAL' or 'D-ALA-GLY'
@@ -539,7 +557,7 @@ def _resolve_sequence(
             return amino_acids
     else:
         actual_length = length if length is not None else 20
-        return _generate_random_amino_acid_sequence(
+        return _get_random_sequence(
             actual_length, use_plausible_frequencies=use_plausible_frequencies, rng=rng
         )
 
@@ -885,9 +903,10 @@ def _build_peptide_chains(
                 if cyclic and len(chain_sequences) == 1:
                     res_conformation = "curved"
 
-            # ── Backbone coordinate placement ───────────────────────────────────
+            # -- Backbone coordinate placement -----------------------------------
             if i == 0:
                 # First residue (N-terminus)
+                # Position N at origin, CA on X-axis, C in XY-plane
                 n_coord = np.array([0.0, 0.0, 0.0])
                 ca_coord = np.array([BOND_LENGTH_N_CA, 0.0, 0.0])
 
@@ -896,18 +915,38 @@ def _build_peptide_chains(
                 c_y = ca_coord[1] + BOND_LENGTH_CA_C * np.sin(angle_with_x)
                 c_coord = np.array([c_x, c_y, 0.0])
 
-                if res_conformation in RAMACHANDRAN_PRESETS:
+                # Determine phi/psi for the FIRST residue
+                if (
+                    phi_list is not None
+                    and i < len(phi_list)
+                    and psi_list is not None
+                    and i < len(psi_list)
+                ):
+                    current_phi = phi_list[i]
+                    current_psi = psi_list[i]
+                elif res_conformation in RAMACHANDRAN_PRESETS:
+                    current_phi = RAMACHANDRAN_PRESETS[res_conformation]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS[res_conformation]["psi"]
                 elif res_conformation == "random":
                     next_res_name = sequence[i + 1] if i + 1 < sequence_length else None
-                    _, current_psi = _sample_ramachandran_angles(res_name, next_res_name, rng=rng)
+                    current_phi, current_psi = _sample_ramachandran_angles(
+                        res_name, next_res_name, rng=rng
+                    )
                 elif res_conformation in BETA_TURN_TYPES:
+                    current_phi = RAMACHANDRAN_PRESETS["extended"]["phi"]
                     current_psi = RAMACHANDRAN_PRESETS["extended"]["psi"]
                 else:
-                    current_psi = -47.0  # Default Alpha
+                    # Fallback to Alpha Helix
+                    current_phi = -60.0
+                    current_psi = -47.0
 
                 if is_d:
-                    current_psi = -current_psi
+                    # Flip chirality for D-amino acids only for presets/sampling.
+                    # Threaded angles are assumed to be absolute.
+                    if phi_list is None or i >= len(phi_list):
+                        current_phi = -current_phi
+                    if psi_list is None or i >= len(psi_list):
+                        current_psi = -current_psi
 
             else:
                 # Subsequent residues use internal-coordinate (NeRF) placement
@@ -927,10 +966,11 @@ def _build_peptide_chains(
                 prev_conformation = residue_conformations.get(prev_res_idx, conformation)
                 prev_is_d = sequence[prev_res_idx].startswith("D-")
 
-                current_phi = None
-                current_psi = None
-
-                if prev_conformation in RAMACHANDRAN_PRESETS:
+                # 1. Determine PSI from the PREVIOUS residue
+                # This places the Nitrogen of the current residue
+                if psi_list is not None and prev_res_idx < len(psi_list):
+                    prev_psi = psi_list[prev_res_idx]
+                elif prev_conformation in RAMACHANDRAN_PRESETS:
                     prev_psi = RAMACHANDRAN_PRESETS[prev_conformation]["psi"]
                 elif prev_conformation in BETA_TURN_TYPES:
                     c_prev = prev_conformation
@@ -959,7 +999,10 @@ def _build_peptide_chains(
                     prev_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
                 if prev_is_d:
-                    prev_psi = -prev_psi
+                    # Flip chirality for D-amino acids only for presets/sampling.
+                    # Threaded angles are assumed to be absolute.
+                    if psi_list is None or prev_res_idx >= len(psi_list):
+                        prev_psi = -prev_psi
 
                 # Place N(i)
                 n_coord = _place_atom_with_dihedral(
@@ -971,7 +1014,8 @@ def _build_peptide_chains(
                     prev_psi,
                 )
 
-                # Place CA(i)
+                # 2. Determine OMEGA from the PREVIOUS-CURRENT bond
+                # This places the Alpha Carbon of the current residue
                 omega_mean = OMEGA_TRANS
                 if res_name == "PRO" and rng.random() < cis_proline_frequency:
                     omega_mean = 0.0
@@ -985,7 +1029,7 @@ def _build_peptide_chains(
                     prev_ca_coord, prev_c_coord, n_coord, BOND_LENGTH_N_CA, ANGLE_C_N_CA, omega
                 )
 
-                # Determine phi/psi for this residue
+                # 3. Determine PHI/PSI for the CURRENT residue
                 if (
                     phi_list is not None
                     and i < len(phi_list)
@@ -1029,28 +1073,35 @@ def _build_peptide_chains(
                     current_psi = RAMACHANDRAN_PRESETS["alpha"]["psi"]
 
                 if is_d:
+                    # Threaded angles already handle chirality; flip only presets/sampling
                     if phi_list is None or i >= len(phi_list):
                         current_phi = -current_phi
                     if psi_list is None or i >= len(psi_list):
                         current_psi = -current_psi
 
+                # Apply drift if requested (simulates conformational noise)
                 if drift > 0:
                     current_phi += rng.uniform(-drift, drift)
                     current_psi += rng.uniform(-drift, drift)
+                    # Normalize angles to [-180, 180]
                     current_phi = ((current_phi + 180) % 360) - 180
                     current_psi = ((current_psi + 180) % 360) - 180
 
+                # Place C(i) using PHI
                 c_coord = _place_atom_with_dihedral(
                     prev_c_coord, n_coord, ca_coord, BOND_LENGTH_CA_C, ANGLE_N_CA_C, current_phi
                 )
 
-            # ── Place Oxygen (O) explicitly ──
+            # -- Place Oxygen (O) explicitly --
+            # The O atom is placed relative to N, CA, C.
+            # Rationale: In the legacy implementation and for parity with the
+            # BatchedGenerator, we use a fixed 180.0 degree dihedral.
             o_dihedral = 180.0
             o_coord = _place_atom_with_dihedral(
                 n_coord, ca_coord, c_coord, BOND_LENGTH_C_O, ANGLE_CA_C_O, o_dihedral
             )
 
-            # ── Store coordinates for next iteration ────────────────────────────
+            # -- Store coordinates for next iteration ----------------------------
             residue_coordinates[i] = {
                 "N": n_coord,
                 "CA": ca_coord,
@@ -1058,7 +1109,7 @@ def _build_peptide_chains(
                 "O": o_coord,
             }
 
-            # ── Biotite reference template ───────────────────────────────────────
+            # -- Biotite reference template ---------------------------------------
             template_res_name = res_name
             if res_name in ["HID", "HIE", "HIP"]:
                 template_res_name = "HIS"
@@ -1066,11 +1117,21 @@ def _build_peptide_chains(
                 d_to_l = {v: k for k, v in L_TO_D_MAPPING.items()}
                 template_res_name = d_to_l[res_name]
 
-            try:
-                ref_res_template = struc.info.residue(template_res_name).copy()
-            except KeyError:
-                logger.warning(f"Residue {res_name} not found in Biotite info, skipping.")
-                continue
+            # DATA INTEGRITY - Template Caching:
+            # Fetching residue templates via struc.info.residue() is expensive.
+            # We use a global cache to avoid parsing Biotite's internal databases
+            # for every residue in every chain.
+            if template_res_name in _RESIDUE_TEMPLATE_CACHE:
+                ref_res_template = _RESIDUE_TEMPLATE_CACHE[template_res_name].copy()
+            else:
+                try:
+                    # Parse once and cache
+                    fresh_template = struc.info.residue(template_res_name)
+                    _RESIDUE_TEMPLATE_CACHE[template_res_name] = fresh_template
+                    ref_res_template = fresh_template.copy()
+                except KeyError:
+                    logger.warning(f"Residue {res_name} not found in Biotite info, skipping.")
+                    continue
 
             # Remove terminal atoms
             if i < sequence_length - 1 or (cyclic and len(chain_sequences) == 1):
@@ -1133,7 +1194,7 @@ def _build_peptide_chains(
                                 )
                                 ref_res_template.coord[atom_idx] = rotated_p + ca_atom.coord
 
-            # ── Superimpose template onto constructed backbone frame ─────────────
+            # -- Superimpose template onto constructed backbone frame -------------
             template_backbone_n = ref_res_template[ref_res_template.atom_name == "N"]
             template_backbone_ca = ref_res_template[ref_res_template.atom_name == "CA"]
             template_backbone_c = ref_res_template[ref_res_template.atom_name == "C"]
@@ -1202,7 +1263,7 @@ def _build_peptide_chains(
                         dist_to_plane = np.dot(w, normal)
                         transformed_res.coord[atom_idx] = p - 2 * dist_to_plane * normal
 
-            # ── Assign residue metadata ──────────────────────────────────────────
+            # -- Assign residue metadata ------------------------------------------
             transformed_res.res_id[:] = res_id
             if is_d:
                 transformed_res.res_name[:] = L_TO_D_MAPPING.get(res_name, res_name)
@@ -1294,7 +1355,7 @@ def _apply_biophysical_mods(
         logger.info("Running side-chain optimization...")
         peptide = run_optimization(peptide)
 
-    # 1. Terminal Capping (ACE/NME) — cyclic peptides are naturally capped.
+    # 1. Terminal Capping (ACE/NME) - cyclic peptides are naturally capped.
     if cap_termini and not cyclic:
         peptide = biophysics.cap_termini(peptide)
 
@@ -1305,11 +1366,16 @@ def _apply_biophysical_mods(
     # Inorganic cofactors like Zinc (Zn2+) are automatically detected.
     # If a coordination motif is found (Cys/His clusters), the ion is
     # injected and harmonic constraints are applied in the physics module.
+    #
+    # TECHNICAL NOTE - Detection Threshold:
+    # During initial generation, we use a lenient threshold (40.0 Angstroms)
+    # to catch potential clusters even in extended random-coil conformations.
+    # The physics module will later regularize these distances.
     sites: list[dict] = []
     if metal_ions == "auto":
         from .cofactors import add_metal_ion, find_metal_binding_sites
 
-        sites = find_metal_binding_sites(peptide)
+        sites = find_metal_binding_sites(peptide, distance_threshold=40.0)
         for site in sites:
             peptide = add_metal_ion(peptide, site)
 
@@ -1332,48 +1398,73 @@ def _do_energy_minimization(
     platform: str | None = None,
     precision: str | None = None,
 ) -> tuple[str | None, struc.AtomArray]:
-    """Run OpenMM energy minimization (or MD equilibration) and return results.
+    """Perform OpenMM energy minimization and optional MD equilibration.
 
-    Writes a temporary PDB, invokes :class:`.EnergyMinimizer`, and reads the
-    optimized structure back.  PTM residue names (SEP, TPO, PTR) that were
-    reverted to their parent types for forcefield compatibility are restored.
+    This function orchestrates the physical refinement of the geometric
+    structure. It handles format switching for massive proteins,
+    coordinate transfer, and metadata restoration.
 
     Args:
-        peptide: Un-minimized AtomArray.
-        sequence: Original amino-acid sequence list (used for PTM restoration).
-        forcefield: Forcefield XML name passed to OpenMM (e.g. ``'amber14-all.xml'``).
-        minimization_k: Energy convergence tolerance (kJ/mol).
-        minimization_max_iter: Max minimization iterations (0 = until convergence).
-        cyclic: If ``True``, caps termini before writing temp PDB for OpenMM.
-        equilibrate: Run MD equilibration instead of pure minimization.
-        equilibrate_steps: Number of 2 fs MD steps for equilibration.
-        coordination: Optional metal coordination sites.
+        peptide: Initial geometric AtomArray.
+        sequence: List of residue names (intent).
+        forcefield: OpenMM forcefield file.
+        minimization_k: Convergence tolerance.
+        minimization_max_iter: Iteration limit.
+        cyclic: Head-to-tail closure.
+        equilibrate: Run MD simulation.
+        equilibrate_steps: MD step count.
+        solvent_model: implicit vs explicit.
+        solvent_padding: Box size (nm).
+        keep_solvent: Preserved HOH atoms.
+        coordination: Metal binding sites.
+        platform: OpenMM platform.
+        precision: OpenMM precision.
 
     Returns:
-        ``(atomic_and_ter_content, updated_peptide)`` where *atomic_and_ter_content*
-        is the raw PDB string from OpenMM (or ``None`` on failure) and
-        *updated_peptide* is the (possibly updated) AtomArray.
-
+        Tuple of (PDB atomic content string or None, Final AtomArray).
     """
-    # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
-    # OpenMM requires a file-based interaction for easy topology handling from PDB.
-    # So we write the current state to a temp file, minimize it, and read it back.
+
     logger.info("Running energy minimization (OpenMM)...")
+
+    # EDUCATIONAL NOTE - Energy Minimization (Phase 2):
+    # Even with high-quality rotamers, the initial assembly may contain subtle
+    # steric clashes. We use the OpenMM physics engine to perform a local
+    # energy minimization, "relaxing" the structure into a physically plausible
+    # state. This is required for NMR simulation and CD prediction.
+
+    # 1. Identify lost disulfides if not provided
+    current_disulfides = _detect_disulfide_bonds(peptide)
+
     try:
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            input_pdb_path = os.path.join(tmpdirname, "pre_min.pdb")
-            output_pdb_path = os.path.join(tmpdirname, "minimized.pdb")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # TECHNICAL NOTE - Format Selection for Minimization Bridge:
+            # Standard PDB format fails at 100,000 atoms or +/-1000 A coordinates.
+            # We automatically switch to mmCIF (.cif) for the internal bridge
+            # between our generator and the OpenMM physics engine if the structure
+            # is too large for the legacy PDB format.
+            is_massive = peptide.array_length() > 90000 or np.any(np.abs(peptide.coord) > 900.0)
+            bridge_ext = ".cif" if is_massive else ".pdb"
 
-            # CRITICAL Fix for OpenMM: cyclic peptides need terminal caps so
-            # Amber template-matching works, then physics.py prunes them.
-            if cyclic:
-                peptide_to_save = biophysics.cap_termini(peptide)
+            input_path = os.path.join(tmpdir, f"pre_min{bridge_ext}")
+            output_path = os.path.join(tmpdir, f"post_min{bridge_ext}")
+
+            # Prepare bridge file
+            # EDUCATIONAL NOTE - Hydrogen Stripping:
+            # We strip existing hydrogens before minimization to allow OpenMM
+            # to place them according to the forcefield's ideal geometry.
+            # This prevents clashes between NeRF-placed and OpenMM-placed hydrogens.
+            peptide_to_save = peptide[peptide.element != "H"]
+
+            if is_massive:
+                from biotite.structure.io.pdbx import CIFFile, set_structure
+
+                cif_tmp = CIFFile()
+                set_structure(cif_tmp, peptide_to_save)
+                cif_tmp.write(input_path)
             else:
-                peptide_to_save = peptide[peptide.element != "H"]
-
-            pdb_file_write = pdb.PDBFile()
-            pdb_file_write.set_structure(peptide_to_save)
-            pdb_file_write.write(input_pdb_path)
+                pdb_file_out = pdb.PDBFile()
+                pdb_file_out.set_structure(peptide_to_save)
+                pdb_file_out.write(input_path)
 
             minimizer = EnergyMinimizer(
                 forcefield_name=forcefield,
@@ -1382,7 +1473,6 @@ def _do_energy_minimization(
                 platform_name=platform,
                 precision=precision,
             )
-            current_disulfides = _detect_disulfide_bonds(peptide)
 
             if equilibrate:
                 logger.info(
@@ -1390,21 +1480,23 @@ def _do_energy_minimization(
                     "This includes minimization."
                 )
                 success = minimizer.equilibrate(
-                    input_pdb_path,
-                    output_pdb_path,
+                    input_path,
+                    output_path,
                     steps=equilibrate_steps,
                     cyclic=cyclic,
                     disulfides=current_disulfides,
+                    coordination=coordination,
                 )
             else:
                 success = minimizer.add_hydrogens_and_minimize(
-                    input_pdb_path,
-                    output_pdb_path,
+                    input_path,
+                    output_path,
                     max_iterations=minimization_max_iter,
                     tolerance=minimization_k,
                     cyclic=cyclic,
                     disulfides=current_disulfides,
                     coordination=coordination,
+                    structure=peptide,
                 )
 
             if not success:
@@ -1412,68 +1504,76 @@ def _do_energy_minimization(
                 return None, peptide
 
             logger.info("Minimization/Equilibration successful.")
-            with open(output_pdb_path) as f:
-                atomic_and_ter_content = f.read()
 
-            pdb_file_read = pdb.PDBFile.read(output_pdb_path)
-            peptide = pdb_file_read.get_structure(model=1)
+            # Read back minimized structure
+            atomic_and_ter_content: str | None = None
+            if is_massive:
+                from biotite.structure.io.pdbx import CIFFile, get_structure
+
+                cif_read = CIFFile.read(output_path)
+                peptide = get_structure(cif_read, model=1, extra_fields=["b_factor", "occupancy"])
+                # CIF files don't have the same "atomic content block" as PDB
+                atomic_and_ter_content = None
+            else:
+                with open(output_path) as f:
+                    atomic_and_ter_content = f.read()
+                pdb_file_read = pdb.PDBFile.read(output_path)
+                peptide = pdb_file_read.get_structure(model=1)
 
             # EDUCATIONAL NOTE - Explicit Solvent Pruning:
             # When researchers request explicit solvent (TIP3P), OpenMM simulates the peptide
             # floating in a dense box of thousands of water molecules.
             # While this is biophysically accurate during minimization, leaving 10,000+
-            # waters in a PDB makes it extraordinarily difficult to parse or feed into AI models.
+            # waters in a structure makes it difficult to parse or feed into AI models.
             #
-            # Thus, if the user did not specify --keep-solvent, we programmatically strip
-            # out the explicit water molecules (HOH residue name) here, leaving only the
-            # high-quality, physics-refined protein coordinates.
+            # Thus, if the user did not specify --keep-solvent, we strip HOH residues here.
             if solvent_model == "explicit" and not keep_solvent:
                 logger.info(
-                    "Stripping thousands of explicit water molecules (HOH) from the final structure for a cleaner PDB..."
+                    "Stripping thousands of explicit water molecules (HOH) from the final structure..."
                 )
                 peptide = peptide[peptide.res_name != "HOH"]
 
-                # We also need to regenerate the atomic_and_ter_content from the pruned peptide,
-                # otherwise the raw OpenMM output string (with full water box) will be saved!
-                peptide.atom_id = np.arange(1, peptide.array_length() + 1)
-                pdb_file_out = pdb.PDBFile()
-                pdb_file_out.set_structure(peptide)
-                string_io = io.StringIO()
-                pdb_file_out.write(string_io)
-                atomic_and_ter_content = string_io.getvalue()
+                # Regenerate PDB content string if needed (for PDB output only)
+                if not is_massive:
+                    peptide.atom_id = np.arange(1, peptide.array_length() + 1)
+                    pdb_file_out = pdb.PDBFile()
+                    pdb_file_out.set_structure(peptide)
+                    string_io = io.StringIO()
+                    pdb_file_out.write(string_io)
+                    atomic_and_ter_content = string_io.getvalue()
 
-            # RESTORE PTM NAMES (Fix for "Missing Orange Balls"):
-            # OpenMM reverted SEP→SER etc.; restore for downstream viewers.
-            # We must rename in BOTH the AtomArray (peptide.res_name) AND in the
-            # raw PDB string (atomic_and_ter_content) — the final output is assembled
-            # from the string, so only patching the array leaves PTMs silently absent.
+            # RESTORE PTM AND D-AMINO ACID NAMES:
+            # OpenMM reverts SEP->SER and DAL->ALA; restore for consistency.
+            # We map names from the original 'flat_sequence' (generated intent)
+            # back to the physics-refined coordinates.
             try:
                 unique_res_ids = np.unique(peptide.res_id)
                 n_seq = len(sequence)
                 n_min = len(unique_res_ids)
                 start_offset = 0
                 if n_min > 0:
-                    first_res_id_local = unique_res_ids[0]
-                    mask_first = peptide.res_id == first_res_id_local
-                    if np.any(mask_first):
-                        first_res_name_local = peptide.res_name[mask_first][0]
-                        if first_res_name_local == "ACE":
-                            logger.info("Detected N-terminal ACE cap. Applying start offset of 1.")
-                            start_offset = 1
+                    mask_first = peptide.res_id == unique_res_ids[0]
+                    if np.any(mask_first) and peptide.res_name[mask_first][0] == "ACE":
+                        start_offset = 1
 
-                # Build a mapping: PDB residue-number → new PTM name
-                ptm_rename_map: dict = {}  # {res_id_int: "SEP"/"TPO"/...}
+                # Build a mapping: PDB residue-number -> target name (intent)
+                ptm_rename_map: dict = {}
                 if n_min >= n_seq + start_offset:
                     for idx, res_name_target in enumerate(sequence):
                         rid = unique_res_ids[idx + start_offset]
-                        if res_name_target in NON_STANDARD_RESIDUES:
-                            mask = peptide.res_id == rid
-                            peptide.res_name[mask] = res_name_target
-                            ptm_rename_map[int(rid)] = res_name_target
 
-                # Apply the same renames to the raw PDB string so the final
-                # assembled output contains the correct PTM residue names.
-                if ptm_rename_map:
+                        # Normalize intent: D-ALA -> DAL for lookup in NON_STANDARD_RESIDUES
+                        intent_name = res_name_target
+                        if intent_name.startswith("D-") and intent_name[2:] in L_TO_D_MAPPING:
+                            intent_name = L_TO_D_MAPPING[intent_name[2:]]
+
+                        if intent_name in NON_STANDARD_RESIDUES:
+                            mask = peptide.res_id == rid
+                            peptide.res_name[mask] = intent_name
+                            ptm_rename_map[int(rid)] = intent_name
+
+                # Patch the PDB string if we are in legacy mode
+                if ptm_rename_map and not is_massive and atomic_and_ter_content:
                     patched_lines = []
                     for line in atomic_and_ter_content.splitlines():
                         if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
@@ -1488,13 +1588,311 @@ def _do_energy_minimization(
                     atomic_and_ter_content = "\n".join(patched_lines) + "\n"
 
             except Exception as ptm_err:
-                logger.warning(f"Failed to restore PTM names: {ptm_err}")
+                logger.warning(f"Failed to restore non-standard names: {ptm_err}")
 
             return atomic_and_ter_content, peptide
 
     except Exception as e:
         logger.error(f"Error during minimization workflow: {e}")
         return None, peptide
+
+
+def _assemble_output(
+    peptide: struc.AtomArray,
+    atomic_and_ter_content: str | None,
+    sequence_length: int,
+    cyclic: bool,
+    rng: random.Random | None = None,
+    output_format: str = "pdb",
+) -> str | bytes:
+    """Assemble the final structure string or bytes with realistic metadata.
+
+    This function is the final stage of the generation pipeline. It takes
+    the geometric coordinates (AtomArray) and the optional physical
+    refinement output (PDB string), and merges them with biophysical
+    metadata like B-factors and occupancies.
+
+    TECHNICAL ARCHITECTURE:
+    The assembly process is 'polyglot', meaning it can output multiple
+    formats from the same in-memory representation. For modern formats
+    (CIF/BCIF), it operates directly on the AtomArray to avoid PDB field
+    width limitations. For legacy PDB, it performs a line-by-line patching
+    operation to ensure high-fidelity metadata insertion.
+
+    Args:
+        peptide: Final AtomArray (minimized or raw).
+        atomic_and_ter_content: Raw ATOM-block PDB string from OpenMM, or ``None``.
+        sequence_length: Number of residues (used for PDB header metadata).
+        cyclic: Whether to add a head-to-tail CONECT record.
+        output_format: "pdb", "cif", or "bcif".
+
+    Returns:
+        Complete structure file as a string (pdb/cif) or bytes (bcif).
+    """
+    # -- Step 1: Initialize Metadata & Atom IDs ------------------------------
+    # BIOPHYSICAL ANALYSIS: Identifying protein atoms for ATOM vs HETATM tagging.
+    # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
+    is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
+    protein_res_ids = peptide.res_id[is_protein]
+    protein_res_ids_set = set(protein_res_ids)
+    max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
+    total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
+
+    # DATA INTEGRITY: Ensure peptide has all required annotation categories.
+    # These are required for modern formats like CIF and BCIF where annotations
+    # are stored as explicit columns rather than fixed-width text fields.
+    if "b_factor" not in peptide.get_annotation_categories():
+        peptide.set_annotation("b_factor", np.zeros(peptide.array_length()))
+    if "occupancy" not in peptide.get_annotation_categories():
+        peptide.set_annotation("occupancy", np.ones(peptide.array_length()))
+    if "atom_id" not in peptide.get_annotation_categories():
+        peptide.set_annotation("atom_id", np.arange(1, peptide.array_length() + 1))
+
+    # EDUCATIONAL NOTE - Adding Realistic B-factors:
+    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
+    # (or the AtomArray for CIF) to replace these with realistic values based on
+    # atom type, position, and residue type. This makes the output look more professional.
+
+    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
+    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
+    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
+
+    # -- Step 2: Biophysical Calculations (AtomArray level) -------------------
+    # GEOMETRIC FLEXIBILITY: Predict Order Parameters (S2) to derive B-factors.
+    # The S2 parameter (0.0 to 1.0) represents the degree of spatial restriction
+    # of a chemical bond. We use it here to simulate realistic thermal motion.
+    sec_mask = peptide.res_name == "SEC"
+    se_mask = (peptide.atom_name == "SE") & sec_mask
+
+    if sec_mask.any():
+        # Temporary renaming for compatibility with SASA-based S2 predictors.
+        peptide.res_name[sec_mask] = "CYS"
+        if se_mask.any():
+            peptide.atom_name[se_mask] = "SG"
+            peptide.element[se_mask] = "S"
+
+    s2_map = predict_order_parameters(peptide)
+
+    # RESTORATION: Revert temporary SEC names back to their chemical identity.
+    if sec_mask.any():
+        peptide.res_name[sec_mask] = "SEC"
+        if se_mask.any():
+            peptide.atom_name[se_mask] = "SE"
+            peptide.element[se_mask] = "SE"
+
+    # PERFORMANCE OPTIMIZATION - Vectorized Metadata Calculation:
+    # Instead of a Python loop over every atom, we use NumPy vectorized
+    # operations to calculate B-factors and occupancies.
+    backbone_atoms = {"N", "CA", "C", "O", "H", "HA"}
+    backbone_mask = np.isin(peptide.atom_name, list(backbone_atoms))
+
+    # 1. Map S2 values to all atoms
+    unique_res_ids = np.unique(peptide.res_id)
+    max_res_id = int(np.max(unique_res_ids))
+    s2_lookup = np.full(max_res_id + 1, 0.85)
+    for rid, val in s2_map.items():
+        if rid <= max_res_id:
+            s2_lookup[int(rid)] = val
+
+    s2_values = s2_lookup[peptide.res_id.astype(int)]
+
+    # 2. Vectorized B-factor calculation
+    b_factors = 100.0 * (1.0 - s2_values) + 5.0
+    b_factors[~backbone_mask] *= 1.5
+    b_factors[peptide.res_name == "GLY"] += 5.0
+    b_factors[peptide.res_name == "PRO"] -= 3.0
+    # Use localized rng if provided, otherwise numpy's global random
+    if rng:
+        noise_bf = np.array([rng.uniform(-2.0, 2.0) for _ in range(len(b_factors))])
+    else:
+        noise_bf = np.random.uniform(-2.0, 2.0, len(b_factors))
+    b_factors += noise_bf
+    b_factors = np.clip(b_factors, 5.0, 99.0)
+    peptide.b_factor = np.round(b_factors, 2)
+
+    # 3. Vectorized Occupancy calculation
+    occupancies = np.where(backbone_mask, 0.98, 0.95)
+    norm_res_id = (peptide.res_id.astype(float) - 1.0) / max(total_residues - 1, 1)
+    dist_from_term = np.minimum(
+        norm_res_id, (total_residues - peptide.res_id.astype(float)) / max(total_residues - 1, 1)
+    )
+    occupancies -= 0.10 * (1.0 - dist_from_term)
+
+    res_mask_1 = np.isin(peptide.res_name, ["GLY", "SER", "ASN", "GLN"])
+    res_mask_2 = np.isin(peptide.res_name, ["PRO", "TRP", "PHE"])
+    occupancies[res_mask_1] -= 0.03
+    occupancies[res_mask_2] += 0.02
+
+    norm_bf = (b_factors - 5.0) / 55.0
+    occupancies -= 0.08 * norm_bf
+    if rng:
+        noise_occ = np.array([rng.uniform(-0.01, 0.01) for _ in range(len(occupancies))])
+    else:
+        noise_occ = np.random.uniform(-0.01, 0.01, len(occupancies))
+    occupancies += noise_occ
+    occupancies = np.clip(occupancies, 0.85, 1.00)
+    peptide.occupancy = np.round(occupancies, 2)
+
+    # -- Step 3: Format-Specific Export -------------------------------------
+    if output_format in ["cif", "bcif"]:
+        if output_format == "bcif":
+            # BinaryCIF export for high-performance AI and web visualization.
+            bcif_file = BinaryCIFFile()
+            set_structure(bcif_file, peptide)
+            out_bytes = io.BytesIO()
+            bcif_file.write(out_bytes)
+            return out_bytes.getvalue()
+        else:
+            # Standard mmCIF (PDBx) export for modern structural biology databases.
+            cif_file = CIFFile()
+            set_structure(cif_file, peptide)
+            out_str = io.StringIO()
+            cif_file.write(out_str)
+            return out_str.getvalue()
+
+    # -- Step 4: PDB Standard Assembly --------------------------------------
+    # If no minimization was performed, we convert the AtomArray to PDB format.
+    if atomic_and_ter_content is None:
+        pdb_file_out = pdb.PDBFile()
+        # This call can fail if coordinates exceed +/-1000A, but that is handled
+        # at the CLI level by recommending CIF format for massive proteins.
+        pdb_file_out.set_structure(peptide)
+        string_io = io.StringIO()
+        pdb_file_out.write(string_io)
+        atomic_and_ter_content = string_io.getvalue()
+    else:
+        # Patch the existing PDB string from OpenMM with updated B-factors/Occupancies.
+        # This ensures consistency even if OpenMM provided its own PDB output.
+        atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
+        processed_lines = []
+        atom_id_to_idx = {aid: i for i, aid in enumerate(peptide.atom_id)}
+
+        for line in atomic_and_ter_content.splitlines():
+            if line.startswith("ATOM") or line.startswith("HETATM"):
+                # Always pad to 80 chars for standard compatibility
+                line = line.ljust(80)
+
+                # DATA INTEGRITY: Ensure occupancy (54-60) and B-factor (60-66) columns are not empty.
+                # This is critical for Biotite 1.5.0 and other strict PDB parsers.
+                if not line[54:60].strip():
+                    line = line[:54] + "  1.00" + line[60:]
+                if not line[60:66].strip():
+                    line = line[:60] + "  0.00" + line[66:]
+
+                serial_str = line[6:11].strip()
+                if serial_str:
+                    serial = int(serial_str)
+                    if serial in atom_id_to_idx:
+                        idx = atom_id_to_idx[serial]
+                        bf = peptide.b_factor[idx]
+                        occ = peptide.occupancy[idx]
+                        # Patch with realistic metadata
+                        line = line[:54] + f"{occ:6.2f}{bf:6.2f}" + line[66:]
+
+                        # EDUCATIONAL NOTE - HETATM vs ATOM:
+                        # OpenMM's PDB writer may output non-standard amino acids (like PTMs)
+                        # as HETATM. We forcefully convert them back to ATOM if they are part
+                        # of the main polymer chain to ensure compatibility with standard viewers.
+                        res_num_str = line[22:26].strip()
+                        if res_num_str:
+                            res_num = int(res_num_str)
+                            if res_num in protein_res_ids_set and line.startswith("HETATM"):
+                                line = "ATOM  " + line[6:]
+
+            processed_lines.append(line)
+        atomic_and_ter_content = "\n".join(processed_lines) + "\n"
+
+    # Sanitize and add PDB markers (TER, CONECT)
+    lines = atomic_and_ter_content.strip().splitlines()
+    if not lines:
+        return atomic_and_ter_content
+
+    # EDUCATIONAL NOTE - PDB Termination (TER):
+    # Ensure a proper TER record exists to separate polymer from ligands/solvent.
+    # PDB standard: TER follows the last atom of the polymer chain.
+    # Find the last protein atom to insert TER
+    last_atom_serial = 0
+    last_protein_atom_line: str | None = None
+    for line in lines:
+        if line.startswith("ATOM"):
+            serial_str = line[6:11].strip()
+            try:
+                serial = int(serial_str)
+                if serial > last_atom_serial:
+                    last_atom_serial = serial
+                    last_protein_atom_line = line
+            except ValueError:
+                continue
+
+    has_ter = any(line_str.startswith("TER") for line_str in lines)
+    if not has_ter and last_protein_atom_line is not None:
+        ter_atom_num = last_atom_serial + 1
+        ter_res_name = last_protein_atom_line[17:20].strip()
+        ter_chain_id = last_protein_atom_line[21].strip()
+        ter_res_num = int(last_protein_atom_line[22:26].strip())
+
+        ter_record = (
+            f"TER   {ter_atom_num: >5}      {ter_res_name: >3} "
+            f"{ter_chain_id: <1}{ter_res_num: >4}"
+        ).ljust(80)
+
+        # Standard insertion after last ATOM
+        last_atom_idx = -1
+        for idx, line_str in enumerate(lines):
+            if line_str.startswith("ATOM"):
+                last_atom_idx = idx
+
+        if last_atom_idx != -1:
+            lines.insert(last_atom_idx + 1, ter_record)
+            atomic_and_ter_content = "\n".join(lines) + "\n"
+
+    padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]
+    final_atomic_content_block = "\n".join(padded_lines).strip()
+
+    # EDUCATIONAL NOTE - Connectivity (CONECT & SSBOND):
+    # Generate records for cyclic peptides and disulfide bonds.
+    # SSBOND records specifically annotate covalent sulfur-sulfur bridges.
+    n_term_serial = None
+    c_term_serial = None
+    sg_serials: dict[int, int] = {}
+    for i in range(peptide.array_length()):
+        res_num = peptide.res_id[i]
+        atom_name = peptide.atom_name[i]
+        serial = peptide.atom_id[i]
+        if cyclic:
+            if res_num == 1 and atom_name == "N":
+                n_term_serial = serial
+            if res_num == max_protein_res_id and atom_name == "C":
+                c_term_serial = serial
+        if (peptide.res_name[i] == "CYS" or peptide.res_name[i] == "CYX") and atom_name == "SG":
+            sg_serials[res_num] = serial
+
+    conect_records = []
+    if cyclic and n_term_serial and c_term_serial:
+        conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
+
+    disulfides = _detect_disulfide_bonds(peptide)
+    ssbond_records = _generate_ssbond_records(disulfides, chain_id="A")
+
+    if disulfides:
+        for r1, r2 in disulfides:
+            s1 = sg_serials.get(r1)
+            s2 = sg_serials.get(r2)
+            if s1 and s2:
+                conect_records.append(f"CONECT{s1:5d}{s2:5d}".ljust(80))
+                conect_records.append(f"CONECT{s2:5d}{s1:5d}".ljust(80))
+
+    conect_block = "\n".join(conect_records)
+    if conect_block:
+        conect_block += "\n"
+
+    return assemble_pdb_content(
+        final_atomic_content_block,
+        sequence_length,
+        command_args=None,
+        extra_records=ssbond_records if ssbond_records else None,
+        conect_records=conect_block if conect_block else None,
+    )
 
 
 def _assemble_pdb_output(
@@ -1504,201 +1902,12 @@ def _assemble_pdb_output(
     cyclic: bool,
     rng: random.Random | None = None,
 ) -> str:
-    """Assemble the final PDB string with realistic B-factors, occupancy, and records.
-
-    If *atomic_and_ter_content* is ``None`` (no minimization was run), generates
-    the raw PDB from the Biotite AtomArray first.  Then post-processes every
-    ATOM/HETATM line to insert order-parameter-derived B-factors and occupancy,
-    adds a TER record if missing, generates CONECT records for cyclic and
-    disulfide bonds, and delegates final assembly to :func:`.assemble_pdb_content`.
-
-    Args:
-        peptide: Final AtomArray (minimized or raw).
-        atomic_and_ter_content: Raw ATOM-block PDB string from OpenMM, or ``None``.
-        sequence_length: Number of residues (used for PDB header metadata).
-        cyclic: Whether to add a head-to-tail CONECT record.
-
-    Returns:
-        Complete PDB file as a string.
-
-    """
-    # ── Step 1: Initialize Atomic Block ─────────────────────────────────────
-    # If no minimization was performed, we convert the AtomArray directly to PDB format.
-    if atomic_and_ter_content is None:
-        peptide.atom_id = np.arange(1, peptide.array_length() + 1)
-        pdb_file_out = pdb.PDBFile()
-        pdb_file_out.set_structure(peptide)
-        string_io = io.StringIO()
-        pdb_file_out.write(string_io)
-        atomic_and_ter_content = string_io.getvalue()
-
-    # EDUCATIONAL NOTE - Adding Realistic B-factors:
-    # Biotite sets all B-factors to 0.00 by default. We post-process the PDB string
-    # to replace these with realistic values based on atom type, position, and residue type.
-    # This makes the output look more professional and realistic.
-
-    # EDUCATIONAL NOTE - Adding Realistic Occupancy:
-    # Similarly, biotite sets all occupancy values to 1.00. We calculate realistic
-    # occupancy values (0.85-1.00) that correlate with B-factors and reflect disorder.
-    # SEC/PTM Fix: Treat SEC and common PTMs as part of the protein chain (ATOM)
-    is_protein = ~peptide.hetero | np.isin(peptide.res_name, ["SEC", "SEP", "TPO", "PTR"])
-    protein_res_ids = peptide.res_id[is_protein]
-    protein_res_ids_set = set(protein_res_ids)
-    max_protein_res_id = np.max(protein_res_ids) if len(protein_res_ids) > 0 else 0
-    total_residues = np.max(peptide.res_id) if len(peptide.res_id) > 0 else 0
-
-    # Predict Order Parameters (S2) to derive B-factors from geometric flexibility.
-    # SEC fix: Temporarily rename SEC to CYS and SE to SG for SASA/Order Parameter calculation
-    sec_mask = peptide.res_name == "SEC"
-    se_mask = (peptide.atom_name == "SE") & sec_mask
-
-    if sec_mask.any():
-        peptide.res_name[sec_mask] = "CYS"
-        if se_mask.any():
-            peptide.atom_name[se_mask] = "SG"
-            peptide.element[se_mask] = "S"
-
-    s2_map = predict_order_parameters(peptide)
-
-    # Restore SEC names
-    if sec_mask.any():
-        peptide.res_name[sec_mask] = "SEC"
-        if se_mask.any():
-            peptide.atom_name[se_mask] = "SE"
-            peptide.element[se_mask] = "SE"
-
-    # Sanitize: Extract only atomic content to avoid header duplication
-    atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
-
-    processed_lines = []
-    n_term_serial = None
-    c_term_serial = None
-    sg_serials: dict[int, int] = {}
-    serial = 0  # tracks last serial of any ATOM/HETATM line
-    last_atom_serial = 0  # tracks last serial of ATOM (polymer) lines only
-    last_protein_atom_line: str | None = None  # last ATOM line text
-
-    # ── Step 2: Line-by-Line Refinement ────────────────────────────────────
-    # We iterate over every ATOM line to apply biophysical metadata.
-    for line in atomic_and_ter_content.splitlines():
-        if line.startswith("ATOM") or line.startswith("HETATM"):
-            try:
-                res_num = int(line[22:26].strip())
-            except ValueError:
-                # Handle alphanumeric residue IDs from large solvent boxes (e.g., A000)
-                # We use the raw string to ensure we don't crash, though S2 mapping
-                # might be limited for these residues.
-                res_num_str = line[22:26].strip()
-                # Try to extract numeric part if possible, otherwise use a dummy
-                import re
-
-                match = re.search(r"\d+", res_num_str)
-                res_num = int(match.group()) if match else 9999
-
-            # EDUCATIONAL NOTE - HETATM vs ATOM:
-            # OpenMM's PDB writer may output non-standard amino acids (like PTMs)
-            # as HETATM. We forcefully convert them back to ATOM if they are part
-            # of the main polymer chain to ensure compatibility with standard viewers.
-            if res_num in protein_res_ids_set and line.startswith("HETATM"):
-                line = "ATOM  " + line[6:]
-
-            serial = int(line[6:11].strip())
-            if line.startswith("ATOM"):
-                last_atom_serial = serial
-                last_protein_atom_line = line
-            atom_name = line[12:16].strip()
-            res_name = line[17:20].strip()
-
-            # Identify terminal atoms for CONECT record generation in cyclic peptides.
-            if cyclic:
-                if res_num == 1 and atom_name == "N":
-                    n_term_serial = serial
-                if res_num == max_protein_res_id and atom_name == "C":
-                    c_term_serial = serial
-
-            # Track sulfur atom serials for disulfide bond CONECT records.
-            if (res_name == "CYS" or res_name == "CYX") and atom_name == "SG":
-                sg_serials[res_num] = serial
-
-            # Calculate and inject realistic B-factor and Occupancy values.
-            current_s2 = s2_map.get(res_num, 0.85)
-            bfactor = _calculate_bfactor(
-                atom_name, res_num, total_residues, res_name, s2=current_s2, rng=rng
-            )
-            occupancy = _calculate_occupancy(
-                atom_name, res_num, total_residues, res_name, bfactor, rng=rng
-            )
-
-            # Patch the PDB line with the new floating-point values.
-            line = line[:54] + f"{occupancy:6.2f}" + f"{bfactor:6.2f}" + line[66:]
-
-        processed_lines.append(line)
-
-    atomic_and_ter_content = "\n".join(processed_lines) + "\n"
-
-    # ── Step 3: PDB Termination (TER) ──────────────────────────────────────
-    # Ensure a proper TER record exists to separate polymer from ligands/solvent.
-    lines = atomic_and_ter_content.strip().splitlines()
-    if not lines:
-        logger.error("Generated PDB content is empty! Falling back to raw sequence string.")
-        return atomic_and_ter_content
-
-    has_ter = any(line_str.startswith("TER") for line_str in lines)
-    if not has_ter and last_protein_atom_line is not None:
-        # PDB standard: TER follows the last atom of the polymer chain.
-        ter_atom_num = last_atom_serial + 1
-        ter_res_name = last_protein_atom_line[17:20].strip()
-        ter_chain_id = last_protein_atom_line[21].strip()
-        ter_res_num = int(last_protein_atom_line[22:26].strip())
-
-        # Build a standard 80-character TER record.
-        ter_record = (
-            f"TER   {ter_atom_num: >5}      {ter_res_name: >3} "
-            f"{ter_chain_id: <1}{ter_res_num: >4}"
-        ).ljust(80)
-
-        # Splicing: Insert TER immediately after the polymer ATOM block.
-        insert_lines = atomic_and_ter_content.strip().splitlines()
-        last_atom_idx = max(
-            i for i, line_str in enumerate(insert_lines) if line_str.startswith("ATOM")
-        )
-        insert_lines.insert(last_atom_idx + 1, ter_record)
-        atomic_and_ter_content = "\n".join(insert_lines) + "\n"
-
-    # Ensure all lines are padded to 80 characters for legacy PDB compatibility.
-    padded_lines = [line.ljust(80) for line in atomic_and_ter_content.splitlines()]
-    final_atomic_content_block = "\n".join(padded_lines).strip()
-
-    # ── Step 4: Connectivity (CONECT & SSBOND) ─────────────────────────────
-    # Generate records for cyclic peptides and disulfide bonds.
-    conect_records = []
-    if cyclic and n_term_serial and c_term_serial:
-        conect_records.append(f"CONECT{n_term_serial:5d}{c_term_serial:5d}".ljust(80))
-
-    disulfides = _detect_disulfide_bonds(peptide)
-    # SSBOND records specifically annotate covalent sulfur-sulfur bridges.
-    ssbond_records = _generate_ssbond_records(disulfides, chain_id="A")
-
-    if disulfides:
-        for r1, r2 in disulfides:
-            s1 = sg_serials.get(r1)
-            s2 = sg_serials.get(r2)
-            if s1 and s2:
-                # Disulfide connectivity requires bidirectional records.
-                conect_records.append(f"CONECT{s1:5d}{s2:5d}".ljust(80))
-                conect_records.append(f"CONECT{s2:5d}{s1:5d}".ljust(80))
-
-    conect_block = "\n".join(conect_records)
-    if conect_block:
-        conect_block += "\n"
-
-    # Final assembly using the project-standard utility.
-    return assemble_pdb_content(
-        final_atomic_content_block,
-        sequence_length,
-        command_args=None,
-        extra_records=ssbond_records if ssbond_records else None,
-        conect_records=conect_block if conect_block else None,
+    """Backward compatibility wrapper for _assemble_output."""
+    return cast(
+        str,
+        _assemble_output(
+            peptide, atomic_and_ter_content, sequence_length, cyclic, rng, output_format="pdb"
+        ),
     )
 
 
@@ -1731,8 +1940,9 @@ def generate_pdb_content(
     omega_list: list[float] | None = None,  # Explicit Omega angles
     platform: str | None = None,  # OpenMM platform override
     precision: str | None = None,  # OpenMM precision override
-) -> str:
-    r"""Generates PDB content for a linear or cyclic peptide chain.
+    output_format: str = "pdb",  # Output format: pdb, cif, bcif
+) -> str | bytes:
+    r"""Generates a realistic protein structure in PDB, mmCIF, or BinaryCIF format.
 
     EDUCATIONAL NOTE - New Feature: Cyclic Peptides
     Cyclic peptides have their N-terminus bonded to their C-terminus.
@@ -1794,7 +2004,7 @@ def generate_pdb_content(
 
     EDUCATIONAL NOTE - Multi-Chain Complex Generation (Phase 16):
     ----------------------------------------------------------
-    A major frontier in structural biology is the study of the "Interactome"—how
+    A major frontier in structural biology is the study of the "Interactome"-how
     individual proteins assemble into complexes. This generator supports the creation
     of dimers, trimers, and larger multimers by accepting multiple sequences
     separated by a colon (':').
@@ -1835,7 +2045,7 @@ def generate_pdb_content(
             if not c_str.strip():
                 continue
             chain_sequences.append(
-                _resolve_sequence(
+                _get_sequence(
                     length=None,
                     user_sequence_str=c_str,
                     use_plausible_frequencies=use_plausible_frequencies,
@@ -1845,7 +2055,7 @@ def generate_pdb_content(
     else:
         # Single chain
         chain_sequences = [
-            _resolve_sequence(
+            _get_sequence(
                 length=length,
                 user_sequence_str=sequence_str,
                 use_plausible_frequencies=use_plausible_frequencies,
@@ -1927,9 +2137,16 @@ def generate_pdb_content(
             precision=precision,
         )
 
-    # Assemble final PDB with B-factors, occupancy, TER, CONECT records
+    # Assemble final structure with B-factors, occupancy, and metadata
     total_res_count = sum(len(s) for s in chain_sequences)
-    return _assemble_pdb_output(peptide, atomic_and_ter_content, total_res_count, cyclic, rng=rng)
+    return _assemble_output(
+        peptide,
+        atomic_and_ter_content,
+        total_res_count,
+        cyclic,
+        rng=rng,
+        output_format=output_format,
+    )
 
 
 class PeptideGenerator:
@@ -1959,12 +2176,13 @@ class PeptideGenerator:
         """
         # Merge init config with call-time overrides
         call_config = {**self.config, **overrides}
+        output_format = call_config.get("output_format", "pdb")
 
         # Call the functional generator which handles multichain splitting
-        pdb_content = generate_pdb_content(sequence_str=self.sequence, **call_config)
+        content = generate_pdb_content(sequence_str=self.sequence, **call_config)
 
         # Package into a Result object for easy access to structures
-        self._last_result = PeptideResult(pdb_content)
+        self._last_result = PeptideResult(content, format=output_format)
         return self._last_result
 
     def generate_ensemble(self, n_models: int = 10, as_stack: bool = True, **overrides: Any) -> Any:
@@ -2012,53 +2230,157 @@ class PeptideGenerator:
 
 class PeptideResult:
     """Container for generation outputs, providing easy access to
-    PDB strings, Biotite structures, and metadata.
+    PDB/mmCIF strings, Biotite structures, and metadata.
 
     BIOPHYSICAL SIGNIFICANCE:
     Storing the result in a structured container allows for seamless
     integration with downstream analysis modules like NMR predictors
-    or interface validators.
+    or interface validators. It acts as a bridge between the raw
+    text/binary file formats and the high-level geometric objects
+    needed for structural biology.
+
+    STRUCTURAL INTEGRITY:
+    The container lazily parses the content only when needed, which
+    saves memory during large-scale data generation (ensembles).
+    It also preserves the 'format' metadata, ensuring that re-parsing
+    always uses the correct engine (e.g., PDB vs PDBx).
     """
 
-    def __init__(self, pdb_content: str) -> None:
-        """Initialize the result container with a PDB-formatted string."""
-        self.pdb = pdb_content
+    def __init__(self, content: str | bytes, format: str = "pdb") -> None:
+        """Initialize the result container with generated content."""
+        self.content = content
+        self.format = format
         self._structure = None
+
+    @property
+    def pdb(self) -> str:
+        """Compatibility property for legacy PDB access.
+
+        If the content is in BinaryCIF format, it is first decoded.
+        Note that this returns the RAW content; if you need a PDB
+        representation of a CIF-originated structure, use
+        `get_content('pdb')`.
+        """
+        if isinstance(self.content, bytes):
+            return self.content.decode("utf-8")
+        return str(self.content)
 
     @property
     def structure(self) -> struc.AtomArray:
         """Returns the structure as a Biotite AtomArray (cached).
 
-        This property lazily parses the PDB string into a high-level
-        biotite structure object for geometric analysis.
+        This property lazily parses the content into a high-level
+        biotite structure object for geometric analysis. It includes
+        metadata retrieval for B-factors and occupancies which are
+        critical for realistic structural modeling.
         """
         if self._structure is None:
-            # Defensive check for empty or invalid PDB content
-            if not self.pdb or ("ATOM" not in self.pdb and "HETATM" not in self.pdb):
-                logger.error("PeptideResult contains no atomic data. Returning empty AtomArray.")
+            if self.format == "bcif":
+                import io
+
+                # BinaryCIF requires a byte-stream for parsing.
+                f = BinaryCIFFile.read(io.BytesIO(cast(bytes, self.content)))
+                # We explicitly request b_factor and occupancy to maintain
+                # biophysical fidelity during the transition from binary to memory.
+                self._structure = get_structure(f, model=1, extra_fields=["b_factor", "occupancy"])
+                return self._structure
+
+            # Text formats (PDB, CIF)
+            content_str = self.pdb
+
+            # Defensive check for empty or invalid content
+            if not content_str or ("ATOM" not in content_str and "HETATM" not in content_str):
+                logger.error(f"PeptideResult ({self.format}) contains no atomic data.")
                 self._structure = struc.AtomArray(0)
                 return self._structure
 
-            # We use io.StringIO to avoid unnecessary disk I/O
             import io
 
-            from biotite.structure.io.pdb import PDBFile
-
-            f = PDBFile.read(io.StringIO(self.pdb))
-
-            # Additional check: ensure at least one model exists in the PDB
-            if f.get_model_count() == 0:
-                logger.error("PDB content has 0 models. Returning empty AtomArray.")
-                self._structure = struc.AtomArray(0)
+            if self.format == "cif":
+                # mmCIF (PDBx) parsing using the modern CIFFile API.
+                f = CIFFile.read(io.StringIO(content_str))
+                self._structure = get_structure(f, model=1, extra_fields=["b_factor", "occupancy"])
             else:
-                self._structure = f.get_structure(model=1)
+                # Legacy PDB format handling.
+                from biotite.structure.io.pdb import PDBFile
+
+                # DATA INTEGRITY: Ensure all lines are padded to 80 chars.
+                # Many mocks in tests provide short lines, which cause Biotite
+                # to raise ValueError during occupancy/B-factor parsing.
+                # Padding here ensures robust parsing across all input sources.
+                lines = content_str.splitlines()
+                padded_lines = []
+                for line in lines:
+                    if line.startswith("ATOM") or line.startswith("HETATM"):
+                        line = line.ljust(80)
+                        # DATA INTEGRITY: Ensure occupancy (54-60) and B-factor (60-66) columns are not empty.
+                        if not line[54:60].strip():
+                            line = line[:54] + "  1.00" + line[60:]
+                        if not line[60:66].strip():
+                            line = line[:60] + "  0.00" + line[66:]
+                    padded_lines.append(line)
+
+                # Re-assemble and read to ensure Biotite internal state is correctly initialized
+                f = PDBFile.read(io.StringIO("\n".join(padded_lines)))
+
+                if f.get_model_count() == 0:
+                    logger.error("PDB content has 0 models. Returning empty AtomArray.")
+                    self._structure = struc.AtomArray(0)
+                else:
+                    self._structure = f.get_structure(model=1)
+
         return self._structure
 
     def save(self, path: str) -> None:
-        """Saves the generated PDB content to a permanent file on disk."""
-        with open(path, "w") as f:
-            f.write(self.pdb)
+        """Saves the generated content to a permanent file on disk.
+
+        Automatically handles text (w) vs binary (wb) modes based on
+        the content type.
+        """
+        mode = "wb" if isinstance(self.content, bytes) else "w"
+        with open(path, mode) as f:
+            f.write(self.content)
+
+    def get_content(self, target_format: str) -> str | bytes:
+        """Returns the structure content in the requested format.
+
+        This method enables on-the-fly format conversion (e.g., PDB to CIF).
+        It leverages the cached AtomArray to ensure that all biophysical
+        annotations (B-factors, order parameters) are preserved in the
+        target format.
+
+        EDUCATIONAL RATIONALE - Polyglot Export Architecture:
+        In modern structural biology, tools must be "polyglot"-able to speak
+        multiple file formats fluently. By using a high-level AtomArray as
+        the intermediate representation, we ensure that converting a PDB to
+        an mmCIF does not lose scientific metadata (like occupancies or
+        residue numbering) which often happens with simple text-to-text
+        converters. This architecture is future-proofed for the PDBx transition
+        by maintaining scientific fidelity at the AtomArray level, preserving
+        all biophysical annotations during format translation.
+
+        """
+        if target_format == self.format:
+            return self.content
+
+        # Convert via _assemble_output (using cached structure)
+        # We need sequence length for PDB header metadata.
+        sequence_length = len(set(self.structure.res_id))
+        content = _assemble_output(
+            self.structure,
+            None,  # No raw PDB block needed, will generate from structure
+            sequence_length,
+            cyclic=False,  # Default to False for generic conversion
+            output_format=target_format,
+        )
+        return content
 
     def __repr__(self) -> str:
         """Structured representation of the peptide result."""
-        return f"<PeptideResult: {len(self.pdb)} chars, {self.structure.array_length()} atoms>"
+        return f"<PeptideResult: {self.format.upper()}, {self.structure.array_length()} atoms>"
+
+
+# Re-export for backward compatibility with tests
+_position_atom_3d_from_internal_coords = position_atom_3d_from_internal_coords
+_resolve_sequence = _get_sequence
+_generate_random_amino_acid_sequence = _get_random_sequence

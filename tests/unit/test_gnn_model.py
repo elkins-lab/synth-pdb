@@ -1,6 +1,6 @@
 """TDD tests for synth_pdb/quality/gnn/model.py and gnn_classifier.py.
 
-Written BEFORE the implementation exists — all tests should fail initially.
+Written BEFORE the implementation exists - all tests should fail initially.
 """
 
 import unittest
@@ -42,14 +42,14 @@ class TestGNNModelForwardPass(unittest.TestCase):
         )
 
     def test_output_is_log_probabilities(self):
-        """Output must be log-probabilities: all values ≤ 0 and exp() sums to 1."""
+        """Output must be log-probabilities: all values <= 0 and exp() sums to 1."""
         from torch_geometric.data import Batch
 
         batch = Batch.from_data_list([self.graph])
         with torch.no_grad():
             log_probs = self.model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
         # log-softmax output: all values <= 0
-        self.assertTrue((log_probs <= 0).all().item(), msg="log_softmax outputs must all be ≤ 0")
+        self.assertTrue((log_probs <= 0).all().item(), msg="log_softmax outputs must all be <= 0")
         # exp() must sum to ~1 per row
         probs = log_probs.exp()
         row_sum = probs.sum(dim=-1).item()
@@ -83,7 +83,7 @@ class TestGNNClassifierAPI(unittest.TestCase):
     def setUpClass(cls):
         from synth_pdb.quality.gnn.gnn_classifier import GNNQualityClassifier
 
-        # Untrained model — we just test API shape / types, not accuracy
+        # Untrained model - we just test API shape / types, not accuracy
         cls.clf = GNNQualityClassifier()
         cls.pdb = _make_helix_pdb(20)
 

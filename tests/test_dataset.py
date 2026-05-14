@@ -260,3 +260,34 @@ class TestDatasetGenerator:
                 generator = DatasetGenerator(output_dir=output_dir, num_samples=1)
                 generator.generate()
                 # Should complete without raising (line 240-241)
+
+    def test_seeding_reproducibility(self, output_dir):
+        """Verify that a seed produces deterministic randomization in the main process."""
+        generator1 = DatasetGenerator(output_dir=Path(output_dir) / "1", num_samples=10, seed=42)
+        generator2 = DatasetGenerator(output_dir=Path(output_dir) / "2", num_samples=10, seed=42)
+        generator3 = DatasetGenerator(output_dir=Path(output_dir) / "3", num_samples=10, seed=43)
+
+        # We want to check the 'tasks' list which is generated using self.rng
+        def get_tasks(gen):
+            # Mock prepare_directories to avoid disk I/O
+            gen.prepare_directories = MagicMock()
+
+            tasks = []
+            for i in range(gen.num_samples):
+                sample_id = f"synth_{i:06d}"
+                length = gen.rng.randint(gen.min_length, gen.max_length)
+                conf_type = gen.rng.choices(
+                    ["alpha", "beta", "random", "ppii", "extended"],
+                    weights=[0.3, 0.3, 0.3, 0.05, 0.05],
+                )[0]
+                is_train = gen.rng.random() < gen.train_ratio
+                split = "train" if is_train else "test"
+                tasks.append((sample_id, length, conf_type, split))
+            return tasks
+
+        tasks1 = get_tasks(generator1)
+        tasks2 = get_tasks(generator2)
+        tasks3 = get_tasks(generator3)
+
+        assert tasks1 == tasks2, "Identical seeds should produce identical task parameters"
+        assert tasks1 != tasks3, "Different seeds should produce different task parameters"

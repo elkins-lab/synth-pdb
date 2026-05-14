@@ -1,6 +1,6 @@
 """tests/test_plm.py.
 -----------------
-TDD test suite for synth_pdb.plm — the ESM-2 protein language model embedder.
+TDD test suite for synth_pdb.plm - the ESM-2 protein language model embedder.
 
 WHAT IS A PROTEIN LANGUAGE MODEL (PLM)?
 ----------------------------------------
@@ -9,14 +9,14 @@ of protein sequences using masked-language-modelling (MLM): randomly mask amino
 acids in a sequence and train the model to predict them from context.
 
 After pre-training, the model's *internal representations* (the activations at
-the last hidden layer) encode far more than just the sequence — they capture:
+the last hidden layer) encode far more than just the sequence - they capture:
 
-  • Evolutionary information: which positions co-vary across the tree of life
-  • Structural context: residues buried in a hydrophobic core vs. solvent-exposed
-  • Chemical environment: charged vs. polar vs. nonpolar neighbourhoods
-  • Functional context: active-site residues vs. scaffold residues
+  * Evolutionary information: which positions co-vary across the tree of life
+  * Structural context: residues buried in a hydrophobic core vs. solvent-exposed
+  * Chemical environment: charged vs. polar vs. nonpolar neighbourhoods
+  * Functional context: active-site residues vs. scaffold residues
 
-Crucially, all of this is learned from *sequence alone* — no 3D coordinates.
+Crucially, all of this is learned from *sequence alone* - no 3D coordinates.
 Yet ESM-2 embeddings predict secondary structure, solvent accessibility, and
 contact maps at near-state-of-the-art accuracy without any fine-tuning.  This
 is the foundation of ESMFold (a structure predictor that rivals AlphaFold2 in
@@ -27,22 +27,22 @@ MODEL CHOICE: facebook/esm2_t6_8M_UR50D
 ESM-2 comes in several scales.  We use the smallest:
 
   Model          Params   Embedding dim  File size
-  t6_8M          8M       320            ~30 MB     ← used here
+  t6_8M          8M       320            ~30 MB     <- used here
   t12_35M        35M      480            ~140 MB
   t30_150M       150M     640            ~580 MB
-  t33_650M       650M     1280           ~2.5 GB    ← AlphaFold-level accuracy
+  t33_650M       650M     1280           ~2.5 GB    <- AlphaFold-level accuracy
 
-The API is identical regardless of which model you choose — just change the
+The API is identical regardless of which model you choose - just change the
 model name string.  Start small, scale up when you need accuracy.
 
 TEST STRUCTURE
 --------------
 Five test classes, ordered from trivial to semantic:
-  1. TestImportSafety       — module importable without transformers
-  2. TestEmbeddingShape     — output array has the right shape and dtype
-  3. TestEmbeddingValues    — values are finite, bounded, deterministic
-  4. TestEmbeddingSemantics — similar sequences embed closer than random pairs
-  5. TestStructureInput     — embed_structure() extracts sequence and embeds
+  1. TestImportSafety       - module importable without transformers
+  2. TestEmbeddingShape     - output array has the right shape and dtype
+  3. TestEmbeddingValues    - values are finite, bounded, deterministic
+  4. TestEmbeddingSemantics - similar sequences embed closer than random pairs
+  5. TestStructureInput     - embed_structure() extracts sequence and embeds
 """
 
 import unittest
@@ -53,11 +53,11 @@ import numpy as np
 # Shared test fixture: minimal amino acid sequences
 # ---------------------------------------------------------------------------
 
-# A short α-helical peptide (polyalanine prefers α-helix)
+# A short alpha-helical peptide (polyalanine prefers alpha-helix)
 _HELIX_SEQ = "AAAAAAAAAAAAAAAA"  # 16 residues
 
-# A short β-strand mimic (alternating Val/Ile strongly favours extended strand)
-_STRAND_SEQ = "VIVIVIVIVIVIVIVIVI"  # 18 residues — mismatched length from helix
+# A short beta-strand mimic (alternating Val/Ile strongly favours extended strand)
+_STRAND_SEQ = "VIVIVIVIVIVIVIVIVI"  # 18 residues - mismatched length from helix
 
 # Ubiquitin N-terminal region (real, well-characterised)
 _UBIQUITIN_N20 = "MQIFVKTLTGKTITLEVEPS"  # 20 residues
@@ -78,7 +78,7 @@ def _get_embedder():
         from synth_pdb.plm import ESM2Embedder
 
         embedder = ESM2Embedder()
-        # Trigger the lazy load now — catches ImportError if transformers is absent
+        # Trigger the lazy load now - catches ImportError if transformers is absent
         embedder.embed("ACDEF")
         return embedder
     except ImportError as e:
@@ -105,7 +105,7 @@ class TestImportSafety(unittest.TestCase):
     """
 
     def test_module_importable_without_transformers(self):
-        """synth_pdb.plm must import cleanly — no torch/transformers at module level."""
+        """synth_pdb.plm must import cleanly - no torch/transformers at module level."""
         import sys
 
         # Temporarily hide transformers to simulate environment without it
@@ -130,7 +130,7 @@ class TestImportSafety(unittest.TestCase):
         from synth_pdb.plm import ESM2Embedder
 
         embedder = ESM2Embedder()
-        # The model should not be loaded yet — only on first embed() call
+        # The model should not be loaded yet - only on first embed() call
         self.assertIsNone(
             embedder._model, "Model should be None until first embed() call (lazy loading)"
         )
@@ -177,14 +177,14 @@ class TestEmbeddingShape(unittest.TestCase):
     Per-residue embeddings are what make PLMs powerful for structure work.
     A single sequence-level vector (like BERT's [CLS] token) loses positional
     information.  With per-residue vectors we can:
-      • Predict secondary structure at each position independently
-      • Feed into GNNs as node features (one node = one residue)
-      • Compute inter-residue similarity matrices for contact prediction
-      • Detect local functional motifs
+      * Predict secondary structure at each position independently
+      * Feed into GNNs as node features (one node = one residue)
+      * Compute inter-residue similarity matrices for contact prediction
+      * Detect local functional motifs
 
     The embedding dimension (D=320 for esm2_t6_8M) is fixed by the model
     architecture.  Each dimension is a learned feature with no direct physical
-    interpretation — they are only meaningful relative to each other.
+    interpretation - they are only meaningful relative to each other.
     """
 
     @classmethod
@@ -215,7 +215,7 @@ class TestEmbeddingShape(unittest.TestCase):
         )
 
     def test_output_dtype_is_float32(self):
-        """Embeddings must be float32 (not float64 — PyTorch default is float32)."""
+        """Embeddings must be float32 (not float64 - PyTorch default is float32)."""
         result = self.embedder.embed(_HELIX_SEQ)
         self.assertEqual(result.dtype, np.float32, f"Expected float32, got {result.dtype}")
 
@@ -266,7 +266,7 @@ class TestEmbeddingValues(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(self.emb)), "Embedding contains NaN or Inf values")
 
     def test_values_bounded(self):
-        """Values should be in a plausible range — not wildly exploding."""
+        """Values should be in a plausible range - not wildly exploding."""
         # ESM-2 uses LayerNorm; embeddings are typically in [-10, 10]
         # We use a generous bound to avoid false failures
         self.assertLess(
@@ -282,7 +282,7 @@ class TestEmbeddingValues(unittest.TestCase):
     def test_not_all_zeros(self):
         """Embeddings must not be trivially zero."""
         self.assertGreater(
-            np.sum(np.abs(self.emb)), 0.0, "Embeddings are all zeros — model output is degenerate"
+            np.sum(np.abs(self.emb)), 0.0, "Embeddings are all zeros - model output is degenerate"
         )
 
 
@@ -312,13 +312,13 @@ class TestEmbeddingSemantics(unittest.TestCase):
 
     MEAN POOLING
     ------------
-    mean_embed(seq) = (1/L) * Σ embedding[i]    for i in 0..L-1
+    mean_embed(seq) = (1/L) * Sum embedding[i]    for i in 0..L-1
 
     This gives a single D-dim vector.  It discards positional info but
     lets us compare whole sequences.  Alternatives:
-      • Use only the [CLS] token (first position) — sometimes better
-      • Use attention-weighted pooling — more complex, marginally better
-      • Use per-residue embeddings directly — necessary for structure tasks
+      * Use only the [CLS] token (first position) - sometimes better
+      * Use attention-weighted pooling - more complex, marginally better
+      * Use per-residue embeddings directly - necessary for structure tasks
     """
 
     @classmethod
@@ -369,11 +369,11 @@ class TestStructureInput(unittest.TestCase):
       1. Extracts the amino acid sequence from a biotite AtomArray
       2. Delegates to embed().
 
-    This keeps the core embed() clean (sequence → embeddings) while
+    This keeps the core embed() clean (sequence -> embeddings) while
     letting callers pass structures directly without extracting sequences
     themselves.
 
-    The sequence is extracted via the standard 3-letter → 1-letter code
+    The sequence is extracted via the standard 3-letter -> 1-letter code
     mapping from the residue names in the AtomArray.  Only standard amino
     acids are included; HETATM residues are skipped.
     """

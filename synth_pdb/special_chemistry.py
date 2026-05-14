@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 #    imidazolinone ring.
 # 3. Dehydration: Loss of a water molecule.
 # 4. Oxidation: Molecular oxygen (O2) oxidates the Ca-Cb bond of Tyr66,
-#    extending the π-conjugation system.
+#    extending the pi-conjugation system.
 #
 # The result is a highly conjugated heterocyclic system buried deep within
 # the protective "can" of the beta-barrel, shielding it from water quenching.

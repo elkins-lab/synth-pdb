@@ -5,30 +5,30 @@ Pure-numpy structural biology evaluation metrics for the AlphaFold benchmarking 
 All functions operate on numpy arrays and have no optional dependencies,
 making them trivially unit-testable and usable in headless environments.
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 Metrics implemented
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
 TM-score
-    Template Modelling score ∈ [0, 1].  A TM-score > 0.5 indicates that two
+    Template Modelling score in [0, 1].  A TM-score > 0.5 indicates that two
     proteins share the same global topology regardless of RMSD.  It is the
     primary metric in CASP (Critical Assessment of Structure Prediction).
-    Reference: Zhang & Skolnick (2004) *Proteins* 57, 702–710.
+    Reference: Zhang & Skolnick (2004) *Proteins* 57, 702-710.
 
 lDDT
-    Local Distance Difference Test ∈ [0, 1].  Evaluates per-residue local
+    Local Distance Difference Test in [0, 1].  Evaluates per-residue local
     geometry without superposition.  Used by AlphaFold to report per-residue
     confidence (pLDDT) during training.
-    Reference: Mariani et al. (2013) *Bioinformatics* 29, 2722–2728.
+    Reference: Mariani et al. (2013) *Bioinformatics* 29, 2722-2728.
 
 GDT-TS
-    Global Distance Test — Total Score.  CASP standard metric computed as
-    the average fraction of Cα atoms within 1, 2, 4, 8 Å of the reference.
-    Reference: Zemla (2003) *Nucleic Acids Research* 31, 3370–3374.
+    Global Distance Test - Total Score.  CASP standard metric computed as
+    the average fraction of Calpha atoms within 1, 2, 4, 8 A of the reference.
+    Reference: Zemla (2003) *Nucleic Acids Research* 31, 3370-3374.
 
 shift_rmsd
     NMR Chemical Shift Root-Mean-Square Deviation.  Measures the agreement
-    between predicted and reference ¹H/¹³C/¹⁵N chemical shifts.
+    between predicted and reference 1H/13C/15N chemical shifts.
 
 """
 
@@ -52,13 +52,13 @@ def superpose_kabsch(
     between two sets of paired points by SVD-decomposing their cross-covariance
     matrix.
 
-    ── Algorithm ────────────────────────────────────────────────────────────
+    -- Algorithm ------------------------------------------------------------
     1. Translate both sets to their centroids.
     2. Compute cross-covariance  H = mobile_centred.T @ ref_centred
-    3. SVD: H = U Σ V^T
-    4. R = V diag(1, 1, det(V U^T)) U^T   ← det term fixes reflections
+    3. SVD: H = U Sum V^T
+    4. R = V diag(1, 1, det(V U^T)) U^T   <- det term fixes reflections
     5. Apply R to mobile.
-    ─────────────────────────────────────────────────────────────────────────
+    -------------------------------------------------------------------------
 
     Parameters
     ----------
@@ -68,33 +68,33 @@ def superpose_kabsch(
     Returns
     -------
     rotated  : np.ndarray [N, 3]  Mobile after optimal superposition.
-    rmsd     : float              Cα-RMSD after superposition (Å).
+    rmsd     : float              Calpha-RMSD after superposition (A).
 
     """
     assert mobile.shape == reference.shape, "mobile and reference must have the same shape"
     n = len(mobile)
 
-    # ── Step 1: Centre both sets ───────────────────────────────────────
+    # -- Step 1: Centre both sets ---------------------------------------
     mob_c = mobile - mobile.mean(axis=0)
     ref_c = reference - reference.mean(axis=0)
 
-    # ── Step 2: Cross-covariance matrix ───────────────────────────────
+    # -- Step 2: Cross-covariance matrix -------------------------------
     h = mob_c.T @ ref_c  # [3, 3]
 
-    # ── Step 3: SVD ───────────────────────────────────────────────────
+    # -- Step 3: SVD ---------------------------------------------------
     u, _s, vt = np.linalg.svd(h)
 
-    # ── Step 4: Rotation matrix (with reflection correction) ──────────
+    # -- Step 4: Rotation matrix (with reflection correction) ----------
     # det(V U^T) is +1 for a proper rotation, -1 for a reflection.
     # We force a proper rotation by flipping the last singular vector.
     d = np.linalg.det(vt.T @ u.T)
     diag = np.diag([1.0, 1.0, d])
     rot = vt.T @ diag @ u.T  # [3, 3]
 
-    # ── Step 5: Apply rotation ─────────────────────────────────────────
+    # -- Step 5: Apply rotation -----------------------------------------
     rotated = mob_c @ rot.T + reference.mean(axis=0)
 
-    # ── RMSD ──────────────────────────────────────────────────────────
+    # -- RMSD ----------------------------------------------------------
     diff = rotated - reference
     rmsd = float(math.sqrt(np.sum(diff**2) / n))
 
@@ -107,48 +107,48 @@ def tm_score(
     *,
     normalise_by: int | None = None,
 ) -> float:
-    """Compute TM-score between a predicted and reference Cα trace.
+    """Compute TM-score between a predicted and reference Calpha trace.
 
     TM-score is defined as::
 
-        TM = (1/L_ref) Σ_i  1 / (1 + (d_i / d0)²)
+        TM = (1/L_ref) Sum_i  1 / (1 + (d_i / d0)^2)
 
-    where ``d_i`` is the distance between the i-th pair of aligned Cα atoms
+    where ``d_i`` is the distance between the i-th pair of aligned Calpha atoms
     after optimal superposition, ``L_ref`` is the reference chain length, and
     ``d0`` is a length-normalising constant::
 
-        d0 = 1.24 × (L_ref − 15)^(1/3) − 1.8    (for L_ref ≥ 22)
+        d0 = 1.24 x (L_ref - 15)^(1/3) - 1.8    (for L_ref >= 22)
         d0 = 0.5                                   (for L_ref < 22)
 
     Parameters
     ----------
-    ca_pred      : np.ndarray [N, 3]  Predicted Cα coordinates.
-    ca_ref       : np.ndarray [N, 3]  Reference Cα coordinates.
+    ca_pred      : np.ndarray [N, 3]  Predicted Calpha coordinates.
+    ca_ref       : np.ndarray [N, 3]  Reference Calpha coordinates.
     normalise_by : int, optional      If provided, normalise by this length
                                       rather than len(ca_ref).  Useful when
                                       comparing structures of different lengths.
 
     Returns
     -------
-    float  TM-score ∈ (0, 1].  Two random structures ≈ 0.17; same fold ≥ 0.5.
+    float  TM-score in (0, 1].  Two random structures ~ 0.17; same fold >= 0.5.
 
     """
     assert ca_pred.shape == ca_ref.shape and ca_pred.ndim == 2 and ca_pred.shape[1] == 3
     n = len(ca_ref)
     l_ref = normalise_by if normalise_by is not None else n
 
-    # ── d0 normalisation constant ──────────────────────────────────────
+    # -- d0 normalisation constant --------------------------------------
     if l_ref >= 22:
         d0 = 1.24 * (l_ref - 15) ** (1.0 / 3.0) - 1.8
     else:
         d0 = 0.5
     d0 = max(d0, 0.5)  # never let d0 go below 0.5
 
-    # ── Superpose then compute per-residue distances ───────────────────
+    # -- Superpose then compute per-residue distances -------------------
     rotated, _rmsd = superpose_kabsch(ca_pred, ca_ref)
     d = np.linalg.norm(rotated - ca_ref, axis=1)  # [N]
 
-    # ── TM-score sum ──────────────────────────────────────────────────
+    # -- TM-score sum --------------------------------------------------
     tm = float(np.sum(1.0 / (1.0 + (d / d0) ** 2)) / l_ref)
     return tm
 
@@ -166,33 +166,33 @@ def lddt(
     agrees with the reference, without requiring superposition.
 
     For each residue i, we look at all pairs (i, j) where j is within
-    ``inclusion_radius`` Å of i in the *reference* structure.  We then count
+    ``inclusion_radius`` A of i in the *reference* structure.  We then count
     what fraction of those reference distances are preserved in the predicted
     structure within each threshold.
 
     Per-residue lDDT::
 
-        lDDT_i = (1 / |T|) Σ_t  (fraction of distances within threshold t)
+        lDDT_i = (1 / |T|) Sum_t  (fraction of distances within threshold t)
 
     where |T| = len(thresholds) = 4.
 
     Parameters
     ----------
-    ca_pred          : np.ndarray [N, 3]  Predicted Cα coordinates.
-    ca_ref           : np.ndarray [N, 3]  Reference Cα coordinates.
+    ca_pred          : np.ndarray [N, 3]  Predicted Calpha coordinates.
+    ca_ref           : np.ndarray [N, 3]  Reference Calpha coordinates.
     inclusion_radius : float              Only pairs within this radius in the
-                                          reference contribute (default 15 Å).
-    thresholds       : tuple of float     Distance preservation thresholds (Å).
+                                          reference contribute (default 15 A).
+    thresholds       : tuple of float     Distance preservation thresholds (A).
 
     Returns
     -------
-    np.ndarray [N]  Per-residue lDDT ∈ [0, 1].  Global lDDT = mean().
+    np.ndarray [N]  Per-residue lDDT in [0, 1].  Global lDDT = mean().
 
     """
     assert ca_pred.shape == ca_ref.shape
     n = len(ca_ref)
 
-    # Pairwise distances in reference and predicted structures — O(N²) memory
+    # Pairwise distances in reference and predicted structures - O(N^2) memory
     ref_dists = np.sqrt(((ca_ref[:, None, :] - ca_ref[None, :, :]) ** 2).sum(axis=-1))
     pred_dists = np.sqrt(((ca_pred[:, None, :] - ca_pred[None, :, :]) ** 2).sum(axis=-1))
 
@@ -224,21 +224,21 @@ def gdt_ts(
     *,
     cutoffs: tuple[float, ...] = (1.0, 2.0, 4.0, 8.0),
 ) -> float:
-    """Compute GDT-TS (Global Distance Test — Total Score).
+    """Compute GDT-TS (Global Distance Test - Total Score).
 
-    GDT-TS is the average fraction of Cα atoms placed within
-    {1, 2, 4, 8} Å of the reference after optimal superposition.
+    GDT-TS is the average fraction of Calpha atoms placed within
+    {1, 2, 4, 8} A of the reference after optimal superposition.
     It is the primary ranking metric used in CASP competitions.
 
     Parameters
     ----------
-    ca_pred : np.ndarray [N, 3]  Predicted Cα coordinates.
-    ca_ref  : np.ndarray [N, 3]  Reference Cα coordinates.
-    cutoffs : tuple of float     Distance cutoffs in Å (default CASP standard).
+    ca_pred : np.ndarray [N, 3]  Predicted Calpha coordinates.
+    ca_ref  : np.ndarray [N, 3]  Reference Calpha coordinates.
+    cutoffs : tuple of float     Distance cutoffs in A (default CASP standard).
 
     Returns
     -------
-    float  GDT-TS ∈ [0, 1].  Perfect prediction = 1.0.
+    float  GDT-TS in [0, 1].  Perfect prediction = 1.0.
 
     """
     assert ca_pred.shape == ca_ref.shape
@@ -259,7 +259,7 @@ def shift_rmsd(
 
     Parameters
     ----------
-    pred_shifts, ref_shifts : dict mapping nucleus → np.ndarray [N]
+    pred_shifts, ref_shifts : dict mapping nucleus -> np.ndarray [N]
         Nucleus keys are typically "H", "C", "N" (matching BMRB convention).
         Arrays must be the same length (one entry per residue).
     nucleus_weights : dict, optional
@@ -312,9 +312,9 @@ def shift_rmsd(
 
 
 def extract_ca_coords(pdb_content: str) -> np.ndarray:
-    """Extract Cα coordinates from a PDB string in residue order.
+    """Extract Calpha coordinates from a PDB string in residue order.
 
-    A lightweight parser — uses only the standard library, no biotite.
+    A lightweight parser - uses only the standard library, no biotite.
 
     Parameters
     ----------
@@ -322,11 +322,11 @@ def extract_ca_coords(pdb_content: str) -> np.ndarray:
 
     Returns
     -------
-    np.ndarray [N, 3]  Cα coordinates in Å.
+    np.ndarray [N, 3]  Calpha coordinates in A.
 
     Raises
     ------
-    ValueError  If fewer than 2 Cα atoms are found.
+    ValueError  If fewer than 2 Calpha atoms are found.
 
     """
     coords = []
@@ -353,6 +353,6 @@ def extract_ca_coords(pdb_content: str) -> np.ndarray:
             coords.append([x, y, z])
 
     if len(coords) < 2:
-        raise ValueError(f"Only {len(coords)} Cα atoms found in PDB — need at least 2.")
+        raise ValueError(f"Only {len(coords)} Calpha atoms found in PDB - need at least 2.")
 
     return np.array(coords, dtype=np.float32)

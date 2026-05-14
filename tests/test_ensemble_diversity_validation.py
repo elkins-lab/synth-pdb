@@ -86,7 +86,7 @@ def test_ensemble_not_all_identical(ensemble_coords):
                 break
         if found_diverse:
             break
-    assert found_diverse, "All ensemble models are numerically identical — degenerate ensemble"
+    assert found_diverse, "All ensemble models are numerically identical - degenerate ensemble"
 
 
 def test_ensemble_max_spread_physically_bounded(ensemble_coords):

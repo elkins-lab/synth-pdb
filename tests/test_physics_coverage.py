@@ -245,10 +245,11 @@ class TestPhysicsCoverage:
                 "out.pdb",
                 max_iterations=50,
                 tolerance=5.0,
-                add_hydrogens=False,
+                add_hydrogens=True,
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
@@ -429,6 +430,7 @@ class TestPhysicsCoverage:
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
         # Test equilibrate with steps
@@ -445,6 +447,7 @@ class TestPhysicsCoverage:
                 cyclic=False,
                 disulfides=None,
                 coordination=None,
+                structure=None,
             )
 
     @patch("synth_pdb.physics.HAS_OPENMM", True)
@@ -486,7 +489,7 @@ class TestPhysicsCoverage:
             result = minimizer._run_simulation("test.pdb", "out.pdb", add_hydrogens=True)
 
         assert result is not None
-        # With the fix, the solvent is configured via XML — createSystem() is called
+        # With the fix, the solvent is configured via XML - createSystem() is called
         # exactly once (no retry needed) and never receives implicitSolvent= as a kwarg.
         assert minimizer.forcefield.createSystem.call_count == 1
         called_kwargs = minimizer.forcefield.createSystem.call_args[1]

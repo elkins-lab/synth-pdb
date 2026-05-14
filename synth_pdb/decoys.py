@@ -1,5 +1,6 @@
 import io
 import logging
+from typing import Any, cast
 
 import biotite.structure as struc
 import biotite.structure.io.pdb as pdb
@@ -12,9 +13,24 @@ logger = logging.getLogger(__name__)
 
 
 class DecoyGenerator:
-    """Generates ensembles of protein structures (decoys) with specific properties."""
+    """Generates ensembles of protein structures (decoys) with specific properties.
+
+    BIOPHYSICAL RATIONALE:
+    Decoy generation is a cornerstone of structural biology validation. By creating
+    a large population of non-native but physically plausible structures, we can
+    statistically evaluate the energy gap between the true native state and the
+    conformational noise. In the context of synth-pdb, these decoys serve as
+    stress-tests for NMR predictors, GNN scoring functions, and docking pipelines.
+
+    TECHNICAL ARCHITECTURE:
+    This class orchestrates multiple calls to the NeRF generator, applying
+    stochastic perturbations (drift) and threading logic to create structural
+    diversity. It implements the Kabsch algorithm for optimal superposition,
+    allowing for precise RMSD-based filtering of the resulting ensemble.
+    """
 
     def __init__(self) -> None:
+        """Initialize the decoy generator engine."""
         pass
 
     def generate_ensemble(
@@ -124,26 +140,32 @@ class DecoyGenerator:
                 # Handling Threading (Hard Decoy)
                 if hard_mode and template_sequence:
                     # Generate a template-fold structure first
-                    template_pdb = generate_pdb_content(
-                        sequence_str=template_sequence,
-                        conformation="random",
-                        seed=attempts + (seed if seed else 0),
+                    template_pdb = cast(
+                        str,
+                        generate_pdb_content(
+                            sequence_str=template_sequence,
+                            conformation="random",
+                            seed=attempts + (seed if seed else 0),
+                        ),
                     )
                     phi_list, psi_list, omega_list = self._extract_backbone_dihedrals(template_pdb)
                     # We thread 'sequence' on this fold
                     gen_sequence = sequence
 
-                pdb_content = generate_pdb_content(
-                    sequence_str=gen_sequence,
-                    conformation="random",
-                    optimize_sidechains=optimize,
-                    minimize_energy=minimize,
-                    forcefield=forcefield,
-                    seed=attempts + (seed if seed else 0),
-                    drift=drift,
-                    phi_list=phi_list,
-                    psi_list=psi_list,
-                    omega_list=omega_list,
+                pdb_content = cast(
+                    str,
+                    generate_pdb_content(
+                        sequence_str=gen_sequence,
+                        conformation="random",
+                        optimize_sidechains=optimize,
+                        minimize_energy=minimize,
+                        forcefield=forcefield,
+                        seed=attempts + (seed if seed else 0),
+                        drift=drift,
+                        phi_list=phi_list,
+                        psi_list=psi_list,
+                        omega_list=omega_list,
+                    ),
                 )
 
                 # Handling Shuffling (Hard Decoy)

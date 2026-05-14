@@ -48,7 +48,7 @@ class TestCalculateRMSD:
         rmsd = calculate_rmsd(coords1, coords2)
 
         # Point 1: diff = 0, Point 2: diff = [0, 1, 0]
-        # RMSD = sqrt(mean([0, 1])) = sqrt(0.5) ≈ 0.707
+        # RMSD = sqrt(mean([0, 1])) = sqrt(0.5) ~ 0.707
         assert rmsd == pytest.approx(np.sqrt(0.5))
 
     def test_345_triangle(self):
@@ -279,7 +279,7 @@ class TestCalculateRMSDToAverage:
         avg_rmsd, avg_coords = calculate_rmsd_to_average([coords1, coords2, coords3])
 
         # Average is at [1, 0, 0]
-        # RMSD: coords1→avg = 1, coords2→avg = 0, coords3→avg = 1
+        # RMSD: coords1->avg = 1, coords2->avg = 0, coords3->avg = 1
         # Average RMSD = (1 + 0 + 1) / 3 = 2/3
         expected_rmsd = 2.0 / 3.0
         assert avg_rmsd == pytest.approx(expected_rmsd)

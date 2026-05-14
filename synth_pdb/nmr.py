@@ -15,7 +15,7 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
 
 See: https://github.com/elkins/synth-nmr
 
-EDUCATIONAL NOTE — The Nuclear Overhauser Effect (NOE)
+EDUCATIONAL NOTE - The Nuclear Overhauser Effect (NOE)
 ======================================================
 The Nuclear Overhauser Effect (NOE) is the fundamental observable used to
 determine the three-dimensional structure of proteins in solution. It is the
@@ -31,9 +31,9 @@ inter-atomic distances in a dynamic, aqueous environment.
 
 2. DISTANCE DEPENDENCE:
    The intensity of an NOE cross-peak in a 2D or 3D NMR spectrum is inversely
-   proportional to the sixth power of the distance between the two nuclei (1/r⁶).
+   proportional to the sixth power of the distance between the two nuclei (1/r^6).
    Due to this rapid decay, NOEs are typically only detectable when the
-   inter-proton distance is less than approximately 6.0 Å. This sensitivity
+   inter-proton distance is less than approximately 6.0 A. This sensitivity
    makes the NOE an incredibly precise tool for structural determination.
 
 3. STRUCTURAL INFORMATION:
@@ -46,7 +46,7 @@ inter-atomic distances in a dynamic, aqueous environment.
      structure elements pack against each other.
 
 4. DYNAMICS AND AVERAGING:
-   Because the NOE depends on 1/r⁶, the observed signal is heavily weighted
+   Because the NOE depends on 1/r^6, the observed signal is heavily weighted
    towards shorter distances in a dynamic ensemble. This "r-6 averaging"
    means that even a small population of a "compact" state can dominate the
    observed NOE spectrum.
@@ -77,8 +77,8 @@ inter-atomic distances in a dynamic, aqueous environment.
 NOE DISTANCE RESTRAINTS IN SYNTH-PDB:
 ======================================
 In structural biology workflows, NOE intensities are converted into distance
-restraints (upper bounds). A "strong" peak typically corresponds to < 2.5 Å,
-"medium" to < 3.5 Å, and "weak" to < 5.0 Å.
+restraints (upper bounds). A "strong" peak typically corresponds to < 2.5 A,
+"medium" to < 3.5 A, and "weak" to < 5.0 A.
 
 `synth-pdb` generates these synthetic restraints to allow for:
 - Benchmarking of new structure determination algorithms.
@@ -90,7 +90,7 @@ restraints (upper bounds). A "strong" peak typically corresponds to < 2.5 Å,
 HISTORICAL CONTEXT:
 ====================
 The development of the NOE as a structural tool was a transformative moment
-in biochemistry, eventually leading to Kurt Wüthrich's Nobel Prize in 2002.
+in biochemistry, eventually leading to Kurt Wuthrich's Nobel Prize in 2002.
 By proving that proteins could be solved in their native solution state,
 NMR opened the door to studying dynamic systems, disordered regions, and
 interactions that are inaccessible to X-ray crystallography.
@@ -132,7 +132,7 @@ for evaluating search engines and database queries. In structural biology:
 
 BIBLIOGRAPHY AND FURTHER READING:
 =================================
-1. Wüthrich, K. (1986). NMR of Proteins and Nucleic Acids. Wiley.
+1. Wuthrich, K. (1986). NMR of Proteins and Nucleic Acids. Wiley.
 2. Huang, Y. J., et al. (2005). Protein NMR recall, precision, and
    F-measure scores (RPF scores). J. Am. Chem. Soc. 127, 1665-1674.
 3. Montelione, G. T., et al. (2013). Recommendations of the wwPDB NMR
@@ -151,25 +151,25 @@ import biotite.structure as struc
 import numpy as np
 import synth_nmr as _nmr
 
-# ── LOGGING CONFIGURATION ───────────────────────────────────────────────────
+# -- LOGGING CONFIGURATION ---------------------------------------------------
 # We use a dedicated logger for the NMR module to allow for granular
 # debugging of spectroscopic calculations. This follows the standard
 # Python logging pattern.
 logger = logging.getLogger(__name__)
 
-# ── RE-EXPORTS ──────────────────────────────────────────────────────────────
+# -- RE-EXPORTS --------------------------------------------------------------
 # We re-export the core engine functions to maintain a stable API while
 # allowing the underlying implementation to evolve in the synth-nmr package.
 
 # calculate_synthetic_noes: This is the core generator for synthetic NOEs.
 # It takes a 3D structure (Biotite AtomArray) and returns a list of all
-# atom pairs that are close enough in space (< 6.0 Å) to produce an NMR
+# atom pairs that are close enough in space (< 6.0 A) to produce an NMR
 # signal in a standard NOESY experiment.
 #
 # Technical Implementation Summary:
 # 1. Identify all Hydrogen atoms ('H') using atomic element mapping.
 # 2. Compute a complete pairwise distance matrix using vectorized NumPy.
-# 3. Apply a detection threshold (typically 5.0 to 6.0 Ångströms).
+# 3. Apply a detection threshold (typically 5.0 to 6.0 Angstroms).
 # 4. Map the resulting indices back to residue and atom identifiers.
 calculate_synthetic_noes = _nmr.calculate_synthetic_noes
 
@@ -216,13 +216,13 @@ def calculate_rpf_score(
     1. RECALL (R):
        Let 'E' be the set of experimental restraints and 'M' be the set of
        contacts satisfied by the model.
-       R = |M ∩ E| / |E|
+       R = |M intersection E| / |E|
        It measures the "sensitivity" or data-coverage of the model.
 
     2. PRECISION (P):
        Let 'S' be the set of all short inter-proton distances (< threshold)
        predicted by the model.
-       P = |M ∩ E| / |S|
+       P = |M intersection E| / |S|
        It measures the "false positive rate" of the model's packing.
 
     3. F-MEASURE (F):
@@ -234,7 +234,7 @@ def calculate_rpf_score(
     structure calculation. They allow for an unbiased comparison between
     models generated by different groups or algorithms.
 
-    DEVELOPER NOTE — Corner Cases:
+    DEVELOPER NOTE - Corner Cases:
     ------------------------------
     For a perfect fit, R=1, P=1, and thus F=1.
     If a model is completely disordered but happens to satisfy one restraint,
@@ -253,10 +253,10 @@ def calculate_rpf_score(
             - 'atom_i' / 'atom_name_1': Name of the first atom.
             - 'res_j' / 'index_2': Residue ID of the second atom in the pair.
             - 'atom_j' / 'atom_name_2': Name of the second atom.
-            - 'upper_bound' / 'upper_limit': The maximum allowed distance in Å.
-        distance_threshold (float, optional): The threshold in Å used to identify
+            - 'upper_bound' / 'upper_limit': The maximum allowed distance in A.
+        distance_threshold (float, optional): The threshold in A used to identify
             "short distances" in the model for the Precision calculation.
-            Common values are 5.0 or 6.0 Å. Defaults to 5.0 Å.
+            Common values are 5.0 or 6.0 A. Defaults to 5.0 A.
 
     Returns:
         Dict[str, float]: A dictionary containing the calculated metrics:
@@ -264,7 +264,7 @@ def calculate_rpf_score(
             - 'precision': The precision score [0.0 to 1.0].
             - 'f_measure': The composite F-measure score [0.0 to 1.0].
     """
-    # ── DEFENSIVE CHECKS ─────────────────────────────────────────────────────
+    # -- DEFENSIVE CHECKS -----------------------------------------------------
     # We return zeroed scores if no restraints are provided to avoid potential
     # division by zero errors in the statistics. This handles edge cases like
     # completely disordered regions or empty datasets gracefully.
@@ -276,7 +276,7 @@ def calculate_rpf_score(
         logger.warning("Empty restraint list provided to calculate_rpf_score.")
         return {"recall": 0.0, "precision": 0.0, "f_measure": 0.0}
 
-    # 1. ── CALCULATE RECALL (R) ──────────────────────────────────────────────
+    # 1. -- CALCULATE RECALL (R) ----------------------------------------------
     # Recall measures the sensitivity of the model to the provided restraints.
     # We iterate through every target restraint and check if our model's
     # geometry is consistent with it. This is essentially a "pass/fail"
@@ -298,12 +298,12 @@ def calculate_rpf_score(
         res_j = res.get("index_2") or res.get("res_j")
         atom_j = res.get("atom_name_2") or res.get("atom_j")
 
-        # Upper bound distance limit (default to 5.0 Å if not specified).
+        # Upper bound distance limit (default to 5.0 A if not specified).
         # This is the "target" distance derived from the NOE spectrum.
         # A model atom pair must be closer than this to satisfy the data.
         upper_bound = res.get("upper_limit") or res.get("upper_bound") or 5.0
 
-        # ── CREATE MASKS ─────────────────────────────────────────────────────
+        # -- CREATE MASKS -----------------------------------------------------
         # We create Boolean masks to isolate the specific atoms i and j in the
         # structure. This vectorized approach is robust against variations
         # in atom ordering or nomenclature between different PDB versions.
@@ -312,14 +312,14 @@ def calculate_rpf_score(
         mask_i = (structure.res_id == res_i) & (structure.atom_name == atom_i)
         mask_j = (structure.res_id == res_j) & (structure.atom_name == atom_j)
 
-        # ── CALCULATE DISTANCE ───────────────────────────────────────────────
+        # -- CALCULATE DISTANCE -----------------------------------------------
         # We only calculate the distance if BOTH atoms are actually found
         # in the provided structural model. If an atom is missing, the
         # restraint cannot be "satisfied" and will count against recall.
         # This penalizes models that are incomplete or have missing residues.
         if np.any(mask_i) and np.any(mask_j):
             # Calculate the Euclidean distance between the first match for
-            # each atom mask. Biotite coords are stored as (x, y, z) in Å.
+            # each atom mask. Biotite coords are stored as (x, y, z) in A.
             # Use index 0 to get the first matching atom (handling alt-locs).
             p1_coords = structure[mask_i][0].coord
             p2_coords = structure[mask_j][0].coord
@@ -329,7 +329,7 @@ def calculate_rpf_score(
             # In structural biology, this is the d_ij value.
             dist = np.linalg.norm(p1_coords - p2_coords)
 
-            # ── SATISFACTION CHECK ───────────────────────────────────────────
+            # -- SATISFACTION CHECK -------------------------------------------
             # A restraint is considered "satisfied" if the distance in our model
             # is less than or equal to the experimental upper bound.
             # No tolerance is applied here; the threshold is strict.
@@ -341,21 +341,21 @@ def calculate_rpf_score(
     # If R=0.8, it means 80% of our expected contacts were found in the model.
     recall = satisfied_count / len(restraints)
 
-    # 2. ── CALCULATE PRECISION (P) ───────────────────────────────────────────
+    # 2. -- CALCULATE PRECISION (P) -------------------------------------------
     # Precision identifies potential "false positive" contacts in the model.
     # It answers: "Does the model predict interactions that the data says
     # shouldn't be there?" This is the most computationally expensive part
     # because it involves an all-vs-all search of the structural model.
     # The complexity is O(N_protons^2).
 
-    # ── FILTER FOR PROTONS ───────────────────────────────────────────────────
+    # -- FILTER FOR PROTONS ---------------------------------------------------
     # We first filter the structure for protons (Hydrogen atoms), as the
     # vast majority of NOEs are measured between 1H nuclei.
     # Using element "H" captures all isotopes (D, T) if present.
     # This reduction in atom count significantly speeds up the distance matrix.
     protons = structure[structure.element == "H"]
 
-    # ── HANDLING SPARSE SYSTEMS ──────────────────────────────────────────────
+    # -- HANDLING SPARSE SYSTEMS ----------------------------------------------
     # If the model has fewer than two protons, we cannot compute any
     # inter-atomic distances, so we return a default precision of 1.0.
     # This reflects that there are no "unsupported" interactions possible.
@@ -363,7 +363,7 @@ def calculate_rpf_score(
         # Defaulting to 1.0 avoids NaN values in downstream statistics.
         precision = 1.0
     else:
-        # ── COMPUTE DISTANCE MATRIX ──────────────────────────────────────────
+        # -- COMPUTE DISTANCE MATRIX ------------------------------------------
         # We compute a full O(N^2) distance matrix for all proton-proton pairs.
         # This gives us a complete map of all spatial contacts in the model.
         # For a protein with 1000 protons, this is a 1,000,000 entry matrix.
@@ -380,7 +380,7 @@ def calculate_rpf_score(
         # and take the square root to obtain the final distance matrix.
         dist_matrix = np.sqrt(np.sum(diff**2, axis=-1))
 
-        # ── FILTER FOR SHORT DISTANCES ───────────────────────────────────────
+        # -- FILTER FOR SHORT DISTANCES ---------------------------------------
         # The matrix is symmetric (dist[i,j] == dist[j,i]), so we only need
         # the upper triangle to avoid double-counting.
         # triu(..., k=1) excludes the diagonal (the distance from an atom to itself).
@@ -388,7 +388,7 @@ def calculate_rpf_score(
 
         # Identify all pairs in the structure that are within the 'short' threshold.
         # These are the "predicted contacts" that we will now validate.
-        # Typical thresholds are 5.0 Å (standard) or 6.0 Å (broad).
+        # Typical thresholds are 5.0 A (standard) or 6.0 A (broad).
         # This mask identifies all potential NOE sources in the structural model.
         short_distances_mask = (dist_matrix < distance_threshold) & tri_mask
 
@@ -396,7 +396,7 @@ def calculate_rpf_score(
         # This is our denominator for the Precision calculation.
         total_short_in_struct = np.sum(short_distances_mask)
 
-        # ── RESTRAINT LOOKUP OPTIMIZATION ────────────────────────────────────
+        # -- RESTRAINT LOOKUP OPTIMIZATION ------------------------------------
         # To calculate Precision efficiently, we build a set of all target
         # interactions. Using a set allows for average O(1) lookup time.
         # Without this, we would have an O(N^2 * M) complexity.
@@ -447,8 +447,8 @@ def calculate_rpf_score(
         # A value of 0.5 would mean half of our model's contacts are unsupported.
         precision = supported_count / total_short_in_struct if total_short_in_struct > 0 else 1.0
 
-    # 3. ── CALCULATE F-MEASURE (F) ───────────────────────────────────────────
-    # The F-measure (Sorensen–Dice coefficient) is the harmonic mean of R and P.
+    # 3. -- CALCULATE F-MEASURE (F) -------------------------------------------
+    # The F-measure (Sorensen-Dice coefficient) is the harmonic mean of R and P.
     # It provides a balanced view of structural quality, penalizing models
     # that achieve high recall by simply being too compact (low precision).
     # This is our primary target metric for structure determination.
@@ -487,7 +487,7 @@ def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
        rapid prototyping, manual editing, and teaching.
        Format: res_i atom_i res_j atom_j upper_bound
        Example: 1 HN 5 HA 3.5 (meaning: atom HN of residue 1 is within
-                3.5 Å of atom HA of residue 5).
+                3.5 A of atom HA of residue 5).
 
     Args:
         file_path (str): The system path to the restraint file.
@@ -496,7 +496,7 @@ def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
         List[Dict[str, Any]]: A list of dictionaries, where each entry
             represents a single distance restraint.
     """
-    # ── VALIDATE FILE EXISTENCE ──────────────────────────────────────────────
+    # -- VALIDATE FILE EXISTENCE ----------------------------------------------
     # Before attempting to parse, we ensure the file is accessible on disk.
     # Missing files are a common source of errors in automated pipelines.
     # We use os.path.exists for cross-platform compatibility.
@@ -505,7 +505,7 @@ def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
         # This allows the caller to handle missing files gracefully.
         raise FileNotFoundError(f"Restraint file not found: {file_path}")
 
-    # ── NEF PARSER ───────────────────────────────────────────────────────────
+    # -- NEF PARSER -----------------------------------------------------------
     # If the file extension suggests the modern NEF standard, we delegate
     # to the specialized NEF I/O engine. NEF files are self-documenting
     # and include metadata about the sequence and experiment type.
@@ -517,7 +517,7 @@ def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
 
         return cast(list[dict[str, Any]], read_nef_restraints(file_path))
 
-    # ── SIMPLE WHITESPACE PARSER ─────────────────────────────────────────────
+    # -- SIMPLE WHITESPACE PARSER ---------------------------------------------
     # For non-standard or simplified files, we use a robust line-by-line parser.
     # This parser is designed to be tolerant of blank lines and comments.
     # It follows the Unix tradition of "simple text files for simple tasks."
@@ -568,13 +568,13 @@ def read_restraint_file(file_path: str) -> list[dict[str, Any]]:
         raise ValueError(f"Failed to parse restraint file {file_path}: {e}") from e
 
 
-# ── MODULE EXPORTS ───────────────────────────────────────────────────────────
+# -- MODULE EXPORTS -----------------------------------------------------------
 # We define __all__ to explicitly control the public API of this module.
 # This ensures that internal helpers and imports are not exposed to users.
 # The following symbols are considered the stable, supported interface:
 __all__ = ["calculate_synthetic_noes", "calculate_rpf_score", "read_restraint_file"]
 
-# ── END OF MODULE ────────────────────────────────────────────────────────────
+# -- END OF MODULE ------------------------------------------------------------
 # Documentation density check: This module maintains an exceptionally high
 # level of internal commentary to serve as a pedagogical resource for
 # structural biology students and researchers. Every architectural

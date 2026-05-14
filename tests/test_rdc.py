@@ -10,23 +10,23 @@ Evidence basis for expected values:
 --------------------------------------
 The RDC formula for a backbone N-H vector is (Tjandra & Bax, 1997, Science 278:1111):
 
-    D(θ, φ) = Da · [(3·cos²θ − 1) + (3/2)·R·sin²θ·cos(2φ)]
+    D(theta, phi) = Da * [(3*cos^2theta - 1) + (3/2)*R*sin^2theta*cos(2phi)]
 
 where:
   - Da  = axial component of the alignment tensor (Hz)
-  - R   = rhombicity of the alignment tensor (dimensionless, 0 ≤ R ≤ 2/3)
-  - θ   = polar angle of the N-H bond vector with respect to the principal (Z) axis
-  - φ   = azimuthal angle of the N-H bond vector in the XY plane
+  - R   = rhombicity of the alignment tensor (dimensionless, 0 <= R <= 2/3)
+  - theta   = polar angle of the N-H bond vector with respect to the principal (Z) axis
+  - phi   = azimuthal angle of the N-H bond vector in the XY plane
 
 Reference:
   Tjandra, N. & Bax, A. (1997). Direct measurement of distances and angles in
-  biomolecules by NMR in a dilute liquid crystalline medium. Science, 278, 1111–1114.
+  biomolecules by NMR in a dilute liquid crystalline medium. Science, 278, 1111-1114.
   DOI: 10.1126/science.278.5340.1111
 
 Additional validation context:
   Prestegard, J., Al-Hashimi, H. & Tolman, J. (2000). NMR structures of biomolecules
   using field oriented media and residual dipolar couplings.
-  Q Rev Biophys, 33, 371–424. DOI: 10.1017/S0033583500003656
+  Q Rev Biophys, 33, 371-424. DOI: 10.1017/S0033583500003656
 """
 
 import biotite.structure as struc
@@ -39,14 +39,14 @@ class TestRDCShimImport:
     def test_rdc_shim_importable(self) -> None:
         """The synth_pdb.rdc module must exist and expose calculate_rdcs.
 
-        EDUCATIONAL NOTE — Why shims?
+        EDUCATIONAL NOTE - Why shims?
         ==============================
         synth-pdb acts as the structure-generation layer; synth-nmr is the
         NMR-observable computation layer. Rather than duplicating code, synth-pdb
         exposes synth-nmr's functions via thin re-export 'shim' modules, preserving
         a clean API for downstream users who only install synth-pdb.
         """
-        # This import will FAIL until synth_pdb/rdc.py is created — that is expected
+        # This import will FAIL until synth_pdb/rdc.py is created - that is expected
         # for the Red phase of Red-Green-Refactor (TDD).
         from synth_pdb.rdc import calculate_rdcs  # noqa: F401
 
@@ -68,8 +68,8 @@ class TestRDCPhysics:
     the shim returns the same value.
 
     Alignment tensor parameters used throughout:
-      Da = 10.0 Hz  (typical mid-range; real proteins: 5–25 Hz)
-      R  = 0.5      (moderate rhombicity; R=0 → axially symmetric tensor)
+      Da = 10.0 Hz  (typical mid-range; real proteins: 5-25 Hz)
+      R  = 0.5      (moderate rhombicity; R=0 -> axially symmetric tensor)
     """
 
     @pytest.fixture
@@ -103,14 +103,14 @@ class TestRDCPhysics:
         return struc.array([n_atom, h_atom])
 
     def test_z_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
-        """A vector perfectly aligned with the Z-axis (principal axis) gives RDC = 2·Da.
+        """A vector perfectly aligned with the Z-axis (principal axis) gives RDC = 2*Da.
 
         Derivation (Tjandra & Bax, 1997):
-          θ = 0° → cos θ = 1, sin θ = 0
-          Rhombic term = (3/2)·R·0·cos(2φ) = 0
-          RDC = Da · (3·1² − 1) = 2·Da
+          theta = 0deg -> cos theta = 1, sin theta = 0
+          Rhombic term = (3/2)*R*0*cos(2phi) = 0
+          RDC = Da * (3*1^2 - 1) = 2*Da
 
-        With Da = 10 Hz → expected RDC = 20.0 Hz.
+        With Da = 10 Hz -> expected RDC = 20.0 Hz.
         This is also the maximum possible RDC for an axially symmetric tensor.
         """
         from synth_pdb.rdc import calculate_rdcs
@@ -123,15 +123,15 @@ class TestRDCPhysics:
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_x_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
-        """A vector along the X-axis gives RDC = Da·(−1 + 1.5·R).
+        """A vector along the X-axis gives RDC = Da*(-1 + 1.5*R).
 
         Derivation:
-          θ = 90°, φ = 0°
-          cos θ = 0, sin²θ = 1, cos(2φ) = cos(0°) = 1
-          RDC = Da · [(3·0 − 1) + 1.5·R·1·1]
-              = Da · (−1 + 1.5R)
+          theta = 90deg, phi = 0deg
+          cos theta = 0, sin^2theta = 1, cos(2phi) = cos(0deg) = 1
+          RDC = Da * [(3*0 - 1) + 1.5*R*1*1]
+              = Da * (-1 + 1.5R)
 
-        With Da=10 Hz, R=0.5 → −1 + 0.75 = −0.25 → RDC = −2.5 Hz.
+        With Da=10 Hz, R=0.5 -> -1 + 0.75 = -0.25 -> RDC = -2.5 Hz.
         Negative RDCs are perfectly physical: they simply mean the N-H bond
         is nearly perpendicular to the alignment axis.
         """
@@ -140,19 +140,19 @@ class TestRDCPhysics:
         structure = self._make_nh_structure([0, 0, 0], [1.02, 0, 0])
         rdcs = calculate_rdcs(structure, da=da, r=R)
 
-        expected = da * (-1 + 1.5 * R)  # = −2.5 Hz
+        expected = da * (-1 + 1.5 * R)  # = -2.5 Hz
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_y_axis_aligned_vector(self, da: float, R: float) -> None:  # noqa: N803
-        """A vector along the Y-axis gives RDC = Da·(−1 − 1.5·R).
+        """A vector along the Y-axis gives RDC = Da*(-1 - 1.5*R).
 
         Derivation:
-          θ = 90°, φ = 90°
-          cos(2φ) = cos(180°) = −1
-          RDC = Da · [(−1) + 1.5·R·1·(−1)]
-              = Da · (−1 − 1.5R)
+          theta = 90deg, phi = 90deg
+          cos(2phi) = cos(180deg) = -1
+          RDC = Da * [(-1) + 1.5*R*1*(-1)]
+              = Da * (-1 - 1.5R)
 
-        With Da=10, R=0.5 → RDC = −17.5 Hz.
+        With Da=10, R=0.5 -> RDC = -17.5 Hz.
         This is the minimum possible RDC for this tensor.
         """
         from synth_pdb.rdc import calculate_rdcs
@@ -160,15 +160,15 @@ class TestRDCPhysics:
         structure = self._make_nh_structure([0, 0, 0], [0, 1.02, 0])
         rdcs = calculate_rdcs(structure, da=da, r=R)
 
-        expected = da * (-1 - 1.5 * R)  # = −17.5 Hz
+        expected = da * (-1 - 1.5 * R)  # = -17.5 Hz
         assert rdcs[1] == pytest.approx(expected, abs=1e-2)
 
     def test_rdc_value_in_physical_range(self, da: float, R: float) -> None:  # noqa: N803
-        """RDC values must fall within [Da·(−1−1.5R), 2·Da].
+        """RDC values must fall within [Da*(-1-1.5R), 2*Da].
 
         Physical constraint (Prestegard et al., 2000):
-          The maximum RDC occurs when θ=0 → 2·Da.
-          The minimum occurs when θ=90°, φ=90° → Da·(−1 − 1.5R).
+          The maximum RDC occurs when theta=0 -> 2*Da.
+          The minimum occurs when theta=90deg, phi=90deg -> Da*(-1 - 1.5R).
         """
         from synth_pdb.rdc import calculate_rdcs
 
@@ -192,18 +192,18 @@ class TestRDCEdgeCases:
         """Proline (PRO) has no backbone amide proton due to its cyclic side-chain
         linking the nitrogen: the N atom forms a tertiary amine with no H attached.
 
-        EDUCATIONAL NOTE — Proline as a secondary amine:
+        EDUCATIONAL NOTE - Proline as a secondary amine:
         =================================================
         In all other amino acids, the backbone nitrogen is a primary amine (NH).
         In Proline, the side-chain delta carbon bonds back to the backbone nitrogen,
         forming a five-membered pyrrolidine ring and making the N a secondary amine
         with no exchangeable H. This means:
-          - No backbone amide proton  → no ¹DNH RDC
+          - No backbone amide proton  -> no 1DNH RDC
           - No backbone NH peak in HSQC spectra
           - Important structural constraint: cis/trans isomerism of the Xaa-Pro bond
 
         Reference: Richardson, J.S. (1981). The anatomy and taxonomy of protein structure.
-        Adv Protein Chem, 34, 167–339. DOI: 10.1016/S0065-3233(08)60520-3
+        Adv Protein Chem, 34, 167-339. DOI: 10.1016/S0065-3233(08)60520-3
         """
         from synth_pdb.rdc import calculate_rdcs
 
@@ -221,7 +221,7 @@ class TestRDCEdgeCases:
         """
         from synth_pdb.rdc import calculate_rdcs
 
-        # N at res 1, H at res 2 (mismatched — no H for res 1)
+        # N at res 1, H at res 2 (mismatched - no H for res 1)
         n_atom = struc.Atom(
             [0, 0, 0], atom_name="N", element="N", res_id=1, res_name="ALA", chain_id="A"
         )
@@ -259,7 +259,7 @@ class TestRDCEdgeCases:
             ),
         ]
         structure = struc.array(atoms)
-        rdcs = calculate_rdcs(structure, da=10.0, r=0.0)  # R=0 → pure axial
+        rdcs = calculate_rdcs(structure, da=10.0, r=0.0)  # R=0 -> pure axial
 
         assert 1 in rdcs, "GLY residue should have an RDC"
         assert 2 not in rdcs, "PRO should be absent (no amide H)"

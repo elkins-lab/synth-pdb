@@ -4,10 +4,10 @@ Unit tests for synth_pdb.benchmark_metrics.
 
 Tests verify mathematical correctness of all metric functions:
   - superpose_kabsch: identical structures give RMSD=0 and exact rotation
-  - tm_score: identical structures → 1.0; random structures → < 0.5
-  - lddt: perfect prediction → 1.0; degraded → decreasing
-  - gdt_ts: perfect prediction → 1.0
-  - shift_rmsd: identical shifts → 0; offset shifts → correct value
+  - tm_score: identical structures -> 1.0; random structures -> < 0.5
+  - lddt: perfect prediction -> 1.0; degraded -> decreasing
+  - gdt_ts: perfect prediction -> 1.0
+  - shift_rmsd: identical shifts -> 0; offset shifts -> correct value
   - extract_ca_coords: correct parsing of PDB ATOM records
 """
 
@@ -17,24 +17,24 @@ import numpy as np
 import pytest
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # Fixtures
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 @pytest.fixture
 def helix_coords():
-    """Idealized alpha-helix Cα coordinates for 10 residues.
+    """Idealized alpha-helix Calpha coordinates for 10 residues.
 
     Generated analytically using:
-        x(i) = r * cos(i * 100°)
-        y(i) = r * sin(i * 100°)
+        x(i) = r * cos(i * 100deg)
+        y(i) = r * sin(i * 100deg)
         z(i) = i * rise_per_residue
-    where r=2.3 Å and rise=1.5 Å/residue (standard helix parameters).
+    where r=2.3 A and rise=1.5 A/residue (standard helix parameters).
     """
     n = 10
-    r = 2.3  # Å
-    rise = 1.5  # Å per residue
+    r = 2.3  # A
+    rise = 1.5  # A per residue
     angle_per_res = math.radians(100.0)  # 3.6 residues/turn
 
     coords = np.array(
@@ -49,14 +49,14 @@ def helix_coords():
 
 @pytest.fixture
 def random_coords():
-    """Random Cα coordinates — not a physical protein, just for metric testing."""
+    """Random Calpha coordinates - not a physical protein, just for metric testing."""
     rng = np.random.default_rng(42)
     return (rng.random((10, 3)) * 30.0).astype(np.float32)
 
 
 @pytest.fixture
 def simple_pdb():
-    """Minimal PDB string with 5 Cα atoms for testing extract_ca_coords()."""
+    """Minimal PDB string with 5 Calpha atoms for testing extract_ca_coords()."""
     lines = []
     for i in range(1, 6):
         x, y, z = float(i), float(i * 2), float(i * 3)
@@ -67,9 +67,9 @@ def simple_pdb():
     return "\n".join(lines)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # superpose_kabsch
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestSuperposekabsch:
@@ -89,7 +89,7 @@ class TestSuperposekabsch:
     def test_rotated_structure_rmsd_zero(self, helix_coords):
         from synth_pdb.benchmark_metrics import superpose_kabsch
 
-        # Rotate 90° around z-axis
+        # Rotate 90deg around z-axis
         theta = math.pi / 2
         rot = np.array(
             [
@@ -110,12 +110,12 @@ class TestSuperposekabsch:
         noisy = helix_coords + rng.normal(0, 0.5, helix_coords.shape).astype(np.float32)
         _, rmsd = superpose_kabsch(noisy, helix_coords)
         assert rmsd > 0.0, "Noisy structure should have positive RMSD"
-        assert rmsd < 5.0, f"RMSD of mildly noisy structure should be <5 Å, got {rmsd}"
+        assert rmsd < 5.0, f"RMSD of mildly noisy structure should be <5 A, got {rmsd}"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # tm_score
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestTMScore:
@@ -125,7 +125,7 @@ class TestTMScore:
         score = tm_score(helix_coords, helix_coords)
         assert (
             abs(score - 1.0) < 1e-4
-        ), f"Identical structures should have TM-score ≈ 1.0, got {score}"
+        ), f"Identical structures should have TM-score ~ 1.0, got {score}"
 
     def test_score_in_unit_interval(self, helix_coords, random_coords):
         from synth_pdb.benchmark_metrics import tm_score
@@ -149,9 +149,9 @@ class TestTMScore:
         assert abs(score - 1.0) < 1e-4
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # lddt
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestLddt:
@@ -184,9 +184,9 @@ class TestLddt:
         assert float(np.mean(scores)) < 1.0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # gdt_ts
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestGdtTs:
@@ -210,9 +210,9 @@ class TestGdtTs:
         assert abs(score - 1.0) < 1e-4
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # shift_rmsd
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestShiftRmsd:
@@ -238,7 +238,7 @@ class TestShiftRmsd:
         # With weights H=1.0, C=0.25:
         # sq_sum = 1.0*(0.1^2)*3 + 0.25*(1.0^2)*3 = 0.03 + 0.75 = 0.78
         # weight_sum = 1.0*3 + 0.25*3 = 3 + 0.75 = 3.75
-        # rmsd = sqrt(0.78/3.75) = sqrt(0.208) ≈ 0.4561
+        # rmsd = sqrt(0.78/3.75) = sqrt(0.208) ~ 0.4561
         ref = {"H": np.array([8.0, 8.0, 8.0]), "C": np.array([120.0, 120.0, 120.0])}
         pred = {"H": np.array([8.1, 8.1, 8.1]), "C": np.array([121.0, 121.0, 121.0])}
         rmsd = shift_rmsd(pred, ref)
@@ -252,12 +252,12 @@ class TestShiftRmsd:
         pred = {"H": np.array([8.0, 8.1])}  # N missing
         # Should not raise; N is skipped with a warning
         rmsd = shift_rmsd(pred, ref)
-        assert rmsd < 1e-6  # only H contributes; identical → 0
+        assert rmsd < 1e-6  # only H contributes; identical -> 0
 
 
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 # extract_ca_coords
-# ─────────────────────────────────────────────────────────────────────────────
+# -----------------------------------------------------------------------------
 
 
 class TestExtractCaCoords:

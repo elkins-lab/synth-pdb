@@ -51,7 +51,7 @@ def plot_saxs_results(
     """
     if not HAS_MATPLOTLIB:
         logger.warning("Matplotlib not installed. Skipping SAXS visualization.")
-        print("\nℹ️  To enable SAXS visualization, install matplotlib: pip install matplotlib")
+        print("\n[INFO]  To enable SAXS visualization, install matplotlib: pip install matplotlib")
         return None
 
     if plot_type == "all":
@@ -122,7 +122,7 @@ def _draw_guinier_plot(
     --------------------------------------------
     At very low scattering angles (low q), the scattering intensity can be
     approximated as:
-    I(q) ≈ I(0) * exp(-q^2 * Rg^2 / 3)
+    I(q) ~ I(0) * exp(-q^2 * Rg^2 / 3)
 
     By plotting ln(I) vs q^2, we get a straight line in the low-q region.
     The slope of this line is -Rg^2 / 3. This is the most common method

@@ -65,61 +65,61 @@ def test_karplus_analytical_values(phi_deg, expected, label):
     acceptable parameterisation differences across implementations.
     """
     result = calculate_hn_ha_coupling(phi_deg)
-    print(f"\n  {label}: φ={phi_deg}°  J_ref={expected:.3f} Hz  J_calc={result:.3f} Hz")
+    print(f"\n  {label}: phi={phi_deg}deg  J_ref={expected:.3f} Hz  J_calc={result:.3f} Hz")
     assert (
         abs(result - expected) < 0.3
     ), f"{label}: got {result:.3f} Hz, expected {expected:.3f} Hz (tol 0.3 Hz)"
 
 
 def test_alpha_helix_coupling_is_small():
-    """Helical residues (φ ≈ -60°) must have 3J < 5 Hz.
+    """Helical residues (phi ~ -60deg) must have 3J < 5 Hz.
 
     SCIENTIFIC BASIS:
-    In ideal α-helices, φ ≈ -60°. This places the H-N-Cα-H dihedral at
-    θ ≈ -120°, where cos²(-120°) ≈ 0.25 — yielding small J values.
-    Measured values for helical proteins routinely fall in the 3–5 Hz range.
+    In ideal alpha-helices, phi ~ -60deg. This places the H-N-Calpha-H dihedral at
+    theta ~ -120deg, where cos^2(-120deg) ~ 0.25 - yielding small J values.
+    Measured values for helical proteins routinely fall in the 3-5 Hz range.
     """
     j = calculate_hn_ha_coupling(-60.0)
-    assert j < 5.0, f"α-helix coupling should be < 5 Hz, got {j:.3f} Hz"
-    assert j > 2.0, f"α-helix coupling should be > 2 Hz (non-trivial), got {j:.3f} Hz"
+    assert j < 5.0, f"alpha-helix coupling should be < 5 Hz, got {j:.3f} Hz"
+    assert j > 2.0, f"alpha-helix coupling should be > 2 Hz (non-trivial), got {j:.3f} Hz"
 
 
 def test_beta_sheet_coupling_is_large():
-    """Sheet residues (φ ≈ -135°) must have 3J > 7 Hz.
+    """Sheet residues (phi ~ -135deg) must have 3J > 7 Hz.
 
     SCIENTIFIC BASIS:
-    Extended β-sheet conformations have φ ≈ -135°, placing the dihedral
-    near 180°. cos²(180°) = 1, giving the maximum Karplus value.
-    Measured values for β-sheet proteins are consistently 8–10 Hz.
+    Extended beta-sheet conformations have phi ~ -135deg, placing the dihedral
+    near 180deg. cos^2(180deg) = 1, giving the maximum Karplus value.
+    Measured values for beta-sheet proteins are consistently 8-10 Hz.
     """
     j = calculate_hn_ha_coupling(-135.0)
-    assert j > 7.0, f"β-sheet coupling should be > 7 Hz, got {j:.3f} Hz"
-    assert j < 12.0, f"β-sheet coupling should be < 12 Hz (physical max), got {j:.3f} Hz"
+    assert j > 7.0, f"beta-sheet coupling should be > 7 Hz, got {j:.3f} Hz"
+    assert j < 12.0, f"beta-sheet coupling should be < 12 Hz (physical max), got {j:.3f} Hz"
 
 
 def test_coupling_physically_bounded():
-    """3J(HN-HA) must stay within physical bounds [0, 12] Hz for all φ."""
+    """3J(HN-HA) must stay within physical bounds [0, 12] Hz for all phi."""
     for phi in range(-180, 181, 5):
         j = calculate_hn_ha_coupling(float(phi))
         assert (
             0.0 <= j <= 12.0
-        ), f"Coupling {j:.3f} Hz at φ={phi}° is outside physical bounds [0, 12] Hz"
+        ), f"Coupling {j:.3f} Hz at phi={phi}deg is outside physical bounds [0, 12] Hz"
 
 
 def test_coupling_periodicity():
-    """Karplus equation must be periodic with period 360° in φ."""
+    """Karplus equation must be periodic with period 360deg in phi."""
     for phi in [-170.0, -90.0, 0.0, 45.0, 120.0]:
         j1 = calculate_hn_ha_coupling(phi)
         j2 = calculate_hn_ha_coupling(phi + 360.0)
         assert (
             abs(j1 - j2) < 1e-6
-        ), f"Karplus not periodic at φ={phi}°: J({phi})={j1:.4f}, J({phi+360})={j2:.4f}"
+        ), f"Karplus not periodic at phi={phi}deg: J({phi})={j1:.4f}, J({phi+360})={j2:.4f}"
 
 
 def test_helix_sheet_coupling_ordering():
-    """β-sheet J must be substantially larger than α-helix J.
+    """beta-sheet J must be substantially larger than alpha-helix J.
 
-    This validates the directionality of the implementation — not just that
+    This validates the directionality of the implementation - not just that
     both lie in range, but that the qualitative ordering matches experiment.
     """
     j_helix = calculate_hn_ha_coupling(-60.0)

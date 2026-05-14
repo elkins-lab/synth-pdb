@@ -51,7 +51,7 @@ def test_hetatm_restoration(caplog: pytest.LogCaptureFixture) -> None:
     """Test that HETATMs (like ZN) are restored if culled by OpenMM.
 
     Uses seed=0 to guarantee a deterministic Cys geometry where the four
-    sulfurs cluster within the 10 Å detection threshold, so ZN is always
+    sulfurs cluster within the 10 A detection threshold, so ZN is always
     injected by find_metal_binding_sites.  Without a fixed seed ~5% of
     random conformations scatter the Cys residues too far apart and no ZN
     is inserted, making the later assertion a false negative rather than a

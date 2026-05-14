@@ -153,4 +153,4 @@ class TestConformationalDiversity:
         # So end-to-end distance should be greater for beta
         assert (
             beta_distance > alpha_distance
-        ), f"Beta sheet ({beta_distance:.2f}Å) should be more extended than alpha helix ({alpha_distance:.2f}Å)"
+        ), f"Beta sheet ({beta_distance:.2f}A) should be more extended than alpha helix ({alpha_distance:.2f}A)"

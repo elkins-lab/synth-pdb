@@ -38,8 +38,9 @@ def test_optimization_improves_score():
     np.random.seed(42)
 
     sequence = "WYWYWYWY"
+    # Pass an explicit seed to generate_pdb_content for end-to-end determinism
     pdb_content = generate_pdb_content(
-        sequence_str=sequence, conformation="random", optimize_sidechains=False
+        sequence_str=sequence, conformation="random", optimize_sidechains=False, seed=42
     )
     logger.info(f"Test Sequence: {sequence}")
 

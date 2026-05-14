@@ -65,3 +65,13 @@ After minimization, the `_do_energy_minimization` function in `generator.py` man
 
 **Future Enhancement:**
 Currently, this restoration logic covers PTMs (`SEP`, `TPO`, `PTR`) and Histidine tautomers (`HIE`, `HID`, `HIP`). It should be extended to include **D-Amino Acids** (e.g., `DAL`, `DSE`, etc.), which are also renamed to standard types before simulation in `physics.py`.
+
+## Output Formats (PDBx/mmCIF & BinaryCIF)
+
+`synth-pdb` now supports modern PDB formats to address the limitations of the legacy `.pdb` format (e.g., 99k atom limit).
+
+### Implementation Details
+- **Text CIF (`.cif`)**: Uses the `CIFFile` API in Biotite to generate PDBx/mmCIF data.
+- **BinaryCIF (`.bcif`)**: Uses `BinaryCIFFile` for high-performance, compressed output.
+- **Metadata Preservation**: B-factors and Occupancy values (derived from order parameters) are explicitly mapped to the `_atom_site.B_iso_or_equiv` and `_atom_site.occupancy` columns in CIF.
+- **Biotite Compatibility**: When re-parsing CIF/BCIF files using `PeptideResult`, `extra_fields=["b_factor", "occupancy"]` is used to ensure these annotations are loaded back into the `AtomArray`.

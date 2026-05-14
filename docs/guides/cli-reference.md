@@ -22,7 +22,8 @@ python -m synth_pdb.main --sequence "ALA-GLY-SER-THR-VAL" --output test.pdb
 | :--- | :--- | :--- |
 | `--length` | Length of the amino acid sequence (number of residues). | 10 |
 | `--sequence` | Specify an amino acid sequence (e.g., 'AGV' or 'ALA-GLY-VAL'). | (Random) |
-| `--output` | Output PDB filename. | (Generated) |
+| `--output` | Output filename. | (Generated) |
+| `--format` | Output file format: `pdb`, `cif`, `bcif`. | `pdb` |
 | `--conformation` | Secondary structure conformation: `alpha`, `beta`, `ppii`, `extended`, `random`. | `alpha` |
 | `--structure` | Per-region conformation specification (e.g., '1-10:alpha,11-14:typeII,15-20:beta'). | - |
 | `--seed` | Random seed for reproducible generation. | - |

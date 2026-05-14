@@ -41,11 +41,11 @@ from synth_pdb.geometry.superposition import find_medoid, superimpose_structures
 #   DOI: 10.1021/ja9812610 (NMR: 1D3Z, X-ray: 1UBQ)
 # - BPTI: Otting & Wuthrich (1989) J. Am. Chem. Soc. 111, 1871-1875.
 #   DOI: 10.1021/ja00187a042 (NMR: 1PIT, X-ray: 5PTI)
-# - NESG CtR107 (Montelione Group): Everett et al. (2009) J. Biomol. NMR 45, 13–21.
+# - NESG CtR107 (Montelione Group): Everett et al. (2009) J. Biomol. NMR 45, 13-21.
 #   DOI: 10.1007/s10858-009-9333-x (NMR: 2KCU, X-ray: 3E0H)
 #   - NOTE: CtR107 is a GyrI-like protein from Chlorobaculum tepidum. This pair
 #     was used by the NESG to demonstrate that NMR and X-ray structures can
-#     converge to high accuracy (< 1.2 Å) when high-quality NMR data is used.
+#     converge to high accuracy (< 1.2 A) when high-quality NMR data is used.
 # =============================================================================
 
 

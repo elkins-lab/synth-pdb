@@ -134,13 +134,13 @@ class EnergyMinimizer:
            for better electrostatic performance.
 
         2. **Implicit Solvent (Generalized Born / OBC)**:
-           Also known as "Born Solvation". The cost of moving an ion from vacuum (ε=1)
-           to water (ε=80) is estimated by the **Born Equation**:
+           Also known as "Born Solvation". The cost of moving an ion from vacuum (epsilon=1)
+           to water (epsilon=80) is estimated by the **Born Equation**:
 
-           ΔG_solv = - (q^2 / 2r) * (1 - 1/ε)
+           DeltaG_solv = - (q^2 / 2r) * (1 - 1/epsilon)
 
            In proteins, each atom has a unique "Effective Born Radius" based on how buried
-           it is. Surface atoms feel the full ε=80, while core atoms are shielded.
+           it is. Surface atoms feel the full epsilon=80, while core atoms are shielded.
            The **OBC2 (Onufriev-Bashford-Case)** model is a refined version that
            parameterizes these radii to match explicit solvent behavior closely.
 
@@ -240,6 +240,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Run energy minimization to regularize geometry and resolve clashes.
 
@@ -302,12 +303,13 @@ class EnergyMinimizer:
         res = self._run_simulation(
             pdb_file_path,
             output_path,
-            add_hydrogens=False,
+            add_hydrogens=True,
             max_iterations=max_iterations,
             tolerance=tolerance,
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
@@ -319,6 +321,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Run Thermal Equilibration (MD) at 300K.
 
@@ -359,20 +362,28 @@ class EnergyMinimizer:
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
     def add_hydrogens_and_minimize(
         self,
-        pdb_file_path: str,
+        input_path: str,
         output_path: str,
         max_iterations: int = 0,
         tolerance: float = 10.0,
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> bool:
         """Robust minimization pipeline: Adds Hydrogens -> Creates/Minimizes System -> Saves Result.
+
+        TECHNICAL NOTE - Format Awareness:
+        ----------------------------------
+        This method automatically detects the input format by file extension.
+        If '.cif' is provided, it uses OpenMM's PDBxFile parser to handle massive
+        protein structures that exceed PDB limits. Output will match the input format.
 
         ### Why Add Hydrogens?
         X-ray crystallography often doesn't resolve hydrogen atoms because they have very few electrons.
@@ -386,8 +397,8 @@ class EnergyMinimizer:
         We use `app.Modeller` to "guess" the standard positions of hydrogens at specific pH (7.0).
 
         Args:
-            pdb_file_path: Input PDB path.
-            output_path: Output PDB path.
+            input_path: Input file path (PDB or mmCIF).
+            output_path: Output file path (PDB or mmCIF).
             max_iterations: Limit steps (0 = until convergence).
             tolerance: Target energy convergence threshold (kJ/mol).
             cyclic: Whether to apply head-to-tail peptide bond constraints.
@@ -402,7 +413,7 @@ class EnergyMinimizer:
             logger.error("Cannot add hydrogens: OpenMM not found.")
             return False
         res = self._run_simulation(
-            pdb_file_path,
+            input_path,
             output_path,
             add_hydrogens=True,
             max_iterations=max_iterations,
@@ -410,6 +421,7 @@ class EnergyMinimizer:
             cyclic=cyclic,
             disulfides=disulfides,
             coordination=coordination,
+            structure=structure,
         )
         return res is not None
 
@@ -544,7 +556,7 @@ class EnergyMinimizer:
     ) -> tuple[Any, Any, list[str], dict[Any, Any]]:
         """Load and sanitize the input PDB for OpenMM; return OpenMM topology/positions.
 
-        Performs PTM residue renaming (SEP→SER, etc.), HETATM ion stripping,
+        Performs PTM residue renaming (SEP->SER, etc.), HETATM ion stripping,
         optional OXT dummy insertion for cyclic peptides, and cyclic CONECT
         removal.  Loads the modified PDB into OpenMM and applies standard bond
         generation and cyclic bond surgery.
@@ -566,6 +578,8 @@ class EnergyMinimizer:
         """
         import os
         import tempfile
+
+        is_cif = input_path.lower().endswith(".cif")
 
         # EDUCATIONAL NOTE - PDB PRE-PROCESSING (OpenMM Template Fix):
         # -----------------------------------------------------------
@@ -615,6 +629,24 @@ class EnergyMinimizer:
         first_res_id = None
         last_res_id = None
 
+        if is_cif:
+            # TECHNICAL NOTE - mmCIF Loading:
+            # We use OpenMM's PDBxFile parser for robust handling of massive proteins.
+            pdbx = app.PDBxFile(input_path)
+            topology = pdbx.topology
+            positions = pdbx.positions
+
+            # Pre-populate metadata for restoration
+            for res in topology.residues():
+                res_key = (str(res.id).strip(), res.chain.id)
+                original_metadata[res_key] = {"name": res.name, "id": res.id}
+
+                # Rename to standard counterparts in topology object
+                if res.name in ptm_map:
+                    res.name = ptm_map[res.name]
+
+            return topology, positions, [], original_metadata
+
         if os.path.exists(input_path):
             with open(input_path) as f:
                 pdb_lines = f.readlines()
@@ -627,7 +659,7 @@ class EnergyMinimizer:
             # OpenMM's PDB reader creates CONECT records for all explicit bonds.
             # For cyclic peptides, the head-to-tail bond is already encoded as
             # a CONECT (written by generator.py). We must remove it here so
-            # addHydrogens later does not see a conflicting terminal N–C bond.
+            # addHydrogens later does not see a conflicting terminal N-C bond.
             n_term_serial, c_term_serial = None, None
             c_coords, c_line_template = None, None
             has_existing_oxt = False
@@ -692,7 +724,7 @@ class EnergyMinimizer:
             # EDUCATIONAL NOTE - Dummy OXT Insertion:
             # OpenMM amber14 residue templates for C-termini require an OXT
             # oxygen to match the "C_TERM" patch. Cyclic peptides lack this atom
-            # so we add a temporary OXT positioned ~1.2 Å from the terminal C.
+            # so we add a temporary OXT positioned ~1.2 A from the terminal C.
             # physics.py _finalize_output() will delete it after minimization.
             # Add dummy OXT for cyclic peptides to satisfy C-terminal templates
             if cyclic and last_res_id and c_line_template and not has_existing_oxt:
@@ -702,7 +734,15 @@ class EnergyMinimizer:
                         insert_idx = idx + 1
                 if insert_idx != -1 and c_coords is not None:
                     x, y, z = c_coords
-                    res_name_c = c_line_template[17:20]
+                    # c_line_template was captured in the first pass, before PTM
+                    # renaming. Apply ptm_map here so the dummy OXT carries the
+                    # same residue name as the renamed residue atoms it joins -
+                    # otherwise OpenMM's PDB reader sees two residues with the
+                    # same (chain, id) but different names (e.g. HIE vs HIS) and
+                    # emits a "two consecutive residues with same number" warning.
+                    raw_res_name_c = c_line_template[17:20].strip()
+                    renamed_c = ptm_map.get(raw_res_name_c, raw_res_name_c)
+                    res_name_c = f"{renamed_c: >3}"
                     res_id_full = c_line_template[21:26]
                     oxt_line = (
                         f"ATOM   9999  OXT {res_name_c} {res_id_full}    "
@@ -768,18 +808,19 @@ class EnergyMinimizer:
         cyclic: bool,
         coordination_param: list | None,
         atom_list: list[Any],
+        structure: Any | None = None,
     ) -> tuple[Any, list, list, list, list[Any]]:
         """Build the OpenMM Modeller, apply H handling, detect disulfides and salt bridges.
 
         Steps:
         1. Optionally announce cyclic restraint intent.
-        2. Heuristic backbone stitching (missing C–N peptide bonds).
+        2. Heuristic backbone stitching (missing C-N peptide bonds).
         3. Strip existing hydrogens if ``add_hydrogens`` is True.
-        4. Detect candidate disulfide bonds by S–S proximity.
+        4. Detect candidate disulfide bonds by S-S proximity.
         5. Detect salt bridges via biotite structure analysis.
         6. Add hydrogens via ``Modeller.addHydrogens``.
         7. Weld cyclic topology (post-H) and clean up terminal atoms.
-        8. Rename bonded CYS → CYX, delete SG hydrogens.
+        8. Rename bonded CYS -> CYX, delete SG hydrogens.
 
         Args:
             topology: OpenMM :class:`Topology` from preprocessing.
@@ -864,7 +905,7 @@ class EnergyMinimizer:
         # EDUCATIONAL NOTE - The SSBOND Capture Radius:
         # ---------------------------------------------
         # Unlike distance-based bonding in simple geometry, physical disulfide
-        # formation is highly sensitive to the S-S distance (~2.03 Å).
+        # formation is highly sensitive to the S-S distance (~2.03 A).
         # We use a large "Capture Radius" (SSBOND_CAPTURE_RADIUS) to detect
         # potential pairs in un-optimized structures, then allow the "Mega-Pull"
         # to bring them into the ideal covalent distance.
@@ -934,51 +975,46 @@ class EnergyMinimizer:
                 b_struc = None
 
             if b_struc is not None:
-                # We use BOTH caller-supplied sites (if any) and internally detected ones.
-                # Convert caller-supplied site dictionaries into the list of atom-index pairs
-                # that _build_simulation_context expects.
+                # PERFORMANCE OPTIMIZATION - Lookup Indexing:
+                # We build a mapping of (res_id, atom_name) -> atom_index to avoid
+                # O(N) searching for every ligand in every coordination site.
+                atom_lookup = {(str(a.residue.id).strip(), a.name): a.index for a in atom_list}
 
                 # 1. Process caller sites (from generator)
                 if coordination_param:
                     for site in coordination_param:
+                        i_type = site["type"]
                         i_idx_at = -1
                         # Find the ion atom index in the topology
                         for atom in atom_list:
-                            if atom.residue.name == site["type"]:
+                            if atom.residue.name == i_type:
                                 i_idx_at = atom.index
                                 break
                         if i_idx_at != -1:
                             # Map ligand indices from b_struc to topology
                             for l_idx in site["ligand_indices"]:
                                 l_at = b_struc[l_idx]
-                                for atom in atom_list:
-                                    if (
-                                        int(atom.residue.id) == int(l_at.res_id)
-                                        and atom.name == l_at.atom_name
-                                    ):
-                                        coordination_restraints.append((i_idx_at, atom.index))
-                                        break
+                                l_key = (str(l_at.res_id).strip(), l_at.atom_name)
+                                if l_key in atom_lookup:
+                                    coordination_restraints.append((i_idx_at, atom_lookup[l_key]))
 
                 # 2. Add internally detected sites (if not already covered)
                 internal_sites = find_metal_binding_sites(b_struc)
                 for site in internal_sites:
+                    i_type = site["type"]
                     i_idx_at = -1
                     for atom in atom_list:
-                        if atom.residue.name == site["type"]:
+                        if atom.residue.name == i_type:
                             i_idx_at = atom.index
                             break
                     if i_idx_at != -1:
                         for l_idx in site["ligand_indices"]:
                             l_at = b_struc[l_idx]
-                            for atom in atom_list:
-                                if (
-                                    int(atom.residue.id) == int(l_at.res_id)
-                                    and atom.name == l_at.atom_name
-                                ):
-                                    pair = (i_idx_at, atom.index)
-                                    if pair not in coordination_restraints:
-                                        coordination_restraints.append(pair)
-                                    break
+                            l_key = (str(l_at.res_id).strip(), l_at.atom_name)
+                            if l_key in atom_lookup:
+                                pair = (i_idx_at, atom_lookup[l_key])
+                                if pair not in coordination_restraints:
+                                    coordination_restraints.append(pair)
 
                 # Salt bridges
                 try:
@@ -987,22 +1023,13 @@ class EnergyMinimizer:
                         f"DEBUG: Found {len(salt_bridges) if salt_bridges else 0} salt bridges"
                     )
                     if salt_bridges:
-                        current_atoms = list(modeller.topology.atoms())
                         for br in salt_bridges:
-                            ia, ib = -1, -1
-                            for atom in current_atoms:
-                                if (
-                                    str(atom.residue.id).strip() == str(br["res_ia"]).strip()
-                                    and atom.name == br["atom_a"]
-                                ):
-                                    ia = atom.index
-                                if (
-                                    str(atom.residue.id).strip() == str(br["res_ib"]).strip()
-                                    and atom.name == br["atom_b"]
-                                ):
-                                    ib = atom.index
-                            if ia != -1 and ib != -1:
-                                salt_bridge_restraints.append((ia, ib, br["distance"] / 10.0))
+                            key_a = (str(br["res_ia"]).strip(), br["atom_a"])
+                            key_b = (str(br["res_ib"]).strip(), br["atom_b"])
+                            if key_a in atom_lookup and key_b in atom_lookup:
+                                salt_bridge_restraints.append(
+                                    (atom_lookup[key_a], atom_lookup[key_b], br["distance"] / 10.0)
+                                )
                 except Exception as e:
                     logger.debug(f"Internal salt bridge detection failed: {e}")
         except Exception as e:
@@ -1257,7 +1284,7 @@ class EnergyMinimizer:
         # EDUCATIONAL NOTE - Harmonic "Pull" Restraints & Hard Constraints:
         # -----------------------------------------------------------------
         # To bridge the gap between N and C termini, we use two levels of force:
-        # 1. Harmonic Pull: A massive "spring" (100M kJ/mol/nm²) that treats the
+        # 1. Harmonic Pull: A massive "spring" (100M kJ/mol/nm^2) that treats the
         #    termini like two magnets. It provides a global gradient that pulls
         #    the structure toward closure.
         # 2. Hard Constraint: A specialized OpenMM constraint that FIXES the
@@ -1267,7 +1294,7 @@ class EnergyMinimizer:
         #
         # EDUCATIONAL NOTE - Why we avoid adding a hard constraint initially:
         # If the termini are far apart, a hard constraint crashes the system.
-        # The 100M kJ magnet (pull_force) will get us to 1.33Å first.
+        # The 100M kJ magnet (pull_force) will get us to 1.33A first.
         # Pull forces for cyclic closure and disulfide formation
         if cyclic or added_bonds:
             pull_force = mm.CustomBondForce("0.5*k_pull*(r-r0)^2")
@@ -1431,6 +1458,16 @@ class EnergyMinimizer:
             logger.debug(f"Using Cached OpenMM Platform: {platform.getName()}")
         else:
             # Fallback auto-detection logic
+            #
+            # We probe accelerated platforms only. CPU and Reference are intentionally
+            # NOT probed - when no GPU platform validates here, we leave ``platform=None``
+            # so OpenMM's built-in selector picks the fastest available platform by its
+            # registered speed (CPU=10.0, Reference=1.0). Explicitly probing CPU here
+            # caused it to be cached on hosts where the dummy GPU probe spuriously fails
+            # (e.g. mixed-precision OpenCL on macOS), even though OpenMM would happily
+            # use OpenCL/CUDA when called without explicit platform/props. Pinning the
+            # Reference platform in CI similarly cost ~50x - Reference is the
+            # single-threaded correctness implementation, not a fast fallback.
             for name in ["CUDA", "Metal", "OpenCL"]:
                 try:
                     temp_platform = mm.Platform.getPlatformByName(name)
@@ -1641,68 +1678,75 @@ class EnergyMinimizer:
             # (and visualizers like PyMOL) know that the SG atoms are covalently linked,
             # rather than just displaying them as physically close.
 
-            # Build PDB buffer
-            # EDUCATIONAL NOTE - PDB Atom Sorting:
-            # ------------------------------------
-            # The Protein Data Bank (PDB) format is heavily standardized. Many parsers
-            # will crash if atoms are out of order, or if CONECT records reference
-            # non-existent serial numbers. We use a precise formatting string to ensure
-            # the output precisely matches the PDB v3.3 spec.
+            # Build output buffer
+            is_cif = output_path.lower().endswith(".cif")
             pdb_buffer = _io.StringIO()
-            app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
-            pdb_lines = pdb_buffer.getvalue().split("\n")
+            if is_cif:
+                app.PDBxFile.writeFile(final_topology, final_positions, pdb_buffer)
+                with open(output_path, "w") as f:
+                    f.write(pdb_buffer.getvalue())
+            else:
+                # EDUCATIONAL NOTE - PDB Atom Sorting:
+                # ------------------------------------
+                # The Protein Data Bank (PDB) format is heavily standardized. Many parsers
+                # will crash if atoms are out of order, or if CONECT records reference
+                # non-existent serial numbers. We use a precise formatting string to ensure
+                # the output precisely matches the PDB v3.3 spec.
+                app.PDBFile.writeFile(final_topology, final_positions, pdb_buffer)
+                pdb_lines = pdb_buffer.getvalue().split("\n")
 
-            # EDUCATIONAL NOTE - CONECT Records & Visualization:
-            # CONECT records are critical for molecular viewers (PyMOL, Chimera)
-            # to draw covalent bonds that OpenMM's PDB writer may not emit
-            # automatically for non-standard connections (SS bonds, metal–ligand).
-            # We enumerate them from the final topology and write both directions.
-            # Force CONECT for disulfides
-            extra_conects = []
-            for bond in final_topology.bonds():
-                a1, a2 = bond.atom1, bond.atom2
-                if a1.name == "SG" and a2.name == "SG":
-                    extra_conects.append((a1.index + 1, a2.index + 1))
-            for id1, id2 in coordination_restraints:
-                extra_conects.append((id1 + 1, id2 + 1))
+                # EDUCATIONAL NOTE - CONECT Records & Visualization:
+                # CONECT records are critical for molecular viewers (PyMOL, Chimera)
+                # to draw covalent bonds that OpenMM's PDB writer may not emit
+                # automatically for non-standard connections (SS bonds, metal-ligand).
+                # We enumerate them from the final topology and write both directions.
+                # Force CONECT for disulfides
+                extra_conects = []
+                for bond in final_topology.bonds():
+                    a1, a2 = bond.atom1, bond.atom2
+                    if a1.name == "SG" and a2.name == "SG":
+                        extra_conects.append((a1.index + 1, a2.index + 1))
+                for id1, id2 in coordination_restraints:
+                    extra_conects.append((id1 + 1, id2 + 1))
 
-            final_lines = []
-            for line in pdb_lines:
-                if line.startswith("END") or line.startswith("CONECT"):
-                    continue
-                if line.strip():
-                    final_lines.append(line)
+                final_lines = []
+                for line in pdb_lines:
+                    if line.startswith("END") or line.startswith("CONECT"):
+                        continue
+                    if line.strip():
+                        final_lines.append(line)
 
-            for ci1, ci2 in extra_conects:
-                final_lines.append(f"CONECT{ci1:5d}{ci2:5d}")
-                final_lines.append(f"CONECT{ci2:5d}{ci1:5d}")
+                for ci1, ci2 in extra_conects:
+                    final_lines.append(f"CONECT{ci1:5d}{ci2:5d}")
+                    final_lines.append(f"CONECT{ci2:5d}{ci1:5d}")
 
-            # Restore SSBOND records (after HEADER/TITLE)
-            if added_bonds:
-                insert_idx = 0
-                for idx, line in enumerate(final_lines):
-                    if line.startswith(("HEADER", "TITLE", "COMPND")):
-                        insert_idx = idx + 1
-                for s, (id1, id2) in enumerate(added_bonds, 1):
-                    final_lines.insert(
-                        insert_idx,
-                        f"SSBOND{s:4d} CYS A {int(id1):4d}    "
-                        f"CYS A {int(id2):4d}                          ",
-                    )
+                # Restore SSBOND records (after HEADER/TITLE)
+                if added_bonds:
+                    insert_idx = 0
+                    for idx, line in enumerate(final_lines):
+                        if line.startswith(("HEADER", "TITLE", "COMPND")):
+                            insert_idx = idx + 1
+                    for s, (id1, id2) in enumerate(added_bonds, 1):
+                        final_lines.insert(
+                            insert_idx,
+                            f"SSBOND{s:4d} CYS A {int(id1):4d}    "
+                            f"CYS A {int(id2):4d}                          ",
+                        )
 
-            # EDUCATIONAL NOTE - HETATM Restoration:
-            # Metal ions were stripped before addHydrogens() (they crash it).
-            # Re-append them verbatim at the end of the PDB file so downstream
-            # tools (viewers, NMR shift predictors) can see them correctly.
-            # Restore stripped ions
-            if hetatm_lines:
-                for line in hetatm_lines:
-                    res_name = line[17:20].strip().upper()
-                    logger.debug(f"Appending restored HETATM: {res_name}")
-                    final_lines.append(line.strip())
+                # EDUCATIONAL NOTE - HETATM Restoration:
+                # Metal ions were stripped before addHydrogens() (they crash it).
+                # Re-append them verbatim at the end of the PDB file so downstream
+                # tools (viewers, NMR shift predictors) can see them correctly.
+                # Restore stripped ions
+                if hetatm_lines:
+                    for line in hetatm_lines:
+                        res_name = line[17:20].strip().upper()
+                        logger.debug(f"Appending restored HETATM: {res_name}")
+                        final_lines.append(line.strip())
 
-            final_lines.append("END")
-            f.write("\n".join(final_lines) + "\n")
+                final_lines.append("END")
+                with open(output_path, "w") as f:
+                    f.write("\n".join(final_lines) + "\n")
 
         # Explicitly delete OpenMM State to free memory
         del state
@@ -1719,6 +1763,7 @@ class EnergyMinimizer:
         cyclic: bool = False,
         disulfides: list | None = None,
         coordination: list | None = None,
+        structure: Any | None = None,
     ) -> float | None:
         """Internal engine. Returns final_energy if successful, else None."""
         logger.info(f"Processing physics for {input_path} (cyclic={cyclic})...")
@@ -1735,7 +1780,7 @@ class EnergyMinimizer:
             if HAS_OPENMM and logger.isEnabledFor(logging.DEBUG):
                 reporter = LoggingMinimizationReporter(interval=50)
 
-            # ── Stage 1: PDB preprocessing ──────────────────────────────────────
+            # -- Stage 1: PDB preprocessing --------------------------------------
             (
                 topology,
                 positions,
@@ -1744,7 +1789,7 @@ class EnergyMinimizer:
             ) = self._preprocess_pdb_for_simulation(input_path, cyclic, disulfides)
             atom_list = list(topology.atoms())
 
-            # ── Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) ──
+            # -- Stage 2: Modeller setup (H, SSBOND, salt-bridge, cyclic weld) --
             coordination_param = coordination if coordination is not None else []
             (
                 modeller,
@@ -1761,7 +1806,7 @@ class EnergyMinimizer:
                 atom_list,
             )
 
-            # ── Stage 3: System + forces + Simulation context ───────────────
+            # -- Stage 3: System + forces + Simulation context ---------------
             n_idx: int
             c_idx: int
 
@@ -1795,7 +1840,7 @@ class EnergyMinimizer:
                 state = simulation.context.getState(getEnergy=True)
                 return float(state.getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole))
 
-            # ── Stage 4: Minimization / equilibration ───────────────────────
+            # -- Stage 4: Minimization / equilibration -----------------------
             logger.info(f"Minimizing (Tolerance={tolerance} kJ/mol, MaxIter={max_iterations})...")
             if cyclic or added_bonds or salt_bridge_restraints:
                 cyc_iter = 0
@@ -1811,20 +1856,20 @@ class EnergyMinimizer:
                     )
                     sb_force.addPerBondParameter("r0")
                     new_ats = list(topology.atoms())
+                    # PERFORMANCE OPTIMIZATION - Lookup Indexing:
+                    # Build a map for the post-modeller topology to quickly find atom indices.
+                    new_atom_lookup = {
+                        (str(a.residue.id).strip(), a.name): a.index for a in new_ats
+                    }
+
                     for ao, bo, r0 in salt_bridge_restraints:
                         oa, ob = atom_list[ao], atom_list[bo]
-                        na, nb = -1, -1
-                        for a in new_ats:
-                            if (
-                                str(a.residue.id).strip() == str(oa.residue.id).strip()
-                                and a.name == oa.name
-                            ):
-                                na = a.index
-                            if (
-                                str(a.residue.id).strip() == str(ob.residue.id).strip()
-                                and a.name == ob.name
-                            ):
-                                nb = a.index
+                        key_a = (str(oa.residue.id).strip(), oa.name)
+                        key_b = (str(ob.residue.id).strip(), ob.name)
+
+                        na = new_atom_lookup.get(key_a, -1)
+                        nb = new_atom_lookup.get(key_b, -1)
+
                         if na != -1 and nb != -1:
                             sb_force.addBond(na, nb, [r0 * unit.nanometers])
                     system.addForce(sb_force)
@@ -1894,7 +1939,7 @@ class EnergyMinimizer:
             else:
                 # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
                 # ------------------------------------------
-                # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+                # OpenMM uses the L-BFGS (Limited-memory Broyden-Fletcher-Goldfarb-Shanno)
                 # algorithm. It is a quasi-Newton method that approximates the second
                 # derivative (Hessian) of the potential energy to find the local minimum
                 # efficiently without needing to store the full Hessian matrix.
@@ -1939,7 +1984,7 @@ class EnergyMinimizer:
             if equilibration_steps > 0:
                 simulation.step(equilibration_steps)
 
-            # ── Stage 5: Write output PDB ────────────────────────────────────
+            # -- Stage 5: Write output PDB ------------------------------------
             write_ok = self._finalize_output(
                 output_path,
                 simulation,
@@ -2118,7 +2163,7 @@ def simulate_trajectory(
 
         # EDUCATIONAL NOTE: Gradient Descent (L-BFGS)
         # ------------------------------------------
-        # OpenMM uses the L-BFGS (Limited-memory Broyden–Fletcher–Goldfarb–Shanno)
+        # OpenMM uses the L-BFGS (Limited-memory Broyden-Fletcher-Goldfarb-Shanno)
         # algorithm. It is a quasi-Newton method that approximates the second
         # derivative (Hessian) of the potential energy to find the local minimum
         # efficiently without needing to store the full Hessian matrix.

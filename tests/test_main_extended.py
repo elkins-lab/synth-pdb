@@ -42,6 +42,45 @@ def test_main_cryo_em_missing_sequence() -> None:
         mock_exit.assert_called_with(1)
 
 
+def test_main_cryo_em_seed_propagation() -> None:
+    """Verify --seed is passed to sequence generation in cryo-em mode."""
+    with (
+        patch("sys.argv", ["synth-pdb", "--mode", "cryo-em", "--length", "5", "--seed", "42"]),
+        patch("synth_pdb.generator._get_random_sequence", return_value=["ALA"]) as mock_get_seq,
+        patch("synth_pdb.batch_generator.BatchedGenerator"),
+        patch(
+            "synth_pdb.cryo_em.generate_density_map", return_value=(np.zeros((1, 1, 1)), [0, 0, 0])
+        ),
+        patch("synth_pdb.cryo_em.save_mrc_file"),
+    ):
+        main()
+        assert mock_get_seq.called
+        _, kwargs = mock_get_seq.call_args
+        assert "rng" in kwargs
+        assert kwargs["rng"] is not None
+
+
+def test_main_saxs_seed_propagation() -> None:
+    """Verify --seed is passed to sequence generation in saxs mode."""
+    with (
+        patch("sys.argv", ["synth-pdb", "--mode", "saxs", "--length", "5", "--seed", "42"]),
+        patch("synth_pdb.generator._get_random_sequence", return_value=["ALA"]) as mock_get_seq,
+        patch("synth_pdb.batch_generator.BatchedGenerator") as mock_bg_class,
+        patch("synth_pdb.saxs.calculate_saxs_profile", return_value=(np.zeros(1), np.zeros(1))),
+        patch("synth_pdb.saxs.export_saxs_profile"),
+    ):
+        mock_batch = MagicMock()
+        mock_stack = [MagicMock()]
+        mock_batch.to_stack.return_value = mock_stack
+        mock_bg_class.return_value.generate_batch.return_value = mock_batch
+
+        main()
+        assert mock_get_seq.called
+        _, kwargs = mock_get_seq.call_args
+        assert "rng" in kwargs
+        assert kwargs["rng"] is not None
+
+
 def test_main_saxs_happy_path() -> None:
     """Test saxs mode successful execution path."""
     with (

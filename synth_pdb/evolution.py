@@ -37,7 +37,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     """Calculate the Relative Solvent Accessible Surface Area (rSASA) for each residue.
 
     Why Relative?
-    - Absolute SASA (in Å²) depends on the size of the amino acid.
+    - Absolute SASA (in A^2) depends on the size of the amino acid.
     - rSASA gives the fraction of the residue exposed, normalized by its theoretical max exposure in a tripeptide (Gly-X-Gly).
     - Rule of thumb: rSASA < 0.2 is "Buried".
 
@@ -55,7 +55,7 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     try:
         # Get standard vdW radii for atoms
         # Biotite 0.38+ supports this
-        sasa = struc.sasa(atom_array, probe_radius=1.4)  # 1.4Å is radius of water molecule
+        sasa = struc.sasa(atom_array, probe_radius=1.4)  # 1.4A is radius of water molecule
     except Exception as e:
         logger.warning(f"SASA Check failed ({e}). Falling back to dummy SASA (all exposed).")
         # Fallback if libraries missing or structure invalid
@@ -69,12 +69,12 @@ def calculate_relative_sasa(atom_array: struc.AtomArray) -> np.ndarray:
     # We use roughly approximated max SASA values from literature (Tien et al, 2013)
     # For a rigorous implementation, we'd lookup exact values.
     # Here we define an approximate average max to assume "normalization".
-    # Simplified approach: If SASA > 20 Å², it's exposed.
+    # Simplified approach: If SASA > 20 A^2, it's exposed.
     # We return normalized-ish values or just a raw fraction if we had maxes.
 
     # Let's map strict "Buried" threshold to return binary-like logic for the mutator,
     # or implement real max values.
-    # Implementing approximate Max SASA (in Å²) for X in G-X-G
+    # Implementing approximate Max SASA (in A^2) for X in G-X-G
     max_sasa = {
         "A": 121,
         "R": 265,

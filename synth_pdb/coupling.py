@@ -32,21 +32,21 @@ def predict_couplings_from_structure(
     1. Filters out residues that physically lack a backbone amide proton (e.g., Proline).
     2. Corrects the Karplus equation phase for D-amino acids by inverting the phi angle.
 
-    EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings
+    EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings
     ================================================================
     The 3J(HN-HA) scalar coupling is a through-bond magnetic interaction between
     the backbone amide proton (HN) and the alpha proton (HA). This coupling is
-    highly sensitive to the intervening H-N-CA-H dihedral angle (θ), which is
-    geometrically related to the backbone Ramachandran Phi (φ) angle.
+    highly sensitive to the intervening H-N-CA-H dihedral angle (theta), which is
+    geometrically related to the backbone Ramachandran Phi (phi) angle.
 
     The relationship is empirically described by the Karplus equation:
-        3J(θ) = A * cos^2(θ) - B * cos(θ) + C
+        3J(theta) = A * cos^2(theta) - B * cos(theta) + C
 
-    For typical L-amino acids, θ ≈ φ - 60°. This means:
-    - In an ideal alpha-helix (φ ≈ -60°), θ ≈ -120°, yielding small couplings (3-5 Hz).
-    - In a beta-sheet (φ ≈ -120° to -140°), θ ≈ 180°, yielding large couplings (8-10 Hz).
+    For typical L-amino acids, theta ~ phi - 60deg. This means:
+    - In an ideal alpha-helix (phi ~ -60deg), theta ~ -120deg, yielding small couplings (3-5 Hz).
+    - In a beta-sheet (phi ~ -120deg to -140deg), theta ~ 180deg, yielding large couplings (8-10 Hz).
 
-    EDUCATIONAL NOTE — Proline and Secondary Amines
+    EDUCATIONAL NOTE - Proline and Secondary Amines
     ===============================================
     Proline (PRO) and its D-isomer (DPR) are unique among standard amino acids
     because their sidechain cyclizes onto the backbone nitrogen, forming a
@@ -55,18 +55,18 @@ def predict_couplings_from_structure(
     H-N-CA-H spin system, and thus the 3J(HN-HA) coupling is physically undefined.
     Our shim layer explicitly strips these residues from the results.
 
-    EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry
+    EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry
     ====================================================
     D-amino acids are non-superimposable mirror images of natural L-amino acids.
     Because the Karplus equation is parameterized for the natural L-configuration,
-    directly feeding a D-amino acid's φ angle into the standard Karplus curve
+    directly feeding a D-amino acid's phi angle into the standard Karplus curve
     yields incorrect results (e.g., predicting ~6.3 Hz instead of ~3.8 Hz for a
-    D-alpha helix where φ ≈ +60°).
+    D-alpha helix where phi ~ +60deg).
 
     Due to mirror symmetry, the geometric relationship inverts:
-    θ_D(φ) = -θ_L(-φ). Therefore, we can accurately predict the D-amino acid
+    theta_D(phi) = -theta_L(-phi). Therefore, we can accurately predict the D-amino acid
     coupling by evaluating the L-parameterized Karplus equation at the
-    negated phi angle: J_D(φ) = J_L(-φ).
+    negated phi angle: J_D(phi) = J_L(-phi).
 
     Args:
         structure: Biotite AtomArray
@@ -74,14 +74,14 @@ def predict_couplings_from_structure(
     Returns:
         Dict keyed by Chain ID -> Residue ID -> J-coupling value (Hz).
     """
-    # ── 1. PRIMARY PREDICTION ────────────────────────────────────────────────
+    # -- 1. PRIMARY PREDICTION ------------------------------------------------
     # We first delegate to the core synth-nmr engine to calculate raw couplings.
     # The engine uses a highly optimized C++ backend or Numba-jitted array ops
     # to evaluate the Karplus equation for all residues simultaneously.
     raw_couplings = _j.calculate_hn_ha_coupling(structure)
     filtered_couplings: dict[str, dict[int, float]] = {}
 
-    # ── 2. BIOPHYSICAL FILTER DEFINITIONS ────────────────────────────────────
+    # -- 2. BIOPHYSICAL FILTER DEFINITIONS ------------------------------------
     # Proline-like residues do not have an amide proton when in a peptide bond.
     # Therefore, they cannot produce a 3J_HNHa coupling.
     proline_names = {"PRO", "DPR"}
@@ -111,7 +111,7 @@ def predict_couplings_from_structure(
         "DVA",
     }
 
-    # ── 3. PRE-CALCULATING STRUCTURAL ANGLES ─────────────────────────────────
+    # -- 3. PRE-CALCULATING STRUCTURAL ANGLES ---------------------------------
     # We extract the entire array of backbone phi dihedrals from the structure.
     # Biotite returns these in radians, so we convert them to degrees, which
     # the Karplus parametrization expects.
@@ -124,7 +124,7 @@ def predict_couplings_from_structure(
     for c, r, p in zip(chain_ids, res_ids, phi, strict=False):
         phi_map[(c, int(r))] = np.degrees(p)
 
-    # ── 4. ITERATIVE FILTERING & CORRECTION ──────────────────────────────────
+    # -- 4. ITERATIVE FILTERING & CORRECTION ----------------------------------
     # We iterate over the raw predictions and selectively copy/modify them
     # into our sanitized output dictionary.
     for chain_id, res_dict in raw_couplings.items():

@@ -8,7 +8,7 @@ two cysteine residues in a protein.
 What are Disulfide Bonds?
 - Covalent S-S bond between sulfur atoms of two cysteines
 - Form when two CYS side chains come close together
-- Typical SG-SG distance: 2.0-2.1 Å
+- Typical SG-SG distance: 2.0-2.1 A
 - One of the strongest bonds in proteins
 
 How They Form:
@@ -18,7 +18,7 @@ How They Form:
 4. Two hydrogen atoms are removed (oxidation)
 
 Chemical Reaction:
-2 Cys-SH → Cys-S-S-Cys + 2H+ + 2e-
+2 Cys-SH -> Cys-S-S-Cys + 2H+ + 2e-
 
 Why They're Important:
 1. **Protein Stability**: Stabilize folded structure
@@ -66,7 +66,7 @@ class TestDisulfideBonds:
         We need a function to detect potential disulfide bonds by:
         1. Finding all CYS residues in the structure
         2. Calculating SG-SG distances between all CYS pairs
-        3. Identifying pairs within bonding distance (2.0-2.1 Å)
+        3. Identifying pairs within bonding distance (2.0-2.1 A)
         """
         from synth_pdb.generator import _detect_disulfide_bonds
 
@@ -77,16 +77,16 @@ class TestDisulfideBonds:
 
         EDUCATIONAL NOTE - Distance Criteria:
         Disulfide bonds have very specific geometry:
-        - SG-SG distance: 2.0-2.1 Å (very consistent)
-        - S-S-Cα angle: ~103°
+        - SG-SG distance: 2.0-2.1 A (very consistent)
+        - S-S-Calpha angle: ~103deg
         - Dihedral angles: specific preferences
 
         For detection, we primarily use distance:
-        - < 2.0 Å: Too close (steric clash)
-        - 2.0-2.1 Å: Typical disulfide bond
-        - > 2.1 Å: Too far (no bond)
+        - < 2.0 A: Too close (steric clash)
+        - 2.0-2.1 A: Typical disulfide bond
+        - > 2.1 A: Too far (no bond)
 
-        We use a slightly relaxed criterion (2.0-2.2 Å) to account for:
+        We use a slightly relaxed criterion (2.0-2.2 A) to account for:
         - Structural flexibility
         - Coordinate precision
         - Different oxidation states
@@ -127,12 +127,12 @@ class TestDisulfideBonds:
 
         EDUCATIONAL NOTE - False Positives:
         It's important not to report disulfide bonds that don't exist:
-        - Distant CYS pairs (>2.2 Å) should not be bonded
+        - Distant CYS pairs (>2.2 A) should not be bonded
         - Only actual close pairs should be reported
         - False positives would mislead structure analysis
 
         In linear peptides (our case):
-        - Sequential CYS residues are typically ~6-7 Å apart
+        - Sequential CYS residues are typically ~6-7 A apart
         - Would need specific folding to bring them close
         - Most random structures won't have disulfides
         """

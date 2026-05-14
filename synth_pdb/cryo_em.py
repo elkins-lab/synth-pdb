@@ -26,12 +26,12 @@ logger = logging.getLogger(__name__)
 #
 # Simulation Principles:
 # 1. Atomic Scattering: Each atom (C, N, O, P, S) contributes to the density.
-# 2. Gaussian Approximation: At medium resolutions (3-10Å), each atom can be
+# 2. Gaussian Approximation: At medium resolutions (3-10A), each atom can be
 #    approximated as a Gaussian blob. The width of the Gaussian corresponds to
 #    the target resolution of the map.
 # 3. Ensemble Averaging: Real Cryo-EM maps are averages of thousands of
 #    individual particles. By generating density for a synthetic ensemble,
-#    we can simulate "conformational heterogeneity" — regions where the
+#    we can simulate "conformational heterogeneity" - regions where the
 #    protein is moving will appear blurred or "smeared" in the final map.
 
 
@@ -45,8 +45,8 @@ def generate_density_map(
 
     Args:
         structure: Biotite structure(s) to convert to density.
-        resolution: Target resolution in Angstroms (Gaussian sigma ≈ res/3).
-        grid_spacing: Voxel size in Angstroms (default 1.0Å).
+        resolution: Target resolution in Angstroms (Gaussian sigma ~ res/3).
+        grid_spacing: Voxel size in Angstroms (default 1.0A).
         buffer: Extra padding around the protein in Angstroms.
 
     Returns:
@@ -54,9 +54,9 @@ def generate_density_map(
 
     SCIENTIFIC NOTE - Resolution vs Sigma:
     --------------------------------------
-    The relationship between the resolution (R) and the Gaussian sigma (σ)
-    is often approximated as σ = R / (2 * sqrt(2 * ln 2)) ≈ R / 2.355.
-    However, for simple visual benchmarks, σ = resolution / 3 is also common.
+    The relationship between the resolution (R) and the Gaussian sigma (sigma)
+    is often approximated as sigma = R / (2 * sqrt(2 * ln 2)) ~ R / 2.355.
+    However, for simple visual benchmarks, sigma = resolution / 3 is also common.
     We use the 1/3 rule here for a conservative "sharpness" at the target res.
     """
     if isinstance(structure, struc.AtomArray):
@@ -75,7 +75,7 @@ def generate_density_map(
     grid_dims = np.ceil((c_max - c_min) / grid_spacing).astype(int)
     density = np.zeros(grid_dims)
 
-    logger.info(f"Generating Cryo-EM map with dimensions {grid_dims} and spacing {grid_spacing}Å")
+    logger.info(f"Generating Cryo-EM map with dimensions {grid_dims} and spacing {grid_spacing}A")
 
     # 2. Voxelization
     # For each atom in each model, we increment the corresponding voxel.
@@ -166,8 +166,8 @@ class CryoEMSimulator:
         """Initialize the simulator.
 
         Args:
-            resolution: Target map resolution (Å).
-            spacing: Voxel spacing (Å).
+            resolution: Target map resolution (A).
+            spacing: Voxel spacing (A).
         """
         self.resolution = resolution
         self.spacing = spacing

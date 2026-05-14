@@ -671,6 +671,52 @@ class TestMainCLI:
         assert "Clustering requires --input-pattern" in caplog.text
         mock_exit.assert_called_with(1)
 
+    def test_ai_cluster_seed_propagation(self, mocker: Any) -> None:
+        """Verify --seed is passed to clustering in AI mode."""
+        mock_cluster = mocker.patch("synth_pdb.quality.cluster.cluster_structures")
+
+        test_args = [
+            "synth_pdb",
+            "--mode",
+            "ai",
+            "--ai-op",
+            "cluster",
+            "--input-pattern",
+            "*.pdb",
+            "--seed",
+            "123",
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        mock_cluster.assert_called_once()
+        _, kwargs = mock_cluster.call_args
+        assert kwargs["random_seed"] == 123
+
+    def test_ai_cluster_default_seed(self, mocker: Any) -> None:
+        """Verify that AI clustering uses default seed 42 when --seed is omitted."""
+        mock_cluster = mocker.patch("synth_pdb.quality.cluster.cluster_structures")
+
+        test_args = [
+            "synth_pdb",
+            "--mode",
+            "ai",
+            "--ai-op",
+            "cluster",
+            "--input-pattern",
+            "*.pdb",
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        mock_cluster.assert_called_once()
+        _, kwargs = mock_cluster.call_args
+        assert kwargs["random_seed"] == 42
+
     # --- Additional tests for error conditions and edge cases ---
 
     def test_invalid_length_without_sequence(self, tmp_path: Path) -> None:
@@ -1026,6 +1072,33 @@ class TestMainCLI:
         assert kwargs["rmsd_max"] == 999.0
         mock_exit.assert_not_called()
 
+    def test_decoys_seed_propagation(self, mocker: Any) -> None:
+        """Verify --seed is passed to sequence generation in decoy mode."""
+        mocker.patch("synth_pdb.main.DecoyGenerator")
+        mock_get_seq = mocker.patch(
+            "synth_pdb.generator._get_random_sequence", return_value=["ALA"]
+        )
+
+        test_args = [
+            "synth_pdb",
+            "--mode",
+            "decoys",
+            "--length",
+            "5",
+            "--seed",
+            "42",
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        # Verify rng argument was passed (it should be a random.Random instance)
+        assert mock_get_seq.called
+        _, kwargs = mock_get_seq.call_args
+        assert "rng" in kwargs
+        assert kwargs["rng"] is not None
+
     def test_decoys_missing_sequence_generates_random(
         self, mocker: Any, caplog: pytest.LogCaptureFixture
     ) -> None:
@@ -1139,6 +1212,36 @@ class TestMainCLI:
         assert "Constraints exported to" in caplog.text
         mock_exit.assert_not_called()
 
+    def test_constraint_cutoff_flag_propagation(self, mocker: Any, tmp_path: Path) -> None:
+        """Verify that --constraint-cutoff is passed to calculation and export functions."""
+        mocker.patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="HEADER test\nATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\n",
+        )
+        mock_compute = mocker.patch(
+            "synth_pdb.contact.compute_contact_map", return_value=np.zeros((1, 1))
+        )
+        mock_export = mocker.patch("synth_pdb.export.export_constraints", return_value="dummy")
+
+        test_args = [
+            "synth_pdb",
+            "--sequence",
+            "ALA",
+            "--export-constraints",
+            str(tmp_path / "c.rr"),
+            "--constraint-cutoff",
+            "12.3",
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        # Verify threshold is passed to calculation
+        assert mock_compute.call_args.kwargs["threshold"] == 12.3
+        # Verify threshold is passed to export
+        assert mock_export.call_args.kwargs["threshold"] == 12.3
+
     def test_run_export_torsion(
         self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture
     ) -> None:
@@ -1179,6 +1282,35 @@ class TestMainCLI:
 
         assert "Torsion angles exported to" in caplog.text
         mock_exit.assert_not_called()
+
+    def test_msa_cutoff_flag_propagation(self, mocker: Any, tmp_path: Path) -> None:
+        """Verify that --constraint-cutoff is used for MSA generation."""
+        mocker.patch(
+            "synth_pdb.main.generate_pdb_content",
+            return_value="HEADER test\nATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\n",
+        )
+        mock_compute = mocker.patch(
+            "synth_pdb.contact.compute_contact_map", return_value=np.zeros((1, 1))
+        )
+        mocker.patch("synth_pdb.msa.generate_msa", return_value=["AAA"])
+
+        test_args = [
+            "synth_pdb",
+            "--sequence",
+            "ALA",
+            "--gen-msa",
+            "--output",
+            str(tmp_path / "t.pdb"),
+            "--constraint-cutoff",
+            "15.0",
+        ]
+        mocker.patch("sys.argv", test_args)
+        mocker.patch("sys.exit")
+
+        main.main()
+
+        # Verify threshold is passed to calculation for MSA
+        assert mock_compute.call_args.kwargs["threshold"] == 15.0
 
     def test_run_msa_generation(
         self, mocker: Any, tmp_path: Path, caplog: pytest.LogCaptureFixture

@@ -7,7 +7,7 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
 
 See: https://github.com/elkins/synth-nmr
 
-EDUCATIONAL NOTE — NMR Relaxation and the Lipari-Szabo Model
+EDUCATIONAL NOTE - NMR Relaxation and the Lipari-Szabo Model
 ============================================================
 NMR relaxation rate measurements (T1, T2, NOE) provide information about the
 timescales and amplitudes of protein motion. These motions range from fast
@@ -16,15 +16,15 @@ bond vibrations (picoseconds) to slow loop rearrangements (microseconds).
 THE MODEL-FREE FORMALISM:
 Lipari and Szabo (1982) introduced a "model-free" approach to describe
 protein dynamics using only two key parameters:
-1. S² (Order Parameter): Measures the spatial amplitude of internal motion.
-   S²=1 means rigid, S²=0 means fully isotropic.
-2. τe (Effective Correlation Time): Measures the speed of the internal motion.
+1. S^2 (Order Parameter): Measures the spatial amplitude of internal motion.
+   S^2=1 means rigid, S^2=0 means fully isotropic.
+2. taue (Effective Correlation Time): Measures the speed of the internal motion.
 
 APPLICATION:
-For a globular protein, the overall tumbling (τm) usually dominates the
+For a globular protein, the overall tumbling (taum) usually dominates the
 relaxation rate. By measuring relaxation at multiple magnetic field strengths,
 researchers can de-convolve the global and local motions. synth-pdb uses
-S² parameters predicted from sequence and structure to generate synthetic
+S^2 parameters predicted from sequence and structure to generate synthetic
 T1/T2 rates that reflect the protein's dynamic landscape.
 
 """

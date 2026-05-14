@@ -24,7 +24,7 @@ Relationship to B-factors:
 - B-factor = dynamic disorder (thermal motion)
 
 In Real Structures:
-- Core residues: occupancy ≈ 1.00 (well-ordered)
+- Core residues: occupancy ~ 1.00 (well-ordered)
 - Surface residues: occupancy 0.90-1.00 (some disorder)
 - Flexible loops: occupancy 0.85-0.95 (disordered)
 - Alternate conformations: occupancy 0.40-0.60 each (split)

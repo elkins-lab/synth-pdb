@@ -1,6 +1,6 @@
 """TDD integration tests for GNN training and checkpoint save/load.
 
-Written BEFORE the implementation exists — all tests should fail initially.
+Written BEFORE the implementation exists - all tests should fail initially.
 """
 
 import os
@@ -95,7 +95,7 @@ class TestGNNTraining(unittest.TestCase):
                 prob_before,
                 prob_after,
                 places=4,
-                msg=f"Probability changed after save/load: {prob_before:.6f} → {prob_after:.6f}",
+                msg=f"Probability changed after save/load: {prob_before:.6f} -> {prob_after:.6f}",
             )
         finally:
             if os.path.exists(checkpoint_path):

@@ -84,7 +84,10 @@ def test_dataset_generator_full_manifest_update(temp_output_dir: str) -> None:
     mock_f1.result.return_value = {"success": False, "sample_id": "synth_000001", "error": "Fail"}
 
     # Patch the executor and as_completed
-    with patch("concurrent.futures.ProcessPoolExecutor") as mock_exec_class:
+    with patch("concurrent.futures.ProcessPoolExecutor") as mock_exec_class, patch(
+        "synth_pdb.dataset._generate_single_sample_task",
+        side_effect=[mock_f0.result(), mock_f1.result()],
+    ):
         mock_executor = mock_exec_class.return_value.__enter__.return_value
         # Map submit calls to our mock futures
         mock_executor.submit.side_effect = [mock_f0, mock_f1]
@@ -135,3 +138,40 @@ def test_npz_task_missing_cb(temp_output_dir: str) -> None:
         data = np.load(npz_path)
         # CB is at index 4, should be [0,0,0]
         assert np.all(data["coords"][0, 4] == 0.0)
+
+
+def test_dataset_generator_multiprocessing_fallback(temp_output_dir: str) -> None:
+    """Verify that DatasetGenerator falls back to sequential execution if multiprocessing fails."""
+    # num_samples=1 to keep it simple
+    generator = DatasetGenerator(output_dir=temp_output_dir, num_samples=1, max_workers=2)
+
+    # Mock result
+    mock_result = {
+        "success": True,
+        "sample_id": "synth_000000",
+        "length": 5,
+        "conformation": "alpha",
+        "split": "train",
+        "pdb_path": "train/s0.pdb",
+        "cmap_path": "train/s0.casp",
+    }
+
+    # 1. Mock ProcessPoolExecutor to raise PermissionError on entry
+    # 2. Mock the sequential task function to return success
+    with (
+        patch(
+            "concurrent.futures.ProcessPoolExecutor",
+            side_effect=PermissionError("Semaphore failure"),
+        ),
+        patch("synth_pdb.dataset._generate_single_sample_task", return_value=mock_result),
+    ):
+        generator.generate()
+
+    # Verify manifest was updated correctly by the sequential fallback
+    manifest_path = Path(temp_output_dir) / "dataset_manifest.csv"
+    assert manifest_path.exists()
+    import pandas as pd
+
+    df = pd.read_csv(manifest_path)
+    assert len(df) == 1
+    assert df.iloc[0]["id"] == "synth_000000"

@@ -52,9 +52,9 @@ def find_metal_binding_sites(
 
     candidate_coords = structure.coord[candidate_indices]
     sites = []
-    assigned_indices = set()
+    assigned_residues: set[tuple[str, int]] = set()
 
-    # ── Iterative Motif Detection (Tightest-Cluster First) ──────────────────
+    # -- Iterative Motif Detection (Tightest-Cluster First) ------------------
     # Unlike a simple greedy search which might pick arbitrary nearby atoms,
     # we iteratively identify the "best" coordination sites.
     #
@@ -63,7 +63,7 @@ def find_metal_binding_sites(
     # 2. If 4+ ligands are found, calculate the 'spread' (average pair-wise
     #    distance) of the tightest sub-group of 4.
     # 3. Identify the cluster with the global minimum spread across the whole protein.
-    # 4. 'Commit' that cluster as a site and mark atoms as assigned.
+    # 4. 'Commit' that cluster as a site and mark the entire RESIDUE as assigned.
     # 5. Repeat until no more 4-ligand clusters can be formed.
     while True:
         best_cluster = None
@@ -72,8 +72,11 @@ def find_metal_binding_sites(
         # Outer loop: Evaluate every possible ligand as a potential cluster 'seed'
         for i in range(len(candidate_indices)):
             idx_i = candidate_indices[i]
-            # Skip if this atom was already claimed by a previous site
-            if idx_i in assigned_indices:
+            c_id_i = structure.chain_id[idx_i]
+            r_id_i = structure.res_id[idx_i]
+
+            # Skip if this residue was already claimed by a previous site
+            if (c_id_i, r_id_i) in assigned_residues:
                 continue
 
             # Calculate distances from this seed to all other candidate ligands
@@ -89,10 +92,12 @@ def find_metal_binding_sites(
             # We map (chain, res_id) -> (distance, candidate_index)
             res_to_best_atom: dict[tuple[str, int], tuple[float, int]] = {}
             for j in range(len(candidate_indices)):
-                if neighbor_mask[j] and candidate_indices[j] not in assigned_indices:
-                    c_id = structure.chain_id[candidate_indices[j]]
-                    r_id = structure.res_id[candidate_indices[j]]
-                    rid = (c_id, r_id)
+                idx_j = candidate_indices[j]
+                c_id_j = structure.chain_id[idx_j]
+                r_id_j = structure.res_id[idx_j]
+                rid = (c_id_j, r_id_j)
+
+                if neighbor_mask[j] and rid not in assigned_residues:
                     d = float(dists[j])
                     if rid not in res_to_best_atom or d < res_to_best_atom[rid][0]:
                         res_to_best_atom[rid] = (d, j)
@@ -126,7 +131,7 @@ def find_metal_binding_sites(
         if best_cluster:
             sites.append({"type": "ZN", "ligand_indices": best_cluster})
             for idx in best_cluster:
-                assigned_indices.add(idx)
+                assigned_residues.add((structure.chain_id[idx], structure.res_id[idx]))
         else:
             # Termination condition: No more unassigned groups of 4 found
             break

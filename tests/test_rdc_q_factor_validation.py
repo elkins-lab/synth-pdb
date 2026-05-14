@@ -32,7 +32,7 @@ from synth_pdb.generator import generate_pdb_content
 from synth_pdb.rdc import calculate_rdc_q_factor, calculate_rdcs
 
 
-# ── UNIT TESTS: Q-factor formula correctness ─────────────────────────────────
+# -- UNIT TESTS: Q-factor formula correctness ---------------------------------
 
 
 def test_q_factor_perfect_agreement():
@@ -94,7 +94,7 @@ def test_q_bounds_for_typical_data():
         assert q >= 0.0, f"Q must be non-negative, got {q}"
 
 
-# ── INTEGRATION TEST: Self-consistent Q from back-calculation ─────────────────
+# -- INTEGRATION TEST: Self-consistent Q from back-calculation -----------------
 
 
 @pytest.fixture(scope="module")

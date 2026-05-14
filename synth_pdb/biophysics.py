@@ -282,7 +282,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
     final_structure = structure
 
     if ace_structure:
-        # ── Residue ID Management ─────────────────────────────────────────────
+        # -- Residue ID Management ---------------------------------------------
         # To maintain a valid PDB structure, every residue must have a unique ID.
         # Adding an N-terminal cap requires shifting the entire protein chain
         # forward to make room for the ACE residue at index 1.
@@ -292,7 +292,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # ACE is now Res 1
         ace_structure.res_id[:] = 1
 
-        # ── Protonation Correction ────────────────────────────────────────────
+        # -- Protonation Correction --------------------------------------------
         # When a terminal NH3+ group becomes an internal amide bond (via ACE),
         # it must lose its N-terminal specific hydrogens (H2, H3).
         n_term_mask = (final_structure.res_id == (n_term_id + 1)) & np.isin(
@@ -308,14 +308,14 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         c_term_id += 1
 
     if nme_structure:
-        # ── C-Terminal Indexing ───────────────────────────────────────────────
+        # -- C-Terminal Indexing -----------------------------------------------
         # Unlike ACE (which prepends), NME is appended to the end. We simply
         # find the current highest ID and increment.
         current_res_ids = sorted(set(final_structure.res_id))
         last_id = current_res_ids[-1]
         nme_structure.res_id[:] = last_id + 1
 
-        # ── Carboxyl Correction ───────────────────────────────────────────────
+        # -- Carboxyl Correction -----------------------------------------------
         # A free C-terminus typically ends with a Carboxyl group (COO-) which
         # includes an OXT atom. When we cap it with N-Methylamide (NME), the
         # residue becomes an internal amide and must lose the OXT/HXT atoms

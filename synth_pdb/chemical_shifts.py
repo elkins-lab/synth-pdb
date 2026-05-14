@@ -76,9 +76,9 @@ For direct usage of NMR functionality, consider using synth-nmr directly:
 
 See: https://github.com/elkins/synth-nmr
 
-EDUCATIONAL NOTE — Chemical Shifts in Structural Biology
+EDUCATIONAL NOTE - Chemical Shifts in Structural Biology
 ========================================================
-Chemical shifts (δ) are the most easily measured NMR observables and provide
+Chemical shifts (delta) are the most easily measured NMR observables and provide
 atom-specific information about the local electronic environment. They are
 the "fingerprints" of a protein's structure and dynamics.
 
@@ -87,21 +87,21 @@ the "fingerprints" of a protein's structure and dynamics.
    by the cloud of electrons surrounding a nucleus. In a protein, this
    environment is influenced by covalent bonds, nearby partial charges, and
    magnetic fields from aromatic rings (ring currents).
-   The effective field seen by the nucleus is B_eff = B0 * (1 - σ).
-   - σ is the shielding constant, a 3x3 tensor property.
+   The effective field seen by the nucleus is B_eff = B0 * (1 - sigma).
+   - sigma is the shielding constant, a 3x3 tensor property.
    - Values are reported in parts-per-million (ppm).
 
 2. SECONDARY STRUCTURE SENSITIVITY:
-   Backbone chemical shifts (¹Hα, ¹³Cα, ¹³C', ¹⁵N, ¹HN) are highly sensitive
-   to the local (φ, ψ) torsion angles.
-   - α-helices: ¹³Cα and ¹³C' shifts move downfield (+), while ¹Hα moves upfield (-).
-   - β-sheets: The opposite trends are observed.
+   Backbone chemical shifts (1Halpha, 13Calpha, 13C', 15N, 1HN) are highly sensitive
+   to the local (phi, psi) torsion angles.
+   - alpha-helices: 13Calpha and 13C' shifts move downfield (+), while 1Halpha moves upfield (-).
+   - beta-sheets: The opposite trends are observed.
    These systematic deviations from random-coil values allow for the calculation
    of the Chemical Shift Index (CSI).
    - Helical patterns show contiguous positive C-alpha CSI values.
 
 3. RING CURRENT EFFECTS:
-   The circulation of π-electrons in aromatic side chains (Phe, Tyr, Trp, His)
+   The circulation of pi-electrons in aromatic side chains (Phe, Tyr, Trp, His)
    creates small local magnetic fields. Nuclei positioned above or below the
    ring plane experience a significant shift, which is a powerful constraint
    for identifying side-chain packing interactions.
@@ -109,7 +109,7 @@ the "fingerprints" of a protein's structure and dynamics.
    - Shifts can be as large as 2-3 ppm for nearby protons.
 
 4. HYDROGEN BONDING:
-   The ¹HN chemical shift is particularly sensitive to hydrogen bond strength.
+   The 1HN chemical shift is particularly sensitive to hydrogen bond strength.
    Formation of a hydrogen bond typically results in a downfield shift due to
    the deshielding effect of the electron-withdrawing oxygen atom.
    - Stronger H-bonds correspond to larger downfield shifts.
@@ -143,17 +143,17 @@ the reported experimental values.
 
 References:
   1. Wishart, D.S. et al. (1991). Relationship between 13C chemical shift and
-     protein secondary structure. J Biomol NMR, 1, 271–240.
+     protein secondary structure. J Biomol NMR, 1, 271-240.
   2. Han, B. et al. (2011). SHIFTX2: significantly improved protein chemical
-     shift prediction. J Biomol NMR, 50, 43–57.
+     shift prediction. J Biomol NMR, 50, 43-57.
   3. Shen, Y. & Bax, A. (2010). SPARTA+: a modest improvement in empirical
-     NMR chemical shift prediction. J Biomol NMR, 48, 13–22.
+     NMR chemical shift prediction. J Biomol NMR, 48, 13-22.
   4. Spera, S. & Bax, A. (1991). The relationship between secondary structure
      and alpha-carbon chemical shifts in proteins. J Am Chem Soc, 113, 5490.
 
 """
 
-# ── MODULE-LEVEL IMPORTS ─────────────────────────────────────────────────────
+# -- MODULE-LEVEL IMPORTS -----------------------------------------------------
 # Standard library logging for diagnostic output during prediction.
 # Used to track re-mapping and engine dispatch status.
 # Logging levels can be configured via the project root logger.
@@ -179,7 +179,7 @@ import synth_nmr.chemical_shifts as _cs
 # Scipy is the standard for Pearson correlation in bioinformatics.
 from scipy.stats import pearsonr
 
-# ── LOGGING CONFIGURATION ───────────────────────────────────────────────────
+# -- LOGGING CONFIGURATION ---------------------------------------------------
 # We use a dedicated logger for the chemical shift module to allow for
 # granular debugging of spectroscopic calculations.
 #
@@ -201,7 +201,7 @@ from scipy.stats import pearsonr
 # Logger name follows the project-wide hierarchy (synth_pdb.chemical_shifts).
 logger = logging.getLogger(__name__)
 
-# ── SPECTROSCOPIC RE-EXPORTS ─────────────────────────────────────────────────
+# -- SPECTROSCOPIC RE-EXPORTS -------------------------------------------------
 # We re-export core utilities from synth-nmr to maintain a stable API.
 # This ensures that researchers using synth-pdb have a one-stop-shop for
 # structural and spectroscopic back-calculation.
@@ -260,7 +260,7 @@ _calculate_ring_current_shift = _cs._calculate_ring_current_shift
 # It identifies Phe, Tyr, Trp, and His rings in the structure.
 _get_aromatic_rings = _cs._get_aromatic_rings
 
-# ── MAIN PREDICTION ENGINE ───────────────────────────────────────────────────
+# -- MAIN PREDICTION ENGINE ---------------------------------------------------
 # Main entry point for shift prediction from coordinates.
 #
 # This function orchestrates the entire calculation pipeline, including
@@ -452,7 +452,7 @@ def predict_chemical_shifts(
         Dict: A nested dictionary structure {chain: {res_id: {atom: value}}}.
              Values are in parts-per-million (ppm).
     """
-    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------
     # To support non-standard residues (D-amino acids, PTMs) we must ensure
     # the underlying engine recognizes all residues in the chain.
     #
@@ -465,7 +465,7 @@ def predict_chemical_shifts(
     # 6. NumPy masking is used for performance on large structure arrays.
     # 7. ResName attribute is modified to match the parent amino acid.
     # 8. All standard atoms (N, CA, C, O, CB) are preserved for the engine.
-    # ── 1. PRE-PROCESSING: RESIDUE MAPPING ───────────────────────────────────
+    # -- 1. PRE-PROCESSING: RESIDUE MAPPING -----------------------------------
     # To support non-standard residues (D-amino acids, PTMs) we must ensure
     # the underlying engine recognizes all residues in the chain.
     working_struc = structure.copy()
@@ -502,12 +502,12 @@ def predict_chemical_shifts(
                 _cs.predict_chemical_shifts(struc_to_predict),
             )
 
-    # ── 2. PASS 1: STANDARD PREDICTION ───────────────────────────────────────
+    # -- 2. PASS 1: STANDARD PREDICTION ---------------------------------------
     # Predict shifts for the mapped structure. This provides physically accurate
     # results for all standard L-amino acids and PTMs.
     base_shifts = _dispatch_predictor(working_struc)
 
-    # ── 3. PASS 2: COORDINATE INVERSION FOR D-PEPTIDES ───────────────────────
+    # -- 3. PASS 2: COORDINATE INVERSION FOR D-PEPTIDES -----------------------
     # If D-amino acids are present, their local geometry is inverted relative to
     # the L-parameterized training data. We invert the entire coordinate space
     # (mirror image) and run a second prediction pass. The shifts of an enantiomer
@@ -516,7 +516,7 @@ def predict_chemical_shifts(
     if not has_d_amino_acids:
         return base_shifts
 
-    # ── 3. INVERTED PREDICTION PASS (D-AMINO ACIDS) ──────────────────────────
+    # -- 3. INVERTED PREDICTION PASS (D-AMINO ACIDS) --------------------------
     # SCIENTIFIC BACKGROUND FOR INVERTED PASS:
     # ----------------------------------------
     # Empirical chemical shift predictors (like SHIFTX2 and SPARTA+) are
@@ -561,7 +561,7 @@ def predict_chemical_shifts(
     # Dispatch the inverted structure to the core prediction engine.
     inverted_shifts = _dispatch_predictor(inverted_struc)
 
-    # ── 4. MERGE RESULTS ─────────────────────────────────────────────────────
+    # -- 4. MERGE RESULTS -----------------------------------------------------
     # We selectively pull the predicted shifts for D-residues from the inverted
     # pass, and L-residues from the standard pass, returning a unified dictionary.
     merged_shifts: dict[str, dict[int, dict[str, float]]] = {}
@@ -627,7 +627,7 @@ def calculate_csi(
     Returns:
         Dict: Nested dictionary {chain: {res_id: deviation}}.
     """
-    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------
     # The core CSI calculation relies on looking up the empirically derived
     # random-coil reference values for each specific amino acid type. Because
     # non-standard residues (like D-amino acids or phosphorylated sidechains)
@@ -703,7 +703,7 @@ def get_secondary_structure(
     Returns:
         List[str]: A list of 3-state (H, E, C) or DSSP labels per residue.
     """
-    # ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────
+    # -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------
     # Because empirical secondary structure parsing tools, such as the P-SEA
     # algorithm used natively by Biotite's `annotate_sse`, are intrinsically
     # formulated exclusively for naturally occurring L-amino acid geometries,
@@ -794,7 +794,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dic
             - 'rmsd': The Root Mean Square Deviation in ppm.
             - 'correlation': The Pearson r correlation coefficient.
     """
-    # ── VALIDATION OF INPUT DATA ─────────────────────────────────────────────
+    # -- VALIDATION OF INPUT DATA ---------------------------------------------
     # Both arrays must be aligned atom-for-atom to ensure the metrics are
     # mathematically valid. Misaligned data would produce misleading results.
     # We enforce identical lengths as a proxy for alignment verification.
@@ -808,7 +808,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dic
             f"Input arrays must have same length (obs={len(observed)}, calc={len(calculated)})"
         )
 
-    # ── EDGE CASE HANDLING ───────────────────────────────────────────────────
+    # -- EDGE CASE HANDLING ---------------------------------------------------
     # Handle the case for empty data (e.g. no shifts provided for a region).
     # Defaulting to 0.0 ensures the pipeline continues without crashing.
     if len(observed) == 0:
@@ -818,7 +818,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dic
         logger.debug("Empty shift arrays provided to metrics calculation.")
         return {"rmsd": 0.0, "correlation": 0.0}
 
-    # 1. ── CALCULATE RMSD (Root Mean Square Deviation) ───────────────────────
+    # 1. -- CALCULATE RMSD (Root Mean Square Deviation) -----------------------
     # The RMSD is the standard metric for absolute error in chemical shifts.
     # Higher values indicate a lack of agreement in the local environments.
     # Lower is better. Typical high-quality models achieve < 0.5 ppm for protons
@@ -835,7 +835,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dic
     # This provides a single scalar representating the average deviation.
     rmsd = np.sqrt(np.mean(diff**2))
 
-    # 2. ── CALCULATE PEARSON CORRELATION (r) ─────────────────────────────────
+    # 2. -- CALCULATE PEARSON CORRELATION (r) ---------------------------------
     # The correlation coefficient measures the degree to which predicted
     # shifts follow the experimental upfield/downfield trends.
     # This is often more informative than RMSD for assessing the "correctness"
@@ -865,7 +865,7 @@ def calculate_shift_metrics(observed: np.ndarray, calculated: np.ndarray) -> dic
         # This handles small peptides or disordered fragments gracefully.
         r = 0.0
 
-    # ── DATA TRANSFORMATION ──────────────────────────────────────────────────
+    # -- DATA TRANSFORMATION --------------------------------------------------
     # Final results are cast to float for compatibility with JSON exporters.
     # We cast to standard Python float to ensure the output is JSON serializable
     # and consistent with other project validation reports across the tool.
@@ -907,7 +907,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
         List[Dict[str, Any]]: List of shift dictionaries.
             Format: {'res_id': int, 'atom_name': str, 'value': float}
     """
-    # ── VALIDATE FILE ACCESSIBILITY ──────────────────────────────────────────
+    # -- VALIDATE FILE ACCESSIBILITY ------------------------------------------
     # We verify that the file exists before attempting any I/O stream.
     # This prevents unhandled OS errors from reaching the end user.
     # Checking accessibility early is a key design pattern in synth-pdb.
@@ -920,7 +920,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
 
     shifts = []
     try:
-        # ── FILE STREAM PROCESSING ───────────────────────────────────────────
+        # -- FILE STREAM PROCESSING -------------------------------------------
         # We use UTF-8 for maximum compatibility with modern text editors.
         # The 'with' block ensures the file handle is closed even if errors occur.
         # We iterate line-by-line to handle large files with minimal memory.
@@ -942,7 +942,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
                     # We simply skip to the next iteration of the loop.
                     continue
 
-                # ── FIELD EXTRACTION ─────────────────────────────────────────
+                # -- FIELD EXTRACTION -----------------------------------------
                 # Parse columns [ResID, AtomName, Value] using whitespace split.
                 # This handles multiple spaces or tabs between columns robustly.
                 # Split logic: splits by any whitespace including \t.
@@ -964,7 +964,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
                         {"res_id": int(parts[0]), "atom_name": parts[1], "value": float(parts[2])}
                     )
 
-        # ── LOGGING SUCCESS ──────────────────────────────────────────────────
+        # -- LOGGING SUCCESS --------------------------------------------------
         # Log completion and total atom count found in the file.
         # Essential for verifying that the restraint list is complete.
         # Log parsing success with the total count for transparency.
@@ -975,7 +975,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
         return shifts
 
     except Exception as e:
-        # ── ERROR ENCAPSULATION ──────────────────────────────────────────────
+        # -- ERROR ENCAPSULATION ----------------------------------------------
         # Wrap underlying system errors in a contextual ValueError.
         # Error message includes the original system exception context.
         # Wrap underlying errors in a descriptive ValueError for the user.
@@ -985,7 +985,7 @@ def read_shift_file(file_path: str) -> list[dict[str, Any]]:
         raise ValueError(f"Failed to parse shift file {file_path}: {e}") from e
 
 
-# ── PRIVATE GEOMETRY HELPERS ─────────────────────────────────────────────────
+# -- PRIVATE GEOMETRY HELPERS -------------------------------------------------
 # Private functions used in internal geometric tests for ring currents.
 # These are exposed here to allow the test suite to verify the low-level
 # math of the prediction engine without compromising the clean public API.
@@ -1006,7 +1006,7 @@ def _calculate_ring_current(atom_coords: np.ndarray, ring_coords: np.ndarray) ->
     evaluating the elliptic integrals required for the field calculation.
 
     The Johnson-Bovey equation:
-    Δδ = (e²/4πm) * Σ (1/r³) * (3cos²θ - 1)
+    Deltadelta = (e^2/4pim) * Sum (1/r3) * (3cos^2theta - 1)
     Where theta is the angle relative to the ring normal.
 
     Args:
@@ -1021,7 +1021,7 @@ def _calculate_ring_current(atom_coords: np.ndarray, ring_coords: np.ndarray) ->
     return float(_cs._calculate_ring_current_shift(atom_coords, ring_coords))
 
 
-# ── MODULE EXPORTS ───────────────────────────────────────────────────────────
+# -- MODULE EXPORTS -----------------------------------------------------------
 # Explicit definition of the public API of the Chemical Shift module.
 # Symbols are re-exported to maintain backward compatibility.
 __all__ = [
@@ -1036,7 +1036,7 @@ __all__ = [
     "_get_aromatic_rings",
 ]
 
-# ── MODULE METADATA ─────────────────────────────────────────────────────────
+# -- MODULE METADATA ---------------------------------------------------------
 # Documentation density check: This module maintains a high level of internal
 # commentary to serve as a pedagogical resource. Decisions are linked
 # to structural biology principles and seminal literature.

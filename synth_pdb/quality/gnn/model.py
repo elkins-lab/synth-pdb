@@ -2,9 +2,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Graph Attention Network (GAT) for protein structure quality classification.
 
-─────────────────────────────────────────────────────────────────────────────
-EDUCATIONAL BACKGROUND — How do GNNs work?
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
+EDUCATIONAL BACKGROUND - How do GNNs work?
+-----------------------------------------------------------------------------
 
 A Graph Neural Network learns by *message passing*: each node aggregates
 information from its neighbours, then updates its own representation.
@@ -13,106 +13,106 @@ information about its local structural environment.
 
 The general message-passing equation is:
 
-    h_v^(k) = UPDATE( h_v^(k-1),  AGG( { h_u^(k-1) : u ∈ N(v) } ) )
+    h_v^(k) = UPDATE( h_v^(k-1),  AGG( { h_u^(k-1) : u in N(v) } ) )
 
 where:
   h_v^(k)  = embedding of node v after k message-passing steps
-  N(v)     = neighbours of v (residues within 8 Å of v)
-  AGG      = aggregation function (mean, sum, attention-weighted sum …)
+  N(v)     = neighbours of v (residues within 8 A of v)
+  AGG      = aggregation function (mean, sum, attention-weighted sum ...)
   UPDATE   = transformation (MLP, etc.)
 
 After K layers, node v's embedding captures information from all nodes
-within K hops — i.e., up to K contacts away in the protein.
+within K hops - i.e., up to K contacts away in the protein.
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 WHY GRAPH ATTENTION NETWORK (GAT) over plain GCN?
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
 In a standard Graph Convolutional Network (GCN), every neighbour contributes
 *equally* to the aggregation (weighted only by node degree for normalisation).
 
 In a Graph Attention Network (GAT), the aggregation weight for each edge
-(u → v) is learned:
+(u -> v) is learned:
 
-    α_{uv} = softmax_u ( LeakyReLU( a^T [W h_u ‖ W h_v ‖ W_e e_{uv}] ) )
+    alpha_{uv} = softmax_u ( LeakyReLU( a^T [W h_u || W h_v || W_e e_{uv}] ) )
 
 where W, W_e are learnable weight matrices and e_{uv} is the edge feature
-vector (here: Cα distance and sequence separation).
+vector (here: Calpha distance and sequence separation).
 
 Concrete benefit for structural biology:
-  • Backbone contacts (|i-j|=1) and long-range contacts can receive
-    different attention weights — the model is not forced to treat them
+  * Backbone contacts (|i-j|=1) and long-range contacts can receive
+    different attention weights - the model is not forced to treat them
     equally.
-  • Contacts at 3 Å (steric clash!) can be down-weighted by the attention
+  * Contacts at 3 A (steric clash!) can be down-weighted by the attention
     mechanism during training.
-  • The attention weights α_{uv} are interpretable: after training you can
-    visualise which residue–residue contacts the model considers most
+  * The attention weights alpha_{uv} are interpretable: after training you can
+    visualise which residue-residue contacts the model considers most
     diagnostic of quality.
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 MULTI-HEAD ATTENTION (heads=4)
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
 Like Multi-Head Attention in Transformers, we run H=4 independent attention
 functions in parallel and average (concat=False) their outputs:
 
-    h_v^(k) = σ( (1/H) Σ_h  Σ_{u∈N(v)} α_{uv}^h · W^h h_u )
+    h_v^(k) = sigma( (1/H) Sum_h  Sum_{uinN(v)} alpha_{uv}^h * W^h h_u )
 
 Each head can specialise: one head may focus on local-sequence contacts,
 another on distant cross-contacts, etc.
 
-─────────────────────────────────────────────────────────────────────────────
-READOUT — Global Mean Pooling
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
+READOUT - Global Mean Pooling
+-----------------------------------------------------------------------------
 
 After 3 message-passing layers each node has a rich local embedding.
 We need a single *graph-level* vector to feed into the classifier.
 
-Global Mean Pool:  z_G = (1/N) Σ_v h_v^(3)
+Global Mean Pool:  z_G = (1/N) Sum_v h_v^(3)
 
-This is permutation-invariant — rotating or renumbering residues does not
+This is permutation-invariant - rotating or renumbering residues does not
 change z_G.  More expressive readouts (global_add_pool, Set2Set) exist but
 mean pooling works well for small proteins and is easy to interpret
 (z_G is literally the average residue embedding).
 
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 FULL ARCHITECTURE
-─────────────────────────────────────────────────────────────────────────────
+-----------------------------------------------------------------------------
 
   Input node features [N, 8]
-         │
-  ┌──────▼────────────────────────────────────────────┐
-  │  GATConv(8 → 64, heads=4, concat=False,           │
-  │           edge_dim=2, dropout=0.1)                │ Layer 1
-  │  BatchNorm1d(64) → ELU                            │
-  └──────┬────────────────────────────────────────────┘
-         │
-  ┌──────▼────────────────────────────────────────────┐
-  │  GATConv(64 → 64, heads=4, concat=False,          │
-  │           edge_dim=2, dropout=0.1)                │ Layer 2
-  │  BatchNorm1d(64) → ELU                            │
-  └──────┬────────────────────────────────────────────┘
-         │
-  ┌──────▼────────────────────────────────────────────┐
-  │  GATConv(64 → 64, heads=4, concat=False,          │
-  │           edge_dim=2, dropout=0.1)                │ Layer 3
-  │  BatchNorm1d(64) → ELU                            │
-  └──────┬────────────────────────────────────────────┘
-         │  node embeddings [N, 64]
-         ├───────────────────────────────────────────────────────┐
-         │                                                       │
-  global_mean_pool()  →  graph embedding [batch_size, 64]       │  per-node branch
-         │                                                       │
-  ┌──────▼────────────────────────────────────────────┐  ┌──────▼───────────────┐
-  │  Linear(64 → 32) → ELU → Dropout(0.3)            │  │  Linear(64 → 32)     │
-  │  Linear(32 → 2)  → log_softmax                   │  │  ELU                 │
-  └──────┬────────────────────────────────────────────┘  │  Linear(32 → 1)     │
-         │  [batch_size, 2]  log P(Bad), log P(Good)      │  Sigmoid             │
-                                                          └──────┬───────────────┘
-                                                                 │  [N, 1] pLDDT ∈ [0,1]
+         |
+  +------v--------------------------------------------+
+  |  GATConv(8 -> 64, heads=4, concat=False,           |
+  |           edge_dim=2, dropout=0.1)                | Layer 1
+  |  BatchNorm1d(64) -> ELU                            |
+  +------+--------------------------------------------+
+         |
+  +------v--------------------------------------------+
+  |  GATConv(64 -> 64, heads=4, concat=False,          |
+  |           edge_dim=2, dropout=0.1)                | Layer 2
+  |  BatchNorm1d(64) -> ELU                            |
+  +------+--------------------------------------------+
+         |
+  +------v--------------------------------------------+
+  |  GATConv(64 -> 64, heads=4, concat=False,          |
+  |           edge_dim=2, dropout=0.1)                | Layer 3
+  |  BatchNorm1d(64) -> ELU                            |
+  +------+--------------------------------------------+
+         |  node embeddings [N, 64]
+         +-------------------------------------------------------+
+         |                                                       |
+  global_mean_pool()  ->  graph embedding [batch_size, 64]       |  per-node branch
+         |                                                       |
+  +------v--------------------------------------------+  +------v---------------+
+  |  Linear(64 -> 32) -> ELU -> Dropout(0.3)            |  |  Linear(64 -> 32)     |
+  |  Linear(32 -> 2)  -> log_softmax                   |  |  ELU                 |
+  +------+--------------------------------------------+  |  Linear(32 -> 1)     |
+         |  [batch_size, 2]  log P(Bad), log P(Good)      |  Sigmoid             |
+                                                          +------+---------------+
+                                                                 |  [N, 1] pLDDT in [0,1]
 
-Loss: global head → NLLLoss (cross-entropy equivalent)
-      per-residue head → MSELoss vs Ramachandran Z-score targets
+Loss: global head -> NLLLoss (cross-entropy equivalent)
+      per-residue head -> MSELoss vs Ramachandran Z-score targets
 """
 
 import logging
@@ -134,17 +134,17 @@ def _check_pyg() -> None:
 class ProteinGNN:
     """Graph Attention Network classifier for protein structure quality.
 
-    ── Design note on the __new__ pattern ─────────────────────────────
+    -- Design note on the __new__ pattern -----------------------------
     We want ``ProteinGNN`` to be importable without triggering PyTorch
     imports at module load time (so users without PyTorch can still use
     the rest of synth_pdb.quality).
 
     Using ``__new__`` means ``ProteinGNN(...)`` *returns* an instance of
     the inner ``_ProteinGNNModule`` (a real ``torch.nn.Module``) rather than
-    of ``ProteinGNN`` itself.  This is a factory pattern — the outer class
+    of ``ProteinGNN`` itself.  This is a factory pattern - the outer class
     exists only as a well-named constructor.  The resulting object behaves
     exactly like a plain ``nn.Module``.
-    ─────────────────────────────────────────────────────────────────────
+    ---------------------------------------------------------------------
 
     Usage::
 
@@ -153,13 +153,13 @@ class ProteinGNN:
 
         # Global quality classification
         log_probs = model(data.x, data.edge_index, data.edge_attr, data.batch)
-        # log_probs: [batch_size, 2] — log P(Bad), log P(Good)
+        # log_probs: [batch_size, 2] - log P(Bad), log P(Good)
 
         # Dual output: global + per-residue pLDDT
         log_probs, per_res = model.forward_with_node_embeddings(
             data.x, data.edge_index, data.edge_attr, data.batch
         )
-        # per_res: [total_nodes, 1] — pLDDT ∈ [0, 1] per residue
+        # per_res: [total_nodes, 1] - pLDDT in [0, 1] per residue
     """
 
     def __new__(
@@ -185,7 +185,7 @@ class ProteinGNN:
                 matching graph.py's output).
             edge_features : int
                 Dimensionality of the edge feature vector (default 2:
-                Cα distance, sequence separation).
+                Calpha distance, sequence separation).
             hidden_dim : int
                 Width of all GATConv and MLP hidden layers.
             num_classes : int
@@ -196,18 +196,18 @@ class ProteinGNN:
             def __init__(self) -> None:
                 super().__init__()
 
-                # ── Message-passing layers ─────────────────────────────────
+                # -- Message-passing layers ---------------------------------
                 # GATConv arguments:
-                #   in_channels  — input feature size
-                #   out_channels — output feature size PER HEAD
-                #   heads        — number of independent attention heads
-                #   concat       — if False, heads are AVERAGED (not concatenated)
+                #   in_channels  - input feature size
+                #   out_channels - output feature size PER HEAD
+                #   heads        - number of independent attention heads
+                #   concat       - if False, heads are AVERAGED (not concatenated)
                 #                  keeping the output size = out_channels
-                #   edge_dim     — size of edge feature vector
-                #   dropout      — attention coefficient dropout (regularisation)
+                #   edge_dim     - size of edge feature vector
+                #   dropout      - attention coefficient dropout (regularisation)
                 #
                 # Three layers give a receptive field of 3 hops, meaning each
-                # node's final embedding captures all nodes reachable in ≤ 3
+                # node's final embedding captures all nodes reachable in <= 3
                 # contact-graph steps.  For a 20-residue alpha helix that is
                 # typically the entire protein.
                 self.conv1 = GATConv(
@@ -220,7 +220,7 @@ class ProteinGNN:
                 )
                 # BatchNorm1d normalises each feature across the mini-batch.
                 # This prevents "covariate shift" between layers and stabilises
-                # training — especially important when protein sizes vary (so N varies).
+                # training - especially important when protein sizes vary (so N varies).
                 self.bn1 = nn.BatchNorm1d(hidden_dim)
 
                 self.conv2 = GATConv(
@@ -243,24 +243,24 @@ class ProteinGNN:
                 )
                 self.bn3 = nn.BatchNorm1d(hidden_dim)
 
-                # ── Graph-level MLP classifier head ────────────────────────
+                # -- Graph-level MLP classifier head ------------------------
                 # After readout, z_G is a fixed-size vector regardless of
                 # protein length, so a plain MLP can classify it.
                 self.lin1 = nn.Linear(hidden_dim, hidden_dim // 2)
                 # Dropout(0.3) randomly zeros 30% of activations during training.
-                # This forces the model to be robust — it cannot rely on any
-                # single feature — and reduces overfitting on the small dataset.
+                # This forces the model to be robust - it cannot rely on any
+                # single feature - and reduces overfitting on the small dataset.
                 self.dropout = nn.Dropout(p=0.3)
                 self.lin2 = nn.Linear(hidden_dim // 2, num_classes)
 
-                # ── Per-residue pLDDT head ─────────────────────────────────
+                # -- Per-residue pLDDT head ---------------------------------
                 # Operates on per-node embeddings BEFORE global pooling.
-                # Predicts a confidence score ∈ [0, 1] for each residue,
+                # Predicts a confidence score in [0, 1] for each residue,
                 # analogous to AlphaFold's per-residue pLDDT metric:
-                #   • > 0.90  → Very high confidence (blue)
-                #   • 0.70–0.90 → High confidence (cyan)
-                #   • 0.50–0.70 → Uncertain (yellow)
-                #   • < 0.50  → Low confidence (orange)
+                #   * > 0.90  -> Very high confidence (blue)
+                #   * 0.70-0.90 -> High confidence (cyan)
+                #   * 0.50-0.70 -> Uncertain (yellow)
+                #   * < 0.50  -> Low confidence (orange)
                 # Trained jointly with the global classifier using MSE loss
                 # against per-residue Ramachandran Z-score targets.
                 self.residue_lin1 = nn.Linear(hidden_dim, hidden_dim // 2)
@@ -273,9 +273,9 @@ class ProteinGNN:
                 self.hidden_dim = hidden_dim
                 self.num_classes = num_classes
 
-            # ─────────────────────────────────────────────────────────────
+            # -------------------------------------------------------------
             # Internal: shared message-passing backbone
-            # ─────────────────────────────────────────────────────────────
+            # -------------------------------------------------------------
 
             def _node_embeddings(self, x: Any, edge_index: Any, edge_attr: Any) -> Any:
                 """Run all three GAT layers; return per-node embeddings [N, hidden_dim].
@@ -284,26 +284,26 @@ class ProteinGNN:
                 the global graph-level head and the per-residue pLDDT head
                 without running message passing twice.
                 """
-                # ── Layer 1: local geometry ────────────────────────────────
+                # -- Layer 1: local geometry --------------------------------
                 # After layer 1, each node has aggregated information from its
-                # direct neighbours — the first "shell" of contacts.
-                # For a helix residue, this includes i±1, i±2, i±3, i+4.
+                # direct neighbours - the first "shell" of contacts.
+                # For a helix residue, this includes i+/-1, i+/-2, i+/-3, i+4.
                 x = self.conv1(x, edge_index, edge_attr)
                 x = self.bn1(x)
                 # ELU is chosen over ReLU because it has non-zero gradient for
                 # negative inputs, avoiding the "dying neuron" problem in GNNs.
                 x = functional.elu(x)
 
-                # ── Layer 2: neighbourhood of neighbourhoods ───────────────
-                # Each node now aggregates from nodes 2 hops away —
+                # -- Layer 2: neighbourhood of neighbourhoods ---------------
+                # Each node now aggregates from nodes 2 hops away -
                 # contacts-of-contacts.  Captures secondary structure patterns
                 # (e.g. helix turns) and local packing.
                 x = self.conv2(x, edge_index, edge_attr)
                 x = self.bn2(x)
                 x = functional.elu(x)
 
-                # ── Layer 3: medium-range interactions ─────────────────────
-                # 3-hop receptive field.  For small peptides (≤ 20 residues)
+                # -- Layer 3: medium-range interactions ---------------------
+                # 3-hop receptive field.  For small peptides (<= 20 residues)
                 # this effectively pools global structural information into
                 # each node's embedding.
                 x = self.conv3(x, edge_index, edge_attr)
@@ -312,12 +312,12 @@ class ProteinGNN:
 
                 return x  # [total_nodes, hidden_dim]
 
-            # ─────────────────────────────────────────────────────────────
+            # -------------------------------------------------------------
             # Public forward passes
-            # ─────────────────────────────────────────────────────────────
+            # -------------------------------------------------------------
 
             def forward(self, x: Any, edge_index: Any, edge_attr: Any, batch: Any) -> Any:
-                """Forward pass — global quality classification only.
+                """Forward pass - global quality classification only.
 
                 Parameters
                 ----------
@@ -340,15 +340,15 @@ class ProteinGNN:
                 """
                 node_emb = self._node_embeddings(x, edge_index, edge_attr)
 
-                # ── Readout: node embeddings → graph embedding ─────────────
+                # -- Readout: node embeddings -> graph embedding -------------
                 # global_mean_pool sums node embeddings per graph and divides
                 # by the number of nodes:
-                #     z_G = (1/N) Σ_v h_v^(3)
+                #     z_G = (1/N) Sum_v h_v^(3)
                 # The ``batch`` vector tells PyG which protein each node
                 # belongs to so it averages correctly across the batch.
                 pooled = global_mean_pool(node_emb, batch)  # [batch_size, hidden_dim]
 
-                # ── MLP classification head ────────────────────────────────
+                # -- MLP classification head --------------------------------
                 out = self.lin1(pooled)
                 out = functional.elu(out)
                 # Dropout is only active during .train() mode; disabled in
@@ -380,11 +380,11 @@ class ProteinGNN:
                 log_probs : Tensor [batch_size, num_classes]
                     Global log-probabilities (identical to forward() output).
                 per_residue_scores : Tensor [total_nodes, 1]
-                    Per-residue pLDDT-like confidence ∈ [0, 1].
+                    Per-residue pLDDT-like confidence in [0, 1].
                     Rows align 1-to-1 with the input node feature matrix.
 
-                Educational note — multi-task learning
-                ───────────────────────────────────────
+                Educational note - multi-task learning
+                ---------------------------------------
                 Running message passing once and branching two output heads
                 (multi-task learning) gives two key benefits:
 
@@ -395,7 +395,7 @@ class ProteinGNN:
                 """
                 node_emb = self._node_embeddings(x, edge_index, edge_attr)
 
-                # ── Global classification branch ───────────────────────────
+                # -- Global classification branch ---------------------------
                 pooled = global_mean_pool(node_emb, batch)  # [batch_size, 64]
                 g = self.lin1(pooled)
                 g = functional.elu(g)
@@ -403,13 +403,13 @@ class ProteinGNN:
                 g = self.lin2(g)
                 log_probs = functional.log_softmax(g, dim=-1)
 
-                # ── Per-residue pLDDT branch ───────────────────────────────
+                # -- Per-residue pLDDT branch -------------------------------
                 # Each node gets an independent confidence score derived from
                 # its local structural context (phi/psi, contacts, B-factor).
                 r = self.residue_lin1(node_emb)
                 r = functional.elu(r)
                 per_residue_scores = torch.sigmoid(self.residue_lin2(r))
-                # [total_nodes, 1], values ∈ [0, 1]
+                # [total_nodes, 1], values in [0, 1]
 
                 return log_probs, per_residue_scores
 

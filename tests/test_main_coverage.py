@@ -199,7 +199,7 @@ def test_main_cyclic_logic_coverage():
         ),
         patch(
             "synth_pdb.main.generate_pdb_content",
-            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\nTER\n",
         ),
         patch("builtins.open", MagicMock()),
     ):
@@ -237,8 +237,10 @@ def test_main_rmsd_range_invalid():
             ["synth-pdb", "--mode", "decoys", "--length", "2", "--rmsd-range", "invalid"],
         ),
         patch("synth_pdb.main.DecoyGenerator.generate_ensemble"),
+        patch("sys.exit") as mock_exit,
     ):
         main()
+        mock_exit.assert_called_with(1)
 
 
 def test_main_structure_highlight_failure():
@@ -248,7 +250,7 @@ def test_main_structure_highlight_failure():
         patch("sys.argv", ["synth-pdb", "--sequence", "AA", "--structure", "1-2:alpha:extra"]),
         patch(
             "synth_pdb.main.generate_pdb_content",
-            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\nTER\n",
         ),
         patch("builtins.open", MagicMock()),
     ):
@@ -284,7 +286,7 @@ def test_main_inferred_length_success():
         patch("sys.argv", ["synth-pdb", "--structure", "1-5:alpha,6-12:beta"]),
         patch(
             "synth_pdb.main.generate_pdb_content",
-            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\nTER\n",
         ),
         patch("builtins.open", MagicMock()),
     ):
@@ -312,7 +314,7 @@ def test_main_refine_violations_no_change_coverage():
         patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]),
         patch(
             "synth_pdb.main.generate_pdb_content",
-            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\nTER\n",
         ),
         patch("synth_pdb.validator.PDBValidator.validate_all"),
         patch("synth_pdb.validator.PDBValidator.get_violations", return_value=["V1"]),
@@ -346,7 +348,7 @@ def test_main_refine_violations_increase_warning():
         patch("sys.argv", ["synth-pdb", "--sequence", "A", "--refine-clashes", "1"]),
         patch(
             "synth_pdb.main.generate_pdb_content",
-            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000\nTER\n",
+            return_value="ATOM      1  CA  ALA A   1       0.000   0.000   0.000  1.00  0.00           C\nTER\n",
         ),
         patch("synth_pdb.validator.PDBValidator.validate_all"),
         patch(

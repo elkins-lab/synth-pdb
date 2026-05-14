@@ -67,6 +67,7 @@ out.pdb
 reproduce_*.py
 fix_*.py
 decoys/
+decoy_test/
 bmr6457.json
 1d3z_mr.str
 1D3Z.pdb
