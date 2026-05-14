@@ -5332,46 +5332,48 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># [CONFIG] SETUP: Environment and Dependencies</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="c1"># Check if we are running in Google Colab</span>
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing public dependencies..."</span><span class="p">)</span>
-    <span class="c1"># These are NOT pre-installed in Colab</span>
-    <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">py3Dmol</span> <span class="n">ipywidgets</span>
-
-    <span class="c1"># Path handling for Colab</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'synth_pdb'</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"[WARN] synth_pdb not found in current directory. Appending path..."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing dependencies..."</span><span class="p">)</span>
+    <span class="c1"># Increase timeout for large packages like OpenMM</span>
+    <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">py3Dmol</span> <span class="n">ipywidgets</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running locally"</span><span class="p">)</span>
-
-<span class="c1"># Ensure synth_pdb is in the python path</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in local environment"</span><span class="p">)</span>
+    <span class="c1"># Robust path detection: find repo root by looking for 'synth_pdb' directory</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+    <span class="k">while</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span> <span class="o">!=</span> <span class="n">repo_root</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
+            <span class="k">break</span>
+        <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Setup complete!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># [CONFIG] SETUP: Environment and Dependencies
 import os
 import sys
+from pathlib import Path
 
 # Check if we are running in Google Colab
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
-    print("[INFO] Running in Google Colab - Installing public dependencies...")
-    # These are NOT pre-installed in Colab
-    %pip install -q synth-pdb biotite py3Dmol ipywidgets
-
-    # Path handling for Colab
-    if not os.path.exists('synth_pdb'):
-        print("[WARN] synth_pdb not found in current directory. Appending path...")
+    print("[INFO] Running in Google Colab - Installing dependencies...")
+    # Increase timeout for large packages like OpenMM
+    %pip install --upgrade --default-timeout=1000 -q synth-pdb biotite py3Dmol ipywidgets
 else:
-    print("[INFO] Running locally")
-
-# Ensure synth_pdb is in the python path
-sys.path.append(os.path.abspath('../../'))
+    print("[INFO] Running in local environment")
+    # Robust path detection: find repo root by looking for 'synth_pdb' directory
+    repo_root = Path(os.getcwd())
+    while repo_root.parent != repo_root:
+        if (repo_root / "synth_pdb").exists():
+            sys.path.append(str(repo_root))
+            break
+        repo_root = repo_root.parent
 
 print("[OK] Setup complete!")</div>
 </div>

@@ -5025,9 +5025,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing dependencies..."</span><span class="p">)</span>
+    <span class="c1"># Increase timeout for large packages like OpenMM</span>
+    <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in local environment"</span><span class="p">)</span>
+    <span class="c1"># Robust path detection: find repo root by looking for 'synth_pdb' directory</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+    <span class="k">while</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span> <span class="o">!=</span> <span class="n">repo_root</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">repo_root</span> <span class="o">/</span> <span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">repo_root</span><span class="p">))</span>
+            <span class="k">break</span>
+        <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span><span class="p">,</span> <span class="n">PeptideResult</span>
@@ -5042,9 +5051,18 @@ from pathlib import Path
 IN_COLAB = 'google.colab' in sys.modules
 
 if IN_COLAB:
-    !pip install -q synth-pdb py3Dmol
+    print("[INFO] Running in Google Colab - Installing dependencies...")
+    # Increase timeout for large packages like OpenMM
+    %pip install --upgrade --default-timeout=1000 -q synth-pdb py3Dmol biotite
 else:
-    sys.path.append(os.path.abspath('../../'))
+    print("[INFO] Running in local environment")
+    # Robust path detection: find repo root by looking for 'synth_pdb' directory
+    repo_root = Path(os.getcwd())
+    while repo_root.parent != repo_root:
+        if (repo_root / "synth_pdb").exists():
+            sys.path.append(str(repo_root))
+            break
+        repo_root = repo_root.parent
 
 import numpy as np
 from synth_pdb.generator import generate_pdb_content, PeptideResult
