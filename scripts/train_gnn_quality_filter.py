@@ -11,7 +11,7 @@ Trains the ProteinGNN with two jointly optimised objectives:
    Ramachandran Z-score targets derived from ground-truth torsion angles.
 
 ─────────────────────────────────────────────────────────────────────────────
-STRUCTURAL BIOLOGY CONTEXT — Why this multi-task approach?
+STRUCTURAL BIOLOGY CONTEXT - Why this multi-task approach?
 ─────────────────────────────────────────────────────────────────────────────
 
 A structural biologist typically judges protein quality using two lenses:
@@ -63,7 +63,7 @@ _COIL_PHI, _COIL_PSI = -60.0, 140.0  # PPII/extended approximate centre
 def _ramachandran_score(phi: float | None, psi: float | None) -> float:
     """Return a Ramachandran-based per-residue quality score ∈ [0, 1].
 
-    Educational note — Ramachandran Z-score and Steric Constraints
+    Educational note - Ramachandran Z-score and Steric Constraints
     ────────────────────────────────────────────────────────────────
     A residue's backbone torsion angles (φ, ψ) are not free to rotate 360°.
     The peptide bond has a planar character, and the Cβ atom of the side-chain
@@ -214,7 +214,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
     clash_indices: list[int | None] = []
     failure_counts = {"good": 0, "random": 0, "distorted": 0, "clash": 0}
 
-    # 1. Good — idealized backbone geometry with physical 'wobble'
+    # 1. Good - idealized backbone geometry with physical 'wobble'
     for i in range(n_good):
         if i % 20 == 0:
             logger.info("  Good %d/%d", i, n_good)
@@ -269,7 +269,7 @@ def generate_pdb_dataset(n_samples: int = 200, random_state: int = 42, diverse_g
                 pdb_file.write(f_out)
                 pdbs.append(f_out.getvalue())
             elif rval < 0.66:
-                # Type B: High Torsion Drift (40-60°) — Marginal "Bad"
+                # Type B: High Torsion Drift (40-60deg) - Marginal "Bad"
                 pdbs.append(
                     generate_pdb_content(
                         length=20,
