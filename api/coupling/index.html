@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3274,7 +3302,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-the-karplus-equation-and-3jhn-ha-couplings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings
+        EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings
       
     </span>
   </a>
@@ -3285,7 +3313,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-proline-and-secondary-amines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — Proline and Secondary Amines
+        EDUCATIONAL NOTE - Proline and Secondary Amines
       
     </span>
   </a>
@@ -3296,7 +3324,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-d-amino-acids-and-stereochemistry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry
+        EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry
       
     </span>
   </a>
@@ -4424,7 +4452,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-the-karplus-equation-and-3jhn-ha-couplings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings
+        EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings
       
     </span>
   </a>
@@ -4435,7 +4463,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-proline-and-secondary-amines" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — Proline and Secondary Amines
+        EDUCATIONAL NOTE - Proline and Secondary Amines
       
     </span>
   </a>
@@ -4446,7 +4474,7 @@
   <a href="#synth_pdb.coupling.predict_couplings_from_structure--educational-note-d-amino-acids-and-stereochemistry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry
+        EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry
       
     </span>
   </a>
@@ -4697,36 +4725,36 @@ phi torsion angle via the Karplus equation.</p>
 <p>This function wraps the synth-nmr engine and provides biophysical enhancements:
 1. Filters out residues that physically lack a backbone amide proton (e.g., Proline).
 2. Corrects the Karplus equation phase for D-amino acids by inverting the phi angle.</p>
-<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-the-karplus-equation-and-3jhn-ha-couplings">EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings</h5>
+<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-the-karplus-equation-and-3jhn-ha-couplings">EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings</h5>
 <p>The 3J(HN-HA) scalar coupling is a through-bond magnetic interaction between
 the backbone amide proton (HN) and the alpha proton (HA). This coupling is
-highly sensitive to the intervening H-N-CA-H dihedral angle (θ), which is
-geometrically related to the backbone Ramachandran Phi (φ) angle.</p>
+highly sensitive to the intervening H-N-CA-H dihedral angle (theta), which is
+geometrically related to the backbone Ramachandran Phi (phi) angle.</p>
 
 
 <details class="the-relationship-is-empirically-described-by-the-karplus-equation" open>
   <summary>The relationship is empirically described by the Karplus equation</summary>
-  <p>3J(θ) = A * cos^2(θ) - B * cos(θ) + C</p>
-</details>        <p>For typical L-amino acids, θ ≈ φ - 60°. This means:
-- In an ideal alpha-helix (φ ≈ -60°), θ ≈ -120°, yielding small couplings (3-5 Hz).
-- In a beta-sheet (φ ≈ -120° to -140°), θ ≈ 180°, yielding large couplings (8-10 Hz).</p>
-<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-proline-and-secondary-amines">EDUCATIONAL NOTE — Proline and Secondary Amines</h5>
+  <p>3J(theta) = A * cos^2(theta) - B * cos(theta) + C</p>
+</details>        <p>For typical L-amino acids, theta ~ phi - 60deg. This means:
+- In an ideal alpha-helix (phi ~ -60deg), theta ~ -120deg, yielding small couplings (3-5 Hz).
+- In a beta-sheet (phi ~ -120deg to -140deg), theta ~ 180deg, yielding large couplings (8-10 Hz).</p>
+<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-proline-and-secondary-amines">EDUCATIONAL NOTE - Proline and Secondary Amines</h5>
 <p>Proline (PRO) and its D-isomer (DPR) are unique among standard amino acids
 because their sidechain cyclizes onto the backbone nitrogen, forming a
 secondary amine. Consequently, the nitrogen atom lacks an attached hydrogen
 when incorporated into a peptide bond. Without an amide proton, there is no
 H-N-CA-H spin system, and thus the 3J(HN-HA) coupling is physically undefined.
 Our shim layer explicitly strips these residues from the results.</p>
-<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-d-amino-acids-and-stereochemistry">EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry</h5>
+<h5 id="synth_pdb.coupling.predict_couplings_from_structure--educational-note-d-amino-acids-and-stereochemistry">EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry</h5>
 <p>D-amino acids are non-superimposable mirror images of natural L-amino acids.
 Because the Karplus equation is parameterized for the natural L-configuration,
-directly feeding a D-amino acid's φ angle into the standard Karplus curve
+directly feeding a D-amino acid's phi angle into the standard Karplus curve
 yields incorrect results (e.g., predicting ~6.3 Hz instead of ~3.8 Hz for a
-D-alpha helix where φ ≈ +60°).</p>
+D-alpha helix where phi ~ +60deg).</p>
 <p>Due to mirror symmetry, the geometric relationship inverts:
-θ_D(φ) = -θ_L(-φ). Therefore, we can accurately predict the D-amino acid
+theta_D(phi) = -theta_L(-phi). Therefore, we can accurately predict the D-amino acid
 coupling by evaluating the L-parameterized Karplus equation at the
-negated phi angle: J_D(φ) = J_L(-φ).</p>
+negated phi angle: J_D(phi) = J_L(-phi).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4926,21 +4954,21 @@ negated phi angle: J_D(φ) = J_L(-φ).</p>
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="sd">    1. Filters out residues that physically lack a backbone amide proton (e.g., Proline).</span>
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    2. Corrects the Karplus equation phase for D-amino acids by inverting the phi angle.</span>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    EDUCATIONAL NOTE — The Karplus Equation and 3J(HN-HA) Couplings</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="sd">    EDUCATIONAL NOTE - The Karplus Equation and 3J(HN-HA) Couplings</span>
 </span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="sd">    ================================================================</span>
 </span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="sd">    The 3J(HN-HA) scalar coupling is a through-bond magnetic interaction between</span>
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a><span class="sd">    the backbone amide proton (HN) and the alpha proton (HA). This coupling is</span>
-</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    highly sensitive to the intervening H-N-CA-H dihedral angle (θ), which is</span>
-</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    geometrically related to the backbone Ramachandran Phi (φ) angle.</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    highly sensitive to the intervening H-N-CA-H dihedral angle (theta), which is</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">    geometrically related to the backbone Ramachandran Phi (phi) angle.</span>
 </span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41"></a>
 </span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a><span class="sd">    The relationship is empirically described by the Karplus equation:</span>
-</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        3J(θ) = A * cos^2(θ) - B * cos(θ) + C</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="sd">        3J(theta) = A * cos^2(theta) - B * cos(theta) + C</span>
 </span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    For typical L-amino acids, θ ≈ φ - 60°. This means:</span>
-</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    - In an ideal alpha-helix (φ ≈ -60°), θ ≈ -120°, yielding small couplings (3-5 Hz).</span>
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    - In a beta-sheet (φ ≈ -120° to -140°), θ ≈ 180°, yielding large couplings (8-10 Hz).</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    For typical L-amino acids, theta ~ phi - 60deg. This means:</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="sd">    - In an ideal alpha-helix (phi ~ -60deg), theta ~ -120deg, yielding small couplings (3-5 Hz).</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    - In a beta-sheet (phi ~ -120deg to -140deg), theta ~ 180deg, yielding large couplings (8-10 Hz).</span>
 </span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    EDUCATIONAL NOTE — Proline and Secondary Amines</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    EDUCATIONAL NOTE - Proline and Secondary Amines</span>
 </span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    ===============================================</span>
 </span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    Proline (PRO) and its D-isomer (DPR) are unique among standard amino acids</span>
 </span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    because their sidechain cyclizes onto the backbone nitrogen, forming a</span>
@@ -4949,18 +4977,18 @@ negated phi angle: J_D(φ) = J_L(-φ).</p>
 </span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    H-N-CA-H spin system, and thus the 3J(HN-HA) coupling is physically undefined.</span>
 </span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    Our shim layer explicitly strips these residues from the results.</span>
 </span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a>
-</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    EDUCATIONAL NOTE — D-Amino Acids and Stereochemistry</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    EDUCATIONAL NOTE - D-Amino Acids and Stereochemistry</span>
 </span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    ====================================================</span>
 </span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    D-amino acids are non-superimposable mirror images of natural L-amino acids.</span>
 </span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    Because the Karplus equation is parameterized for the natural L-configuration,</span>
-</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    directly feeding a D-amino acid&#39;s φ angle into the standard Karplus curve</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    directly feeding a D-amino acid&#39;s phi angle into the standard Karplus curve</span>
 </span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    yields incorrect results (e.g., predicting ~6.3 Hz instead of ~3.8 Hz for a</span>
-</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    D-alpha helix where φ ≈ +60°).</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    D-alpha helix where phi ~ +60deg).</span>
 </span><span id="__span-0-65"><a id="__codelineno-0-65" name="__codelineno-0-65"></a>
 </span><span id="__span-0-66"><a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Due to mirror symmetry, the geometric relationship inverts:</span>
-</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    θ_D(φ) = -θ_L(-φ). Therefore, we can accurately predict the D-amino acid</span>
+</span><span id="__span-0-67"><a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    theta_D(phi) = -theta_L(-phi). Therefore, we can accurately predict the D-amino acid</span>
 </span><span id="__span-0-68"><a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    coupling by evaluating the L-parameterized Karplus equation at the</span>
-</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    negated phi angle: J_D(φ) = J_L(-φ).</span>
+</span><span id="__span-0-69"><a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    negated phi angle: J_D(phi) = J_L(-phi).</span>
 </span><span id="__span-0-70"><a id="__codelineno-0-70" name="__codelineno-0-70"></a>
 </span><span id="__span-0-71"><a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    Args:</span>
 </span><span id="__span-0-72"><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        structure: Biotite AtomArray</span>
@@ -4968,14 +4996,14 @@ negated phi angle: J_D(φ) = J_L(-φ).</p>
 </span><span id="__span-0-74"><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    Returns:</span>
 </span><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        Dict keyed by Chain ID -&gt; Residue ID -&gt; J-coupling value (Hz).</span>
 </span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="c1"># ── 1. PRIMARY PREDICTION ────────────────────────────────────────────────</span>
+</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="c1"># -- 1. PRIMARY PREDICTION ------------------------------------------------</span>
 </span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="c1"># We first delegate to the core synth-nmr engine to calculate raw couplings.</span>
 </span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="c1"># The engine uses a highly optimized C++ backend or Numba-jitted array ops</span>
 </span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="c1"># to evaluate the Karplus equation for all residues simultaneously.</span>
 </span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="n">raw_couplings</span> <span class="o">=</span> <span class="n">_j</span><span class="o">.</span><span class="n">calculate_hn_ha_coupling</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
 </span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="n">filtered_couplings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a>
-</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="c1"># ── 2. BIOPHYSICAL FILTER DEFINITIONS ────────────────────────────────────</span>
+</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="c1"># -- 2. BIOPHYSICAL FILTER DEFINITIONS ------------------------------------</span>
 </span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="c1"># Proline-like residues do not have an amide proton when in a peptide bond.</span>
 </span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="c1"># Therefore, they cannot produce a 3J_HNHa coupling.</span>
 </span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">proline_names</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;PRO&quot;</span><span class="p">,</span> <span class="s2">&quot;DPR&quot;</span><span class="p">}</span>
@@ -5005,7 +5033,7 @@ negated phi angle: J_D(φ) = J_L(-φ).</p>
 </span><span id="__span-0-111"><a id="__codelineno-0-111" name="__codelineno-0-111"></a>        <span class="s2">&quot;DVA&quot;</span><span class="p">,</span>
 </span><span id="__span-0-112"><a id="__codelineno-0-112" name="__codelineno-0-112"></a>    <span class="p">}</span>
 </span><span id="__span-0-113"><a id="__codelineno-0-113" name="__codelineno-0-113"></a>
-</span><span id="__span-0-114"><a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="c1"># ── 3. PRE-CALCULATING STRUCTURAL ANGLES ─────────────────────────────────</span>
+</span><span id="__span-0-114"><a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="c1"># -- 3. PRE-CALCULATING STRUCTURAL ANGLES ---------------------------------</span>
 </span><span id="__span-0-115"><a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="c1"># We extract the entire array of backbone phi dihedrals from the structure.</span>
 </span><span id="__span-0-116"><a id="__codelineno-0-116" name="__codelineno-0-116"></a>    <span class="c1"># Biotite returns these in radians, so we convert them to degrees, which</span>
 </span><span id="__span-0-117"><a id="__codelineno-0-117" name="__codelineno-0-117"></a>    <span class="c1"># the Karplus parametrization expects.</span>
@@ -5018,7 +5046,7 @@ negated phi angle: J_D(φ) = J_L(-φ).</p>
 </span><span id="__span-0-124"><a id="__codelineno-0-124" name="__codelineno-0-124"></a>    <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chain_ids</span><span class="p">,</span> <span class="n">res_ids</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="__span-0-125"><a id="__codelineno-0-125" name="__codelineno-0-125"></a>        <span class="n">phi_map</span><span class="p">[(</span><span class="n">c</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">))]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 </span><span id="__span-0-126"><a id="__codelineno-0-126" name="__codelineno-0-126"></a>
-</span><span id="__span-0-127"><a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="c1"># ── 4. ITERATIVE FILTERING &amp; CORRECTION ──────────────────────────────────</span>
+</span><span id="__span-0-127"><a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="c1"># -- 4. ITERATIVE FILTERING &amp; CORRECTION ----------------------------------</span>
 </span><span id="__span-0-128"><a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="c1"># We iterate over the raw predictions and selectively copy/modify them</span>
 </span><span id="__span-0-129"><a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="c1"># into our sanitized output dictionary.</span>
 </span><span id="__span-0-130"><a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="k">for</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">res_dict</span> <span class="ow">in</span> <span class="n">raw_couplings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

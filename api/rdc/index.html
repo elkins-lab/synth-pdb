@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4582,7 +4610,7 @@ Core RDC back-calculation is delegated to the <code>synth-nmr</code> package (<c
 
         <p>Calculates the Cornilescu Q-factor for RDC validation.</p>
 <h4 id="synth_pdb.rdc.calculate_rdc_q_factor--scientific-rationale">SCIENTIFIC RATIONALE:</h4>
-<p>The Q-factor provide a quantitative measure of the agreement between
+<p>The Q-factor provides a quantitative measure of the agreement between
 experimentally observed RDCs and those back-calculated from a structural
 model. It is analogous to the R-factor used in X-ray crystallography,
 measuring the normalized residual of the data fit.</p>
@@ -4599,6 +4627,12 @@ to the global orientation of the principal structural motifs.</p>
 <li>Q &gt; 0.5: Poor agreement; indicates potential misfolding or assignment
            errors in the restraint file.</li>
 </ul>
+<p>BIOPHYSICAL SIGNIFICANCE:
+The Q-factor is the 'gold standard' for NMR structure validation. Because
+RDCs are so sensitive to global topology, a low Q-factor is strong
+evidence that the overall protein fold is correct. Conversely, a high
+Q-factor in the presence of low NOE violations often suggests a
+mis-orientation of domains or an incorrect alignment tensor.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4742,6 +4776,11 @@ Column 2: Atom name of the first nucleus (e.g., 'N')
 Column 3: Residue ID of the second nucleus (integer)
 Column 4: Atom name of the second nucleus (e.g., 'H')
 Column 5: The measured RDC value (float, in Hz)</p>
+<p>BIOINFORMATICS CONTEXT - Column Alignment:
+In structural biology, legacy formats often rely on fixed-width or
+whitespace-delimited columns. While modern databases use XML or JSON,
+NMR data remains largely text-based for interoperability with C/Fortran
+simulation kernels. This function provides a robust bridge to those tools.</p>
 <p>RESEARCH NOTE: Ensure atom names match the structure object (e.g. 'HN' vs 'H').
 Mismatched atom names will lead to KeyError in the structural mapping phase.
 The file is expected to be a flat text file without binary formatting.

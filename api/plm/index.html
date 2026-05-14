@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4553,11 +4581,11 @@ without <code>torch</code> or <code>transformers</code> installed.</p>
 
 
         <p>Per-residue protein language model embeddings from ESM-2.</p>
-<p>The model is loaded <strong>lazily</strong> on the first call to embed() — not at
+<p>The model is loaded <strong>lazily</strong> on the first call to embed() - not at
 <strong>init</strong> time.  This means:
-  • <code>import synth_pdb.plm</code> is always safe with no torch/transformers installed
-  • <code>ESM2Embedder()</code> is instantaneous
-  • The ~5-second model load occurs once, then is cached in self._model</p>
+  * <code>import synth_pdb.plm</code> is always safe with no torch/transformers installed
+  * <code>ESM2Embedder()</code> is instantaneous
+  * The ~5-second model load occurs once, then is cached in self._model</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4691,7 +4719,7 @@ encoding evolutionary, structural, and chemical context learned from
             <td>
               <div class="doc-md-description">
                 <p>Single-letter amino acid string, e.g. "MQIFVKTLTG".
-      Standard 20 amino acids only.  Unknown residues → 'X'.</p>
+      Standard 20 amino acids only.  Unknown residues -&gt; 'X'.</p>
               </div>
             </td>
             <td>
@@ -4791,7 +4819,7 @@ emb.shape
         <p>Embed a protein given its biotite AtomArray.</p>
 <p>Extracts the amino acid sequence from the structure (using residue
 names in the AtomArray), then delegates to embed().</p>
-<p>This is a convenience method — the embeddings are purely sequence-based
+<p>This is a convenience method - the embeddings are purely sequence-based
 and do not use any 3D coordinate information.</p>
 
 
@@ -4885,7 +4913,7 @@ emb.shape
 
 <details class="mean-pooling-averages-the-per-residue-vectors" open>
   <summary>Mean pooling averages the per-residue vectors</summary>
-  <p>mean_embed(seq) = (1/L) Σ embed(seq)[i]    for i in 0..L-1</p>
+  <p>mean_embed(seq) = (1/L) Sum embed(seq)[i]    for i in 0..L-1</p>
 </details>        <p>This gives a single D-dim vector representing the whole sequence.
 Loses positional information but enables fast sequence comparison.</p>
 
@@ -4930,11 +4958,11 @@ Loses positional information but enables fast sequence comparison.</p>
 
         <p>Cosine similarity between the mean embeddings of two sequences.</p>
 <p>Returns a value in [-1, 1]:
-  •  1.0  — identical embeddings (same sequence)
-  •  0.0  — orthogonal (no similarity)
-  • -1.0  — opposite (very unlikely for protein embeddings)</p>
+  *  1.0  - identical embeddings (same sequence)
+  *  0.0  - orthogonal (no similarity)
+  * -1.0  - opposite (very unlikely for protein embeddings)</p>
 <h6 id="synth_pdb.plm.ESM2Embedder.sequence_similarity--why-cosine-not-l2">WHY COSINE, NOT L2?</h6>
-<p>Cosine similarity is magnitude-invariant — it measures the <em>angle</em>
+<p>Cosine similarity is magnitude-invariant - it measures the <em>angle</em>
 between vectors, not their length.  Longer proteins have higher-norm
 embeddings simply because there are more residues, not because they
 are more similar.  Cosine corrects for this.</p>
@@ -5002,7 +5030,7 @@ are more similar.  Cosine corrects for this.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>float — cosine similarity of mean embeddings.</p>
+                <p>float - cosine similarity of mean embeddings.</p>
               </div>
             </td>
           </tr>
@@ -5016,9 +5044,9 @@ are more similar.  Cosine corrects for this.</p>
 <blockquote>
 <blockquote>
 <p>embedder.sequence_similarity("AAAAAAA", "VIVIVIV")
-0.832...   # high — both are simple repetitive peptides
+0.832...   # high - both are simple repetitive peptides
 embedder.sequence_similarity("ACDEFGHIK", "WQMPLRNTS")
-0.71...    # lower — very different character</p>
+0.71...    # lower - very different character</p>
 </blockquote>
 </blockquote>
 </blockquote>

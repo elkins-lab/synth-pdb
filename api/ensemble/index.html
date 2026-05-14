@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4815,8 +4843,8 @@ These tools mirror the analysis performed by <strong>PDBStat</strong> (Tejero et
         <p>Calculator for Dihedral Angle Order Parameters (DAOP).</p>
 <p>The DAOP quantifies the consistency of a dihedral angle across an NMR
 ensemble.  Values range from 0 (completely disordered) to 1 (perfectly
-ordered).  Typical NMR convention: S ≥ 0.9 means the residue is
-well-defined (corresponds to ≲ ±24° circular standard deviation).</p>
+ordered).  Typical NMR convention: S &gt;= 0.9 means the residue is
+well-defined (corresponds to &lt;~ +/-24deg circular standard deviation).</p>
 <p>All methods are static - no instantiation required.</p>
 
 
@@ -4824,7 +4852,7 @@ well-defined (corresponds to ≲ ±24° circular standard deviation).</p>
     <div class="language-pycon highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.ensemble.daop</span><span class="w"> </span><span class="kn">import</span> <span class="n">DAOPCalculator</span>
 </span></code></pre></div>
-    <div class="language-pycon highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perfectly ordered angles (all -60°)</span>
+    <div class="language-pycon highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Perfectly ordered angles (all -60deg)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">DAOPCalculator</span><span class="o">.</span><span class="n">calculate_order_parameter</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">1.0</span>
@@ -4873,13 +4901,13 @@ well-defined (corresponds to ≲ ±24° circular standard deviation).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Identify well-defined residues using the PDBStat S(φ) + S(ψ) criterion.</p>
+        <p>Identify well-defined residues using the PDBStat S(phi) + S(psi) criterion.</p>
 <p>A residue is considered well-defined when:</p>
-<div class="language-text highlight"><pre><span></span><code>S(φᵢ) + S(ψᵢ) ≥ threshold
+<div class="language-text highlight"><pre><span></span><code>S(phi_i) + S(psi_i) &gt;= threshold
 </code></pre></div>
 <p>The default threshold of 1.8 follows the PDBStat convention and
-corresponds to both angles having S ≥ 0.9, i.e. a circular standard
-deviation of ≲ ±24° for each.</p>
+corresponds to both angles having S &gt;= 0.9, i.e. a circular standard
+deviation of &lt;~ +/-24deg for each.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4902,7 +4930,7 @@ deviation of ≲ ±24° for each.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Array of shape (n_residues, n_models) with φ angles
+                <p>Array of shape (n_residues, n_models) with phi angles
 <strong>in radians</strong>.</p>
               </div>
             </td>
@@ -4919,7 +4947,7 @@ deviation of ≲ ±24° for each.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Array of shape (n_residues, n_models) with ψ angles
+                <p>Array of shape (n_residues, n_models) with psi angles
 <strong>in radians</strong>.</p>
               </div>
             </td>
@@ -5099,7 +5127,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mean of all pairwise RMSDs (Å).</p>
+                <p>Mean of all pairwise RMSDs (A).</p>
               </div>
             </td>
           </tr>
@@ -5110,7 +5138,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Median of all pairwise RMSDs (Å).</p>
+                <p>Median of all pairwise RMSDs (A).</p>
               </div>
             </td>
           </tr>
@@ -5121,7 +5149,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Standard deviation of pairwise RMSDs (Å).</p>
+                <p>Standard deviation of pairwise RMSDs (A).</p>
               </div>
             </td>
           </tr>
@@ -5132,7 +5160,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Minimum pairwise RMSD (Å).</p>
+                <p>Minimum pairwise RMSD (A).</p>
               </div>
             </td>
           </tr>
@@ -5143,7 +5171,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maximum pairwise RMSD (Å).</p>
+                <p>Maximum pairwise RMSD (A).</p>
               </div>
             </td>
           </tr>
@@ -5165,7 +5193,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mean RMSD of the medoid to all other models (Å).</p>
+                <p>Mean RMSD of the medoid to all other models (A).</p>
               </div>
             </td>
           </tr>
@@ -5176,7 +5204,7 @@ round-trips, and a human-readable <code>__str__</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mean RMSD-to-ensemble-mean (Å).  Primary precision
+                <p>Mean RMSD-to-ensemble-mean (A).  Primary precision
 indicator; thresholds from Tejero et al. 2013.</p>
               </div>
             </td>
@@ -5188,7 +5216,7 @@ indicator; thresholds from Tejero et al. 2013.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mean per-residue RMSF (Å).</p>
+                <p>Mean per-residue RMSF (A).</p>
               </div>
             </td>
           </tr>
@@ -5199,7 +5227,7 @@ indicator; thresholds from Tejero et al. 2013.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maximum per-residue RMSF (Å).</p>
+                <p>Maximum per-residue RMSF (A).</p>
               </div>
             </td>
           </tr>
@@ -5210,7 +5238,7 @@ indicator; thresholds from Tejero et al. 2013.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Count of residues with RMSF &lt; 1.0 Å.</p>
+                <p>Count of residues with RMSF &lt; 1.0 A.</p>
               </div>
             </td>
           </tr>
@@ -5340,7 +5368,7 @@ indicator; thresholds from Tejero et al. 2013.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"HIGH"</code>     if <code>rmsd_to_mean &lt; 1.0</code> Å,</p>
+                <p><code>"HIGH"</code>     if <code>rmsd_to_mean &lt; 1.0</code> A,</p>
               </div>
             </td>
           </tr>
@@ -5350,7 +5378,7 @@ indicator; thresholds from Tejero et al. 2013.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>"GOOD"</code>     if <code>rmsd_to_mean &lt; 2.0</code> Å,</p>
+                <p><code>"GOOD"</code>     if <code>rmsd_to_mean &lt; 2.0</code> A,</p>
               </div>
             </td>
           </tr>
@@ -5685,7 +5713,7 @@ human-readable precision tier and overall quality string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Precision tier — <code>"HIGH"</code>, <code>"GOOD"</code>, <code>"MODERATE"</code>,
+                <p>Precision tier - <code>"HIGH"</code>, <code>"GOOD"</code>, <code>"MODERATE"</code>,
 or <code>"UNKNOWN"</code>.</p>
               </div>
             </td>

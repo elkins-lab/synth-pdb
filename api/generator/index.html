@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2715,7 +2743,7 @@
   <a href="#synth_pdb.generator._resolve_sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;_resolve_sequence
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;_resolve_sequence
       
     </span>
   </a>
@@ -4565,7 +4593,7 @@
   <a href="#synth_pdb.generator._resolve_sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;_resolve_sequence
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;_resolve_sequence
       
     </span>
   </a>
@@ -4722,157 +4750,159 @@ of decoys with varying levels of torsion drift.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1935">1935</a></span>
-<span class="normal"><a href="#__codelineno-0-1936">1936</a></span>
-<span class="normal"><a href="#__codelineno-0-1937">1937</a></span>
-<span class="normal"><a href="#__codelineno-0-1938">1938</a></span>
-<span class="normal"><a href="#__codelineno-0-1939">1939</a></span>
-<span class="normal"><a href="#__codelineno-0-1940">1940</a></span>
-<span class="normal"><a href="#__codelineno-0-1941">1941</a></span>
-<span class="normal"><a href="#__codelineno-0-1942">1942</a></span>
-<span class="normal"><a href="#__codelineno-0-1943">1943</a></span>
-<span class="normal"><a href="#__codelineno-0-1944">1944</a></span>
-<span class="normal"><a href="#__codelineno-0-1945">1945</a></span>
-<span class="normal"><a href="#__codelineno-0-1946">1946</a></span>
-<span class="normal"><a href="#__codelineno-0-1947">1947</a></span>
-<span class="normal"><a href="#__codelineno-0-1948">1948</a></span>
-<span class="normal"><a href="#__codelineno-0-1949">1949</a></span>
-<span class="normal"><a href="#__codelineno-0-1950">1950</a></span>
-<span class="normal"><a href="#__codelineno-0-1951">1951</a></span>
-<span class="normal"><a href="#__codelineno-0-1952">1952</a></span>
-<span class="normal"><a href="#__codelineno-0-1953">1953</a></span>
-<span class="normal"><a href="#__codelineno-0-1954">1954</a></span>
-<span class="normal"><a href="#__codelineno-0-1955">1955</a></span>
-<span class="normal"><a href="#__codelineno-0-1956">1956</a></span>
-<span class="normal"><a href="#__codelineno-0-1957">1957</a></span>
-<span class="normal"><a href="#__codelineno-0-1958">1958</a></span>
-<span class="normal"><a href="#__codelineno-0-1959">1959</a></span>
-<span class="normal"><a href="#__codelineno-0-1960">1960</a></span>
-<span class="normal"><a href="#__codelineno-0-1961">1961</a></span>
-<span class="normal"><a href="#__codelineno-0-1962">1962</a></span>
-<span class="normal"><a href="#__codelineno-0-1963">1963</a></span>
-<span class="normal"><a href="#__codelineno-0-1964">1964</a></span>
-<span class="normal"><a href="#__codelineno-0-1965">1965</a></span>
-<span class="normal"><a href="#__codelineno-0-1966">1966</a></span>
-<span class="normal"><a href="#__codelineno-0-1967">1967</a></span>
-<span class="normal"><a href="#__codelineno-0-1968">1968</a></span>
-<span class="normal"><a href="#__codelineno-0-1969">1969</a></span>
-<span class="normal"><a href="#__codelineno-0-1970">1970</a></span>
-<span class="normal"><a href="#__codelineno-0-1971">1971</a></span>
-<span class="normal"><a href="#__codelineno-0-1972">1972</a></span>
-<span class="normal"><a href="#__codelineno-0-1973">1973</a></span>
-<span class="normal"><a href="#__codelineno-0-1974">1974</a></span>
-<span class="normal"><a href="#__codelineno-0-1975">1975</a></span>
-<span class="normal"><a href="#__codelineno-0-1976">1976</a></span>
-<span class="normal"><a href="#__codelineno-0-1977">1977</a></span>
-<span class="normal"><a href="#__codelineno-0-1978">1978</a></span>
-<span class="normal"><a href="#__codelineno-0-1979">1979</a></span>
-<span class="normal"><a href="#__codelineno-0-1980">1980</a></span>
-<span class="normal"><a href="#__codelineno-0-1981">1981</a></span>
-<span class="normal"><a href="#__codelineno-0-1982">1982</a></span>
-<span class="normal"><a href="#__codelineno-0-1983">1983</a></span>
-<span class="normal"><a href="#__codelineno-0-1984">1984</a></span>
-<span class="normal"><a href="#__codelineno-0-1985">1985</a></span>
-<span class="normal"><a href="#__codelineno-0-1986">1986</a></span>
-<span class="normal"><a href="#__codelineno-0-1987">1987</a></span>
-<span class="normal"><a href="#__codelineno-0-1988">1988</a></span>
-<span class="normal"><a href="#__codelineno-0-1989">1989</a></span>
-<span class="normal"><a href="#__codelineno-0-1990">1990</a></span>
-<span class="normal"><a href="#__codelineno-0-1991">1991</a></span>
-<span class="normal"><a href="#__codelineno-0-1992">1992</a></span>
-<span class="normal"><a href="#__codelineno-0-1993">1993</a></span>
-<span class="normal"><a href="#__codelineno-0-1994">1994</a></span>
-<span class="normal"><a href="#__codelineno-0-1995">1995</a></span>
-<span class="normal"><a href="#__codelineno-0-1996">1996</a></span>
-<span class="normal"><a href="#__codelineno-0-1997">1997</a></span>
-<span class="normal"><a href="#__codelineno-0-1998">1998</a></span>
-<span class="normal"><a href="#__codelineno-0-1999">1999</a></span>
-<span class="normal"><a href="#__codelineno-0-2000">2000</a></span>
-<span class="normal"><a href="#__codelineno-0-2001">2001</a></span>
-<span class="normal"><a href="#__codelineno-0-2002">2002</a></span>
-<span class="normal"><a href="#__codelineno-0-2003">2003</a></span>
-<span class="normal"><a href="#__codelineno-0-2004">2004</a></span>
-<span class="normal"><a href="#__codelineno-0-2005">2005</a></span>
-<span class="normal"><a href="#__codelineno-0-2006">2006</a></span>
-<span class="normal"><a href="#__codelineno-0-2007">2007</a></span>
-<span class="normal"><a href="#__codelineno-0-2008">2008</a></span>
-<span class="normal"><a href="#__codelineno-0-2009">2009</a></span>
-<span class="normal"><a href="#__codelineno-0-2010">2010</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1935"><a id="__codelineno-0-1935" name="__codelineno-0-1935"></a><span class="k">class</span><span class="w"> </span><span class="nc">PeptideGenerator</span><span class="p">:</span>
-</span><span id="__span-0-1936"><a id="__codelineno-0-1936" name="__codelineno-0-1936"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Object-oriented wrapper for protein structure generation.</span>
-</span><span id="__span-0-1937"><a id="__codelineno-0-1937" name="__codelineno-0-1937"></a>
-</span><span id="__span-0-1938"><a id="__codelineno-0-1938" name="__codelineno-0-1938"></a><span class="sd">    This class provides a stateful interface for generating synthetic</span>
-</span><span id="__span-0-1939"><a id="__codelineno-0-1939" name="__codelineno-0-1939"></a><span class="sd">    protein structures. It allows users to pre-configure generation</span>
-</span><span id="__span-0-1940"><a id="__codelineno-0-1940" name="__codelineno-0-1940"></a><span class="sd">    parameters (like forcefields or PTM rates) and then generate</span>
-</span><span id="__span-0-1941"><a id="__codelineno-0-1941" name="__codelineno-0-1941"></a><span class="sd">    multiple structures from the same configuration.</span>
-</span><span id="__span-0-1942"><a id="__codelineno-0-1942" name="__codelineno-0-1942"></a>
-</span><span id="__span-0-1943"><a id="__codelineno-0-1943" name="__codelineno-0-1943"></a><span class="sd">    EDUCATIONAL RATIONALE:</span>
-</span><span id="__span-0-1944"><a id="__codelineno-0-1944" name="__codelineno-0-1944"></a><span class="sd">    Encapsulating the generation logic in a class makes it easier</span>
-</span><span id="__span-0-1945"><a id="__codelineno-0-1945" name="__codelineno-0-1945"></a><span class="sd">    to manage complex experiments, such as generating an ensemble</span>
-</span><span id="__span-0-1946"><a id="__codelineno-0-1946" name="__codelineno-0-1946"></a><span class="sd">    of decoys with varying levels of torsion drift.</span>
-</span><span id="__span-0-1947"><a id="__codelineno-0-1947" name="__codelineno-0-1947"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-1948"><a id="__codelineno-0-1948" name="__codelineno-0-1948"></a>
-</span><span id="__span-0-1949"><a id="__codelineno-0-1949" name="__codelineno-0-1949"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-1950"><a id="__codelineno-0-1950" name="__codelineno-0-1950"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the generator with a target sequence and config.&quot;&quot;&quot;</span>
-</span><span id="__span-0-1951"><a id="__codelineno-0-1951" name="__codelineno-0-1951"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-</span><span id="__span-0-1952"><a id="__codelineno-0-1952" name="__codelineno-0-1952"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
-</span><span id="__span-0-1953"><a id="__codelineno-0-1953" name="__codelineno-0-1953"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">PeptideResult</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-0-1954"><a id="__codelineno-0-1954" name="__codelineno-0-1954"></a>
-</span><span id="__span-0-1955"><a id="__codelineno-0-1955" name="__codelineno-0-1955"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
-</span><span id="__span-0-1956"><a id="__codelineno-0-1956" name="__codelineno-0-1956"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.</span>
-</span><span id="__span-0-1957"><a id="__codelineno-0-1957" name="__codelineno-0-1957"></a>
-</span><span id="__span-0-1958"><a id="__codelineno-0-1958" name="__codelineno-0-1958"></a><span class="sd">        Supports on-the-fly overrides for any configuration parameter.</span>
-</span><span id="__span-0-1959"><a id="__codelineno-0-1959" name="__codelineno-0-1959"></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="__span-0-1960"><a id="__codelineno-0-1960" name="__codelineno-0-1960"></a>        <span class="c1"># Merge init config with call-time overrides</span>
-</span><span id="__span-0-1961"><a id="__codelineno-0-1961" name="__codelineno-0-1961"></a>        <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
-</span><span id="__span-0-1962"><a id="__codelineno-0-1962" name="__codelineno-0-1962"></a>
-</span><span id="__span-0-1963"><a id="__codelineno-0-1963" name="__codelineno-0-1963"></a>        <span class="c1"># Call the functional generator which handles multichain splitting</span>
-</span><span id="__span-0-1964"><a id="__codelineno-0-1964" name="__codelineno-0-1964"></a>        <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
-</span><span id="__span-0-1965"><a id="__codelineno-0-1965" name="__codelineno-0-1965"></a>
-</span><span id="__span-0-1966"><a id="__codelineno-0-1966" name="__codelineno-0-1966"></a>        <span class="c1"># Package into a Result object for easy access to structures</span>
-</span><span id="__span-0-1967"><a id="__codelineno-0-1967" name="__codelineno-0-1967"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
-</span><span id="__span-0-1968"><a id="__codelineno-0-1968" name="__codelineno-0-1968"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
-</span><span id="__span-0-1969"><a id="__codelineno-0-1969" name="__codelineno-0-1969"></a>
-</span><span id="__span-0-1970"><a id="__codelineno-0-1970" name="__codelineno-0-1970"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_models</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">as_stack</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span id="__span-0-1971"><a id="__codelineno-0-1971" name="__codelineno-0-1971"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a structural ensemble using the high-performance BatchedGenerator.</span>
-</span><span id="__span-0-1972"><a id="__codelineno-0-1972" name="__codelineno-0-1972"></a>
-</span><span id="__span-0-1973"><a id="__codelineno-0-1973" name="__codelineno-0-1973"></a><span class="sd">        Args:</span>
-</span><span id="__span-0-1974"><a id="__codelineno-0-1974" name="__codelineno-0-1974"></a><span class="sd">            n_models: Number of models to generate.</span>
-</span><span id="__span-0-1975"><a id="__codelineno-0-1975" name="__codelineno-0-1975"></a><span class="sd">            as_stack: If True, returns a Biotite AtomArrayStack. If False,</span>
-</span><span id="__span-0-1976"><a id="__codelineno-0-1976" name="__codelineno-0-1976"></a><span class="sd">                      returns a list of PeptideResult objects.</span>
-</span><span id="__span-0-1977"><a id="__codelineno-0-1977" name="__codelineno-0-1977"></a><span class="sd">            **overrides: On-the-fly configuration overrides.</span>
-</span><span id="__span-0-1978"><a id="__codelineno-0-1978" name="__codelineno-0-1978"></a>
-</span><span id="__span-0-1979"><a id="__codelineno-0-1979" name="__codelineno-0-1979"></a><span class="sd">        Returns:</span>
-</span><span id="__span-0-1980"><a id="__codelineno-0-1980" name="__codelineno-0-1980"></a><span class="sd">            biotite.structure.AtomArrayStack or List[PeptideResult].</span>
-</span><span id="__span-0-1981"><a id="__codelineno-0-1981" name="__codelineno-0-1981"></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="__span-0-1982"><a id="__codelineno-0-1982" name="__codelineno-0-1982"></a>        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
-</span><span id="__span-0-1983"><a id="__codelineno-0-1983" name="__codelineno-0-1983"></a>        <span class="n">conformation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;conformation&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
-</span><span id="__span-0-1984"><a id="__codelineno-0-1984" name="__codelineno-0-1984"></a>        <span class="n">drift</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drift&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-</span><span id="__span-0-1985"><a id="__codelineno-0-1985" name="__codelineno-0-1985"></a>        <span class="n">seed</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">)</span>
-</span><span id="__span-0-1986"><a id="__codelineno-0-1986" name="__codelineno-0-1986"></a>
-</span><span id="__span-0-1987"><a id="__codelineno-0-1987" name="__codelineno-0-1987"></a>        <span class="c1"># BatchedGenerator is 10-100x faster for ensembles than looping generate()</span>
-</span><span id="__span-0-1988"><a id="__codelineno-0-1988" name="__codelineno-0-1988"></a>        <span class="n">bg</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_models</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-0-1989"><a id="__codelineno-0-1989" name="__codelineno-0-1989"></a>        <span class="n">batch</span> <span class="o">=</span> <span class="n">bg</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="n">conformation</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="n">drift</span><span class="p">)</span>
-</span><span id="__span-0-1990"><a id="__codelineno-0-1990" name="__codelineno-0-1990"></a>
-</span><span id="__span-0-1991"><a id="__codelineno-0-1991" name="__codelineno-0-1991"></a>        <span class="k">if</span> <span class="n">as_stack</span><span class="p">:</span>
-</span><span id="__span-0-1992"><a id="__codelineno-0-1992" name="__codelineno-0-1992"></a>            <span class="n">stack</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
-</span><span id="__span-0-1993"><a id="__codelineno-0-1993" name="__codelineno-0-1993"></a>            <span class="c1"># Explicitly clear templates to free memory</span>
-</span><span id="__span-0-1994"><a id="__codelineno-0-1994" name="__codelineno-0-1994"></a>            <span class="n">bg</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
-</span><span id="__span-0-1995"><a id="__codelineno-0-1995" name="__codelineno-0-1995"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
-</span><span id="__span-0-1996"><a id="__codelineno-0-1996" name="__codelineno-0-1996"></a>
-</span><span id="__span-0-1997"><a id="__codelineno-0-1997" name="__codelineno-0-1997"></a>            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-</span><span id="__span-0-1998"><a id="__codelineno-0-1998" name="__codelineno-0-1998"></a>            <span class="k">return</span> <span class="n">stack</span>
-</span><span id="__span-0-1999"><a id="__codelineno-0-1999" name="__codelineno-0-1999"></a>
-</span><span id="__span-0-2000"><a id="__codelineno-0-2000" name="__codelineno-0-2000"></a>        <span class="c1"># Fallback to list of results for backward compatibility or unique formatting</span>
-</span><span id="__span-0-2001"><a id="__codelineno-0-2001" name="__codelineno-0-2001"></a>        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="__span-0-2002"><a id="__codelineno-0-2002" name="__codelineno-0-2002"></a>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_models</span><span class="p">):</span>
-</span><span id="__span-0-2003"><a id="__codelineno-0-2003" name="__codelineno-0-2003"></a>            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PeptideResult</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
-</span><span id="__span-0-2004"><a id="__codelineno-0-2004" name="__codelineno-0-2004"></a>
-</span><span id="__span-0-2005"><a id="__codelineno-0-2005" name="__codelineno-0-2005"></a>        <span class="c1"># Explicitly clear templates to free memory</span>
-</span><span id="__span-0-2006"><a id="__codelineno-0-2006" name="__codelineno-0-2006"></a>        <span class="n">bg</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
-</span><span id="__span-0-2007"><a id="__codelineno-0-2007" name="__codelineno-0-2007"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
-</span><span id="__span-0-2008"><a id="__codelineno-0-2008" name="__codelineno-0-2008"></a>
-</span><span id="__span-0-2009"><a id="__codelineno-0-2009" name="__codelineno-0-2009"></a>        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-</span><span id="__span-0-2010"><a id="__codelineno-0-2010" name="__codelineno-0-2010"></a>        <span class="k">return</span> <span class="n">results</span>
+                <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2152">2152</a></span>
+<span class="normal"><a href="#__codelineno-0-2153">2153</a></span>
+<span class="normal"><a href="#__codelineno-0-2154">2154</a></span>
+<span class="normal"><a href="#__codelineno-0-2155">2155</a></span>
+<span class="normal"><a href="#__codelineno-0-2156">2156</a></span>
+<span class="normal"><a href="#__codelineno-0-2157">2157</a></span>
+<span class="normal"><a href="#__codelineno-0-2158">2158</a></span>
+<span class="normal"><a href="#__codelineno-0-2159">2159</a></span>
+<span class="normal"><a href="#__codelineno-0-2160">2160</a></span>
+<span class="normal"><a href="#__codelineno-0-2161">2161</a></span>
+<span class="normal"><a href="#__codelineno-0-2162">2162</a></span>
+<span class="normal"><a href="#__codelineno-0-2163">2163</a></span>
+<span class="normal"><a href="#__codelineno-0-2164">2164</a></span>
+<span class="normal"><a href="#__codelineno-0-2165">2165</a></span>
+<span class="normal"><a href="#__codelineno-0-2166">2166</a></span>
+<span class="normal"><a href="#__codelineno-0-2167">2167</a></span>
+<span class="normal"><a href="#__codelineno-0-2168">2168</a></span>
+<span class="normal"><a href="#__codelineno-0-2169">2169</a></span>
+<span class="normal"><a href="#__codelineno-0-2170">2170</a></span>
+<span class="normal"><a href="#__codelineno-0-2171">2171</a></span>
+<span class="normal"><a href="#__codelineno-0-2172">2172</a></span>
+<span class="normal"><a href="#__codelineno-0-2173">2173</a></span>
+<span class="normal"><a href="#__codelineno-0-2174">2174</a></span>
+<span class="normal"><a href="#__codelineno-0-2175">2175</a></span>
+<span class="normal"><a href="#__codelineno-0-2176">2176</a></span>
+<span class="normal"><a href="#__codelineno-0-2177">2177</a></span>
+<span class="normal"><a href="#__codelineno-0-2178">2178</a></span>
+<span class="normal"><a href="#__codelineno-0-2179">2179</a></span>
+<span class="normal"><a href="#__codelineno-0-2180">2180</a></span>
+<span class="normal"><a href="#__codelineno-0-2181">2181</a></span>
+<span class="normal"><a href="#__codelineno-0-2182">2182</a></span>
+<span class="normal"><a href="#__codelineno-0-2183">2183</a></span>
+<span class="normal"><a href="#__codelineno-0-2184">2184</a></span>
+<span class="normal"><a href="#__codelineno-0-2185">2185</a></span>
+<span class="normal"><a href="#__codelineno-0-2186">2186</a></span>
+<span class="normal"><a href="#__codelineno-0-2187">2187</a></span>
+<span class="normal"><a href="#__codelineno-0-2188">2188</a></span>
+<span class="normal"><a href="#__codelineno-0-2189">2189</a></span>
+<span class="normal"><a href="#__codelineno-0-2190">2190</a></span>
+<span class="normal"><a href="#__codelineno-0-2191">2191</a></span>
+<span class="normal"><a href="#__codelineno-0-2192">2192</a></span>
+<span class="normal"><a href="#__codelineno-0-2193">2193</a></span>
+<span class="normal"><a href="#__codelineno-0-2194">2194</a></span>
+<span class="normal"><a href="#__codelineno-0-2195">2195</a></span>
+<span class="normal"><a href="#__codelineno-0-2196">2196</a></span>
+<span class="normal"><a href="#__codelineno-0-2197">2197</a></span>
+<span class="normal"><a href="#__codelineno-0-2198">2198</a></span>
+<span class="normal"><a href="#__codelineno-0-2199">2199</a></span>
+<span class="normal"><a href="#__codelineno-0-2200">2200</a></span>
+<span class="normal"><a href="#__codelineno-0-2201">2201</a></span>
+<span class="normal"><a href="#__codelineno-0-2202">2202</a></span>
+<span class="normal"><a href="#__codelineno-0-2203">2203</a></span>
+<span class="normal"><a href="#__codelineno-0-2204">2204</a></span>
+<span class="normal"><a href="#__codelineno-0-2205">2205</a></span>
+<span class="normal"><a href="#__codelineno-0-2206">2206</a></span>
+<span class="normal"><a href="#__codelineno-0-2207">2207</a></span>
+<span class="normal"><a href="#__codelineno-0-2208">2208</a></span>
+<span class="normal"><a href="#__codelineno-0-2209">2209</a></span>
+<span class="normal"><a href="#__codelineno-0-2210">2210</a></span>
+<span class="normal"><a href="#__codelineno-0-2211">2211</a></span>
+<span class="normal"><a href="#__codelineno-0-2212">2212</a></span>
+<span class="normal"><a href="#__codelineno-0-2213">2213</a></span>
+<span class="normal"><a href="#__codelineno-0-2214">2214</a></span>
+<span class="normal"><a href="#__codelineno-0-2215">2215</a></span>
+<span class="normal"><a href="#__codelineno-0-2216">2216</a></span>
+<span class="normal"><a href="#__codelineno-0-2217">2217</a></span>
+<span class="normal"><a href="#__codelineno-0-2218">2218</a></span>
+<span class="normal"><a href="#__codelineno-0-2219">2219</a></span>
+<span class="normal"><a href="#__codelineno-0-2220">2220</a></span>
+<span class="normal"><a href="#__codelineno-0-2221">2221</a></span>
+<span class="normal"><a href="#__codelineno-0-2222">2222</a></span>
+<span class="normal"><a href="#__codelineno-0-2223">2223</a></span>
+<span class="normal"><a href="#__codelineno-0-2224">2224</a></span>
+<span class="normal"><a href="#__codelineno-0-2225">2225</a></span>
+<span class="normal"><a href="#__codelineno-0-2226">2226</a></span>
+<span class="normal"><a href="#__codelineno-0-2227">2227</a></span>
+<span class="normal"><a href="#__codelineno-0-2228">2228</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2152"><a id="__codelineno-0-2152" name="__codelineno-0-2152"></a><span class="k">class</span><span class="w"> </span><span class="nc">PeptideGenerator</span><span class="p">:</span>
+</span><span id="__span-0-2153"><a id="__codelineno-0-2153" name="__codelineno-0-2153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Object-oriented wrapper for protein structure generation.</span>
+</span><span id="__span-0-2154"><a id="__codelineno-0-2154" name="__codelineno-0-2154"></a>
+</span><span id="__span-0-2155"><a id="__codelineno-0-2155" name="__codelineno-0-2155"></a><span class="sd">    This class provides a stateful interface for generating synthetic</span>
+</span><span id="__span-0-2156"><a id="__codelineno-0-2156" name="__codelineno-0-2156"></a><span class="sd">    protein structures. It allows users to pre-configure generation</span>
+</span><span id="__span-0-2157"><a id="__codelineno-0-2157" name="__codelineno-0-2157"></a><span class="sd">    parameters (like forcefields or PTM rates) and then generate</span>
+</span><span id="__span-0-2158"><a id="__codelineno-0-2158" name="__codelineno-0-2158"></a><span class="sd">    multiple structures from the same configuration.</span>
+</span><span id="__span-0-2159"><a id="__codelineno-0-2159" name="__codelineno-0-2159"></a>
+</span><span id="__span-0-2160"><a id="__codelineno-0-2160" name="__codelineno-0-2160"></a><span class="sd">    EDUCATIONAL RATIONALE:</span>
+</span><span id="__span-0-2161"><a id="__codelineno-0-2161" name="__codelineno-0-2161"></a><span class="sd">    Encapsulating the generation logic in a class makes it easier</span>
+</span><span id="__span-0-2162"><a id="__codelineno-0-2162" name="__codelineno-0-2162"></a><span class="sd">    to manage complex experiments, such as generating an ensemble</span>
+</span><span id="__span-0-2163"><a id="__codelineno-0-2163" name="__codelineno-0-2163"></a><span class="sd">    of decoys with varying levels of torsion drift.</span>
+</span><span id="__span-0-2164"><a id="__codelineno-0-2164" name="__codelineno-0-2164"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2165"><a id="__codelineno-0-2165" name="__codelineno-0-2165"></a>
+</span><span id="__span-0-2166"><a id="__codelineno-0-2166" name="__codelineno-0-2166"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2167"><a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the generator with a target sequence and config.&quot;&quot;&quot;</span>
+</span><span id="__span-0-2168"><a id="__codelineno-0-2168" name="__codelineno-0-2168"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+</span><span id="__span-0-2169"><a id="__codelineno-0-2169" name="__codelineno-0-2169"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+</span><span id="__span-0-2170"><a id="__codelineno-0-2170" name="__codelineno-0-2170"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">PeptideResult</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-2171"><a id="__codelineno-0-2171" name="__codelineno-0-2171"></a>
+</span><span id="__span-0-2172"><a id="__codelineno-0-2172" name="__codelineno-0-2172"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
+</span><span id="__span-0-2173"><a id="__codelineno-0-2173" name="__codelineno-0-2173"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.</span>
+</span><span id="__span-0-2174"><a id="__codelineno-0-2174" name="__codelineno-0-2174"></a>
+</span><span id="__span-0-2175"><a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">        Supports on-the-fly overrides for any configuration parameter.</span>
+</span><span id="__span-0-2176"><a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2177"><a id="__codelineno-0-2177" name="__codelineno-0-2177"></a>        <span class="c1"># Merge init config with call-time overrides</span>
+</span><span id="__span-0-2178"><a id="__codelineno-0-2178" name="__codelineno-0-2178"></a>        <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+</span><span id="__span-0-2179"><a id="__codelineno-0-2179" name="__codelineno-0-2179"></a>        <span class="n">output_format</span> <span class="o">=</span> <span class="n">call_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_format&quot;</span><span class="p">,</span> <span class="s2">&quot;pdb&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2180"><a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>
+</span><span id="__span-0-2181"><a id="__codelineno-0-2181" name="__codelineno-0-2181"></a>        <span class="c1"># Call the functional generator which handles multichain splitting</span>
+</span><span id="__span-0-2182"><a id="__codelineno-0-2182" name="__codelineno-0-2182"></a>        <span class="n">content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
+</span><span id="__span-0-2183"><a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>
+</span><span id="__span-0-2184"><a id="__codelineno-0-2184" name="__codelineno-0-2184"></a>        <span class="c1"># Package into a Result object for easy access to structures</span>
+</span><span id="__span-0-2185"><a id="__codelineno-0-2185" name="__codelineno-0-2185"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">output_format</span><span class="p">)</span>
+</span><span id="__span-0-2186"><a id="__codelineno-0-2186" name="__codelineno-0-2186"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
+</span><span id="__span-0-2187"><a id="__codelineno-0-2187" name="__codelineno-0-2187"></a>
+</span><span id="__span-0-2188"><a id="__codelineno-0-2188" name="__codelineno-0-2188"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_ensemble</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_models</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">as_stack</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span id="__span-0-2189"><a id="__codelineno-0-2189" name="__codelineno-0-2189"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates a structural ensemble using the high-performance BatchedGenerator.</span>
+</span><span id="__span-0-2190"><a id="__codelineno-0-2190" name="__codelineno-0-2190"></a>
+</span><span id="__span-0-2191"><a id="__codelineno-0-2191" name="__codelineno-0-2191"></a><span class="sd">        Args:</span>
+</span><span id="__span-0-2192"><a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">            n_models: Number of models to generate.</span>
+</span><span id="__span-0-2193"><a id="__codelineno-0-2193" name="__codelineno-0-2193"></a><span class="sd">            as_stack: If True, returns a Biotite AtomArrayStack. If False,</span>
+</span><span id="__span-0-2194"><a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">                      returns a list of PeptideResult objects.</span>
+</span><span id="__span-0-2195"><a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">            **overrides: On-the-fly configuration overrides.</span>
+</span><span id="__span-0-2196"><a id="__codelineno-0-2196" name="__codelineno-0-2196"></a>
+</span><span id="__span-0-2197"><a id="__codelineno-0-2197" name="__codelineno-0-2197"></a><span class="sd">        Returns:</span>
+</span><span id="__span-0-2198"><a id="__codelineno-0-2198" name="__codelineno-0-2198"></a><span class="sd">            biotite.structure.AtomArrayStack or List[PeptideResult].</span>
+</span><span id="__span-0-2199"><a id="__codelineno-0-2199" name="__codelineno-0-2199"></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="__span-0-2200"><a id="__codelineno-0-2200" name="__codelineno-0-2200"></a>        <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+</span><span id="__span-0-2201"><a id="__codelineno-0-2201" name="__codelineno-0-2201"></a>        <span class="n">conformation</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;conformation&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2202"><a id="__codelineno-0-2202" name="__codelineno-0-2202"></a>        <span class="n">drift</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drift&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+</span><span id="__span-0-2203"><a id="__codelineno-0-2203" name="__codelineno-0-2203"></a>        <span class="n">seed</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2204"><a id="__codelineno-0-2204" name="__codelineno-0-2204"></a>
+</span><span id="__span-0-2205"><a id="__codelineno-0-2205" name="__codelineno-0-2205"></a>        <span class="c1"># BatchedGenerator is 10-100x faster for ensembles than looping generate()</span>
+</span><span id="__span-0-2206"><a id="__codelineno-0-2206" name="__codelineno-0-2206"></a>        <span class="n">bg</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_models</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-2207"><a id="__codelineno-0-2207" name="__codelineno-0-2207"></a>        <span class="n">batch</span> <span class="o">=</span> <span class="n">bg</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="n">conformation</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="n">drift</span><span class="p">)</span>
+</span><span id="__span-0-2208"><a id="__codelineno-0-2208" name="__codelineno-0-2208"></a>
+</span><span id="__span-0-2209"><a id="__codelineno-0-2209" name="__codelineno-0-2209"></a>        <span class="k">if</span> <span class="n">as_stack</span><span class="p">:</span>
+</span><span id="__span-0-2210"><a id="__codelineno-0-2210" name="__codelineno-0-2210"></a>            <span class="n">stack</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
+</span><span id="__span-0-2211"><a id="__codelineno-0-2211" name="__codelineno-0-2211"></a>            <span class="c1"># Explicitly clear templates to free memory</span>
+</span><span id="__span-0-2212"><a id="__codelineno-0-2212" name="__codelineno-0-2212"></a>            <span class="n">bg</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
+</span><span id="__span-0-2213"><a id="__codelineno-0-2213" name="__codelineno-0-2213"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+</span><span id="__span-0-2214"><a id="__codelineno-0-2214" name="__codelineno-0-2214"></a>
+</span><span id="__span-0-2215"><a id="__codelineno-0-2215" name="__codelineno-0-2215"></a>            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</span><span id="__span-0-2216"><a id="__codelineno-0-2216" name="__codelineno-0-2216"></a>            <span class="k">return</span> <span class="n">stack</span>
+</span><span id="__span-0-2217"><a id="__codelineno-0-2217" name="__codelineno-0-2217"></a>
+</span><span id="__span-0-2218"><a id="__codelineno-0-2218" name="__codelineno-0-2218"></a>        <span class="c1"># Fallback to list of results for backward compatibility or unique formatting</span>
+</span><span id="__span-0-2219"><a id="__codelineno-0-2219" name="__codelineno-0-2219"></a>        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-0-2220"><a id="__codelineno-0-2220" name="__codelineno-0-2220"></a>        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_models</span><span class="p">):</span>
+</span><span id="__span-0-2221"><a id="__codelineno-0-2221" name="__codelineno-0-2221"></a>            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PeptideResult</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+</span><span id="__span-0-2222"><a id="__codelineno-0-2222" name="__codelineno-0-2222"></a>
+</span><span id="__span-0-2223"><a id="__codelineno-0-2223" name="__codelineno-0-2223"></a>        <span class="c1"># Explicitly clear templates to free memory</span>
+</span><span id="__span-0-2224"><a id="__codelineno-0-2224" name="__codelineno-0-2224"></a>        <span class="n">bg</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
+</span><span id="__span-0-2225"><a id="__codelineno-0-2225" name="__codelineno-0-2225"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+</span><span id="__span-0-2226"><a id="__codelineno-0-2226" name="__codelineno-0-2226"></a>
+</span><span id="__span-0-2227"><a id="__codelineno-0-2227" name="__codelineno-0-2227"></a>        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</span><span id="__span-0-2228"><a id="__codelineno-0-2228" name="__codelineno-0-2228"></a>        <span class="k">return</span> <span class="n">results</span>
 </span></code></pre></div></td></tr></table></div>
               </details>
 
@@ -4905,15 +4935,15 @@ of decoys with varying levels of torsion drift.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1949">1949</a></span>
-<span class="normal"><a href="#__codelineno-0-1950">1950</a></span>
-<span class="normal"><a href="#__codelineno-0-1951">1951</a></span>
-<span class="normal"><a href="#__codelineno-0-1952">1952</a></span>
-<span class="normal"><a href="#__codelineno-0-1953">1953</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1949"><a id="__codelineno-0-1949" name="__codelineno-0-1949"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-1950"><a id="__codelineno-0-1950" name="__codelineno-0-1950"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the generator with a target sequence and config.&quot;&quot;&quot;</span>
-</span><span id="__span-0-1951"><a id="__codelineno-0-1951" name="__codelineno-0-1951"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
-</span><span id="__span-0-1952"><a id="__codelineno-0-1952" name="__codelineno-0-1952"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
-</span><span id="__span-0-1953"><a id="__codelineno-0-1953" name="__codelineno-0-1953"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">PeptideResult</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2166">2166</a></span>
+<span class="normal"><a href="#__codelineno-0-2167">2167</a></span>
+<span class="normal"><a href="#__codelineno-0-2168">2168</a></span>
+<span class="normal"><a href="#__codelineno-0-2169">2169</a></span>
+<span class="normal"><a href="#__codelineno-0-2170">2170</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2166"><a id="__codelineno-0-2166" name="__codelineno-0-2166"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ALA-GLY-SER&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2167"><a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the generator with a target sequence and config.&quot;&quot;&quot;</span>
+</span><span id="__span-0-2168"><a id="__codelineno-0-2168" name="__codelineno-0-2168"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+</span><span id="__span-0-2169"><a id="__codelineno-0-2169" name="__codelineno-0-2169"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+</span><span id="__span-0-2170"><a id="__codelineno-0-2170" name="__codelineno-0-2170"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span><span class="p">:</span> <span class="n">PeptideResult</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4937,33 +4967,35 @@ of decoys with varying levels of torsion drift.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>synth_pdb/generator.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1955">1955</a></span>
-<span class="normal"><a href="#__codelineno-0-1956">1956</a></span>
-<span class="normal"><a href="#__codelineno-0-1957">1957</a></span>
-<span class="normal"><a href="#__codelineno-0-1958">1958</a></span>
-<span class="normal"><a href="#__codelineno-0-1959">1959</a></span>
-<span class="normal"><a href="#__codelineno-0-1960">1960</a></span>
-<span class="normal"><a href="#__codelineno-0-1961">1961</a></span>
-<span class="normal"><a href="#__codelineno-0-1962">1962</a></span>
-<span class="normal"><a href="#__codelineno-0-1963">1963</a></span>
-<span class="normal"><a href="#__codelineno-0-1964">1964</a></span>
-<span class="normal"><a href="#__codelineno-0-1965">1965</a></span>
-<span class="normal"><a href="#__codelineno-0-1966">1966</a></span>
-<span class="normal"><a href="#__codelineno-0-1967">1967</a></span>
-<span class="normal"><a href="#__codelineno-0-1968">1968</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-1955"><a id="__codelineno-0-1955" name="__codelineno-0-1955"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
-</span><span id="__span-0-1956"><a id="__codelineno-0-1956" name="__codelineno-0-1956"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.</span>
-</span><span id="__span-0-1957"><a id="__codelineno-0-1957" name="__codelineno-0-1957"></a>
-</span><span id="__span-0-1958"><a id="__codelineno-0-1958" name="__codelineno-0-1958"></a><span class="sd">    Supports on-the-fly overrides for any configuration parameter.</span>
-</span><span id="__span-0-1959"><a id="__codelineno-0-1959" name="__codelineno-0-1959"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-1960"><a id="__codelineno-0-1960" name="__codelineno-0-1960"></a>    <span class="c1"># Merge init config with call-time overrides</span>
-</span><span id="__span-0-1961"><a id="__codelineno-0-1961" name="__codelineno-0-1961"></a>    <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
-</span><span id="__span-0-1962"><a id="__codelineno-0-1962" name="__codelineno-0-1962"></a>
-</span><span id="__span-0-1963"><a id="__codelineno-0-1963" name="__codelineno-0-1963"></a>    <span class="c1"># Call the functional generator which handles multichain splitting</span>
-</span><span id="__span-0-1964"><a id="__codelineno-0-1964" name="__codelineno-0-1964"></a>    <span class="n">pdb_content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
-</span><span id="__span-0-1965"><a id="__codelineno-0-1965" name="__codelineno-0-1965"></a>
-</span><span id="__span-0-1966"><a id="__codelineno-0-1966" name="__codelineno-0-1966"></a>    <span class="c1"># Package into a Result object for easy access to structures</span>
-</span><span id="__span-0-1967"><a id="__codelineno-0-1967" name="__codelineno-0-1967"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
-</span><span id="__span-0-1968"><a id="__codelineno-0-1968" name="__codelineno-0-1968"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2172">2172</a></span>
+<span class="normal"><a href="#__codelineno-0-2173">2173</a></span>
+<span class="normal"><a href="#__codelineno-0-2174">2174</a></span>
+<span class="normal"><a href="#__codelineno-0-2175">2175</a></span>
+<span class="normal"><a href="#__codelineno-0-2176">2176</a></span>
+<span class="normal"><a href="#__codelineno-0-2177">2177</a></span>
+<span class="normal"><a href="#__codelineno-0-2178">2178</a></span>
+<span class="normal"><a href="#__codelineno-0-2179">2179</a></span>
+<span class="normal"><a href="#__codelineno-0-2180">2180</a></span>
+<span class="normal"><a href="#__codelineno-0-2181">2181</a></span>
+<span class="normal"><a href="#__codelineno-0-2182">2182</a></span>
+<span class="normal"><a href="#__codelineno-0-2183">2183</a></span>
+<span class="normal"><a href="#__codelineno-0-2184">2184</a></span>
+<span class="normal"><a href="#__codelineno-0-2185">2185</a></span>
+<span class="normal"><a href="#__codelineno-0-2186">2186</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2172"><a id="__codelineno-0-2172" name="__codelineno-0-2172"></a><span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;PeptideResult&quot;</span><span class="p">:</span>
+</span><span id="__span-0-2173"><a id="__codelineno-0-2173" name="__codelineno-0-2173"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates the protein structure and returns a Result object.</span>
+</span><span id="__span-0-2174"><a id="__codelineno-0-2174" name="__codelineno-0-2174"></a>
+</span><span id="__span-0-2175"><a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">    Supports on-the-fly overrides for any configuration parameter.</span>
+</span><span id="__span-0-2176"><a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-2177"><a id="__codelineno-0-2177" name="__codelineno-0-2177"></a>    <span class="c1"># Merge init config with call-time overrides</span>
+</span><span id="__span-0-2178"><a id="__codelineno-0-2178" name="__codelineno-0-2178"></a>    <span class="n">call_config</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">overrides</span><span class="p">}</span>
+</span><span id="__span-0-2179"><a id="__codelineno-0-2179" name="__codelineno-0-2179"></a>    <span class="n">output_format</span> <span class="o">=</span> <span class="n">call_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_format&quot;</span><span class="p">,</span> <span class="s2">&quot;pdb&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2180"><a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>
+</span><span id="__span-0-2181"><a id="__codelineno-0-2181" name="__codelineno-0-2181"></a>    <span class="c1"># Call the functional generator which handles multichain splitting</span>
+</span><span id="__span-0-2182"><a id="__codelineno-0-2182" name="__codelineno-0-2182"></a>    <span class="n">content</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">call_config</span><span class="p">)</span>
+</span><span id="__span-0-2183"><a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>
+</span><span id="__span-0-2184"><a id="__codelineno-0-2184" name="__codelineno-0-2184"></a>    <span class="c1"># Package into a Result object for easy access to structures</span>
+</span><span id="__span-0-2185"><a id="__codelineno-0-2185" name="__codelineno-0-2185"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">output_format</span><span class="p">)</span>
+</span><span id="__span-0-2186"><a id="__codelineno-0-2186" name="__codelineno-0-2186"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4983,14 +5015,14 @@ of decoys with varying levels of torsion drift.</p>
 
 
 <h2 id="synth_pdb.generator.generate_pdb_content" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sequence_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">use_plausible_frequencies</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">conformation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optimize_sidechains</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">forcefield</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;amber14-all.xml&#39;</span><span class="p">,</span> <span class="n">solvent_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;obc2&#39;</span><span class="p">,</span> <span class="n">solvent_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">keep_solvent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ph</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.4</span><span class="p">,</span> <span class="n">cap_termini</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">equilibrate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">equilibrate_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">metal_ions</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">minimization_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">minimization_max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cis_proline_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">phosphorylation_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cyclic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">drift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">phi_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">psi_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">omega_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sequence_str</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">use_plausible_frequencies</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">conformation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optimize_sidechains</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">forcefield</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;amber14-all.xml&#39;</span><span class="p">,</span> <span class="n">solvent_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;obc2&#39;</span><span class="p">,</span> <span class="n">solvent_padding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">keep_solvent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ph</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.4</span><span class="p">,</span> <span class="n">cap_termini</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">equilibrate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">equilibrate_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">metal_ions</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">minimization_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">minimization_max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cis_proline_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">phosphorylation_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cyclic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">drift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">phi_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">psi_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">omega_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;pdb&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bytes</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents first">
 
-        <p>Generates PDB content for a linear or cyclic peptide chain.</p>
+        <p>Generates a realistic protein structure in PDB, mmCIF, or BinaryCIF format.</p>
 <p>EDUCATIONAL NOTE - New Feature: Cyclic Peptides
 Cyclic peptides have their N-terminus bonded to their C-terminus.
 This modification increases metabolic stability and is common in
@@ -5352,7 +5384,7 @@ therapeutic peptides (e.g., Cyclosporin).</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>str</code></td>            <td>
-                  <code><span title="str">str</span></code>
+                  <code><span title="str">str</span> | <span title="bytes">bytes</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5399,7 +5431,7 @@ are covalently linked. This has profound biological implications:
    the entropic penalty of binding to a target is greatly reduced.
 3. Bioavailability: Many legendary drugs (like Cyclosporine A) are macrocycles.</p>
 <h4 id="synth_pdb.generator.generate_pdb_content--educational-note-multi-chain-complex-generation-phase-16">EDUCATIONAL NOTE - Multi-Chain Complex Generation (Phase 16):</h4>
-<p>A major frontier in structural biology is the study of the "Interactome"—how
+<p>A major frontier in structural biology is the study of the "Interactome"-how
 individual proteins assemble into complexes. This generator supports the creation
 of dimers, trimers, and larger multimers by accepting multiple sequences
 separated by a colon (':').</p>
@@ -5465,105 +5497,21 @@ perform energy minimization or manual docking to find the native interface.</p>
 <h2 id="helper-functions">Helper Functions</h2>
 
 
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
+
 
 
 <h2 id="synth_pdb.generator._resolve_sequence" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <code class="highlight language-python"><span class="n">_resolve_sequence</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">user_sequence_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_plausible_frequencies</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <code class="highlight language-python"><span class="n">_resolve_sequence</span> <span class="o">=</span> <span class="n">_get_sequence</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
 
 </h2>
 
 
     <div class="doc doc-contents first">
-
-        <p>Resolve the amino acid sequence from user input or random generation.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>length</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Target length for random generation.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>user_sequence_str</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional user-provided sequence (1-letter or 3-letter).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>use_plausible_frequencies</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If True, uses biological frequencies for random.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="list">list</span>[<span title="str">str</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>List of 3-letter amino acid codes.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
 
     </div>
 
@@ -5701,13 +5649,13 @@ uses a specific 'PRE_PRO' distribution (favors beta/extended).</p>
 sulfur atoms (SG) are close enough to form a covalent S-S bond.</p>
 <p>Detection Criteria:
 - Both residues must be CYS
-- SG-SG distance: 2.0-2.2 Å (slightly relaxed from ideal 2.0-2.1 Å)
+- SG-SG distance: 2.0-2.2 A (slightly relaxed from ideal 2.0-2.1 A)
 - Only report each pair once (avoid duplicates)</p>
 <p>Why Distance Matters:
-- &lt; 2.0 Å: Too close (steric clash, not realistic)
-- 2.0-2.1 Å: Ideal disulfide bond distance
-- 2.1-2.2 Å: Acceptable (allows for flexibility)
-- &gt; 2.2 Å: Too far (no covalent bond possible)</p>
+- &lt; 2.0 A: Too close (steric clash, not realistic)
+- 2.0-2.1 A: Ideal disulfide bond distance
+- 2.1-2.2 A: Acceptable (allows for flexibility)
+- &gt; 2.2 A: Too far (no covalent bond possible)</p>
 <p>Biological Context:
 - Disulfides stabilize protein structure
 - Common in extracellular proteins

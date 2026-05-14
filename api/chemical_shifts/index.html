@@ -1294,7 +1294,7 @@
   <span class="md-ellipsis">
     
   
-    🔬 The NeRF Geometry Lab
+    [INFO] The NeRF Geometry Lab
   
 
     
@@ -1378,7 +1378,7 @@
   <span class="md-ellipsis">
     
   
-    🔍 Protein Quality Assessment Lab
+    [INFO] Protein Quality Assessment Lab
   
 
     
@@ -1935,6 +1935,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/modern_formats_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    [INFO] Modern Formats Lab: PDBx, mmCIF &amp; BinaryCIF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4814,7 +4842,7 @@ Inversion pipeline:
 </span><span id="__span-0-452"><a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">        Dict: A nested dictionary structure {chain: {res_id: {atom: value}}}.</span>
 </span><span id="__span-0-453"><a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">             Values are in parts-per-million (ppm).</span>
 </span><span id="__span-0-454"><a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-455"><a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="c1"># ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────</span>
+</span><span id="__span-0-455"><a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="c1"># -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------</span>
 </span><span id="__span-0-456"><a id="__codelineno-0-456" name="__codelineno-0-456"></a>    <span class="c1"># To support non-standard residues (D-amino acids, PTMs) we must ensure</span>
 </span><span id="__span-0-457"><a id="__codelineno-0-457" name="__codelineno-0-457"></a>    <span class="c1"># the underlying engine recognizes all residues in the chain.</span>
 </span><span id="__span-0-458"><a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="c1">#</span>
@@ -4827,7 +4855,7 @@ Inversion pipeline:
 </span><span id="__span-0-465"><a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="c1"># 6. NumPy masking is used for performance on large structure arrays.</span>
 </span><span id="__span-0-466"><a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="c1"># 7. ResName attribute is modified to match the parent amino acid.</span>
 </span><span id="__span-0-467"><a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="c1"># 8. All standard atoms (N, CA, C, O, CB) are preserved for the engine.</span>
-</span><span id="__span-0-468"><a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="c1"># ── 1. PRE-PROCESSING: RESIDUE MAPPING ───────────────────────────────────</span>
+</span><span id="__span-0-468"><a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="c1"># -- 1. PRE-PROCESSING: RESIDUE MAPPING -----------------------------------</span>
 </span><span id="__span-0-469"><a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="c1"># To support non-standard residues (D-amino acids, PTMs) we must ensure</span>
 </span><span id="__span-0-470"><a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="c1"># the underlying engine recognizes all residues in the chain.</span>
 </span><span id="__span-0-471"><a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="n">working_struc</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -4864,12 +4892,12 @@ Inversion pipeline:
 </span><span id="__span-0-502"><a id="__codelineno-0-502" name="__codelineno-0-502"></a>                <span class="n">_cs</span><span class="o">.</span><span class="n">predict_chemical_shifts</span><span class="p">(</span><span class="n">struc_to_predict</span><span class="p">),</span>
 </span><span id="__span-0-503"><a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="p">)</span>
 </span><span id="__span-0-504"><a id="__codelineno-0-504" name="__codelineno-0-504"></a>
-</span><span id="__span-0-505"><a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="c1"># ── 2. PASS 1: STANDARD PREDICTION ───────────────────────────────────────</span>
+</span><span id="__span-0-505"><a id="__codelineno-0-505" name="__codelineno-0-505"></a>    <span class="c1"># -- 2. PASS 1: STANDARD PREDICTION ---------------------------------------</span>
 </span><span id="__span-0-506"><a id="__codelineno-0-506" name="__codelineno-0-506"></a>    <span class="c1"># Predict shifts for the mapped structure. This provides physically accurate</span>
 </span><span id="__span-0-507"><a id="__codelineno-0-507" name="__codelineno-0-507"></a>    <span class="c1"># results for all standard L-amino acids and PTMs.</span>
 </span><span id="__span-0-508"><a id="__codelineno-0-508" name="__codelineno-0-508"></a>    <span class="n">base_shifts</span> <span class="o">=</span> <span class="n">_dispatch_predictor</span><span class="p">(</span><span class="n">working_struc</span><span class="p">)</span>
 </span><span id="__span-0-509"><a id="__codelineno-0-509" name="__codelineno-0-509"></a>
-</span><span id="__span-0-510"><a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="c1"># ── 3. PASS 2: COORDINATE INVERSION FOR D-PEPTIDES ───────────────────────</span>
+</span><span id="__span-0-510"><a id="__codelineno-0-510" name="__codelineno-0-510"></a>    <span class="c1"># -- 3. PASS 2: COORDINATE INVERSION FOR D-PEPTIDES -----------------------</span>
 </span><span id="__span-0-511"><a id="__codelineno-0-511" name="__codelineno-0-511"></a>    <span class="c1"># If D-amino acids are present, their local geometry is inverted relative to</span>
 </span><span id="__span-0-512"><a id="__codelineno-0-512" name="__codelineno-0-512"></a>    <span class="c1"># the L-parameterized training data. We invert the entire coordinate space</span>
 </span><span id="__span-0-513"><a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="c1"># (mirror image) and run a second prediction pass. The shifts of an enantiomer</span>
@@ -4878,7 +4906,7 @@ Inversion pipeline:
 </span><span id="__span-0-516"><a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_d_amino_acids</span><span class="p">:</span>
 </span><span id="__span-0-517"><a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="k">return</span> <span class="n">base_shifts</span>
 </span><span id="__span-0-518"><a id="__codelineno-0-518" name="__codelineno-0-518"></a>
-</span><span id="__span-0-519"><a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="c1"># ── 3. INVERTED PREDICTION PASS (D-AMINO ACIDS) ──────────────────────────</span>
+</span><span id="__span-0-519"><a id="__codelineno-0-519" name="__codelineno-0-519"></a>    <span class="c1"># -- 3. INVERTED PREDICTION PASS (D-AMINO ACIDS) --------------------------</span>
 </span><span id="__span-0-520"><a id="__codelineno-0-520" name="__codelineno-0-520"></a>    <span class="c1"># SCIENTIFIC BACKGROUND FOR INVERTED PASS:</span>
 </span><span id="__span-0-521"><a id="__codelineno-0-521" name="__codelineno-0-521"></a>    <span class="c1"># ----------------------------------------</span>
 </span><span id="__span-0-522"><a id="__codelineno-0-522" name="__codelineno-0-522"></a>    <span class="c1"># Empirical chemical shift predictors (like SHIFTX2 and SPARTA+) are</span>
@@ -4923,7 +4951,7 @@ Inversion pipeline:
 </span><span id="__span-0-561"><a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="c1"># Dispatch the inverted structure to the core prediction engine.</span>
 </span><span id="__span-0-562"><a id="__codelineno-0-562" name="__codelineno-0-562"></a>    <span class="n">inverted_shifts</span> <span class="o">=</span> <span class="n">_dispatch_predictor</span><span class="p">(</span><span class="n">inverted_struc</span><span class="p">)</span>
 </span><span id="__span-0-563"><a id="__codelineno-0-563" name="__codelineno-0-563"></a>
-</span><span id="__span-0-564"><a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="c1"># ── 4. MERGE RESULTS ─────────────────────────────────────────────────────</span>
+</span><span id="__span-0-564"><a id="__codelineno-0-564" name="__codelineno-0-564"></a>    <span class="c1"># -- 4. MERGE RESULTS -----------------------------------------------------</span>
 </span><span id="__span-0-565"><a id="__codelineno-0-565" name="__codelineno-0-565"></a>    <span class="c1"># We selectively pull the predicted shifts for D-residues from the inverted</span>
 </span><span id="__span-0-566"><a id="__codelineno-0-566" name="__codelineno-0-566"></a>    <span class="c1"># pass, and L-residues from the standard pass, returning a unified dictionary.</span>
 </span><span id="__span-0-567"><a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="n">merged_shifts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -5162,7 +5190,7 @@ or full 3D coordinate generation.</p>
 </span><span id="__span-0-627"><a id="__codelineno-0-627" name="__codelineno-0-627"></a><span class="sd">    Returns:</span>
 </span><span id="__span-0-628"><a id="__codelineno-0-628" name="__codelineno-0-628"></a><span class="sd">        Dict: Nested dictionary {chain: {res_id: deviation}}.</span>
 </span><span id="__span-0-629"><a id="__codelineno-0-629" name="__codelineno-0-629"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-630"><a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="c1"># ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────</span>
+</span><span id="__span-0-630"><a id="__codelineno-0-630" name="__codelineno-0-630"></a>    <span class="c1"># -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------</span>
 </span><span id="__span-0-631"><a id="__codelineno-0-631" name="__codelineno-0-631"></a>    <span class="c1"># The core CSI calculation relies on looking up the empirically derived</span>
 </span><span id="__span-0-632"><a id="__codelineno-0-632" name="__codelineno-0-632"></a>    <span class="c1"># random-coil reference values for each specific amino acid type. Because</span>
 </span><span id="__span-0-633"><a id="__codelineno-0-633" name="__codelineno-0-633"></a>    <span class="c1"># non-standard residues (like D-amino acids or phosphorylated sidechains)</span>
@@ -5459,7 +5487,7 @@ and accurately classify the secondary structure.</p>
 </span><span id="__span-0-703"><a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">    Returns:</span>
 </span><span id="__span-0-704"><a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">        List[str]: A list of 3-state (H, E, C) or DSSP labels per residue.</span>
 </span><span id="__span-0-705"><a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-706"><a id="__codelineno-0-706" name="__codelineno-0-706"></a>    <span class="c1"># ── PRE-PROCESSING: RESIDUE MAPPING ──────────────────────────────────────</span>
+</span><span id="__span-0-706"><a id="__codelineno-0-706" name="__codelineno-0-706"></a>    <span class="c1"># -- PRE-PROCESSING: RESIDUE MAPPING --------------------------------------</span>
 </span><span id="__span-0-707"><a id="__codelineno-0-707" name="__codelineno-0-707"></a>    <span class="c1"># Because empirical secondary structure parsing tools, such as the P-SEA</span>
 </span><span id="__span-0-708"><a id="__codelineno-0-708" name="__codelineno-0-708"></a>    <span class="c1"># algorithm used natively by Biotite&#39;s `annotate_sse`, are intrinsically</span>
 </span><span id="__span-0-709"><a id="__codelineno-0-709" name="__codelineno-0-709"></a>    <span class="c1"># formulated exclusively for naturally occurring L-amino acid geometries,</span>
