@@ -74,6 +74,8 @@ dev = [
     "requests",
     "types-requests",
     "mrcfile>=1.5.0",
+    "matplotlib>=3.8.0",
+    "scipy>=1.11.0",
 ]
 test = [
     "pynmrstar",
@@ -94,6 +96,10 @@ gnn = [
 plm = [
     "torch>=2.0.0",
     "transformers>=4.30.0",  # HuggingFace Transformers for ESM-2 model
+]
+viz = [
+    "matplotlib>=3.8.0",
+    "scipy>=1.11.0",
 ]
 gui = [
     "streamlit>=1.30.0",

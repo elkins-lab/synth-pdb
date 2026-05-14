@@ -101,7 +101,11 @@ class CDSimulator:
 
     def plot(self, save_path: str | None = None) -> None:
         """Plots the synthetic CD spectrum."""
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            logger.warning("Matplotlib not installed. CD plotting is disabled.")
+            return
 
         spectrum = self.get_spectrum()
 

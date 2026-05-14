@@ -111,6 +111,12 @@ def test_side_effect_flag_produces_file(
             assert code == 0, f"CLI for {case_id} exited with code {code}"
 
     for fname in expected_outputs:
+        if case_id == "gen-cd" and fname == "test_cd.png":
+            try:
+                import matplotlib
+            except ImportError:
+                pytest.skip("matplotlib not installed, skipping CD plot existence check")
+
         out_path = tmp_path / fname
         assert out_path.exists(), (
             f"CLI flag set {case_id!r} did not produce expected file {fname!r}. "
