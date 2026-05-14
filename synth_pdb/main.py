@@ -1262,6 +1262,11 @@ def main() -> None:
                     logger.warning(
                         f"PDB generated in attempt {attempt_num} has {len(current_violations)} violations. Retrying..."
                     )
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug("--- PDB Validation Report for failed attempt ---")
+                        for violation in current_violations:
+                            logger.debug(violation)
+                        logger.debug("--- End Validation Report ---")
             elif args.best_of_N > 1:
                 if len(current_violations) < min_violations_count:
                     min_violations_count = len(current_violations)
@@ -1820,27 +1825,53 @@ def main() -> None:
                         # spectra (Greenfield & Fasman, 1969, Biochemistry 8:4108):
                         #   [θ]total = f_helix · [θ]helix + f_sheet · [θ]sheet + f_coil · [θ]coil
                         logger.info("Simulating Circular Dichroism (CD) spectrum...")
-                        from .cd_simulator import CDSimulator
+                        from .cd_simulator import CDSimulator, validate_cd_against_literature
 
                         cd_sim = CDSimulator(structure)
-                        # (Note: cd_simulator needs an export method if we want to save .dat)
-                        cd_sim.plot(save_path=output_filename.replace(".pdb", "_cd.png"))
+                        cd_plot = output_filename.replace(".pdb", "_cd.png")
+                        cd_sim.plot(save_path=cd_plot)
+
+                        # Automated scientific validation against literature CD signatures.
+                        cd_findings = validate_cd_against_literature(
+                            cd_sim.fractions, cd_sim.get_spectrum(noise_level=0)
+                        )
+                        if cd_findings:
+                            logger.info("--- Synthetic CD Validation Report ---")
+                            for find_item in cd_findings:
+                                logger.info(f"  {find_item}")
+                            logger.info("--------------------------------------")
+
                         logger.info(
-                            f"Synthetic CD spectrum plot saved to: {os.path.abspath(output_filename.replace('.pdb', '_cd.png'))}"
+                            f"Synthetic CD spectrum plot saved to: {os.path.abspath(cd_plot)}"
                         )
 
                     # 4.5 J-Couplings (Phase 9.5)
                     if args.gen_couplings:
                         logger.info("Calculating HN-HA scalar couplings...")
-                        from .j_coupling import calculate_hn_ha_coupling
+                        from .coupling import predict_couplings_from_structure
+                        from .torsion import calculate_torsion_angles
 
-                        couplings = calculate_hn_ha_coupling(structure)
+                        # predict_couplings_from_structure() returns
+                        # {chain_id: {res_id: J_value}} with prolines stripped and
+                        # D-amino acids phase-corrected. We iterate over the full
+                        # residue list (from calculate_torsion_angles) so the CSV
+                        # has one row per residue — prolines/N-term get NaN rather
+                        # than being silently absent, which keeps the schema
+                        # fixed-width for downstream consumers.
+                        couplings_by_chain = predict_couplings_from_structure(structure)
+                        flat_couplings: dict[int, float] = {}
+                        for inner in couplings_by_chain.values():
+                            flat_couplings.update(inner)
+
+                        angles_list = calculate_torsion_angles(structure)
                         cp_fn = args.coupling_output or output_filename.replace(".pdb", "_j.csv")
-                        # Export simple CSV
                         with open(cp_fn, "w") as f:
-                            f.write("res_id,3J_HNHA_Hz\n")
-                            for rid, val in couplings.items():
-                                f.write(f"{rid},{val:.4f}\n")
+                            f.write("res_id,residue,J_HN_HA\n")
+                            for angle_data in angles_list:
+                                rid = angle_data["res_id"]
+                                res = angle_data["residue"]
+                                jval = flat_couplings.get(rid, float("nan"))
+                                f.write(f"{rid},{res},{jval:.4f}\n")
                         logger.info(f"Scalar couplings exported to: {os.path.abspath(cp_fn)}")
 
                     # 3.6 RDC Output (Phase 9.6)
