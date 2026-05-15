@@ -206,6 +206,7 @@ filterwarnings = [
     "ignore:.*Passing None into shape arguments.*:DeprecationWarning",
     "ignore:.*invalid value encountered in divide.*:RuntimeWarning",
     "ignore:.*Input structure has no associated 'BondList'.*:UserWarning",
+    "ignore:.*Failing to pass a value to the 'type_params' parameter.*:DeprecationWarning",
 ]
 
 [tool.mypy]

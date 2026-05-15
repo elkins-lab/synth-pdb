@@ -19,13 +19,17 @@ def experimental_pdb():
     """Downloads the 1UBQ PDB file if it doesn't exist locally."""
     if not os.path.exists(PDB_FILE):
         print(f"Downloading {PDB_URL}...")
-        response = requests.get(PDB_URL)
-        response.raise_for_status()
-        with open(PDB_FILE, "w") as f:
-            f.write(response.text)
+        try:
+            response = requests.get(PDB_URL, timeout=30)
+            response.raise_for_status()
+            with open(PDB_FILE, "w") as f:
+                f.write(response.text)
+        except requests.exceptions.RequestException as e:
+            pytest.skip(f"External data source {PDB_URL} is unavailable: {e}")
     return PDB_FILE
 
 
+@pytest.mark.network
 def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     """Verifies structural fidelity of the minimized 1UBQ against the original experimental structure.
     Checks:
@@ -180,6 +184,7 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
     ), f"Found structural violations after minimization: {important_violations}"
 
 
+@pytest.mark.network
 def test_experimental_clash_comparison(experimental_pdb, tmp_path):
     """Compares steric clashes in experimental vs minimized structures.
     Shows that minimization actually improves (reduces) physical violations.
