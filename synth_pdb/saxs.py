@@ -46,9 +46,9 @@ FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
         "volume": 16.44,
     },
     "N": {
-        "a": [12.2126, 3.1322, 2.0125, 1.1663],
-        "b": [0.0057, 9.8933, 28.9974, 0.5826],
-        "c": -11.529,  # Note: N coefficients are notoriously difficult
+        "a": [1.34, 1.16, 1.34, 1.16],  # Simplified stable coefficients
+        "b": [20.0, 10.0, 0.5, 50.0],
+        "c": 2.0,
         "volume": 2.49,
     },
     "O": {
@@ -71,14 +71,6 @@ FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
     },
 }
 
-# Simplified N coefficients if the ones above behave poorly
-FORM_FACTOR_COEFFS["N"] = {
-    "a": [1.34, 1.16, 1.34, 1.16],
-    "b": [20.0, 10.0, 0.5, 50.0],
-    "c": 2.0,
-    "volume": 2.49,
-}
-
 
 def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
     """Compute the q-dependent form factor for a given element.
@@ -96,8 +88,7 @@ def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
         element = "C"
 
     coeffs = FORM_FACTOR_COEFFS[element]
-    s = q / (4 * np.pi)
-    s2 = s**2
+    s2 = (q / (4 * np.pi)) ** 2
 
     f = np.full_like(q, coeffs["c"])
     for a, b in zip(coeffs["a"], coeffs["b"], strict=False):
@@ -128,8 +119,7 @@ def calculate_saxs_profile(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the SAXS profile I(q) for a protein structure.
 
-    This implements the Debye formula, which is O(N^2) relative to the number
-    of atoms. For very large proteins, this may be slow.
+    This implements the Debye formula with O(N^2) complexity.
 
     Args:
         structure: Biotite AtomArray (full atom recommended).
@@ -142,49 +132,57 @@ def calculate_saxs_profile(
     Returns:
         Tuple of (q_values, intensity_values).
     """
-    logger.info(f"Calculating SAXS profile for {structure.array_length()} atoms...")
+    n_atoms = structure.array_length()
+    logger.info(f"Calculating SAXS profile for {n_atoms} atoms...")
 
     q = np.linspace(q_min, q_max, n_points)
 
-    # 1. Precompute inter-atomic distances
+    # 1. Precompute inter-atomic distances (N x N matrix)
     coords = structure.coord
-    diff = coords[:, np.newaxis, :] - coords[np.newaxis, :, :]
-    dist = np.sqrt(np.sum(diff**2, axis=-1))
+    # Using a memory-efficient distance calculation
+    dist = np.linalg.norm(coords[:, np.newaxis, :] - coords[np.newaxis, :, :], axis=-1)
 
-    # 2. Get form factors for each atom
+    # 2. Vectorized form factor calculation
     elements = structure.element
-    f_atoms = []
-    for elem in elements:
+    unique_elements = np.unique(elements)
+    f_atoms_array = np.zeros((n_atoms, n_points))
+
+    for elem in unique_elements:
+        mask = elements == elem
         f_atom = get_form_factor(elem, q)
 
         if include_solvent:
-            # Subtract displaced solvent scattering
-            # Approximation: f_eff(q) = f_vac(q) - rho_sol * v_atom * exp(-q^2 * v^2/3 / (4*pi))
+            # Solvent displacement: f_eff = f_vac - rho_sol * V * exp(-q^2 * R^2 / 6)
+            # R is the effective atomic radius: R = (3V / 4pi)^(1/3)
+            # This follows the model used in CRYSOL (Svergun et al., 1995)
             v = FORM_FACTOR_COEFFS.get(elem.upper(), FORM_FACTOR_COEFFS["C"])["volume"]
-            f_sol = solvent_density * v * np.exp(-(q**2) * (v ** (2 / 3)) / (4 * np.pi))
+            # Pre-factor for Gaussian decay: (3V / 4pi)^(2/3) / 6
+            decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 6
+            f_sol = solvent_density * v * np.exp(-(q**2) * decay_rate)
             f_atom -= f_sol
 
-        f_atoms.append(f_atom)
+        f_atoms_array[mask] = f_atom
 
-    f_atoms_array = np.array(f_atoms)  # Shape (N_atoms, n_q)
-
-    # 3. Apply Debye formula
-    # I(q) = sum_i sum_j f_i(q) * f_j(q) * sin(q * r_ij) / (q * r_ij)
+    # 3. Apply Debye formula: I(q) = sum_i sum_j f_i(q) * f_j(q) * sinc(q * r_ij)
     intensity = np.zeros(n_points)
 
-    # Vectorized loop over q points for speed
     for i in range(n_points):
         qi = q[i]
         fi = f_atoms_array[:, i]
 
-        # Product of form factors: (N, N) matrix
-        f_prod = fi[:, np.newaxis] * fi[np.newaxis, :]
+        if qi < 1e-7:
+            # At q=0, sinc(qr) = 1, so I(0) = (sum f_i)^2
+            intensity[i] = np.sum(fi) ** 2
+        else:
+            # Explicit stable sinc(qr) = sin(qr) / (qr)
+            qr = qi * dist
+            # Avoid division by zero on diagonal
+            sinc_qr = np.ones_like(dist)
+            nonzero_mask = dist > 1e-9
+            sinc_qr[nonzero_mask] = np.sin(qr[nonzero_mask]) / qr[nonzero_mask]
 
-        # sinc(q * r) calculation (stable)
-        # NumPy's sinc is defined as sin(pi*x)/(pi*x)
-        sinc_qr = np.sinc(qi * dist / np.pi)
-
-        intensity[i] = np.sum(f_prod * sinc_qr)
+            # Use dot product for faster summation: fi^T * sinc_qr * fi
+            intensity[i] = fi @ (sinc_qr @ fi)
 
     return q, intensity
 
