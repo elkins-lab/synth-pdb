@@ -49,7 +49,7 @@ FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
         "a": [1.34, 1.16, 1.34, 1.16],  # Simplified stable coefficients
         "b": [20.0, 10.0, 0.5, 50.0],
         "c": 2.0,
-        "volume": 2.49,
+        "volume": 14.0,
     },
     "O": {
         "a": [3.0485, 2.2868, 1.5463, 0.867],
@@ -139,6 +139,10 @@ def calculate_saxs_profile(
 
     # 1. Precompute inter-atomic distances (N x N matrix)
     coords = structure.coord
+    if coords.ndim == 3:
+        # If passed an AtomArrayStack with 1 model, flatten to 2D
+        coords = coords[0]
+
     # Using a memory-efficient distance calculation
     dist = np.linalg.norm(coords[:, np.newaxis, :] - coords[np.newaxis, :, :], axis=-1)
 
@@ -159,7 +163,7 @@ def calculate_saxs_profile(
             # Pre-factor for Gaussian decay: (3V / 4pi)^(2/3) / 6
             decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 6
             f_sol = solvent_density * v * np.exp(-(q**2) * decay_rate)
-            f_atom -= f_sol
+            f_atom = f_atom - f_sol
 
         f_atoms_array[mask] = f_atom
 
@@ -171,15 +175,13 @@ def calculate_saxs_profile(
         fi = f_atoms_array[:, i]
 
         if qi < 1e-7:
-            # At q=0, sinc(qr) = 1, so I(0) = (sum f_i)^2
+            # At q=0, sinc(qr) = 1, so I(0) = (sum f_i) ** 2
             intensity[i] = np.sum(fi) ** 2
         else:
-            # Explicit stable sinc(qr) = sin(qr) / (qr)
-            qr = qi * dist
-            # Avoid division by zero on diagonal
-            sinc_qr = np.ones_like(dist)
-            nonzero_mask = dist > 1e-9
-            sinc_qr[nonzero_mask] = np.sin(qr[nonzero_mask]) / qr[nonzero_mask]
+            # Use np.sinc for numerical stability
+            # Note: np.sinc(x) is sin(pi*x) / (pi*x), so we pass qr/pi
+            qr_over_pi = (qi * dist) / np.pi
+            sinc_qr = np.sinc(qr_over_pi)
 
             # Use dot product for faster summation: fi^T * sinc_qr * fi
             intensity[i] = fi @ (sinc_qr @ fi)
