@@ -66,6 +66,25 @@ After minimization, the `_do_energy_minimization` function in `generator.py` man
 **Future Enhancement:**
 Currently, this restoration logic covers PTMs (`SEP`, `TPO`, `PTR`) and Histidine tautomers (`HIE`, `HID`, `HIP`). It should be extended to include **D-Amino Acids** (e.g., `DAL`, `DSE`, etc.), which are also renamed to standard types before simulation in `physics.py`.
 
+## Dependency Constraints
+
+### NumPy 2.0 Compatibility
+NumPy 2.0 introduced significant breaking changes, particularly in the C API. While `synth-pdb` itself is largely compatible, several transitive and optional dependencies (such as `pyarrow` used by `pandas` and `scikit-learn`) may not be fully compatible in all environments.
+
+**The Issue:**
+Importing `scikit-learn` or `pandas` in an environment with NumPy 2.x and an older version of `pyarrow` can result in an `AttributeError: _ARRAY_API not found` or `ImportError: numpy.core.multiarray failed to import`.
+
+**The Solution:**
+For stability, `synth-pdb` restricts NumPy to `<2.0` in `pyproject.toml`. This ensures that all compiled extensions in the environment remain compatible until the full dependency chain (including user-installed optional packages) has matured for NumPy 2.0.
+
+```toml
+# In pyproject.toml
+dependencies = [
+    "numpy>=1.26.4,<2.0",
+    ...
+]
+```
+
 ## Output Formats (PDBx/mmCIF & BinaryCIF)
 
 `synth-pdb` now supports modern PDB formats to address the limitations of the legacy `.pdb` format (e.g., 99k atom limit).

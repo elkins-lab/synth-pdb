@@ -1162,6 +1162,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dependency-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency Constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numpy-20-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPy 2.0 Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-formats-pdbxmmcif-binarycif" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4585,6 +4613,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dependency-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency Constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numpy-20-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPy 2.0 Compatibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#output-formats-pdbxmmcif-binarycif" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4679,6 +4735,19 @@ Downstream tools and viewers (PyMOL, ChimeraX) rely on the original PTM names (<
 After minimization, the <code>_do_energy_minimization</code> function in <code>generator.py</code> manually restores these names by mapping the original sequence back onto the minimized coordinates. This is applied to both the <code>Biotite</code> AtomArray and the raw PDB string output.</p>
 <p><strong>Future Enhancement:</strong>
 Currently, this restoration logic covers PTMs (<code>SEP</code>, <code>TPO</code>, <code>PTR</code>) and Histidine tautomers (<code>HIE</code>, <code>HID</code>, <code>HIP</code>). It should be extended to include <strong>D-Amino Acids</strong> (e.g., <code>DAL</code>, <code>DSE</code>, etc.), which are also renamed to standard types before simulation in <code>physics.py</code>.</p>
+<h2 id="dependency-constraints">Dependency Constraints</h2>
+<h3 id="numpy-20-compatibility">NumPy 2.0 Compatibility</h3>
+<p>NumPy 2.0 introduced significant breaking changes, particularly in the C API. While <code>synth-pdb</code> itself is largely compatible, several transitive and optional dependencies (such as <code>pyarrow</code> used by <code>pandas</code> and <code>scikit-learn</code>) may not be fully compatible in all environments.</p>
+<p><strong>The Issue:</strong>
+Importing <code>scikit-learn</code> or <code>pandas</code> in an environment with NumPy 2.x and an older version of <code>pyarrow</code> can result in an <code>AttributeError: _ARRAY_API not found</code> or <code>ImportError: numpy.core.multiarray failed to import</code>.</p>
+<p><strong>The Solution:</strong>
+For stability, <code>synth-pdb</code> restricts NumPy to <code>&lt;2.0</code> in <code>pyproject.toml</code>. This ensures that all compiled extensions in the environment remain compatible until the full dependency chain (including user-installed optional packages) has matured for NumPy 2.0.</p>
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># In pyproject.toml</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="s2">&quot;numpy&gt;=1.26.4,&lt;2.0&quot;</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="err">...</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="err">]</span>
+</span></code></pre></div>
 <h2 id="output-formats-pdbxmmcif-binarycif">Output Formats (PDBx/mmCIF &amp; BinaryCIF)</h2>
 <p><code>synth-pdb</code> now supports modern PDB formats to address the limitations of the legacy <code>.pdb</code> format (e.g., 99k atom limit).</p>
 <h3 id="implementation-details">Implementation Details</h3>
