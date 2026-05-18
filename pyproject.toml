@@ -76,6 +76,7 @@ dev = [
     "mrcfile>=1.5.0",
     "matplotlib>=3.8.0",
     "scipy>=1.11.0",
+    "py3Dmol",
 ]
 test = [
     "pynmrstar",
@@ -100,6 +101,7 @@ plm = [
 viz = [
     "matplotlib>=3.8.0",
     "scipy>=1.11.0",
+    "py3Dmol",
 ]
 gui = [
     "streamlit>=1.30.0",
