@@ -46,6 +46,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | [**📏 Geometry Tools Lab**](examples/interactive_tutorials/geometry_tools_reference.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/geometry_tools_reference.ipynb) |
 | [**🧪 The GFP Molecular Forge**](examples/interactive_tutorials/gfp_molecular_forge.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
 | [**⚙️ The Molecular Machine Lab**](examples/interactive_tutorials/molecular_machine_lab.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/molecular_machine_lab.ipynb) |
+| [**🧠 The Prion Chameleon Lab**](examples/interactive_tutorials/prion_chameleon_lab.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/prion_chameleon_lab.ipynb) |
 | [**🧬 PLM Embeddings (ESM-2)**](examples/ml_integration/plm_embeddings.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/plm_embeddings.ipynb) |
 | [**📊 Ubiquitin Validation Suite**](examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) | ⭐⭐⭐ Advanced | 45 min | [CS](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) / [J-Coupling](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_j_coupling_validation.ipynb) / [RDC](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_rdc_validation.ipynb) |
 | [**📐 6D Orientogram Lab**](examples/ml_integration/orientogram_lab.ipynb) | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/orientogram_lab.ipynb) |
@@ -74,6 +75,7 @@ Choose a path based on your background and goals:
 5. **🧬 PLM Embeddings (ESM-2)** (30 min) - Add evolutionary context as per-residue node features
 6. **📐 6D Orientogram Lab** (30 min) - Work with rotation-invariant representations
 7. **🧬 Co-evolution Factory** (35 min) - Simulate sequence evolution kernels
+8. **🧠 The Prion Chameleon Lab** (25 min) - Generate high-quality misfolded decoys for robust structural scoring models
 
 #### 🔬 **For Biophysicists**
 *Understand structure, dynamics, and spectroscopy*
@@ -87,13 +89,14 @@ Choose a path based on your background and goals:
 7. **🧠 GNN pLDDT Explorer** (30 min) - Score structures with a Graph Neural Network; interpret per-residue pLDDT confidence using AlphaFold's colour scheme; compute TM-score, lDDT, and GDT-TS metrics
 8. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
 9. **⚙️ The Molecular Machine Lab** (25 min) - Simulate hinge motions and dynamic CD/NMR observables
-10. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
-11. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
-12. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
-13. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
-14. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
-15. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
-16. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
+10. **🧠 The Prion Chameleon Lab** (25 min) - Model alpha-to-beta transitions and infectious folding decoys
+11. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
+12. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
+13. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
+14. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
+15. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
+16. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
+17. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*
