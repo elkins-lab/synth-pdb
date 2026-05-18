@@ -32,6 +32,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | [**🔗 Framework Handover**](examples/ml_loading/) | ⭐ Beginner | 10 min | [View JAX/PyTorch/MLX Examples](https://github.com/elkins/synth-pdb/tree/master/examples/ml_loading) |
 | [**🧪 BMRB Validation Pipeline**](examples/interactive_tutorials/bmrb_validation.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/bmrb_validation.ipynb) |
 | [**⭕ Macrocycle Design Lab**](examples/ml_integration/macrocycle_lab.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/macrocycle_lab.ipynb) |
+| [**🪞 The Mirror World Lab**](examples/interactive_tutorials/mirror_world_lab.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/mirror_world_lab.ipynb) |
 | [**💊 Bio-Active Hormone Lab**](examples/ml_integration/hormone_lab.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/hormone_lab.ipynb) |
 | [**🔍 Protein Quality Assessment**](examples/interactive_tutorials/protein_quality_assessment.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/protein_quality_assessment.ipynb) |
 | [**🧠 GNN pLDDT Explorer**](examples/interactive_tutorials/gnn_plddt_explorer.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gnn_plddt_explorer.ipynb) |
@@ -44,6 +45,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 | [**📦 Modern Formats Lab**](examples/interactive_tutorials/modern_formats_lab.ipynb) | ⭐⭐ Intermediate | 15 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/modern_formats_lab.ipynb) |
 | [**📏 Geometry Tools Lab**](examples/interactive_tutorials/geometry_tools_reference.ipynb) | ⭐⭐ Intermediate | 20 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/geometry_tools_reference.ipynb) |
 | [**🧪 The GFP Molecular Forge**](examples/interactive_tutorials/gfp_molecular_forge.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/gfp_molecular_forge.ipynb) |
+| [**⚙️ The Molecular Machine Lab**](examples/interactive_tutorials/molecular_machine_lab.ipynb) | ⭐⭐ Intermediate | 25 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/molecular_machine_lab.ipynb) |
 | [**🧬 PLM Embeddings (ESM-2)**](examples/ml_integration/plm_embeddings.ipynb) | ⭐⭐ Intermediate | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/plm_embeddings.ipynb) |
 | [**📊 Ubiquitin Validation Suite**](examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) | ⭐⭐⭐ Advanced | 45 min | [CS](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_chemical_shift_validation.ipynb) / [J-Coupling](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_j_coupling_validation.ipynb) / [RDC](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/interactive_tutorials/ubiquitin_rdc_validation.ipynb) |
 | [**📐 6D Orientogram Lab**](examples/ml_integration/orientogram_lab.ipynb) | ⭐⭐⭐ Advanced | 30 min | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-pdb/blob/master/examples/ml_integration/orientogram_lab.ipynb) |
@@ -84,13 +86,14 @@ Choose a path based on your background and goals:
 6. **🔍 Protein Quality Assessment** (25 min) - Validate structure quality and geometry
 7. **🧠 GNN pLDDT Explorer** (30 min) - Score structures with a Graph Neural Network; interpret per-residue pLDDT confidence using AlphaFold's colour scheme; compute TM-score, lDDT, and GDT-TS metrics
 8. **🧪 GFP Molecular Forge** (30 min) - Explore chromophore chemistry
-8. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
-9. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
-10. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
-11. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
-12. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
-13. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
-14. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
+9. **⚙️ The Molecular Machine Lab** (25 min) - Simulate hinge motions and dynamic CD/NMR observables
+10. **🏔️ Live Folding Landscape** (40 min) - Visualize energy surfaces and Ramachandran space
+11. **📡 Neural NMR Pipeline** (25 min) - Connect structure to NMR observables
+12. **🧬 PLM Embeddings (ESM-2)** (30 min) - See how sequence encodes secondary structure context
+13. **☁️ IDP Conformational Ensembles** (30 min) - Validate unstructured physical domains
+14. **🤖 AlphaFold pLDDT vs NMR S²** (35 min) - Contrast AI rigidity with physical 15N flexibility
+15. **🔬 Cryo-EM & SAXS Lab** (20 min) - Simulate 3D density maps and 1D scattering
+16. **🧪 BMRB Validation Pipeline** (25 min) - Programmatic NMR validation
 
 #### 💊 **For Drug Designers**
 *Design and optimize therapeutic peptides*
@@ -98,10 +101,11 @@ Choose a path based on your background and goals:
 1. **💊 Drug Discovery Pipeline** (35 min) - End-to-end peptide library to lead selection
 2. **⭕ Macrocycle Design Lab** (20 min) - Create head-to-tail cyclic peptides
 3. **💊 Bio-Active Hormone Lab** (20 min) - Model bioactive peptide hormones
-4. **🎯 Hard Decoy Challenge** (35 min) - Generate decoys for docking validation
-5. **🌌 AI Latent Space Explorer** (35 min) - Navigate chemical space with ML
-6. **🔬 Virtual NMR Spectrometer** (25 min) - Predict experimental observables
-7. **🔬 Cryo-EM & SAXS Lab** (20 min) - Multi-modal verification of peptide folds
+4. **🪞 The Mirror World Lab** (20 min) - Design protease-resistant D-amino acid peptides
+5. **🎯 Hard Decoy Challenge** (35 min) - Generate decoys for docking validation
+6. **🌌 AI Latent Space Explorer** (35 min) - Navigate chemical space with ML
+7. **🔬 Virtual NMR Spectrometer** (25 min) - Predict experimental observables
+8. **🔬 Cryo-EM & SAXS Lab** (20 min) - Multi-modal verification of peptide folds
 
 
 ## Table of Contents
