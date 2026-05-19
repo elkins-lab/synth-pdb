@@ -9,7 +9,7 @@ For direct usage of SAXS functionality, consider using synth-saxs directly:
 
 See: https://github.com/elkins/synth-saxs
 
-EDUCATIONAL NOTE - What is Small-Angle X-ray Scattering (SAXS)?
+EDUCATIONAL OVERVIEW - SAXS Curve Simulation:
 ==============================================================
 Small-Angle X-ray Scattering (SAXS) is a fundamental technique for studying
 protein structure and dynamics in solution. It measures the scattering of

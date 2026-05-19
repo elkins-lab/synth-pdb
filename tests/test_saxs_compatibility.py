@@ -22,5 +22,7 @@ def test_rg_shim():
     """Verify Rg calculation remains available via shim."""
     atoms = struc.AtomArray(1)
     atoms.coord = np.array([[0, 0, 0]])
+    atoms.element = ["C"]
+    atoms.res_name = ["ALA"]
     rg = calculate_radius_of_gyration(atoms)
     assert rg == 0.0
