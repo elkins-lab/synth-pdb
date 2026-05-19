@@ -2,6 +2,8 @@
 
 The `saxs` module enables the simulation of Small-Angle X-ray Scattering (SAXS) profiles from atomic structures and ensembles.
 
+> **Note**: As of version 1.38.0, the SAXS calculation engine is powered by the standalone [**synth-saxs**](https://github.com/elkins/synth-saxs) package. This module serves as a backward-compatible shim.
+
 ## Overview
 
 SAXS is a technique used to probe the global shape, size, and flexibility of proteins in solution. This module uses the **Debye Formula** to calculate the scattering intensity $I(q)$ as a function of the scattering vector magnitude $q$.

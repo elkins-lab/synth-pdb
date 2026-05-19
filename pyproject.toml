@@ -49,6 +49,7 @@ dependencies = [
     "openmm>=8.1.0,!=8.5.0,!=8.5.1",
     "numba>=0.57.0",
     "synth-nmr>=0.9.0",
+    "synth-saxs>=0.1.0",
     "scipy>=1.7.0",
     "mrcfile>=1.5.0",
 ]

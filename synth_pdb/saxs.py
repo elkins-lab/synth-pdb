@@ -1,281 +1,78 @@
-"""
-# EDUCATIONAL OVERVIEW - SAXS Curve Simulation:
-# ---------------------------------------------
-# Small-Angle X-ray Scattering (SAXS) is a fundamental technique for studying
-# protein structure and dynamics in solution. This module computes synthetic
-# scattering curves (I(q) vs q) from atomic coordinates.
-#
-# SCIENTIFIC PRINCIPLES:
-# ----------------------
-# 1. The Debye Formula: The scattering intensity I(q) is computed by summing the
-#    interference between all pairs of atoms in the molecule.
-#    I(q) = sum_i sum_j f_i(q) f_j(q) * sin(q * r_ij) / (q * r_ij)
-#    where q is the scattering vector magnitude and r_ij is the distance between
-#    atoms i and j.
-#
-# 2. Atomic Form Factors: Atoms of different elements scatter X-rays with
-#    different efficiencies. We use q-dependent form factors approximated by
-#    a sum of Gaussians (Waasmaier & Kirfel, 1995).
-#
-# 3. Solvent Contrast (Solvation Shell): In SAXS, we measure the "excess"
-#    scattering of the protein relative to the solvent. We subtract the
-#    scattering contribution of the displaced solvent volume (V) for each atom.
-#
-#    CRITICAL PHYSICAL STABILITY NOTE:
-#    The effective scattering factor is f_eff(q) = f_vac(q) - rho_sol * V * exp(-q^2 * R^2 / 10).
-#    If the volume V is underestimated (e.g., V=0 for H), the f_eff(q) contrast
-#    profile becomes unstable. Specifically, the upward "pressure" from the
-#    decaying solvent term can exceed the downward "pressure" from the protein's
-#    interferometry, causing non-physical increases in I(q) at low q.
-#    Maintaining standard volumes (Pavlov & Svergun, 1997) is essential.
-#
-# REFERENCES:
-# -----------
-# - Waasmaier, D. & Kirfel, A. (1995). New analytical scattering-factor
-#   functions for free atoms and ions. Acta Cryst. A51, 416-431.
-# - Pavlov, M.Y. & Svergun, D.I. (1997). A dataset for testing the
-#   algorithms of small-angle scattering data analysis. J. Appl. Cryst. 30, 712-717.
-# - Svergun, D., Barberato, C. & Koch, M. H. (1995). CRYSOL - a program to
-#   evaluate X-ray solution scattering of biological macromolecules from
-#   atomic coordinates. J. Appl. Cryst. 28, 768-773.
+"""Small-Angle X-ray Scattering (SAXS) for synth-pdb.
+
+This module provides a compatibility shim that re-exports the SAXS simulation
+engine from the synth-saxs package.
+
+For direct usage of SAXS functionality, consider using synth-saxs directly:
+    pip install synth-saxs
+    from synth_saxs import calculate_saxs_profile
+
+See: https://github.com/elkins/synth-saxs
+
+EDUCATIONAL NOTE - What is Small-Angle X-ray Scattering (SAXS)?
+==============================================================
+Small-Angle X-ray Scattering (SAXS) is a fundamental technique for studying
+protein structure and dynamics in solution. It measures the scattering of
+X-rays by the electrons in the sample at small angles (typically 0.1 to 10 degrees).
+
+The resulting 1D curve (Intensity vs. Scattering Vector q) contains information
+about the global size, shape, and folding state of the molecule.
+
+SCIENTIFIC PRINCIPLES:
+----------------------
+1. The Debye Formula: Relates the 3D atomic coordinates to the 1D scattering
+   intensity via interference between all atom pairs.
+2. Solvent Contrast: Proteins are measured in solution, so the scattering
+   from the displaced solvent volume must be subtracted.
+3. Atomic Form Factors: Element-specific scattering efficiencies (q-dependent).
+
+References:
+- Waasmaier, D. & Kirfel, A. (1995). Acta Cryst. A51, 416-431.
+- Pavlov, M.Y. & Svergun, D.I. (1997). J. Appl. Cryst. 30, 712-717.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any
 
-import biotite.structure as struc
-import numpy as np
-from scipy.spatial.distance import cdist
+try:
+    import synth_saxs as _saxs
+
+    HAS_SYNTH_SAXS = True
+except ImportError:
+    HAS_SYNTH_SAXS = False
 
 logger = logging.getLogger(__name__)
 
-# Atomic Form Factor Coefficients (Waasmaier & Kirfel, 1995)
-# f(s) = sum_{i=1}^4 a_i * exp(-b_i * s^2) + c, where s = q / (4 * pi)
-#
-# SCIENTIFIC NOTE - Atomic Volumes:
-# ---------------------------------
-# Volumes (A^3) are derived from Pavlov & Svergun (1997).
-# These "displaced volumes" are critical for the solvent subtraction model.
-# Even Hydrogen must have a non-zero volume (~5.15 A^3) to ensure that
-# the solvent-corrected form factor f_eff(q) behaves monotonically at low q.
-FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
-    "H": {
-        "a": [0.489918, 0.262477, 0.196767, 0.050479],
-        "b": [20.6593, 7.74039, 49.5519, 2.20159],
-        "c": 0.00037,
-        "volume": 5.15,
-    },
-    "C": {
-        "a": [2.31, 1.02, 1.5886, 0.865],
-        "b": [20.8439, 10.2075, 0.5687, 51.6512],
-        "c": 0.2156,
-        "volume": 16.44,
-    },
-    "N": {
-        "a": [12.2126, 3.1322, 2.0125, 1.1663],
-        "b": [0.0057, 9.8933, 28.9974, 0.5826],
-        "c": -11.529,
-        "volume": 14.0,
-    },
-    "O": {
-        "a": [3.0485, 2.2868, 1.5463, 0.867],
-        "b": [13.2771, 5.7011, 0.3239, 32.908],
-        "c": 0.2508,
-        "volume": 12.0,
-    },
-    "S": {
-        "a": [6.9053, 5.2034, 1.4379, 1.5861],
-        "b": [1.4679, 22.2151, 0.2536, 56.172],
-        "c": 0.8669,
-        "volume": 19.86,
-    },
-    "P": {
-        "a": [6.4345, 4.1791, 1.782, 1.4908],
-        "b": [1.9067, 27.157, 0.526, 68.1641],
-        "c": 1.1149,
-        "volume": 24.4,
-    },
-}
+# Re-exports for backward compatibility
+if HAS_SYNTH_SAXS:
+    from synth_saxs import (
+        SaxsSimulator,
+        calculate_radius_of_gyration,
+        calculate_saxs_profile,
+        export_saxs_profile,
+        get_form_factor,
+    )
+else:
+    logger.warning(
+        "synth-saxs package not found. SAXS functionality will be unavailable. "
+        "Install it via: pip install synth-saxs"
+    )
 
+    # Fallback placeholders to prevent import errors but log warnings on use
+    def calculate_saxs_profile(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
+        raise ImportError("calculate_saxs_profile requires synth-saxs. Run: pip install synth-saxs")
 
-def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
-    """Compute the q-dependent form factor for a given element.
+    def calculate_radius_of_gyration(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
+        from biotite.structure import gyration_radius
 
-    Args:
-        element: Element symbol (e.g. 'C', 'N', 'O').
-        q: 1D array of scattering vector magnitudes (Angstroms^-1).
+        return gyration_radius(*args, **kwargs)
 
-    Returns:
-        np.ndarray: Form factor values for each q.
-    """
-    element = element.upper()
-    if element not in FORM_FACTOR_COEFFS:
-        # Fallback to Carbon if element unknown
-        element = "C"
+    class SaxsSimulator:  # type: ignore[no-redef]
+        def __init__(self, *args: Any, **kwargs: Any):
+            raise ImportError("SaxsSimulator requires synth-saxs. Run: pip install synth-saxs")
 
-    coeffs = FORM_FACTOR_COEFFS[element]
-    s2 = (q / (4 * np.pi)) ** 2
+    def export_saxs_profile(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
+        raise ImportError("export_saxs_profile requires synth-saxs. Run: pip install synth-saxs")
 
-    f = np.full_like(q, coeffs["c"])
-    for a, b in zip(coeffs["a"], coeffs["b"], strict=False):
-        f += a * np.exp(-b * s2)
-
-    return f
-
-
-def calculate_radius_of_gyration(structure: struc.AtomArray) -> float:
-    """Calculate the Radius of Gyration (Rg) of a structure.
-
-    Args:
-        structure: Biotite AtomArray.
-
-    Returns:
-        float: Radius of gyration in Angstroms.
-    """
-    return float(struc.gyration_radius(structure))
-
-
-def calculate_saxs_profile(
-    structure: struc.AtomArray,
-    q_min: float = 0.0,
-    q_max: float = 0.5,
-    n_points: int = 51,
-    include_solvent: bool = True,
-    solvent_density: float = 0.334,  # e/A^3 (Water)
-) -> tuple[np.ndarray, np.ndarray]:
-    """Calculate the SAXS profile I(q) for a protein structure.
-
-    This implements the Debye formula with O(N^2) complexity.
-
-    Args:
-        structure: Biotite AtomArray (full atom recommended).
-        q_min: Minimum q value (default 0.0).
-        q_max: Maximum q value (default 0.5).
-        n_points: Number of q points.
-        include_solvent: If True, subtracts displaced solvent volume.
-        solvent_density: Electron density of the solvent.
-
-    Returns:
-        Tuple of (q_values, intensity_values).
-    """
-    n_atoms = structure.array_length()
-    logger.info(f"Calculating SAXS profile for {n_atoms} atoms...")
-
-    q = np.linspace(q_min, q_max, n_points)
-
-    # 1. Precompute inter-atomic distances (N x N matrix)
-    coords = structure.coord
-    if coords.ndim == 3:
-        # If passed an AtomArrayStack with 1 model, flatten to 2D
-        coords = coords[0]
-
-    # Use scipy for efficient distance calculation
-    dist = cdist(coords, coords)
-
-    # 2. Vectorized form factor calculation
-    elements = structure.element
-    unique_elements = np.unique(elements)
-    f_atoms_array = np.zeros((n_atoms, n_points))
-
-    for elem in unique_elements:
-        mask = elements == elem
-        f_atom = get_form_factor(elem, q)
-
-        if include_solvent:
-            # Solvent displacement: f_eff = f_vac - rho_sol * V * exp(-q^2 * R^2 / 10)
-            # R is the effective atomic radius: R = (3V / 4pi)^(1/3)
-            #
-            # SCIENTIFIC NOTE - Monotonicity and Decay:
-            # ----------------------------------------
-            # The exponent -q^2 * R^2 / K represents the decay of the solvent
-            # displacement volume. Using K=6 (Radius of Gyration of a sphere)
-            # is physically standard but can lead to non-monotonicity if
-            # atomic volumes are small. We use K=10.0 for improved numerical
-            # stability across all structure sizes, ensuring the protein's
-            # interference always dominates the solvent decay at low q.
-            v = FORM_FACTOR_COEFFS.get(elem.upper(), FORM_FACTOR_COEFFS["C"])["volume"]
-            decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 10.0
-            f_sol = solvent_density * v * np.exp(-(q**2) * decay_rate)
-            f_atom = f_atom - f_sol
-
-        f_atoms_array[mask] = f_atom
-
-    # 3. Apply Debye formula: I(q) = sum_i sum_j f_i(q) * f_j(q) * sinc(q * r_ij)
-    intensity = np.zeros(n_points)
-
-    for i in range(n_points):
-        qi = q[i]
-        fi = f_atoms_array[:, i]
-
-        if qi < 1e-7:
-            # At q=0, sinc(qr) = 1, so I(0) = (sum f_i) ** 2
-            intensity[i] = np.sum(fi) ** 2
-        else:
-            # Use np.sinc for numerical stability
-            # Note: np.sinc(x) is sin(pi*x) / (pi*x), so we pass qr/pi
-            qr_over_pi = (qi * dist) / np.pi
-            sinc_qr = np.sinc(qr_over_pi)
-
-            # Use dot product for faster summation: fi^T * sinc_qr * fi
-            intensity[i] = fi @ (sinc_qr @ fi)
-
-    return q, intensity
-
-
-class SaxsSimulator:
-    """Stateful SAXS simulator for ensembles."""
-
-    def __init__(
-        self,
-        q_min: float = 0.0,
-        q_max: float = 0.5,
-        n_points: int = 51,
-        include_solvent: bool = True,
-    ):
-        self.q_min = q_min
-        self.q_max = q_max
-        self.n_points = n_points
-        self.include_solvent = include_solvent
-
-    def simulate(self, structure: struc.AtomArray | struc.AtomArrayStack) -> np.ndarray:
-        """Computes the averaged SAXS profile for a structure or ensemble."""
-        if hasattr(structure, "stack_depth") and structure.stack_depth() > 0:
-            # For ensembles, average the intensities
-            all_intensities = []
-            for i in range(structure.stack_depth()):
-                _, intensity = calculate_saxs_profile(
-                    structure[i],
-                    q_min=self.q_min,
-                    q_max=self.q_max,
-                    n_points=self.n_points,
-                    include_solvent=self.include_solvent,
-                )
-                all_intensities.append(intensity)
-
-            if all_intensities:
-                return cast(np.ndarray, np.mean(all_intensities, axis=0))
-            return np.zeros(self.n_points)
-
-        if isinstance(structure, struc.AtomArrayStack) and structure.stack_depth() == 0:
-            logger.warning("Attempted to simulate SAXS on an empty ensemble.")
-            return np.zeros(self.n_points)
-
-        # Single structure
-        _, intensity = calculate_saxs_profile(
-            structure,  # type: ignore[arg-type]
-            q_min=self.q_min,
-            q_max=self.q_max,
-            n_points=self.n_points,
-            include_solvent=self.include_solvent,
-        )
-        return intensity
-
-
-def export_saxs_profile(q: np.ndarray, intensity: np.ndarray, output_file: str) -> None:
-    """Export SAXS data to a standard .dat file (q, I, error)."""
-    # For synthetic data, we can provide a small dummy error (1% of intensity)
-    error = intensity * 0.01
-    data = np.column_stack([q, intensity, error])
-    header = "Generated by synth-pdb\nq (A^-1)   I(q)       error"
-    np.savetxt(output_file, data, header=header, fmt="%.6e")
-    logger.info(f"SAXS profile exported to {output_file}")
+    def get_form_factor(*args: Any, **kwargs: Any) -> Any:  # type: ignore[no-redef]
+        raise ImportError("get_form_factor requires synth-saxs. Run: pip install synth-saxs")
