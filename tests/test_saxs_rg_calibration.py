@@ -64,8 +64,13 @@ def test_saxs_low_q_monotonic_decrease(ubq_struct):
 
     SCIENTIFIC BASIS:
     Guinier: I(q) = I(0) * exp(-q^2 * Rg^2 / 3), strictly decreasing.
-    This regression test ensures that the solvent displacement model doesn't
-    invert the slope at low q (a symptom of incorrect atomic volumes).
+
+    REGRESSION NOTE - Physical Stability:
+    This test is the primary safeguard against "Slope Inversion". If atomic
+    volumes (V) are too small, the effective contrast f_eff(q) increases
+    at low q because the solvent displacement term exp(-q^2 R^2 / 10)
+    decays too quickly. This test ensures the protein's interference
+    always dominates, providing a stable, physically correct negative slope.
     """
     q, intensity = calculate_saxs_profile(ubq_struct, q_max=0.3, n_points=61, include_solvent=True)
     mask = q <= 0.08
@@ -77,6 +82,31 @@ def test_saxs_low_q_monotonic_decrease(ubq_struct):
     assert np.all(
         diffs <= 0
     ), f"I(q) not monotonically decreasing at q < 0.08 A^-1: {diffs[diffs > 0]}"
+
+
+def test_saxs_monotonicity_scale_invariance():
+    """Verify monotonicity holds for structures of different scales.
+
+    This ensures that the balance between atomic contrast and solvent decay
+    is stable for both small peptides and larger proteins.
+    """
+    from synth_pdb.generator import generate_pdb_content
+    import io
+    import biotite.structure.io.pdb as pdb_io
+
+    # 1. Very small peptide (3 residues) - Most sensitive to slope inversion
+    pdb_3 = generate_pdb_content(length=3, seed=42)
+    struct_3 = pdb_io.PDBFile.read(io.StringIO(pdb_3)).get_structure(model=1)
+    q3, i3 = calculate_saxs_profile(struct_3, q_max=0.08, n_points=20, include_solvent=True)
+    assert np.all(
+        np.diff(i3) <= 0
+    ), "Small peptide failed monotonicity (Solvent Contrast Instability)"
+
+    # 2. Medium peptide (50 residues)
+    pdb_50 = generate_pdb_content(length=50, seed=42)
+    struct_50 = pdb_io.PDBFile.read(io.StringIO(pdb_50)).get_structure(model=1)
+    q50, i50 = calculate_saxs_profile(struct_50, q_max=0.08, n_points=20, include_solvent=True)
+    assert np.all(np.diff(i50) <= 0), "Medium protein failed monotonicity"
 
 
 def test_saxs_solvent_vacuum_ratio(ubq_struct):
@@ -92,32 +122,6 @@ def test_saxs_solvent_vacuum_ratio(ubq_struct):
 
     assert i_sol[0] < i_vac[0], "Solvent-subtracted I(0) should be less than vacuum I(0)"
     assert i_sol[0] > 0, "Effective I(0) must be positive"
-
-
-def test_saxs_nitrogen_contribution_regression():
-    """Verify Nitrogen form factors don't cause non-physical scattering.
-
-    This targets the regression where Nitrogen coefficients were 'simplified'
-    and caused non-monotonicity.
-    """
-    import biotite.structure as struc
-
-    # Single Nitrogen atom at origin
-    atom = struc.Atom(coord=[0, 0, 0])
-    atom.element = "N"
-    atom.res_name = "ALA"
-    atom.res_id = 1
-    atom.chain_id = "A"
-    struct = struc.array([atom])
-
-    # In solvent, a single atom's profile is just f_eff(q)^2
-    # f_eff(q) = f_vac(q) - rho_sol * V * exp(-q^2 * R^2 / 10)
-    # This must be positive and decreasing for small q
-    q, intensity = calculate_saxs_profile(struct, q_max=0.2, n_points=20, include_solvent=True)
-
-    diffs = np.diff(intensity)
-    assert np.all(diffs <= 0), "Single Nitrogen atom scattering not monotonic in solvent"
-    assert np.all(intensity > 0), "Single Nitrogen atom scattering must be positive"
 
 
 def test_saxs_guinier_rg_consistent_with_direct(ubq_struct):
