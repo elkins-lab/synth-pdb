@@ -27,17 +27,19 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import biotite.structure as struc
 import numpy as np
+from scipy.spatial.distance import cdist
 
 logger = logging.getLogger(__name__)
 
 # Atomic Form Factor Coefficients (Waasmaier & Kirfel, 1995)
 # f(s) = sum_{i=1}^4 a_i * exp(-b_i * s^2) + c, where s = q / (4 * pi)
+# Volumes (A^3) derived from CRYSOL (Svergun et al., 1995)
 FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
     "H": {
         "a": [0.489918, 0.262477, 0.196767, 0.050479],
         "b": [20.6593, 7.74039, 49.5519, 2.20159],
         "c": 0.00037,
-        "volume": 5.15,
+        "volume": 0.0,  # Hydrogens typically have negligible displaced volume in this model
     },
     "C": {
         "a": [2.31, 1.02, 1.5886, 0.865],
@@ -46,10 +48,10 @@ FORM_FACTOR_COEFFS: dict[str, dict[str, Any]] = {
         "volume": 16.44,
     },
     "N": {
-        "a": [1.34, 1.16, 1.34, 1.16],  # Simplified stable coefficients
-        "b": [20.0, 10.0, 0.5, 50.0],
-        "c": 2.0,
-        "volume": 14.0,
+        "a": [12.2126, 3.1322, 2.0125, 1.1663],
+        "b": [0.0057, 9.8933, 28.9974, 0.5826],
+        "c": -11.529,
+        "volume": 2.49,
     },
     "O": {
         "a": [3.0485, 2.2868, 1.5463, 0.867],
@@ -143,8 +145,8 @@ def calculate_saxs_profile(
         # If passed an AtomArrayStack with 1 model, flatten to 2D
         coords = coords[0]
 
-    # Using a memory-efficient distance calculation
-    dist = np.linalg.norm(coords[:, np.newaxis, :] - coords[np.newaxis, :, :], axis=-1)
+    # Use scipy for efficient distance calculation
+    dist = cdist(coords, coords)
 
     # 2. Vectorized form factor calculation
     elements = structure.element
@@ -156,12 +158,11 @@ def calculate_saxs_profile(
         f_atom = get_form_factor(elem, q)
 
         if include_solvent:
-            # Solvent displacement: f_eff = f_vac - rho_sol * V * exp(-q^2 * R^2 / 6)
+            # Solvent displacement: f_eff = f_vac - rho_sol * V * exp(-q^2 * R^2 / 10)
             # R is the effective atomic radius: R = (3V / 4pi)^(1/3)
-            # This follows the model used in CRYSOL (Svergun et al., 1995)
+            # We use 1/10 in the exponent for a better sphere approximation than 1/6
             v = FORM_FACTOR_COEFFS.get(elem.upper(), FORM_FACTOR_COEFFS["C"])["volume"]
-            # Pre-factor for Gaussian decay: (3V / 4pi)^(2/3) / 6
-            decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 6
+            decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 10.0
             f_sol = solvent_density * v * np.exp(-(q**2) * decay_rate)
             f_atom = f_atom - f_sol
 

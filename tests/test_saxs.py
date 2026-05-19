@@ -77,6 +77,16 @@ def test_get_form_factor_fallback() -> None:
     assert np.allclose(f_carbon, f_unknown)
 
 
+def test_saxs_simulator_empty_ensemble() -> None:
+    """Verify that simulating an empty ensemble returns zeros."""
+    simulator = SaxsSimulator(n_points=10)
+    # Create an empty stack
+    empty_stack = struc.AtomArrayStack(0, 0)
+    intensity = simulator.simulate(empty_stack)
+    assert intensity.shape == (10,)
+    assert np.all(intensity == 0)
+
+
 def test_export_saxs(tmp_path: Any) -> None:
     """Verify SAXS data export."""
     path = str(tmp_path / "test.dat")
