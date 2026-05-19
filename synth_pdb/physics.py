@@ -1158,7 +1158,7 @@ class EnergyMinimizer:
             current_constraints = None if cyclic else app.HBonds
             if self.solvent_model == "explicit":
                 logger.info(
-                    f"Adding explicit solvent (TIP3P water) with a {self.box_size} nm padding..."
+                    f"Adding explicit solvent (TIP3P water) with a {self.box_size} padding..."
                 )
                 modeller.addSolvent(
                     self.forcefield,
