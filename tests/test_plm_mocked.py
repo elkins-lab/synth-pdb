@@ -146,3 +146,19 @@ def test_run_model_internal_logic(mocked_plm_deps):
     mock_tokenizer.assert_called_once_with("ABC", return_tensors="pt", add_special_tokens=True)
     mock_tensor.to.assert_called_with("cpu")
     mock_model.assert_called_once()
+
+
+def test_esm2_embedder_missing_deps():
+    """Verify that ESM2Embedder raises ImportError when dependencies are missing."""
+    embedder = ESM2Embedder()
+
+    # 1. Missing torch
+    with patch.dict("sys.modules", {"torch": None}):
+        with pytest.raises(ImportError, match="torch is required"):
+            embedder.embed("ACDEF")
+
+    # 2. Missing transformers
+    # Note: we must ensure torch IS available but transformers IS NOT
+    with patch.dict("sys.modules", {"torch": MagicMock(), "transformers": None}):
+        with pytest.raises(ImportError, match="transformers is required"):
+            embedder.embed("ACDEF")

@@ -154,3 +154,9 @@ Good luck!
         MockLLMInterface.assert_called_once_with(backend="openai")
         mock_llm_instance.translate_prompt.assert_called_once_with("Make an alpha helix")
         self.assertTrue(mock_generate.called)
+
+    def test_local_llm_missing_deps(self):
+        """Verify that LocalLLMProvider raises ImportError when llama_cpp is missing."""
+        with patch.dict("sys.modules", {"llama_cpp": None}):
+            with self.assertRaisesRegex(ImportError, "Local LLM support requires additional"):
+                LocalLLMProvider()

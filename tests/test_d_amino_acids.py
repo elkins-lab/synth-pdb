@@ -72,3 +72,35 @@ def test_d_amino_acid_validation():
 
     # This should pass without violations if implemented correctly
     assert len(chirality_violations) == 0
+
+
+def test_d_amino_acid_restoration_after_minimization(mocker):
+    """Verify that DAL names are restored after OpenMM minimization (which reverts them to ALA)."""
+    from synth_pdb.generator import generate_pdb_content
+
+    # Mock OpenMM minimizer to simulate success and return a PDB where DAL has become ALA
+    mock_minimizer = mocker.patch("synth_pdb.physics.EnergyMinimizer")
+    mock_instance = mock_minimizer.return_value
+
+    # Create a dummy PDB content where DAL is ALA (simulating OpenMM behavior)
+    mock_pdb_content = (
+        "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+        "ATOM      2  CA  ALA A   1       1.000   1.000   1.000  1.00  0.00           C\n"
+        "TER\n"
+    )
+
+    # Mock add_hydrogens_and_minimize to write this content to the output path
+    def mock_min(input_path, output_path, **kwargs):
+        with open(output_path, "w") as f:
+            f.write(mock_pdb_content)
+        return True
+
+    mock_instance.add_hydrogens_and_minimize.side_effect = mock_min
+
+    # Run generation with minimization
+    # We must ensure minimize_energy=True and a D-amino acid is used
+    pdb_output = generate_pdb_content(sequence_str="D-ALA", length=1, minimize_energy=True)
+
+    # DAL should be restored in the PDB string
+    assert "DAL" in pdb_output
+    assert "ALA" not in pdb_output
