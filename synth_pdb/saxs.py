@@ -17,7 +17,7 @@
 #    different efficiencies. We use q-dependent form factors approximated by
 #    a sum of Gaussians (Waasmaier & Kirfel, 1995).
 #
-# 3. Solvent Contrast (Solvation Shell): In SAXS, we measure the "excess"
+# 3. Solvent Contrast: (Solvation Shell) - In SAXS, we measure the "excess"
 #    scattering of the protein relative to the solvent. We subtract the
 #    scattering contribution of the displaced solvent volume (V) for each atom.
 #
