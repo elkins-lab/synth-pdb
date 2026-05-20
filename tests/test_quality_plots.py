@@ -13,9 +13,10 @@ from synth_pdb.quality.plots import (
 
 @pytest.fixture
 def mock_matplotlib():
-    with patch("synth_pdb.quality.plots.HAS_MATPLOTLIB", True), patch(
-        "matplotlib.pyplot.subplots"
-    ) as mock_subplots:
+    with (
+        patch("synth_pdb.quality.plots.HAS_MATPLOTLIB", True),
+        patch("matplotlib.pyplot.subplots") as mock_subplots,
+    ):
         mock_fig = MagicMock()
         mock_ax = MagicMock()
         mock_subplots.return_value = (mock_fig, mock_ax)
@@ -122,8 +123,9 @@ def test_plots_no_matplotlib():
 
 def test_plot_correlation_no_scipy():
     """Verify that correlation plots handle missing scipy gracefully."""
-    with patch("synth_pdb.quality.plots.HAS_SCIPY", False), patch(
-        "synth_pdb.quality.plots.HAS_MATPLOTLIB", True
+    with (
+        patch("synth_pdb.quality.plots.HAS_SCIPY", False),
+        patch("synth_pdb.quality.plots.HAS_MATPLOTLIB", True),
     ):
         exp_data = {1: {"CA": 55.0}, 2: {"CA": 56.0}}
         syn_data = {1: {"CA": 55.5}, 2: {"CA": 56.5}}

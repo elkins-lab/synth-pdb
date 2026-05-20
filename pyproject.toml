@@ -236,6 +236,7 @@ module = [
     "torch.*",
     "numba.*",
     "synth_nmr.*",
+    "synth_saxs.*",
     "torch_geometric.*",
     "transformers.*",
     "setuptools",
