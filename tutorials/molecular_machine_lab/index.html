@@ -5375,10 +5375,10 @@ print('Trajectory generation complete.')</div>
     <span class="n">frame_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.pdb'</span>
     <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">frame_path</span><span class="p">)</span>
     <span class="n">structure</span> <span class="o">=</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="n">cd_sim</span> <span class="o">=</span> <span class="n">CDSimulator</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
     <span class="n">spectrum</span> <span class="o">=</span> <span class="n">cd_sim</span><span class="o">.</span><span class="n">get_spectrum</span><span class="p">(</span><span class="n">noise_level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># remove noise for clear trend</span>
-    
+
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">190</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Frame </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Dynamic CD Spectra during Hinge Motion'</span><span class="p">)</span>
@@ -5394,10 +5394,10 @@ for i in range(steps + 1):
     frame_path = f'{output_prefix}_{i}.pdb'
     pdb_file = pdb.PDBFile.read(frame_path)
     structure = pdb_file.get_structure(model=1)
-    
+
     cd_sim = CDSimulator(structure)
     spectrum = cd_sim.get_spectrum(noise_level=0) # remove noise for clear trend
-    
+
     plt.plot(np.arange(190, 251, 1), spectrum, color=colors[i], alpha=0.7, label=f'Frame {i}')
 
 plt.title('Dynamic CD Spectra during Hinge Motion')

@@ -5435,17 +5435,17 @@ $$ [θ] = 3298 (\epsilon_L - \epsilon_R) $$</p>
     <span class="k">if</span> <span class="n">coil_pct</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️ Error: Fractions must sum to 100</span><span class="si">% o</span><span class="s2">r less!"</span><span class="p">)</span>
         <span class="k">return</span>
-    
+
     <span class="c1"># Combine basis spectra</span>
-    <span class="n">total_spectrum</span> <span class="o">=</span> <span class="p">(</span><span class="n">helix_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'H'</span><span class="p">]</span> <span class="o">+</span> 
-                      <span class="n">sheet_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'E'</span><span class="p">]</span> <span class="o">+</span> 
+    <span class="n">total_spectrum</span> <span class="o">=</span> <span class="p">(</span><span class="n">helix_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'H'</span><span class="p">]</span> <span class="o">+</span>
+                      <span class="n">sheet_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'E'</span><span class="p">]</span> <span class="o">+</span>
                       <span class="n">coil_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'C'</span><span class="p">])</span>
-    
+
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">WAVELENGTHS</span><span class="p">,</span> <span class="n">total_spectrum</span><span class="p">,</span> <span class="s1">'k-'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Total Spectrum'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">WAVELENGTHS</span><span class="p">,</span> <span class="n">helix_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'H'</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Helix Contribution'</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">WAVELENGTHS</span><span class="p">,</span> <span class="n">sheet_pct</span> <span class="o">*</span> <span class="n">BASIS_SPECTRA</span><span class="p">[</span><span class="s1">'E'</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Sheet Contribution'</span><span class="p">)</span>
-    
+
     <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Wavelength (nm)"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Molar Ellipticity [θ]"</span><span class="p">)</span>
@@ -5455,7 +5455,7 @@ $$ [θ] = 3298 (\epsilon_L - \epsilon_R) $$</p>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">45000</span><span class="p">,</span> <span class="mi">80000</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">widgets</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">simulate_protein_cd</span><span class="p">,</span> 
+<span class="n">widgets</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">simulate_protein_cd</span><span class="p">,</span>
                  <span class="n">helix_pct</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">'Helix %'</span><span class="p">),</span>
                  <span class="n">sheet_pct</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">'Sheet %'</span><span class="p">))</span>
 </pre></div>
@@ -5473,17 +5473,17 @@ def simulate_protein_cd(helix_pct, sheet_pct):
     if coil_pct &lt; 0:
         print("⚠️ Error: Fractions must sum to 100% or less!")
         return
-    
+
     # Combine basis spectra
-    total_spectrum = (helix_pct * BASIS_SPECTRA['H'] + 
-                      sheet_pct * BASIS_SPECTRA['E'] + 
+    total_spectrum = (helix_pct * BASIS_SPECTRA['H'] +
+                      sheet_pct * BASIS_SPECTRA['E'] +
                       coil_pct * BASIS_SPECTRA['C'])
-    
+
     plt.figure(figsize=(10, 6))
     plt.plot(WAVELENGTHS, total_spectrum, 'k-', linewidth=3, label='Total Spectrum')
     plt.fill_between(WAVELENGTHS, helix_pct * BASIS_SPECTRA['H'], color='blue', alpha=0.1, label='Helix Contribution')
     plt.fill_between(WAVELENGTHS, sheet_pct * BASIS_SPECTRA['E'], color='red', alpha=0.1, label='Sheet Contribution')
-    
+
     plt.axhline(0, color='black', linewidth=0.8)
     plt.xlabel("Wavelength (nm)")
     plt.ylabel(r"Molar Ellipticity [θ]")
@@ -5493,7 +5493,7 @@ def simulate_protein_cd(helix_pct, sheet_pct):
     plt.ylim(-45000, 80000)
     plt.show()
 
-widgets.interact(simulate_protein_cd, 
+widgets.interact(simulate_protein_cd,
                  helix_pct=widgets.FloatSlider(min=0, max=1.0, step=0.05, value=0.8, description='Helix %'),
                  sheet_pct=widgets.FloatSlider(min=0, max=1.0, step=0.05, value=0.0, description='Sheet %'))</div>
 </div>
@@ -5536,36 +5536,36 @@ widgets.interact(simulate_protein_cd,
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔨 Generating 3D model for conformation: </span><span class="si">{</span><span class="n">conformation</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
     <span class="c1"># Generate model</span>
     <span class="n">pdb_text</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">sequence_str</span><span class="o">=</span><span class="s2">"A"</span><span class="o">*</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="n">conformation</span><span class="p">)</span>
-    
+
     <span class="c1"># Parse with Biotite</span>
     <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_text</span><span class="p">))</span>
     <span class="n">structure</span> <span class="o">=</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    
+
     <span class="c1"># Run CD Simulator</span>
     <span class="n">sim</span> <span class="o">=</span> <span class="n">CDSimulator</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"📊 SSE Analysis Found: </span><span class="si">{</span><span class="n">sim</span><span class="o">.</span><span class="n">fractions</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
+
     <span class="n">sim</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-    
-<span class="n">widgets</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">run_3d_experiment</span><span class="p">,</span> 
+
+<span class="n">widgets</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">run_3d_experiment</span><span class="p">,</span>
                  <span class="n">conformation</span><span class="o">=</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">,</span> <span class="s1">'beta'</span><span class="p">,</span> <span class="s1">'random'</span><span class="p">])</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">def run_3d_experiment(conformation):
     print(f"🔨 Generating 3D model for conformation: {conformation}...")
     # Generate model
     pdb_text = generate_pdb_content(length=30, sequence_str="A"*30, conformation=conformation)
-    
+
     # Parse with Biotite
     pdb_file = PDBFile.read(io.StringIO(pdb_text))
     structure = pdb_file.get_structure(model=1)
-    
+
     # Run CD Simulator
     sim = CDSimulator(structure)
     print(f"📊 SSE Analysis Found: {sim.fractions}")
-    
+
     sim.plot()
-    
-widgets.interact(run_3d_experiment, 
+
+widgets.interact(run_3d_experiment,
                  conformation=['alpha', 'beta', 'random'])</div>
 </div>
 </div>

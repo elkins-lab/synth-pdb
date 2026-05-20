@@ -5986,9 +5986,9 @@ if not IN_CI:
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Generating minimized structure (200 iterations)... "</span><span class="p">)</span>
 
 <span class="n">res_phys</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> 
-    <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> 
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span>
+    <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span>
 <span class="n">struct_phys</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">res_phys</span><span class="p">)</span><span class="o">.</span><span class="n">structure</span>
@@ -6021,9 +6021,9 @@ struct_geom = PeptideResult(res_geom).structure
 print("[INFO] Generating minimized structure (200 iterations)... ")
 
 res_phys = generate_pdb_content(
-    sequence_str=seq, 
-    conformation="alpha", 
-    minimize_energy=True, 
+    sequence_str=seq,
+    conformation="alpha",
+    minimize_energy=True,
     minimization_max_iter=200
 )
 struct_phys = PeptideResult(res_phys).structure

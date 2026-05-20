@@ -5291,11 +5291,11 @@ print("✅ Environment configured!")</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">seq</span> <span class="o">=</span> <span class="s2">"MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"</span> <span class="c1"># Ubiquitin</span>
 <span class="n">n_models</span> <span class="o">=</span> <span class="mi">50</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🚀 Generating Folded Ensemble (Alpha Helix)..."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 Generating Folded Ensemble (Alpha Helix)..."</span><span class="p">)</span>
 <span class="n">bg_folded</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_models</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ensemble_folded</span> <span class="o">=</span> <span class="n">bg_folded</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🚀 Generating Disordered Ensemble (IDP-like)..."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 Generating Disordered Ensemble (IDP-like)..."</span><span class="p">)</span>
 <span class="n">bg_disordered</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_models</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ensemble_disordered</span> <span class="o">=</span> <span class="n">bg_disordered</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
 
@@ -5304,11 +5304,11 @@ print("✅ Environment configured!")</div>
 <div class="clipboard-copy-txt" id="cell-2">seq = "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG" # Ubiquitin
 n_models = 50
 
-print(f"🚀 Generating Folded Ensemble (Alpha Helix)...")
+print("🚀 Generating Folded Ensemble (Alpha Helix)...")
 bg_folded = BatchedGenerator(seq, n_batch=n_models, full_atom=True)
 ensemble_folded = bg_folded.generate_batch(conformation="alpha", drift=1.0, seed=42).to_stack()
 
-print(f"🚀 Generating Disordered Ensemble (IDP-like)...")
+print("🚀 Generating Disordered Ensemble (IDP-like)...")
 bg_disordered = BatchedGenerator(seq, n_batch=n_models, full_atom=True)
 ensemble_disordered = bg_disordered.generate_batch(conformation="random", drift=10.0, seed=42).to_stack()
 
@@ -5368,7 +5368,7 @@ print(f"✅ Generated two ensembles with {n_models} models each.")</div>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_folded</span><span class="p">,</span> <span class="s1">'g-'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Folded (Alpha Helix)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_disordered</span><span class="p">,</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Disordered (Random Coil)'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'q (Å⁻¹)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'$q^2 \cdot I(q)$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$q^2 \cdot I(q)$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Kratky Plot: Folded vs. Disordered Ensembles'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
@@ -5389,7 +5389,7 @@ fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(q, (q**2) * i_folded, 'g-', linewidth=2, label='Folded (Alpha Helix)')
 ax.plot(q, (q**2) * i_disordered, 'r--', linewidth=2, label='Disordered (Random Coil)')
 ax.set_xlabel('q (Å⁻¹)', fontsize=12)
-ax.set_ylabel('$q^2 \cdot I(q)$', fontsize=12)
+ax.set_ylabel(r'$q^2 \cdot I(q)$', fontsize=12)
 ax.set_title('Kratky Plot: Folded vs. Disordered Ensembles', fontsize=14)
 ax.legend()
 ax.grid(True, alpha=0.3)
