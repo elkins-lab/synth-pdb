@@ -84,9 +84,12 @@ def test_dataset_generator_full_manifest_update(temp_output_dir: str) -> None:
     mock_f1.result.return_value = {"success": False, "sample_id": "synth_000001", "error": "Fail"}
 
     # Patch the executor and as_completed
-    with patch("concurrent.futures.ProcessPoolExecutor") as mock_exec_class, patch(
-        "synth_pdb.dataset._generate_single_sample_task",
-        side_effect=[mock_f0.result(), mock_f1.result()],
+    with (
+        patch("concurrent.futures.ProcessPoolExecutor") as mock_exec_class,
+        patch(
+            "synth_pdb.dataset._generate_single_sample_task",
+            side_effect=[mock_f0.result(), mock_f1.result()],
+        ),
     ):
         mock_executor = mock_exec_class.return_value.__enter__.return_value
         # Map submit calls to our mock futures

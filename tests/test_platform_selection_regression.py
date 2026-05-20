@@ -41,9 +41,10 @@ def test_platform_selection_gpu_to_cpu_fallback_regression(mocker):
     # We'll use a real file and run a minimal minimization to trigger the logic.
     import tempfile
 
-    with tempfile.NamedTemporaryFile(
-        suffix=".pdb", mode="w"
-    ) as tmp_in, tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_out:
+    with (
+        tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_in,
+        tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_out,
+    ):
         tmp_in.write(generate_pdb_content(length=3, minimize_energy=False))
         tmp_in.flush()
 
@@ -72,9 +73,10 @@ def test_platform_selection_explicit_request(mocker):
 
     import tempfile
 
-    with tempfile.NamedTemporaryFile(
-        suffix=".pdb", mode="w"
-    ) as tmp_in, tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_out:
+    with (
+        tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_in,
+        tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_out,
+    ):
         tmp_in.write(generate_pdb_content(length=3, minimize_energy=False))
         tmp_in.flush()
 
