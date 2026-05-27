@@ -5519,51 +5519,57 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ synth-pdb already installed'</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   📦 Installing synth-pdb...'</span><span class="p">)</span>
-        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ Installation complete'</span><span class="p">)</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
-    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'colab'</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter / CI environment'</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
-    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'notebook'</span>  <span class="c1"># Prevent browser-open hang in CI</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb..."</span><span class="p">)</span>
+        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+
+    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">"colab"</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter / CI environment"</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+
+    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">"notebook"</span>  <span class="c1"># Prevent browser-open hang in CI</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Detection &amp; Setup
 import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     try:
         import synth_pdb
-        print('   ✅ synth-pdb already installed')
-    except ImportError:
-        print('   📦 Installing synth-pdb...')
-        !pip install -q synth-pdb py3Dmol biotite
-        print('   ✅ Installation complete')
-    import plotly.io as pio
-    pio.renderers.default = 'colab'
-else:
-    print('💻 Running in local Jupyter / CI environment')
-    sys.path.append(os.path.abspath('../../'))
-    import plotly.io as pio
-    pio.renderers.default = 'notebook'  # Prevent browser-open hang in CI
 
-print('✅ Environment configured!')</div>
+        print("   ✅ synth-pdb already installed")
+    except ImportError:
+        print("   📦 Installing synth-pdb...")
+        !pip install -q synth-pdb py3Dmol biotite
+        print("   ✅ Installation complete")
+    import plotly.io as pio
+
+    pio.renderers.default = "colab"
+else:
+    print("💻 Running in local Jupyter / CI environment")
+    sys.path.append(os.path.abspath("../../"))
+    import plotly.io as pio
+
+    pio.renderers.default = "notebook"  # Prevent browser-open hang in CI
+
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5601,7 +5607,7 @@ print('✅ Environment configured!')</div>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.special_chemistry</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_gfp_chromophore_motif</span><span class="p">,</span> <span class="n">form_gfp_chromophore</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ GFP Molecular Forge Ready!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ GFP Molecular Forge Ready!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import tempfile
 
@@ -5616,7 +5622,7 @@ from ipywidgets import SelectionSlider
 from synth_pdb import PeptideGenerator
 from synth_pdb.special_chemistry import find_gfp_chromophore_motif, form_gfp_chromophore
 
-print('✅ GFP Molecular Forge Ready!')</div>
+print("✅ GFP Molecular Forge Ready!")</div>
 </div>
 </div>
 </div>
@@ -5718,7 +5724,8 @@ print('✅ GFP Molecular Forge Ready!')</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"VAL-PRO-SER-TYR-GLY-VAL-LEU"</span>
 
-<span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s2">"""</span>
+<span class="n">display</span><span class="p">(</span>
+    <span class="n">HTML</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">&lt;div style='background: linear-gradient(135deg, #00C853 0%, #00796B 100%);</span>
 <span class="s2">            color: white; padding: 15px; border-radius: 10px;</span>
 <span class="s2">            font-family: monospace; margin-bottom: 15px;'&gt;</span>
@@ -5727,7 +5734,8 @@ print('✅ GFP Molecular Forge Ready!')</div>
 <span class="s2">    Critical residues: SER65, TYR66, GLY67&lt;br&gt;</span>
 <span class="s2">    Status: Pre-maturation (non-fluorescent)</span>
 <span class="s2">&lt;/div&gt;</span>
-<span class="s2">"""</span><span class="p">))</span>
+<span class="s2">"""</span><span class="p">)</span>
+<span class="p">)</span>
 
 <span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 <span class="n">peptide</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">)</span>
@@ -5737,7 +5745,8 @@ print('✅ GFP Molecular Forge Ready!')</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">sequence = "VAL-PRO-SER-TYR-GLY-VAL-LEU"
 
-display(HTML("""
+display(
+    HTML("""
 <div style="background: linear-gradient(135deg, #00C853 0%, #00796B 100%);
             color: white; padding: 15px; border-radius: 10px;
             font-family: monospace; margin-bottom: 15px;">
@@ -5746,7 +5755,8 @@ display(HTML("""
     Critical residues: SER65, TYR66, GLY67<br/>
     Status: Pre-maturation (non-fluorescent)
 </div>
-"""))
+""")
+)
 
 gen = PeptideGenerator(sequence)
 peptide = gen.generate(conformation="alpha")
@@ -5794,25 +5804,26 @@ print("✅ Motif generated (pre-maturation state)")</div>
         <span class="s2">"1. Native"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"desc"</span><span class="p">:</span> <span class="s2">"Standard polypeptide backbone. No fluorescence."</span><span class="p">,</span>
             <span class="s2">"bg_color"</span><span class="p">:</span> <span class="s2">"#1a1a1a"</span><span class="p">,</span>
-            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"SER-TYR-GLY in linear configuration"</span>
+            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"SER-TYR-GLY in linear configuration"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="s2">"2. Cyclization"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"desc"</span><span class="p">:</span> <span class="s2">"Gly67 N attacks Ser65 C=O → 5-membered ring formed."</span><span class="p">,</span>
             <span class="s2">"bg_color"</span><span class="p">:</span> <span class="s2">"#1a1a2a"</span><span class="p">,</span>
-            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Nucleophilic addition-elimination"</span>
+            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Nucleophilic addition-elimination"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="s2">"3. Dehydration"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"desc"</span><span class="p">:</span> <span class="s2">"Water elimination from Tyr66 Cα → double bond created."</span><span class="p">,</span>
             <span class="s2">"bg_color"</span><span class="p">:</span> <span class="s2">"#1a2a1a"</span><span class="p">,</span>
-            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Cα=Cβ conjugation begins"</span>
+            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Cα=Cβ conjugation begins"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="s2">"4. Oxidation"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"desc"</span><span class="p">:</span> <span class="s2">"O₂ oxidizes Tyr66 → full π-conjugation → FLUORESCENCE!"</span><span class="p">,</span>
             <span class="s2">"bg_color"</span><span class="p">:</span> <span class="s2">"#001a00"</span><span class="p">,</span>
-            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Complete p-hydroxybenzylidene-imidazolinone"</span>
-        <span class="p">}</span>
+            <span class="s2">"chemistry"</span><span class="p">:</span> <span class="s2">"Complete p-hydroxybenzylidene-imidazolinone"</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">info</span><span class="p">[</span><span class="n">step_name</span><span class="p">]</span>
+
 
 <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"1. Native"</span><span class="p">,</span> <span class="s2">"2. Cyclization"</span><span class="p">,</span> <span class="s2">"3. Dehydration"</span><span class="p">,</span> <span class="s2">"4. Oxidation"</span><span class="p">]</span>
 </pre></div>
@@ -5822,25 +5833,26 @@ print("✅ Motif generated (pre-maturation state)")</div>
         "1. Native": {
             "desc": "Standard polypeptide backbone. No fluorescence.",
             "bg_color": "#1a1a1a",
-            "chemistry": "SER-TYR-GLY in linear configuration"
+            "chemistry": "SER-TYR-GLY in linear configuration",
         },
         "2. Cyclization": {
             "desc": "Gly67 N attacks Ser65 C=O → 5-membered ring formed.",
             "bg_color": "#1a1a2a",
-            "chemistry": "Nucleophilic addition-elimination"
+            "chemistry": "Nucleophilic addition-elimination",
         },
         "3. Dehydration": {
             "desc": "Water elimination from Tyr66 Cα → double bond created.",
             "bg_color": "#1a2a1a",
-            "chemistry": "Cα=Cβ conjugation begins"
+            "chemistry": "Cα=Cβ conjugation begins",
         },
         "4. Oxidation": {
             "desc": "O₂ oxidizes Tyr66 → full π-conjugation → FLUORESCENCE!",
             "bg_color": "#001a00",
-            "chemistry": "Complete p-hydroxybenzylidene-imidazolinone"
-        }
+            "chemistry": "Complete p-hydroxybenzylidene-imidazolinone",
+        },
     }
     return info[step_name]
+
 
 steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
 </div>
@@ -5880,16 +5892,19 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="n">IN_CI</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'CI'</span><span class="p">))</span>
+<span class="n">IN_CI</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"CI"</span><span class="p">))</span>
 
 <span class="c1"># Output widget for clean updates</span>
 <span class="n">out</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
 
 <span class="c1"># Slider</span>
-<span class="n">slider</span> <span class="o">=</span> <span class="n">SelectionSlider</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">'Maturation:'</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">'500px'</span><span class="p">))</span>
+<span class="n">slider</span> <span class="o">=</span> <span class="n">SelectionSlider</span><span class="p">(</span>
+    <span class="n">options</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Maturation:"</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">"500px"</span><span class="p">)</span>
+<span class="p">)</span>
 
 <span class="c1"># Track initialization</span>
 <span class="n">_initializing</span> <span class="o">=</span> <span class="kc">True</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">view_forge</span><span class="p">(</span><span class="n">change</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">_initializing</span>
@@ -5902,22 +5917,24 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
     <span class="c1"># In CI we skip the interactive py3Dmol widget (no frontend)</span>
     <span class="c1"># and just print a summary so the cell produces output without hanging.</span>
     <span class="k">if</span> <span class="n">IN_CI</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'[CI] Maturation step: </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">"desc"</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[CI] Maturation step: </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'desc'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span>
 
     <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
         <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Display step information</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+        <span class="n">display</span><span class="p">(</span>
+            <span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">        &lt;div style='background: linear-gradient(135deg, #00C853 0%, #00796B 100%);</span>
 <span class="s2">                    color: white; padding: 15px; border-radius: 10px;</span>
 <span class="s2">                    font-family: monospace; margin-bottom: 15px;'&gt;</span>
 <span class="s2">            &lt;b&gt;⚗️ </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;br&gt;</span>
-<span class="s2">            </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'desc'</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;br&gt;</span>
-<span class="s2">            &lt;b&gt;Chemistry:&lt;/b&gt; </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'chemistry'</span><span class="p">]</span><span class="si">}</span>
+<span class="s2">            </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">"desc"</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;br&gt;</span>
+<span class="s2">            &lt;b&gt;Chemistry:&lt;/b&gt; </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">"chemistry"</span><span class="p">]</span><span class="si">}</span>
 <span class="s2">        &lt;/div&gt;</span>
-<span class="s2">        """</span><span class="p">))</span>
+<span class="s2">        """</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="c1"># 3D viewer</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">native_struct</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -5941,34 +5958,40 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
         <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
 
         <span class="c1"># Style: Highlight chromophore motif</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'VAL'</span><span class="p">,</span> <span class="s1">'PRO'</span><span class="p">,</span> <span class="s1">'LEU'</span><span class="p">]},</span>
-                     <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'gray'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}})</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SER'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'GLY'</span><span class="p">,</span> <span class="s1">'CRO'</span><span class="p">]},</span>
-                     <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'colorscheme'</span><span class="p">:</span> <span class="s1">'magentaCarbon'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"VAL"</span><span class="p">,</span> <span class="s2">"PRO"</span><span class="p">,</span> <span class="s2">"LEU"</span><span class="p">]},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SER"</span><span class="p">,</span> <span class="s2">"TYR"</span><span class="p">,</span> <span class="s2">"GLY"</span><span class="p">,</span> <span class="s2">"CRO"</span><span class="p">]},</span>
+            <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"colorscheme"</span><span class="p">:</span> <span class="s2">"magentaCarbon"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}},</span>
+        <span class="p">)</span>
 
         <span class="c1"># Add glow effect for final step</span>
         <span class="k">if</span> <span class="n">step</span> <span class="o">==</span> <span class="s2">"4. Oxidation"</span><span class="p">:</span>
-            <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'bg_color'</span><span class="p">])</span>
-            <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="s2">"</span><span class="se">\U0001f49a</span><span class="s2"> FLUORESCENT!"</span><span class="p">,</span>
-                         <span class="p">{</span><span class="s1">'position'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-                          <span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'#00FF00'</span><span class="p">,</span>
-                          <span class="s1">'fontColor'</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span>
-                          <span class="s1">'fontSize'</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">"bg_color"</span><span class="p">])</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span>
+                <span class="s2">"</span><span class="se">\U0001f49a</span><span class="s2"> FLUORESCENT!"</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">"position"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                    <span class="s2">"backgroundColor"</span><span class="p">:</span> <span class="s2">"#00FF00"</span><span class="p">,</span>
+                    <span class="s2">"fontColor"</span><span class="p">:</span> <span class="s2">"black"</span><span class="p">,</span>
+                    <span class="s2">"fontSize"</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'bg_color'</span><span class="p">])</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">"bg_color"</span><span class="p">])</span>
 
-        <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'SER'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'GLY'</span><span class="p">,</span> <span class="s1">'CRO'</span><span class="p">]})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SER"</span><span class="p">,</span> <span class="s2">"TYR"</span><span class="p">,</span> <span class="s2">"GLY"</span><span class="p">,</span> <span class="s2">"CRO"</span><span class="p">]})</span>
         <span class="n">display</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">())</span>
 
+
 <span class="c1"># Connect slider</span>
-<span class="n">slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">view_forge</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">)</span>
+<span class="n">slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">view_forge</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">IN_CI</span><span class="p">:</span>
     <span class="c1"># In CI: run view_forge once for each maturation step (static output, no widget display)</span>
     <span class="k">for</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
         <span class="n">slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">step_name</span>
         <span class="n">view_forge</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'[CI] GFP maturation walkthrough complete.'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[CI] GFP maturation walkthrough complete."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Interactive: display the widget UI</span>
     <span class="n">display</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">slider</span><span class="p">,</span> <span class="n">out</span><span class="p">]))</span>
@@ -5980,26 +6003,32 @@ steps = ["1. Native", "2. Cyclization", "3. Dehydration", "4. Oxidation"]</div>
     <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">_HTML</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span> <span class="k">as</span> <span class="n">_disp</span>
-        <span class="n">_disp</span><span class="p">(</span><span class="n">_HTML</span><span class="p">(</span>
-            <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
-            <span class="s1">'border:1px dashed #555;border-radius:8px;'</span>
-            <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
-            <span class="s1">'&amp;#128260; Move the slider above to load the 3D structure'</span>
-            <span class="s1">'&lt;/div&gt;'</span>
-        <span class="p">))</span>
+
+        <span class="n">_disp</span><span class="p">(</span>
+            <span class="n">_HTML</span><span class="p">(</span>
+                <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
+                <span class="s2">"border:1px dashed #555;border-radius:8px;"</span>
+                <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
+                <span class="s2">"&amp;#128260; Move the slider above to load the 3D structure"</span>
+                <span class="s2">"&lt;/div&gt;"</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">import os
 
-IN_CI = bool(os.getenv('CI'))
+IN_CI = bool(os.getenv("CI"))
 
 # Output widget for clean updates
 out = widgets.Output()
 
 # Slider
-slider = SelectionSlider(options=steps, value=steps[0], description='Maturation:', layout=widgets.Layout(width='500px'))
+slider = SelectionSlider(
+    options=steps, value=steps[0], description="Maturation:", layout=widgets.Layout(width="500px")
+)
 
 # Track initialization
 _initializing = True
+
 
 def view_forge(change=None):
     global _initializing
@@ -6012,22 +6041,24 @@ def view_forge(change=None):
     # In CI we skip the interactive py3Dmol widget (no frontend)
     # and just print a summary so the cell produces output without hanging.
     if IN_CI:
-        print(f'[CI] Maturation step: {step} | {info["desc"]}')
+        print(f"[CI] Maturation step: {step} | {info['desc']}")
         return
 
     with out:
         clear_output(wait=True)
 
         # Display step information
-        display(HTML(f"""
+        display(
+            HTML(f"""
         <div style="background: linear-gradient(135deg, #00C853 0%, #00796B 100%);
                     color: white; padding: 15px; border-radius: 10px;
                     font-family: monospace; margin-bottom: 15px;">
 <b>⚗️ {step}</b><br/>
-            {info['desc']}<br/>
-<b>Chemistry:</b> {info['chemistry']}
+            {info["desc"]}<br/>
+<b>Chemistry:</b> {info["chemistry"]}
         </div>
-        """))
+        """)
+        )
 
         # 3D viewer
         struct = native_struct.copy()
@@ -6051,34 +6082,40 @@ def view_forge(change=None):
         view.addModel(pdb_content, "pdb")
 
         # Style: Highlight chromophore motif
-        view.setStyle({'resn': ['VAL', 'PRO', 'LEU']},
-                     {'stick': {'color': 'gray', 'opacity': 0.4}})
-        view.setStyle({'resn': ['SER', 'TYR', 'GLY', 'CRO']},
-                     {'stick': {'colorscheme': 'magentaCarbon', 'radius': 0.25}})
+        view.setStyle({"resn": ["VAL", "PRO", "LEU"]}, {"stick": {"color": "gray", "opacity": 0.4}})
+        view.setStyle(
+            {"resn": ["SER", "TYR", "GLY", "CRO"]},
+            {"stick": {"colorscheme": "magentaCarbon", "radius": 0.25}},
+        )
 
         # Add glow effect for final step
         if step == "4. Oxidation":
-            view.setBackgroundColor(info['bg_color'])
-            view.addLabel("\U0001f49a FLUORESCENT!",
-                         {'position': {'x': 0, 'y': 5, 'z': 0},
-                          'backgroundColor': '#00FF00',
-                          'fontColor': 'black',
-                          'fontSize': 14})
+            view.setBackgroundColor(info["bg_color"])
+            view.addLabel(
+                "\U0001f49a FLUORESCENT!",
+                {
+                    "position": {"x": 0, "y": 5, "z": 0},
+                    "backgroundColor": "#00FF00",
+                    "fontColor": "black",
+                    "fontSize": 14,
+                },
+            )
         else:
-            view.setBackgroundColor(info['bg_color'])
+            view.setBackgroundColor(info["bg_color"])
 
-        view.zoomTo({'resn': ['SER', 'TYR', 'GLY', 'CRO']})
+        view.zoomTo({"resn": ["SER", "TYR", "GLY", "CRO"]})
         display(view.show())
 
+
 # Connect slider
-slider.observe(view_forge, 'value')
+slider.observe(view_forge, "value")
 
 if IN_CI:
     # In CI: run view_forge once for each maturation step (static output, no widget display)
     for step_name in steps:
         slider.value = step_name
         view_forge()
-    print('[CI] GFP maturation walkthrough complete.')
+    print("[CI] GFP maturation walkthrough complete.")
 else:
     # Interactive: display the widget UI
     display(widgets.VBox([slider, out]))
@@ -6090,15 +6127,15 @@ else:
     with out:
         from IPython.display import HTML as _HTML
         from IPython.display import display as _disp
-        _disp(_HTML(
-            '<div style="text-align:center;padding:40px;color:#aaa;'
-            'border:1px dashed #555;border-radius:8px;'
-            'font-style:italic;background:#1a1a1a;">'
-            '🔄 Move the slider above to load the 3D structure'
-            '</div>'
-        ))
 
-</div>
+        _disp(
+            _HTML(
+                '<div #555;border-radius:8px;"="" 'font-style:italic;background:#1a1a1a;"="" border:1px="" dashed="" style="text-align:center;padding:40px;color:#aaa;'
+                ">'
+                "🔄 Move the slider above to load the 3D structure"
+                "</div>"
+            )
+        )</div>
 </div>
 </div>
 </div>
@@ -6139,9 +6176,11 @@ else:
 <span class="c1"># Create absorption and emission spectra</span>
 <span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">350</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
 
+
 <span class="c1"># Gaussian approximations of GFP spectra</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
 
 <span class="c1"># Two absorption peaks</span>
 <span class="n">abs_395</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
@@ -6154,45 +6193,54 @@ else:
 <span class="c1"># Plot</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
 
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">absorption</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">'Absorption'</span><span class="p">,</span>
-    <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
-    <span class="n">fill</span><span class="o">=</span><span class="s1">'tozeroy'</span><span class="p">,</span>
-    <span class="n">fillcolor</span><span class="o">=</span><span class="s1">'rgba(0,0,255,0.2)'</span>
-<span class="p">))</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">emission</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s1">'Emission'</span><span class="p">,</span>
-    <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'green'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
-    <span class="n">fill</span><span class="o">=</span><span class="s1">'tozeroy'</span><span class="p">,</span>
-    <span class="n">fillcolor</span><span class="o">=</span><span class="s1">'rgba(0,255,0,0.2)'</span>
-<span class="p">))</span>
-
-<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">'GFP Absorption &amp; Emission Spectra'</span><span class="p">,</span>
-    <span class="n">xaxis_title</span><span class="o">=</span><span class="s1">'Wavelength (nm)'</span><span class="p">,</span>
-    <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">'Normalized Intensity'</span><span class="p">,</span>
-    <span class="n">template</span><span class="o">=</span><span class="s1">'plotly_dark'</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-    <span class="n">annotations</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">395</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_abs = 395 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">475</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_abs = 475 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">508</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mf">0.79</span><span class="p">,</span> <span class="s1">'text'</span><span class="p">:</span> <span class="s2">"λ_em = 508 nm"</span><span class="p">,</span> <span class="s1">'showarrow'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">'arrowhead'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-    <span class="p">]</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">absorption</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Absorption"</span><span class="p">,</span>
+        <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+        <span class="n">fill</span><span class="o">=</span><span class="s2">"tozeroy"</span><span class="p">,</span>
+        <span class="n">fillcolor</span><span class="o">=</span><span class="s2">"rgba(0,0,255,0.2)"</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">renderer</span><span class="o">=</span><span class="s1">'json'</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">'CI'</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+    <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">emission</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Emission"</span><span class="p">,</span>
+        <span class="n">line</span><span class="o">=</span><span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"green"</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+        <span class="n">fill</span><span class="o">=</span><span class="s2">"tozeroy"</span><span class="p">,</span>
+        <span class="n">fillcolor</span><span class="o">=</span><span class="s2">"rgba(0,255,0,0.2)"</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"GFP Absorption &amp; Emission Spectra"</span><span class="p">,</span>
+    <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">"Wavelength (nm)"</span><span class="p">,</span>
+    <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">"Normalized Intensity"</span><span class="p">,</span>
+    <span class="n">template</span><span class="o">=</span><span class="s2">"plotly_dark"</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">annotations</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">395</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"λ_abs = 395 nm"</span><span class="p">,</span> <span class="s2">"showarrow"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"arrowhead"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">475</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"λ_abs = 475 nm"</span><span class="p">,</span> <span class="s2">"showarrow"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"arrowhead"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">508</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mf">0.79</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"λ_em = 508 nm"</span><span class="p">,</span> <span class="s2">"showarrow"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"arrowhead"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">renderer</span><span class="o">=</span><span class="s2">"json"</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"CI"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">import os
 
 # Create absorption and emission spectra
 wavelengths = np.linspace(350, 600, 500)
 
+
 # Gaussian approximations of GFP spectra
 def gaussian(x, mu, sigma, amplitude):
     return amplitude * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
 
 # Two absorption peaks
 abs_395 = gaussian(wavelengths, 395, 15, 0.6)
@@ -6205,36 +6253,43 @@ emission = gaussian(wavelengths, 508, 25, 0.79)
 # Plot
 fig = go.Figure()
 
-fig.add_trace(go.Scatter(
-    x=wavelengths, y=absorption,
-    name='Absorption',
-    line={'color': 'blue', 'width': 3},
-    fill='tozeroy',
-    fillcolor='rgba(0,0,255,0.2)'
-))
-
-fig.add_trace(go.Scatter(
-    x=wavelengths, y=emission,
-    name='Emission',
-    line={'color': 'green', 'width': 3},
-    fill='tozeroy',
-    fillcolor='rgba(0,255,0,0.2)'
-))
-
-fig.update_layout(
-    title='GFP Absorption &amp; Emission Spectra',
-    xaxis_title='Wavelength (nm)',
-    yaxis_title='Normalized Intensity',
-    template='plotly_dark',
-    width=800, height=500,
-    annotations=[
-        {'x': 395, 'y': 0.6, 'text': "λ_abs = 395 nm", 'showarrow': True, 'arrowhead': 2},
-        {'x': 475, 'y': 1.0, 'text': "λ_abs = 475 nm", 'showarrow': True, 'arrowhead': 2},
-        {'x': 508, 'y': 0.79, 'text': "λ_em = 508 nm", 'showarrow': True, 'arrowhead': 2}
-    ]
+fig.add_trace(
+    go.Scatter(
+        x=wavelengths,
+        y=absorption,
+        name="Absorption",
+        line={"color": "blue", "width": 3},
+        fill="tozeroy",
+        fillcolor="rgba(0,0,255,0.2)",
+    )
 )
 
-fig.show(renderer='json' if os.getenv('CI') else None)</div>
+fig.add_trace(
+    go.Scatter(
+        x=wavelengths,
+        y=emission,
+        name="Emission",
+        line={"color": "green", "width": 3},
+        fill="tozeroy",
+        fillcolor="rgba(0,255,0,0.2)",
+    )
+)
+
+fig.update_layout(
+    title="GFP Absorption &amp; Emission Spectra",
+    xaxis_title="Wavelength (nm)",
+    yaxis_title="Normalized Intensity",
+    template="plotly_dark",
+    width=800,
+    height=500,
+    annotations=[
+        {"x": 395, "y": 0.6, "text": "λ_abs = 395 nm", "showarrow": True, "arrowhead": 2},
+        {"x": 475, "y": 1.0, "text": "λ_abs = 475 nm", "showarrow": True, "arrowhead": 2},
+        {"x": 508, "y": 0.79, "text": "λ_em = 508 nm", "showarrow": True, "arrowhead": 2},
+    ],
+)
+
+fig.show(renderer="json" if os.getenv("CI") else None)</div>
 </div>
 </div>
 </div>

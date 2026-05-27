@@ -5500,26 +5500,26 @@ and its polar residues EXPOSED (high SASA).</em></p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5562,20 +5562,22 @@ print("✅ Environment configured!")</div>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">google.colab</span>  <span class="c1"># noqa: F401</span>
+
     <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab — installing dependencies...'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab — installing dependencies..."</span><span class="p">)</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install'</span><span class="p">,</span> <span class="s1">'-q'</span><span class="p">,</span> <span class="s1">'synth-pdb'</span><span class="p">,</span> <span class="s1">'biotite'</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">,</span> <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">],</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Local development: add the repo root to sys.path</span>
-    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="s1">'__file__'</span><span class="p">),</span> <span class="s1">'..'</span><span class="p">,</span> <span class="s1">'..'</span><span class="p">))</span>
+    <span class="n">repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="s2">"__file__"</span><span class="p">),</span> <span class="s2">".."</span><span class="p">,</span> <span class="s2">".."</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">repo_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">repo_root</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'💻 Running locally — using repo at </span><span class="si">{</span><span class="n">repo_root</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"💻 Running locally — using repo at </span><span class="si">{</span><span class="n">repo_root</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpatches</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -5584,28 +5586,30 @@ print("✅ Environment configured!")</div>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">PDBValidator</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ All imports successful!'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Hydrophobic residues tracked: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">HYDROPHOBIC_AMINO_ACIDS</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ All imports successful!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Hydrophobic residues tracked: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">HYDROPHOBIC_AMINO_ACIDS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 import sys
 
 try:
     import google.colab  # noqa: F401
+
     IN_COLAB = True
 except ImportError:
     IN_COLAB = False
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab — installing dependencies...')
+    print("🌐 Running in Google Colab — installing dependencies...")
     import subprocess
-    subprocess.run(['pip', 'install', '-q', 'synth-pdb', 'biotite'], check=True)
+
+    subprocess.run(["pip", "install", "-q", "synth-pdb", "biotite"], check=True)
 else:
     # Local development: add the repo root to sys.path
-    repo_root = os.path.abspath(os.path.join(os.path.dirname('__file__'), '..', '..'))
+    repo_root = os.path.abspath(os.path.join(os.path.dirname("__file__"), "..", ".."))
     if repo_root not in sys.path:
         sys.path.insert(0, repo_root)
-    print(f'💻 Running locally — using repo at {repo_root}')
+    print(f"💻 Running locally — using repo at {repo_root}")
 
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -5614,9 +5618,8 @@ from synth_pdb.data import HYDROPHOBIC_AMINO_ACIDS
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
 
-print('✅ All imports successful!')
-print(f'   Hydrophobic residues tracked: {sorted(HYDROPHOBIC_AMINO_ACIDS)}')
-</div>
+print("✅ All imports successful!")
+print(f"   Hydrophobic residues tracked: {sorted(HYDROPHOBIC_AMINO_ACIDS)}")</div>
 </div>
 </div>
 </div>
@@ -5719,60 +5722,53 @@ consistent with hydrophobic burial. This is the threshold used in <code>get_qual
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># ── Amphipathic helix: alternating polar/hydrophobic faces ──────────────</span>
 <span class="c1"># AAKLLLAAKLLLAAK  →  Ala/Leu hydrophobic face, Lys/Ala polar face</span>
-<span class="n">SEQ_HELIX</span>  <span class="o">=</span> <span class="s1">'AAKLLLAAKLLLAAK'</span>
-<span class="n">SEQ_HYDRO</span>  <span class="o">=</span> <span class="s1">'VIVVIVVIVVI'</span>       <span class="c1"># All hydrophobic — should FAIL burial check</span>
-<span class="n">SEQ_RANDOM</span> <span class="o">=</span> <span class="s1">'LKLALAKLLAKA'</span>      <span class="c1"># Scrambled — may or may not pass</span>
+<span class="n">SEQ_HELIX</span> <span class="o">=</span> <span class="s2">"AAKLLLAAKLLLAAK"</span>
+<span class="n">SEQ_HYDRO</span> <span class="o">=</span> <span class="s2">"VIVVIVVIVVI"</span>  <span class="c1"># All hydrophobic — should FAIL burial check</span>
+<span class="n">SEQ_RANDOM</span> <span class="o">=</span> <span class="s2">"LKLALAKLLAKA"</span>  <span class="c1"># Scrambled — may or may not pass</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'🧬 Generating structures (seed=42 for reproducibility)...'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating structures (seed=42 for reproducibility)..."</span><span class="p">)</span>
 
-<span class="n">pdb_helix</span>  <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_HELIX</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s1">'1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HELIX</span><span class="p">)</span><span class="si">}</span><span class="s1">:alpha'</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="n">pdb_helix</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_HELIX</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s2">"1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HELIX</span><span class="p">)</span><span class="si">}</span><span class="s2">:alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
-<span class="n">pdb_hydro</span>  <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_HYDRO</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s1">'1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HYDRO</span><span class="p">)</span><span class="si">}</span><span class="s1">:beta'</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="n">pdb_hydro</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_HYDRO</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s2">"1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HYDRO</span><span class="p">)</span><span class="si">}</span><span class="s2">:beta"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
 <span class="n">pdb_random</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_RANDOM</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s1">'1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_RANDOM</span><span class="p">)</span><span class="si">}</span><span class="s1">:random'</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQ_RANDOM</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="sa">f</span><span class="s2">"1-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_RANDOM</span><span class="p">)</span><span class="si">}</span><span class="s2">:random"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ All three structures generated!'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Amphipathic helix:     </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HELIX</span><span class="p">)</span><span class="si">}</span><span class="s1"> residues'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Hydrophobic-only:      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HYDRO</span><span class="p">)</span><span class="si">}</span><span class="s1"> residues'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Random-coil decoy:     </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_RANDOM</span><span class="p">)</span><span class="si">}</span><span class="s1"> residues'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ All three structures generated!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Amphipathic helix:     </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HELIX</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Hydrophobic-only:      </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_HYDRO</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Random-coil decoy:     </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">SEQ_RANDOM</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># ── Amphipathic helix: alternating polar/hydrophobic faces ──────────────
 # AAKLLLAAKLLLAAK  →  Ala/Leu hydrophobic face, Lys/Ala polar face
-SEQ_HELIX  = 'AAKLLLAAKLLLAAK'
-SEQ_HYDRO  = 'VIVVIVVIVVI'       # All hydrophobic — should FAIL burial check
-SEQ_RANDOM = 'LKLALAKLLAKA'      # Scrambled — may or may not pass
+SEQ_HELIX = "AAKLLLAAKLLLAAK"
+SEQ_HYDRO = "VIVVIVVIVVI"  # All hydrophobic — should FAIL burial check
+SEQ_RANDOM = "LKLALAKLLAKA"  # Scrambled — may or may not pass
 
-print('🧬 Generating structures (seed=42 for reproducibility)...')
+print("🧬 Generating structures (seed=42 for reproducibility)...")
 
-pdb_helix  = generate_pdb_content(
-    sequence_str=SEQ_HELIX, structure=f'1-{len(SEQ_HELIX)}:alpha',
-    minimize_energy=True, seed=42
+pdb_helix = generate_pdb_content(
+    sequence_str=SEQ_HELIX, structure=f"1-{len(SEQ_HELIX)}:alpha", minimize_energy=True, seed=42
 )
 
-pdb_hydro  = generate_pdb_content(
-    sequence_str=SEQ_HYDRO, structure=f'1-{len(SEQ_HYDRO)}:beta',
-    minimize_energy=False, seed=42
+pdb_hydro = generate_pdb_content(
+    sequence_str=SEQ_HYDRO, structure=f"1-{len(SEQ_HYDRO)}:beta", minimize_energy=False, seed=42
 )
 
 pdb_random = generate_pdb_content(
-    sequence_str=SEQ_RANDOM, structure=f'1-{len(SEQ_RANDOM)}:random',
-    minimize_energy=False, seed=42
+    sequence_str=SEQ_RANDOM, structure=f"1-{len(SEQ_RANDOM)}:random", minimize_energy=False, seed=42
 )
 
-print('✅ All three structures generated!')
-print(f'   Amphipathic helix:     {len(SEQ_HELIX)} residues')
-print(f'   Hydrophobic-only:      {len(SEQ_HYDRO)} residues')
-print(f'   Random-coil decoy:     {len(SEQ_RANDOM)} residues')
-</div>
+print("✅ All three structures generated!")
+print(f"   Amphipathic helix:     {len(SEQ_HELIX)} residues")
+print(f"   Hydrophobic-only:      {len(SEQ_HYDRO)} residues")
+print(f"   Random-coil decoy:     {len(SEQ_RANDOM)} residues")</div>
 </div>
 </div>
 </div>
@@ -5821,32 +5817,52 @@ print(f'   Random-coil decoy:     {len(SEQ_RANDOM)} residues')
     <span class="c1"># Build a list of (res_id, one_letter, sasa, is_hydrophobic)</span>
     <span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">aa_3to1</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">'ALA'</span><span class="p">:</span><span class="s1">'A'</span><span class="p">,</span><span class="s1">'ARG'</span><span class="p">:</span><span class="s1">'R'</span><span class="p">,</span><span class="s1">'ASN'</span><span class="p">:</span><span class="s1">'N'</span><span class="p">,</span><span class="s1">'ASP'</span><span class="p">:</span><span class="s1">'D'</span><span class="p">,</span><span class="s1">'CYS'</span><span class="p">:</span><span class="s1">'C'</span><span class="p">,</span><span class="s1">'GLN'</span><span class="p">:</span><span class="s1">'Q'</span><span class="p">,</span><span class="s1">'GLU'</span><span class="p">:</span><span class="s1">'E'</span><span class="p">,</span>
-        <span class="s1">'GLY'</span><span class="p">:</span><span class="s1">'G'</span><span class="p">,</span><span class="s1">'HIS'</span><span class="p">:</span><span class="s1">'H'</span><span class="p">,</span><span class="s1">'ILE'</span><span class="p">:</span><span class="s1">'I'</span><span class="p">,</span><span class="s1">'LEU'</span><span class="p">:</span><span class="s1">'L'</span><span class="p">,</span><span class="s1">'LYS'</span><span class="p">:</span><span class="s1">'K'</span><span class="p">,</span><span class="s1">'MET'</span><span class="p">:</span><span class="s1">'M'</span><span class="p">,</span><span class="s1">'PHE'</span><span class="p">:</span><span class="s1">'F'</span><span class="p">,</span>
-        <span class="s1">'PRO'</span><span class="p">:</span><span class="s1">'P'</span><span class="p">,</span><span class="s1">'SER'</span><span class="p">:</span><span class="s1">'S'</span><span class="p">,</span><span class="s1">'THR'</span><span class="p">:</span><span class="s1">'T'</span><span class="p">,</span><span class="s1">'TRP'</span><span class="p">:</span><span class="s1">'W'</span><span class="p">,</span><span class="s1">'TYR'</span><span class="p">:</span><span class="s1">'Y'</span><span class="p">,</span><span class="s1">'VAL'</span><span class="p">:</span><span class="s1">'V'</span><span class="p">,</span>
+        <span class="s2">"ALA"</span><span class="p">:</span> <span class="s2">"A"</span><span class="p">,</span>
+        <span class="s2">"ARG"</span><span class="p">:</span> <span class="s2">"R"</span><span class="p">,</span>
+        <span class="s2">"ASN"</span><span class="p">:</span> <span class="s2">"N"</span><span class="p">,</span>
+        <span class="s2">"ASP"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
+        <span class="s2">"CYS"</span><span class="p">:</span> <span class="s2">"C"</span><span class="p">,</span>
+        <span class="s2">"GLN"</span><span class="p">:</span> <span class="s2">"Q"</span><span class="p">,</span>
+        <span class="s2">"GLU"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span>
+        <span class="s2">"GLY"</span><span class="p">:</span> <span class="s2">"G"</span><span class="p">,</span>
+        <span class="s2">"HIS"</span><span class="p">:</span> <span class="s2">"H"</span><span class="p">,</span>
+        <span class="s2">"ILE"</span><span class="p">:</span> <span class="s2">"I"</span><span class="p">,</span>
+        <span class="s2">"LEU"</span><span class="p">:</span> <span class="s2">"L"</span><span class="p">,</span>
+        <span class="s2">"LYS"</span><span class="p">:</span> <span class="s2">"K"</span><span class="p">,</span>
+        <span class="s2">"MET"</span><span class="p">:</span> <span class="s2">"M"</span><span class="p">,</span>
+        <span class="s2">"PHE"</span><span class="p">:</span> <span class="s2">"F"</span><span class="p">,</span>
+        <span class="s2">"PRO"</span><span class="p">:</span> <span class="s2">"P"</span><span class="p">,</span>
+        <span class="s2">"SER"</span><span class="p">:</span> <span class="s2">"S"</span><span class="p">,</span>
+        <span class="s2">"THR"</span><span class="p">:</span> <span class="s2">"T"</span><span class="p">,</span>
+        <span class="s2">"TRP"</span><span class="p">:</span> <span class="s2">"W"</span><span class="p">,</span>
+        <span class="s2">"TYR"</span><span class="p">:</span> <span class="s2">"Y"</span><span class="p">,</span>
+        <span class="s2">"VAL"</span><span class="p">:</span> <span class="s2">"V"</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="c1"># Map from sequence index to 3-letter</span>
     <span class="n">aa_1to3</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">aa_3to1</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">res_id</span><span class="p">,</span> <span class="n">sasa_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">sasa_data</span><span class="p">[</span><span class="s1">'SASA'</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())):</span>
-        <span class="n">aa1</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="k">else</span> <span class="s1">'?'</span>
-        <span class="n">aa3</span> <span class="o">=</span> <span class="n">aa_1to3</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aa1</span><span class="p">,</span> <span class="s1">'UNK'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">res_id</span><span class="p">,</span> <span class="n">sasa_val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">sasa_data</span><span class="p">[</span><span class="s2">"SASA"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())):</span>
+        <span class="n">aa1</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="k">else</span> <span class="s2">"?"</span>
+        <span class="n">aa3</span> <span class="o">=</span> <span class="n">aa_1to3</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aa1</span><span class="p">,</span> <span class="s2">"UNK"</span><span class="p">)</span>
         <span class="n">is_hydro</span> <span class="o">=</span> <span class="n">aa3</span> <span class="ow">in</span> <span class="n">HYDROPHOBIC_AMINO_ACIDS</span>
-        <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'res_id'</span><span class="p">:</span> <span class="n">res_id</span><span class="p">,</span> <span class="s1">'aa'</span><span class="p">:</span> <span class="n">aa1</span><span class="p">,</span> <span class="s1">'sasa'</span><span class="p">:</span> <span class="n">sasa_val</span><span class="p">,</span> <span class="s1">'hydrophobic'</span><span class="p">:</span> <span class="n">is_hydro</span><span class="p">})</span>
+        <span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"res_id"</span><span class="p">:</span> <span class="n">res_id</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">:</span> <span class="n">aa1</span><span class="p">,</span> <span class="s2">"sasa"</span><span class="p">:</span> <span class="n">sasa_val</span><span class="p">,</span> <span class="s2">"hydrophobic"</span><span class="p">:</span> <span class="n">is_hydro</span><span class="p">})</span>
 
     <span class="k">return</span> <span class="n">residues</span><span class="p">,</span> <span class="n">sasa_data</span>
 
-<span class="n">residues_helix</span><span class="p">,</span>  <span class="n">sasa_helix</span>  <span class="o">=</span> <span class="n">compute_sasa</span><span class="p">(</span><span class="n">pdb_helix</span><span class="p">,</span>  <span class="n">SEQ_HELIX</span><span class="p">)</span>
-<span class="n">residues_hydro</span><span class="p">,</span>  <span class="n">sasa_hydro</span>  <span class="o">=</span> <span class="n">compute_sasa</span><span class="p">(</span><span class="n">pdb_hydro</span><span class="p">,</span>  <span class="n">SEQ_HYDRO</span><span class="p">)</span>
+
+<span class="n">residues_helix</span><span class="p">,</span> <span class="n">sasa_helix</span> <span class="o">=</span> <span class="n">compute_sasa</span><span class="p">(</span><span class="n">pdb_helix</span><span class="p">,</span> <span class="n">SEQ_HELIX</span><span class="p">)</span>
+<span class="n">residues_hydro</span><span class="p">,</span> <span class="n">sasa_hydro</span> <span class="o">=</span> <span class="n">compute_sasa</span><span class="p">(</span><span class="n">pdb_hydro</span><span class="p">,</span> <span class="n">SEQ_HYDRO</span><span class="p">)</span>
 <span class="n">residues_random</span><span class="p">,</span> <span class="n">sasa_random</span> <span class="o">=</span> <span class="n">compute_sasa</span><span class="p">(</span><span class="n">pdb_random</span><span class="p">,</span> <span class="n">SEQ_RANDOM</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">sasa_data</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">'Amphipathic helix'</span><span class="p">,</span> <span class="n">sasa_helix</span><span class="p">),</span>
-                          <span class="p">(</span><span class="s1">'Hydrophobic-only'</span><span class="p">,</span>  <span class="n">sasa_hydro</span><span class="p">),</span>
-                          <span class="p">(</span><span class="s1">'Random-coil decoy'</span><span class="p">,</span> <span class="n">sasa_random</span><span class="p">)]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">:'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   mean_hydrophobic_sasa = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s2">"mean_hydrophobic_sasa"</span><span class="p">]</span><span class="si">:</span><span class="s1">7.1f</span><span class="si">}</span><span class="s1"> Å²'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   mean_polar_sasa       = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s2">"mean_polar_sasa"</span><span class="p">]</span><span class="si">:</span><span class="s1">7.1f</span><span class="si">}</span><span class="s1"> Å²'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   burial_ratio          = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">]</span><span class="si">:</span><span class="s1">7.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">sasa_data</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"Amphipathic helix"</span><span class="p">,</span> <span class="n">sasa_helix</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"Hydrophobic-only"</span><span class="p">,</span> <span class="n">sasa_hydro</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"Random-coil decoy"</span><span class="p">,</span> <span class="n">sasa_random</span><span class="p">),</span>
+<span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   mean_hydrophobic_sasa = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s1">'mean_hydrophobic_sasa'</span><span class="p">]</span><span class="si">:</span><span class="s2">7.1f</span><span class="si">}</span><span class="s2"> Å²"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   mean_polar_sasa       = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s1">'mean_polar_sasa'</span><span class="p">]</span><span class="si">:</span><span class="s2">7.1f</span><span class="si">}</span><span class="s2"> Å²"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   burial_ratio          = </span><span class="si">{</span><span class="n">sasa_data</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">]</span><span class="si">:</span><span class="s2">7.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">def compute_sasa(pdb_content, sequence):
@@ -5857,34 +5873,53 @@ print(f'   Random-coil decoy:     {len(SEQ_RANDOM)} residues')
     # Build a list of (res_id, one_letter, sasa, is_hydrophobic)
     residues = []
     aa_3to1 = {
-        'ALA':'A','ARG':'R','ASN':'N','ASP':'D','CYS':'C','GLN':'Q','GLU':'E',
-        'GLY':'G','HIS':'H','ILE':'I','LEU':'L','LYS':'K','MET':'M','PHE':'F',
-        'PRO':'P','SER':'S','THR':'T','TRP':'W','TYR':'Y','VAL':'V',
+        "ALA": "A",
+        "ARG": "R",
+        "ASN": "N",
+        "ASP": "D",
+        "CYS": "C",
+        "GLN": "Q",
+        "GLU": "E",
+        "GLY": "G",
+        "HIS": "H",
+        "ILE": "I",
+        "LEU": "L",
+        "LYS": "K",
+        "MET": "M",
+        "PHE": "F",
+        "PRO": "P",
+        "SER": "S",
+        "THR": "T",
+        "TRP": "W",
+        "TYR": "Y",
+        "VAL": "V",
     }
     # Map from sequence index to 3-letter
     aa_1to3 = {v: k for k, v in aa_3to1.items()}
 
-    for i, (res_id, sasa_val) in enumerate(sorted(sasa_data['SASA'].items())):
-        aa1 = sequence[i] if i &lt; len(sequence) else '?'
-        aa3 = aa_1to3.get(aa1, 'UNK')
+    for i, (res_id, sasa_val) in enumerate(sorted(sasa_data["SASA"].items())):
+        aa1 = sequence[i] if i &lt; len(sequence) else "?"
+        aa3 = aa_1to3.get(aa1, "UNK")
         is_hydro = aa3 in HYDROPHOBIC_AMINO_ACIDS
-        residues.append({'res_id': res_id, 'aa': aa1, 'sasa': sasa_val, 'hydrophobic': is_hydro})
+        residues.append({"res_id": res_id, "aa": aa1, "sasa": sasa_val, "hydrophobic": is_hydro})
 
     return residues, sasa_data
 
-residues_helix,  sasa_helix  = compute_sasa(pdb_helix,  SEQ_HELIX)
-residues_hydro,  sasa_hydro  = compute_sasa(pdb_hydro,  SEQ_HYDRO)
+
+residues_helix, sasa_helix = compute_sasa(pdb_helix, SEQ_HELIX)
+residues_hydro, sasa_hydro = compute_sasa(pdb_hydro, SEQ_HYDRO)
 residues_random, sasa_random = compute_sasa(pdb_random, SEQ_RANDOM)
 
-for label, sasa_data in [('Amphipathic helix', sasa_helix),
-                          ('Hydrophobic-only',  sasa_hydro),
-                          ('Random-coil decoy', sasa_random)]:
-    print(f'{label}:')
-    print(f'   mean_hydrophobic_sasa = {sasa_data["mean_hydrophobic_sasa"]:7.1f} Å²')
-    print(f'   mean_polar_sasa       = {sasa_data["mean_polar_sasa"]:7.1f} Å²')
-    print(f'   burial_ratio          = {sasa_data["burial_ratio"]:7.3f}')
-    print()
-</div>
+for label, sasa_data in [
+    ("Amphipathic helix", sasa_helix),
+    ("Hydrophobic-only", sasa_hydro),
+    ("Random-coil decoy", sasa_random),
+]:
+    print(f"{label}:")
+    print(f"   mean_hydrophobic_sasa = {sasa_data['mean_hydrophobic_sasa']:7.1f} Å²")
+    print(f"   mean_polar_sasa       = {sasa_data['mean_polar_sasa']:7.1f} Å²")
+    print(f"   burial_ratio          = {sasa_data['burial_ratio']:7.3f}")
+    print()</div>
 </div>
 </div>
 </div>
@@ -5927,110 +5962,139 @@ for label, sasa_data in [('Amphipathic helix', sasa_helix),
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_sasa_bars</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">residues</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">burial_ratio</span><span class="p">,</span> <span class="n">plausible</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Draw per-residue SASA coloured by residue type."""</span>
-    <span class="n">ids</span>   <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s1">'res_id'</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
-    <span class="n">vals</span>  <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s1">'sasa'</span><span class="p">]</span>   <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
-    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'#e67e22'</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">'hydrophobic'</span><span class="p">]</span> <span class="k">else</span> <span class="s1">'#27ae60'</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s1">'aa'</span><span class="p">]</span>    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"res_id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"sasa"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#e67e22"</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s2">"hydrophobic"</span><span class="p">]</span> <span class="k">else</span> <span class="s2">"#27ae60"</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"aa"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">residues</span><span class="p">]</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)),</span> <span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)),</span> <span class="n">vals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)))</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'SASA (Å²)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"SASA (Å²)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="k">if</span> <span class="n">vals</span> <span class="k">else</span> <span class="mi">200</span><span class="p">)</span>
 
-    <span class="n">verdict</span> <span class="o">=</span> <span class="s1">'PASS: Plausible'</span> <span class="k">if</span> <span class="n">plausible</span> <span class="k">else</span> <span class="s1">'FAIL: Not plausible'</span>
+    <span class="n">verdict</span> <span class="o">=</span> <span class="s2">"PASS: Plausible"</span> <span class="k">if</span> <span class="n">plausible</span> <span class="k">else</span> <span class="s2">"FAIL: Not plausible"</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s1">burial_ratio = </span><span class="si">{</span><span class="n">burial_ratio</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">  |  </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span>
-        <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s2">burial_ratio = </span><span class="si">{</span><span class="n">burial_ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  </span><span class="si">{</span><span class="n">verdict</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span>
     <span class="p">)</span>
 
     <span class="c1"># Threshold line at 25 Å² (canonical buried cutoff)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#95a5a6'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="s1">'buried &lt; 25 Å²'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'right'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mf">7.5</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s1">'#7f8c8d'</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">'italic'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#95a5a6"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="mi">27</span><span class="p">,</span>
+        <span class="s2">"buried &lt; 25 Å²"</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mf">7.5</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"#7f8c8d"</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="s2">"italic"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">'Per-Residue SASA: The Oil Drop Test'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Per-Residue SASA: The Oil Drop Test"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
 
-<span class="n">plot_sasa_bars</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">residues_helix</span><span class="p">,</span>
-               <span class="s1">'Amphipathic Helix (AAKLLLAAKLLLAAK)'</span><span class="p">,</span>
-               <span class="n">sasa_helix</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">],</span>
-               <span class="n">sasa_helix</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plot_sasa_bars</span><span class="p">(</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">residues_helix</span><span class="p">,</span>
+    <span class="s2">"Amphipathic Helix (AAKLLLAAKLLLAAK)"</span><span class="p">,</span>
+    <span class="n">sasa_helix</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">],</span>
+    <span class="n">sasa_helix</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">plot_sasa_bars</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">residues_hydro</span><span class="p">,</span>
-               <span class="s1">'Hydrophobic-Only Strand (VIVVIVVIVVI)'</span><span class="p">,</span>
-               <span class="n">sasa_hydro</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">],</span>
-               <span class="n">sasa_hydro</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plot_sasa_bars</span><span class="p">(</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">residues_hydro</span><span class="p">,</span>
+    <span class="s2">"Hydrophobic-Only Strand (VIVVIVVIVVI)"</span><span class="p">,</span>
+    <span class="n">sasa_hydro</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">],</span>
+    <span class="n">sasa_hydro</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">plot_sasa_bars</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">residues_random</span><span class="p">,</span>
-               <span class="s1">'Random-Coil Decoy (LKLALAKLLAKA)'</span><span class="p">,</span>
-               <span class="n">sasa_random</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">],</span>
-               <span class="n">sasa_random</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plot_sasa_bars</span><span class="p">(</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">residues_random</span><span class="p">,</span>
+    <span class="s2">"Random-Coil Decoy (LKLALAKLLAKA)"</span><span class="p">,</span>
+    <span class="n">sasa_random</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">],</span>
+    <span class="n">sasa_random</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Shared legend</span>
 <span class="n">legend_patches</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#e67e22'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Hydrophobic residue'</span><span class="p">),</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#27ae60'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Polar residue'</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#e67e22"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Hydrophobic residue"</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#27ae60"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Polar residue"</span><span class="p">),</span>
 <span class="p">]</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">legend_patches</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'upper right'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">legend_patches</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def plot_sasa_bars(ax, residues, title, burial_ratio, plausible):
     """Draw per-residue SASA coloured by residue type."""
-    ids   = [r['res_id'] for r in residues]
-    vals  = [r['sasa']   for r in residues]
-    colors = ['#e67e22' if r['hydrophobic'] else '#27ae60' for r in residues]
-    labels = [r['aa']    for r in residues]
+    ids = [r["res_id"] for r in residues]
+    vals = [r["sasa"] for r in residues]
+    colors = ["#e67e22" if r["hydrophobic"] else "#27ae60" for r in residues]
+    labels = [r["aa"] for r in residues]
 
-    ax.bar(range(len(ids)), vals, color=colors, edgecolor='white', linewidth=0.5)
+    ax.bar(range(len(ids)), vals, color=colors, edgecolor="white", linewidth=0.5)
     ax.set_xticks(range(len(ids)))
     ax.set_xticklabels(labels, fontsize=9)
-    ax.set_ylabel('SASA (Å²)', fontsize=10)
+    ax.set_ylabel("SASA (Å²)", fontsize=10)
     ax.set_ylim(0, max(vals) * 1.25 if vals else 200)
 
-    verdict = 'PASS: Plausible' if plausible else 'FAIL: Not plausible'
+    verdict = "PASS: Plausible" if plausible else "FAIL: Not plausible"
     ax.set_title(
-        f'{title}\nburial_ratio = {burial_ratio:.3f}  |  {verdict}',
-        fontsize=11, fontweight='bold'
+        f"{title}\nburial_ratio = {burial_ratio:.3f}  |  {verdict}", fontsize=11, fontweight="bold"
     )
 
     # Threshold line at 25 Å² (canonical buried cutoff)
-    ax.axhline(25, color='#95a5a6', linestyle='--', linewidth=0.8, alpha=0.7)
-    ax.text(len(ids) - 0.5, 27, 'buried &lt; 25 Å²', ha='right', fontsize=7.5,
-            color='#7f8c8d', style='italic')
+    ax.axhline(25, color="#95a5a6", linestyle="--", linewidth=0.8, alpha=0.7)
+    ax.text(
+        len(ids) - 0.5,
+        27,
+        "buried &lt; 25 Å²",
+        ha="right",
+        fontsize=7.5,
+        color="#7f8c8d",
+        style="italic",
+    )
 
 
 fig, axes = plt.subplots(3, 1, figsize=(11, 10))
-fig.suptitle('Per-Residue SASA: The Oil Drop Test', fontsize=14, fontweight='bold', y=1.01)
+fig.suptitle("Per-Residue SASA: The Oil Drop Test", fontsize=14, fontweight="bold", y=1.01)
 
-plot_sasa_bars(axes[0], residues_helix,
-               'Amphipathic Helix (AAKLLLAAKLLLAAK)',
-               sasa_helix['burial_ratio'],
-               sasa_helix['burial_ratio'] &gt;= 0.8)
+plot_sasa_bars(
+    axes[0],
+    residues_helix,
+    "Amphipathic Helix (AAKLLLAAKLLLAAK)",
+    sasa_helix["burial_ratio"],
+    sasa_helix["burial_ratio"] &gt;= 0.8,
+)
 
-plot_sasa_bars(axes[1], residues_hydro,
-               'Hydrophobic-Only Strand (VIVVIVVIVVI)',
-               sasa_hydro['burial_ratio'],
-               sasa_hydro['burial_ratio'] &gt;= 0.8)
+plot_sasa_bars(
+    axes[1],
+    residues_hydro,
+    "Hydrophobic-Only Strand (VIVVIVVIVVI)",
+    sasa_hydro["burial_ratio"],
+    sasa_hydro["burial_ratio"] &gt;= 0.8,
+)
 
-plot_sasa_bars(axes[2], residues_random,
-               'Random-Coil Decoy (LKLALAKLLAKA)',
-               sasa_random['burial_ratio'],
-               sasa_random['burial_ratio'] &gt;= 0.8)
+plot_sasa_bars(
+    axes[2],
+    residues_random,
+    "Random-Coil Decoy (LKLALAKLLAKA)",
+    sasa_random["burial_ratio"],
+    sasa_random["burial_ratio"] &gt;= 0.8,
+)
 
 # Shared legend
 legend_patches = [
-    mpatches.Patch(color='#e67e22', label='Hydrophobic residue'),
-    mpatches.Patch(color='#27ae60', label='Polar residue'),
+    mpatches.Patch(color="#e67e22", label="Hydrophobic residue"),
+    mpatches.Patch(color="#27ae60", label="Polar residue"),
 ]
-fig.legend(handles=legend_patches, loc='upper right', fontsize=9, framealpha=0.9)
+fig.legend(handles=legend_patches, loc="upper right", fontsize=9, framealpha=0.9)
 
 plt.tight_layout()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -6068,66 +6132,89 @@ plt.show()
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-<span class="n">labels</span>  <span class="o">=</span> <span class="p">[</span><span class="s1">'Amphipathic</span><span class="se">\n</span><span class="s1">Helix'</span><span class="p">,</span> <span class="s1">'Hydrophobic</span><span class="se">\n</span><span class="s1">Only'</span><span class="p">,</span> <span class="s1">'Random</span><span class="se">\n</span><span class="s1">Coil Decoy'</span><span class="p">]</span>
-<span class="n">ratios</span>  <span class="o">=</span> <span class="p">[</span><span class="n">sasa_helix</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">],</span>
-            <span class="n">sasa_hydro</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">],</span>
-            <span class="n">sasa_random</span><span class="p">[</span><span class="s1">'burial_ratio'</span><span class="p">]]</span>
-<span class="n">colors</span>  <span class="o">=</span> <span class="p">[</span><span class="s1">'#2ecc71'</span> <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="mf">0.8</span> <span class="k">else</span> <span class="s1">'#e74c3c'</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ratios</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Amphipathic</span><span class="se">\n</span><span class="s2">Helix"</span><span class="p">,</span> <span class="s2">"Hydrophobic</span><span class="se">\n</span><span class="s2">Only"</span><span class="p">,</span> <span class="s2">"Random</span><span class="se">\n</span><span class="s2">Coil Decoy"</span><span class="p">]</span>
+<span class="n">ratios</span> <span class="o">=</span> <span class="p">[</span><span class="n">sasa_helix</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">],</span> <span class="n">sasa_hydro</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">],</span> <span class="n">sasa_random</span><span class="p">[</span><span class="s2">"burial_ratio"</span><span class="p">]]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#2ecc71"</span> <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="mf">0.8</span> <span class="k">else</span> <span class="s2">"#e74c3c"</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ratios</span><span class="p">]</span>
 
-<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">ratios</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">ratios</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="c1"># Value labels</span>
 <span class="k">for</span> <span class="n">bar</span><span class="p">,</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="n">ratios</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="nb">min</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">'bottom'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="nb">min</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ratio</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="c1"># Threshold line</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#2c3e50'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Threshold (0.8)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#2c3e50"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Threshold (0.8)"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'burial_ratio  (polar SASA / hydrophobic SASA)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Oil Drop Test: Which structure passes?'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"burial_ratio  (polar SASA / hydrophobic SASA)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Oil Drop Test: Which structure passes?"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
 
-<span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="p">[</span><span class="s1">'PASS'</span><span class="p">,</span> <span class="s1">'FAIL'</span><span class="p">,</span> <span class="s1">'?'</span> <span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
-    <span class="n">col</span> <span class="o">=</span> <span class="s1">'#27ae60'</span> <span class="k">if</span> <span class="s1">'PASS'</span> <span class="ow">in</span> <span class="n">label</span> <span class="k">else</span> <span class="p">(</span><span class="s1">'#e74c3c'</span> <span class="k">if</span> <span class="s1">'FAIL'</span> <span class="ow">in</span> <span class="n">label</span> <span class="k">else</span> <span class="s1">'#7f8c8d'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
-            <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">'bottom'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="p">(</span><span class="n">bar</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bars</span><span class="p">,</span> <span class="p">[</span><span class="s2">"PASS"</span><span class="p">,</span> <span class="s2">"FAIL"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="s2">"#27ae60"</span> <span class="k">if</span> <span class="s2">"PASS"</span> <span class="ow">in</span> <span class="n">label</span> <span class="k">else</span> <span class="p">(</span><span class="s2">"#e74c3c"</span> <span class="k">if</span> <span class="s2">"FAIL"</span> <span class="ow">in</span> <span class="n">label</span> <span class="k">else</span> <span class="s2">"#7f8c8d"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="mf">0.04</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">,</span>
+        <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">fig, ax = plt.subplots(figsize=(8, 4))
 
-labels  = ['Amphipathic\nHelix', 'Hydrophobic\nOnly', 'Random\nCoil Decoy']
-ratios  = [sasa_helix['burial_ratio'],
-            sasa_hydro['burial_ratio'],
-            sasa_random['burial_ratio']]
-colors  = ['#2ecc71' if r &gt;= 0.8 else '#e74c3c' for r in ratios]
+labels = ["Amphipathic\nHelix", "Hydrophobic\nOnly", "Random\nCoil Decoy"]
+ratios = [sasa_helix["burial_ratio"], sasa_hydro["burial_ratio"], sasa_random["burial_ratio"]]
+colors = ["#2ecc71" if r &gt;= 0.8 else "#e74c3c" for r in ratios]
 
-bars = ax.bar(labels, ratios, color=colors, alpha=0.85, edgecolor='white', linewidth=0.5)
+bars = ax.bar(labels, ratios, color=colors, alpha=0.85, edgecolor="white", linewidth=0.5)
 
 # Value labels
 for bar, ratio in zip(bars, ratios, strict=False):
-    ax.text(bar.get_x() + bar.get_width() / 2,
-            min(bar.get_height(), 2.0) + 0.05,
-            f'{ratio:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+    ax.text(
+        bar.get_x() + bar.get_width() / 2,
+        min(bar.get_height(), 2.0) + 0.05,
+        f"{ratio:.3f}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+        fontweight="bold",
+    )
 
 # Threshold line
-ax.axhline(0.8, color='#2c3e50', linestyle='--', linewidth=1.2, alpha=0.7, label='Threshold (0.8)')
+ax.axhline(0.8, color="#2c3e50", linestyle="--", linewidth=1.2, alpha=0.7, label="Threshold (0.8)")
 ax.set_ylim(0, max(max(ratios) * 1.2, 1.1))
-ax.set_ylabel('burial_ratio  (polar SASA / hydrophobic SASA)', fontsize=10)
-ax.set_title('Oil Drop Test: Which structure passes?', fontsize=12, fontweight='bold')
+ax.set_ylabel("burial_ratio  (polar SASA / hydrophobic SASA)", fontsize=10)
+ax.set_title("Oil Drop Test: Which structure passes?", fontsize=12, fontweight="bold")
 ax.legend(fontsize=9)
 
-for _i, (bar, label) in enumerate(zip(bars, ['PASS', 'FAIL', '?' ], strict=False)):
-    col = '#27ae60' if 'PASS' in label else ('#e74c3c' if 'FAIL' in label else '#7f8c8d')
-    ax.text(bar.get_x() + bar.get_width() / 2, 0.04, label,
-            ha='center', va='bottom', fontsize=12, color=col, fontweight='bold')
+for _i, (bar, label) in enumerate(zip(bars, ["PASS", "FAIL", "?"], strict=False)):
+    col = "#27ae60" if "PASS" in label else ("#e74c3c" if "FAIL" in label else "#7f8c8d")
+    ax.text(
+        bar.get_x() + bar.get_width() / 2,
+        0.04,
+        label,
+        ha="center",
+        va="bottom",
+        fontsize=12,
+        color=col,
+        fontweight="bold",
+    )
 
 plt.tight_layout()
-plt.show()
-</div>
+plt.show()</div>
 </div>
 </div>
 </div>
@@ -6168,42 +6255,45 @@ Let's see it in context:</p>
     <span class="n">v</span> <span class="o">=</span> <span class="n">PDBValidator</span><span class="p">(</span><span class="n">pdb_content</span><span class="p">)</span>
     <span class="n">report</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_quality_report</span><span class="p">()</span>
 
-    <span class="n">br</span>    <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s1">'hydrophobic_burial_ratio'</span><span class="p">]</span>
-    <span class="n">bio</span>   <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s1">'is_biophysically_plausible'</span><span class="p">]</span>
-    <span class="n">defns</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s1">'is_overall_scientifically_defensible'</span><span class="p">]</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tick</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">'PASS'</span> <span class="k">if</span> <span class="n">b</span> <span class="k">else</span> <span class="s1">'FAIL'</span>
+    <span class="n">br</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s2">"hydrophobic_burial_ratio"</span><span class="p">]</span>
+    <span class="n">bio</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s2">"is_biophysically_plausible"</span><span class="p">]</span>
+    <span class="n">defns</span> <span class="o">=</span> <span class="n">report</span><span class="p">[</span><span class="s2">"is_overall_scientifically_defensible"</span><span class="p">]</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   burial_ratio            = </span><span class="si">{</span><span class="n">br</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="n">tick</span><span class="p">(</span><span class="n">bio</span><span class="p">)</span><span class="si">}</span><span class="s1"> Oil Drop test)'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   is_biophysically_plausible = </span><span class="si">{</span><span class="n">bio</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   is_overall_defensible      = </span><span class="si">{</span><span class="n">defns</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tick</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"PASS"</span> <span class="k">if</span> <span class="n">b</span> <span class="k">else</span> <span class="s2">"FAIL"</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   burial_ratio            = </span><span class="si">{</span><span class="n">br</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">tick</span><span class="p">(</span><span class="n">bio</span><span class="p">)</span><span class="si">}</span><span class="s2"> Oil Drop test)"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   is_biophysically_plausible = </span><span class="si">{</span><span class="n">bio</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   is_overall_defensible      = </span><span class="si">{</span><span class="n">defns</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 
-<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s1">'Amphipathic Helix'</span><span class="p">,</span> <span class="n">pdb_helix</span><span class="p">)</span>
-<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s1">'Hydrophobic-Only Strand'</span><span class="p">,</span> <span class="n">pdb_hydro</span><span class="p">)</span>
-<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s1">'Random-Coil Decoy'</span><span class="p">,</span> <span class="n">pdb_random</span><span class="p">)</span>
+
+<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s2">"Amphipathic Helix"</span><span class="p">,</span> <span class="n">pdb_helix</span><span class="p">)</span>
+<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s2">"Hydrophobic-Only Strand"</span><span class="p">,</span> <span class="n">pdb_hydro</span><span class="p">)</span>
+<span class="n">show_burial_in_report</span><span class="p">(</span><span class="s2">"Random-Coil Decoy"</span><span class="p">,</span> <span class="n">pdb_random</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">def show_burial_in_report(label, pdb_content):
     v = PDBValidator(pdb_content)
     report = v.get_quality_report()
 
-    br    = report['hydrophobic_burial_ratio']
-    bio   = report['is_biophysically_plausible']
-    defns = report['is_overall_scientifically_defensible']
-    def tick(b):
-        return 'PASS' if b else 'FAIL'
+    br = report["hydrophobic_burial_ratio"]
+    bio = report["is_biophysically_plausible"]
+    defns = report["is_overall_scientifically_defensible"]
 
-    print(f'{label}')
-    print(f'   burial_ratio            = {br:.3f}  ({tick(bio)} Oil Drop test)')
-    print(f'   is_biophysically_plausible = {bio}')
-    print(f'   is_overall_defensible      = {defns}')
+    def tick(b):
+        return "PASS" if b else "FAIL"
+
+    print(f"{label}")
+    print(f"   burial_ratio            = {br:.3f}  ({tick(bio)} Oil Drop test)")
+    print(f"   is_biophysically_plausible = {bio}")
+    print(f"   is_overall_defensible      = {defns}")
     print()
 
-show_burial_in_report('Amphipathic Helix', pdb_helix)
-show_burial_in_report('Hydrophobic-Only Strand', pdb_hydro)
-show_burial_in_report('Random-Coil Decoy', pdb_random)
-</div>
+
+show_burial_in_report("Amphipathic Helix", pdb_helix)
+show_burial_in_report("Hydrophobic-Only Strand", pdb_hydro)
+show_burial_in_report("Random-Coil Decoy", pdb_random)</div>
 </div>
 </div>
 </div>

@@ -5302,10 +5302,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol biotite numpy matplotlib'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb py3Dmol biotite numpy matplotlib"</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5316,6 +5316,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
@@ -5333,10 +5334,10 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol biotite numpy matplotlib')
+        get_ipython().run_line_magic("pip", "install synth-pdb py3Dmol biotite numpy matplotlib")
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5347,6 +5348,7 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
+
     print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__}")</div>
 </div>
 </div>
@@ -5427,11 +5429,7 @@ print("Molecular Pharmacopoeia: ONLINE 🧪")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"💍 Synthesizing Oxytocin with Disulfide Closure..."</span><span class="p">)</span>
 
 <span class="c1"># We generate the structure and enable minimization to resolve the loop</span>
-<span class="n">oxy_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">oxytocin_seq</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">cap_termini</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
+<span class="n">oxy_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">oxytocin_seq</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cap_termini</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Synthesis Complete."</span><span class="p">)</span>
 </pre></div>
@@ -5441,11 +5439,7 @@ oxytocin_seq = "CYS-TYR-ILE-GLN-ASN-CYS-PRO-LEU-GLY"
 print("💍 Synthesizing Oxytocin with Disulfide Closure...")
 
 # We generate the structure and enable minimization to resolve the loop
-oxy_pdb = generate_pdb_content(
-    sequence_str=oxytocin_seq,
-    minimize_energy=True,
-    cap_termini=True
-)
+oxy_pdb = generate_pdb_content(sequence_str=oxytocin_seq, minimize_energy=True, cap_termini=True)
 
 print("✅ Synthesis Complete.")</div>
 </div>
@@ -5473,46 +5467,58 @@ print("✅ Synthesis Complete.")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">oxy_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s2">"#fdfdfd"</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">oxy_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
 
 <span class="c1"># 1. Style the main backbone with ribbons</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#a29bfe'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#a29bfe"</span><span class="p">,</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}})</span>
 
 <span class="c1"># 2. STYLE THE BRIDGE: Show Cys side chains as thick sticks</span>
 <span class="c1"># Use addStyle to layer the Cys representation without breaking connectivity.</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="s1">'CYS'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#fdcb6e'</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="s2">"CYS"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#fdcb6e"</span><span class="p">}})</span>
 
 <span class="c1"># 3. Highlight the Sulfur atoms as spheres for prominence</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="s1">'CYS'</span><span class="p">,</span> <span class="s1">'atom'</span><span class="p">:</span> <span class="s1">'SG'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'sphere'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#fdcb6e'</span><span class="p">}})</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="s2">"Disulfide Bridge"</span><span class="p">,</span> <span class="p">{</span><span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'#e17055'</span><span class="p">,</span> <span class="s1">'fontColor'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'resn'</span><span class="p">:</span> <span class="s1">'CYS'</span><span class="p">,</span> <span class="s1">'atom'</span><span class="p">:</span> <span class="s1">'SG'</span><span class="p">})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="s2">"CYS"</span><span class="p">,</span> <span class="s2">"atom"</span><span class="p">:</span> <span class="s2">"SG"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#fdcb6e"</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span>
+    <span class="s2">"Disulfide Bridge"</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">"backgroundColor"</span><span class="p">:</span> <span class="s2">"#e17055"</span><span class="p">,</span> <span class="s2">"fontColor"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="s2">"CYS"</span><span class="p">,</span> <span class="s2">"atom"</span><span class="p">:</span> <span class="s2">"SG"</span><span class="p">},</span>
+<span class="p">)</span>
 
 <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into proximity to satisfy the disulfide geometry."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into proximity to satisfy the disulfide geometry."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">view = py3Dmol.view(width=800, height=500)
-view.setBackgroundColor('#fdfdfd')
-view.addModel(oxy_pdb, 'pdb')
+view.setBackgroundColor("#fdfdfd")
+view.addModel(oxy_pdb, "pdb")
 
 # 1. Style the main backbone with ribbons
-view.setStyle({'model': -1}, {'cartoon': {'color': '#a29bfe', 'opacity': 0.9}})
+view.setStyle({"model": -1}, {"cartoon": {"color": "#a29bfe", "opacity": 0.9}})
 
 # 2. STYLE THE BRIDGE: Show Cys side chains as thick sticks
 # Use addStyle to layer the Cys representation without breaking connectivity.
-view.addStyle({'resn': 'CYS'}, {'stick': {'radius': 0.2, 'color': '#fdcb6e'}})
+view.addStyle({"resn": "CYS"}, {"stick": {"radius": 0.2, "color": "#fdcb6e"}})
 
 # 3. Highlight the Sulfur atoms as spheres for prominence
-view.addStyle({'resn': 'CYS', 'atom': 'SG'}, {'sphere': {'radius': 0.4, 'color': '#fdcb6e'}})
-view.addLabel("Disulfide Bridge", {'backgroundColor': '#e17055', 'fontColor': 'white'}, {'resn': 'CYS', 'atom': 'SG'})
+view.addStyle({"resn": "CYS", "atom": "SG"}, {"sphere": {"radius": 0.4, "color": "#fdcb6e"}})
+view.addLabel(
+    "Disulfide Bridge",
+    {"backgroundColor": "#e17055", "fontColor": "white"},
+    {"resn": "CYS", "atom": "SG"},
+)
 
 view.zoomTo()
 view.center()
 view.show()
 
-print("Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into proximity to satisfy the disulfide geometry.")</div>
+print(
+    "Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into proximity to satisfy the disulfide geometry."
+)</div>
 </div>
 </div>
 </div>
@@ -5556,9 +5562,9 @@ print("Educational Insight: Note how 'Cys1' and 'Cys6' residues are forced into 
 
 <span class="n">cyc_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">cyclosporine_proxy</span><span class="p">,</span>
-    <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>       <span class="c1"># Enable head-to-tail closure</span>
+    <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable head-to-tail closure</span>
     <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">cap_termini</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">cap_termini</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Cyclic Macrocycle Generated."</span><span class="p">)</span>
@@ -5570,9 +5576,9 @@ print("💍 Cyclizing 11-mer with D-amino acid integration...")
 
 cyc_pdb = generate_pdb_content(
     sequence_str=cyclosporine_proxy,
-    cyclic=True,       # Enable head-to-tail closure
+    cyclic=True,  # Enable head-to-tail closure
     minimize_energy=True,
-    cap_termini=False
+    cap_termini=False,
 )
 
 print("✅ Cyclic Macrocycle Generated.")</div>
@@ -5603,42 +5609,50 @@ print("✅ Cyclic Macrocycle Generated.")</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
 
 <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">cyc_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s2">"#fdfdfd"</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">cyc_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
 
 <span class="c1"># Style the Cyclic Backbone with high-contrast colors</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#00b894'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}})</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#55efc4'</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#00b894"</span><span class="p">,</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#55efc4"</span><span class="p">}})</span>
 
 <span class="c1"># Highlight the D-Alanine residue in Intense Red</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="s1">'D-ALA'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#d63031'</span><span class="p">}})</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="s2">"D-Alanine Hinge"</span><span class="p">,</span> <span class="p">{</span><span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'#d63031'</span><span class="p">,</span> <span class="s1">'fontColor'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'resn'</span><span class="p">:</span> <span class="s1">'D-ALA'</span><span class="p">})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="s2">"D-ALA"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#d63031"</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span>
+    <span class="s2">"D-Alanine Hinge"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"backgroundColor"</span><span class="p">:</span> <span class="s2">"#d63031"</span><span class="p">,</span> <span class="s2">"fontColor"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="s2">"D-ALA"</span><span class="p">}</span>
+<span class="p">)</span>
 
 <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: The D-Alanine (red) provides a 'hinge' that helps stabilize the circular backbone."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Educational Insight: The D-Alanine (red) provides a 'hinge' that helps stabilize the circular backbone."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">import py3Dmol
 
 view = py3Dmol.view(width=800, height=500)
-view.setBackgroundColor('#fdfdfd')
-view.addModel(cyc_pdb, 'pdb')
+view.setBackgroundColor("#fdfdfd")
+view.addModel(cyc_pdb, "pdb")
 
 # Style the Cyclic Backbone with high-contrast colors
-view.setStyle({'model': -1}, {'cartoon': {'color': '#00b894', 'opacity': 0.8}})
-view.setStyle({'model': -1}, {'stick': {'radius': 0.2, 'color': '#55efc4'}})
+view.setStyle({"model": -1}, {"cartoon": {"color": "#00b894", "opacity": 0.8}})
+view.setStyle({"model": -1}, {"stick": {"radius": 0.2, "color": "#55efc4"}})
 
 # Highlight the D-Alanine residue in Intense Red
-view.setStyle({'resn': 'D-ALA'}, {'stick': {'radius': 0.5, 'color': '#d63031'}})
-view.addLabel("D-Alanine Hinge", {'backgroundColor': '#d63031', 'fontColor': 'white'}, {'resn': 'D-ALA'})
+view.setStyle({"resn": "D-ALA"}, {"stick": {"radius": 0.5, "color": "#d63031"}})
+view.addLabel(
+    "D-Alanine Hinge", {"backgroundColor": "#d63031", "fontColor": "white"}, {"resn": "D-ALA"}
+)
 
 view.zoomTo()
 view.center()
 view.show()
 
-print("Educational Insight: The D-Alanine (red) provides a 'hinge' that helps stabilize the circular backbone.")</div>
+print(
+    "Educational Insight: The D-Alanine (red) provides a 'hinge' that helps stabilize the circular backbone."
+)</div>
 </div>
 </div>
 </div>
@@ -5681,7 +5695,9 @@ print("Educational Insight: The D-Alanine (red) provides a 'hinge' that helps st
 <span class="n">batch</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">drift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Ensemble Generated."</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Note: In a real lab, you would run MD simulations on these samples to find the one with the best binding affinity."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Educational Note: In a real lab, you would run MD simulations on these samples to find the one with the best binding affinity."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">n_peptides = 20
 print(f"🔥 Sampling {n_peptides} possible conformations for our therapeutic lead...")
@@ -5690,7 +5706,9 @@ generator = BatchedGenerator(oxytocin_seq, n_batch=n_peptides, full_atom=True)
 batch = generator.generate_batch(drift=10.0)
 
 print("✅ Ensemble Generated.")
-print("Educational Note: In a real lab, you would run MD simulations on these samples to find the one with the best binding affinity.")</div>
+print(
+    "Educational Note: In a real lab, you would run MD simulations on these samples to find the one with the best binding affinity."
+)</div>
 </div>
 </div>
 </div>
@@ -5718,17 +5736,19 @@ print("Educational Note: In a real lab, you would run MD simulations on these sa
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
 
 <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#fdfdfd'</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s2">"#fdfdfd"</span><span class="p">)</span>
 
 <span class="c1"># Qualitative palette for the ensemble</span>
-<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'#6c5ce7'</span><span class="p">,</span> <span class="s1">'#e17055'</span><span class="p">,</span> <span class="s1">'#00b894'</span><span class="p">,</span> <span class="s1">'#0984e3'</span><span class="p">,</span> <span class="s1">'#fdcb6e'</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#6c5ce7"</span><span class="p">,</span> <span class="s2">"#e17055"</span><span class="p">,</span> <span class="s2">"#00b894"</span><span class="p">,</span> <span class="s2">"#0984e3"</span><span class="p">,</span> <span class="s2">"#fdcb6e"</span><span class="p">]</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_peptides</span><span class="p">)):</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="s1">'pdb'</span><span class="p">)</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="s2">"pdb"</span><span class="p">)</span>
     <span class="c1"># Use thin "sticks" for an ultra-premium look across the ensemble</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)],</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}})</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">"model"</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)],</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}}</span>
+    <span class="p">)</span>
     <span class="c1"># Use addStyle for the spheres so they don't erase the side-chain sticks</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">'atom'</span><span class="p">:</span> <span class="s1">'SG'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'sphere'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#fab1a0'</span><span class="p">}})</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s2">"atom"</span><span class="p">:</span> <span class="s2">"SG"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#fab1a0"</span><span class="p">}})</span>
 
 <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
@@ -5737,22 +5757,23 @@ print("Educational Note: In a real lab, you would run MD simulations on these sa
 <div class="clipboard-copy-txt" id="cell-8">import py3Dmol
 
 view = py3Dmol.view(width=800, height=450)
-view.setBackgroundColor('#fdfdfd')
+view.setBackgroundColor("#fdfdfd")
 
 # Qualitative palette for the ensemble
-colors = ['#6c5ce7', '#e17055', '#00b894', '#0984e3', '#fdcb6e']
+colors = ["#6c5ce7", "#e17055", "#00b894", "#0984e3", "#fdcb6e"]
 
 for i in range(min(5, n_peptides)):
-    view.addModel(batch.to_pdb(i), 'pdb')
+    view.addModel(batch.to_pdb(i), "pdb")
     # Use thin "sticks" for an ultra-premium look across the ensemble
-    view.setStyle({'model': i}, {'stick': {'radius': 0.15, 'color': colors[i % len(colors)], 'opacity': 0.8}})
+    view.setStyle(
+        {"model": i}, {"stick": {"radius": 0.15, "color": colors[i % len(colors)], "opacity": 0.8}}
+    )
     # Use addStyle for the spheres so they don't erase the side-chain sticks
-    view.addStyle({'model': i, 'atom': 'SG'}, {'sphere': {'radius': 0.4, 'color': '#fab1a0'}})
+    view.addStyle({"model": i, "atom": "SG"}, {"sphere": {"radius": 0.4, "color": "#fab1a0"}})
 
 view.zoomTo()
 view.center()
-view.show()
-</div>
+view.show()</div>
 </div>
 </div>
 </div>

@@ -5342,10 +5342,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb py3Dmol"</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5357,7 +5357,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
 import os
@@ -5375,10 +5378,10 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol')
+        get_ipython().run_line_magic("pip", "install synth-pdb py3Dmol")
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5390,7 +5393,10 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
-    print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}")</div>
+
+    print(
+        f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}"
+    )</div>
 </div>
 </div>
 </div>
@@ -5427,17 +5433,24 @@ else:
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"ATOM"</span><span class="p">):</span>
             <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">coords</span><span class="p">:</span> <span class="k">return</span> <span class="n">pdb_str</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">coords</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pdb_str</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
     <span class="c1"># Robust centroid calculation</span>
     <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">coords</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
     <span class="n">new_lines</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"ATOM"</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">])</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">)</span>
             <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}{</span><span class="n">y</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}{</span><span class="n">z</span><span class="si">:</span><span class="s2">&gt;8.3f</span><span class="si">}</span><span class="s2">"</span> <span class="o">+</span> <span class="n">line</span><span class="p">[</span><span class="mi">54</span><span class="p">:])</span>
-        <span class="k">else</span><span class="p">:</span> <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
     <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_lines</span><span class="p">)</span>
+
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries Loaded."</span><span class="p">)</span>
 </pre></div>
@@ -5453,17 +5466,24 @@ def center_pdb(pdb_str):
     for line in lines:
         if line.startswith("ATOM"):
             coords.append([float(line[30:38]), float(line[38:46]), float(line[46:54])])
-    if not coords: return pdb_str
+    if not coords:
+        return pdb_str
     coords = np.array(coords)
     # Robust centroid calculation
     center = (coords.min(axis=0) + coords.max(axis=0)) / 2
     new_lines = []
     for line in lines:
         if line.startswith("ATOM"):
-            x, y, z = float(line[30:38]) - center[0], float(line[38:46]) - center[1], float(line[46:54]) - center[2]
+            x, y, z = (
+                float(line[30:38]) - center[0],
+                float(line[38:46]) - center[1],
+                float(line[46:54]) - center[2],
+            )
             new_lines.append(line[:30] + f"{x:&gt;8.3f}{y:&gt;8.3f}{z:&gt;8.3f}" + line[54:])
-        else: new_lines.append(line)
+        else:
+            new_lines.append(line)
     return "\n".join(new_lines)
+
 
 print("Libraries Loaded.")</div>
 </div>
@@ -5502,7 +5522,7 @@ print("Libraries Loaded.")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"TRP-SER-GLY-VAL-VAL-ASN-GLY-SER"</span> <span class="c1"># A random 8-mer</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"TRP-SER-GLY-VAL-VAL-ASN-GLY-SER"</span>  <span class="c1"># A random 8-mer</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Generating Linear Control..."</span><span class="p">)</span>
 <span class="n">linear_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">cyclic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -5512,7 +5532,7 @@ print("Libraries Loaded.")</div>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Generation Complete."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">sequence = "TRP-SER-GLY-VAL-VAL-ASN-GLY-SER" # A random 8-mer
+<div class="clipboard-copy-txt" id="cell-3">sequence = "TRP-SER-GLY-VAL-VAL-ASN-GLY-SER"  # A random 8-mer
 
 print("Generating Linear Control...")
 linear_pdb = generate_pdb_content(sequence_str=sequence, cyclic=False, minimize_energy=True)
@@ -5565,19 +5585,28 @@ print("Generation Complete.")</div>
     <span class="n">pdb2</span> <span class="o">=</span> <span class="n">center_pdb</span><span class="p">(</span><span class="n">pdb2</span><span class="p">)</span>
 
     <span class="c1"># Model 1</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb1</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span> <span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="n">title1</span><span class="p">,</span> <span class="p">{</span><span class="s1">'position'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">,</span> <span class="s1">'fontColor'</span><span class="p">:</span><span class="s1">'black'</span><span class="p">},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb1</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span> <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span>
+        <span class="n">title1</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"position"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="s2">"backgroundColor"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"fontColor"</span><span class="p">:</span> <span class="s2">"black"</span><span class="p">},</span>
+        <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="c1"># Model 2</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb2</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span> <span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span><span class="n">title2</span><span class="p">,</span> <span class="p">{</span><span class="s1">'position'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'y'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="s1">'backgroundColor'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">,</span> <span class="s1">'fontColor'</span><span class="p">:</span><span class="s1">'black'</span><span class="p">},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb2</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span> <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addLabel</span><span class="p">(</span>
+        <span class="n">title2</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">"position"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="s2">"backgroundColor"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"fontColor"</span><span class="p">:</span> <span class="s2">"black"</span><span class="p">},</span>
+        <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">1.2</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
 
 <span class="n">view_structures</span><span class="p">(</span><span class="n">linear_pdb</span><span class="p">,</span> <span class="s2">"Linear Peptide"</span><span class="p">,</span> <span class="n">cyclic_pdb</span><span class="p">,</span> <span class="s2">"Cyclic Macrocycle"</span><span class="p">)</span>
 </pre></div>
@@ -5590,19 +5619,28 @@ print("Generation Complete.")</div>
     pdb2 = center_pdb(pdb2)
 
     # Model 1
-    view.addModel(pdb1, 'pdb', viewer=(0, 0))
-    view.setStyle({'stick': {'radius': 0.15}, 'cartoon': {'color': 'spectrum'}}, viewer=(0, 0))
-    view.addLabel(title1, {'position': {'x': 0, 'y': 20, 'z': 0}, 'backgroundColor': 'white', 'fontColor':'black'}, viewer=(0, 0))
+    view.addModel(pdb1, "pdb", viewer=(0, 0))
+    view.setStyle({"stick": {"radius": 0.15}, "cartoon": {"color": "spectrum"}}, viewer=(0, 0))
+    view.addLabel(
+        title1,
+        {"position": {"x": 0, "y": 20, "z": 0}, "backgroundColor": "white", "fontColor": "black"},
+        viewer=(0, 0),
+    )
 
     # Model 2
-    view.addModel(pdb2, 'pdb', viewer=(0, 1))
-    view.setStyle({'stick': {'radius': 0.15}, 'cartoon': {'color': 'spectrum'}}, viewer=(0, 1))
-    view.addLabel(title2, {'position': {'x': 0, 'y': 20, 'z': 0}, 'backgroundColor': 'white', 'fontColor':'black'}, viewer=(0, 1))
+    view.addModel(pdb2, "pdb", viewer=(0, 1))
+    view.setStyle({"stick": {"radius": 0.15}, "cartoon": {"color": "spectrum"}}, viewer=(0, 1))
+    view.addLabel(
+        title2,
+        {"position": {"x": 0, "y": 20, "z": 0}, "backgroundColor": "white", "fontColor": "black"},
+        viewer=(0, 1),
+    )
 
     view.zoomTo()
     view.center()
     view.zoom(1.2)
     view.show()
+
 
 view_structures(linear_pdb, "Linear Peptide", cyclic_pdb, "Cyclic Macrocycle")</div>
 </div>
@@ -5691,7 +5729,7 @@ for l in conect_lines[-3:]:
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Generate 3 random macrocycles</span>
 <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generating Macrocycle </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Generating Macrocycle </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
@@ -5700,7 +5738,7 @@ for l in conect_lines[-3:]:
 <div class="clipboard-copy-txt" id="cell-6"># Generate 3 random macrocycles
 results = []
 for i in range(3):
-    print(f"Generating Macrocycle {i+1}...")
+    print(f"Generating Macrocycle {i + 1}...")
     p = generate_pdb_content(length=7, cyclic=True, minimize_energy=True)
     results.append(p)
 

@@ -5301,32 +5301,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">pynmrstar</span> <span class="n">biotite</span> <span class="n">py3dmol</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Setup
 import os
 import sys
 import urllib.request
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     !pip install -q synth-pdb pynmrstar biotite py3dmol matplotlib numpy scipy scikit-learn
 else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
 
-print('✅ Environment configured!')</div>
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5369,16 +5369,19 @@ print('✅ Environment configured!')</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 
 <span class="c1"># Download 1D3Z structure if not present</span>
-<span class="n">pdb_file</span> <span class="o">=</span> <span class="s1">'1D3Z.pdb'</span>
+<span class="n">pdb_file</span> <span class="o">=</span> <span class="s2">"1D3Z.pdb"</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading 1D3Z.pdb..."</span><span class="p">)</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s1">'https://files.rcsb.org/download/1D3Z.pdb'</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">"https://files.rcsb.org/download/1D3Z.pdb"</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
 
 <span class="c1"># Download experimental NMR restraints if not present</span>
-<span class="n">rdc_file</span> <span class="o">=</span> <span class="s1">'1d3z_mr.str'</span>
+<span class="n">rdc_file</span> <span class="o">=</span> <span class="s2">"1d3z_mr.str"</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rdc_file</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading 1d3z NMR restraints..."</span><span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz"</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="s2">"curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz"</span><span class="p">,</span>
+        <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"gunzip -f 1d3z_mr.str.gz"</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Experimental data downloaded."</span><span class="p">)</span>
@@ -5386,16 +5389,19 @@ print('✅ Environment configured!')</div>
 <div class="clipboard-copy-txt" id="cell-2">import subprocess
 
 # Download 1D3Z structure if not present
-pdb_file = '1D3Z.pdb'
+pdb_file = "1D3Z.pdb"
 if not os.path.exists(pdb_file):
     print("Downloading 1D3Z.pdb...")
-    urllib.request.urlretrieve('https://files.rcsb.org/download/1D3Z.pdb', pdb_file)
+    urllib.request.urlretrieve("https://files.rcsb.org/download/1D3Z.pdb", pdb_file)
 
 # Download experimental NMR restraints if not present
-rdc_file = '1d3z_mr.str'
+rdc_file = "1d3z_mr.str"
 if not os.path.exists(rdc_file):
     print("Downloading 1d3z NMR restraints...")
-    subprocess.run("curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz", shell=True)
+    subprocess.run(
+        "curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz",
+        shell=True,
+    )
     subprocess.run("gunzip -f 1d3z_mr.str.gz", shell=True)
 
 print("✅ Experimental data downloaded.")</div>
@@ -5446,36 +5452,37 @@ print("✅ Experimental data downloaded.")</div>
         <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
     <span class="c1"># Extract the block containing N-H RDCs in bicelles</span>
-    <span class="n">start_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">'!!! DipolarCouplings.HN-N.tbl</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">'!!! DipolarCouplings.HN-CO.tbl</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">)</span>
+    <span class="n">start_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"!!! DipolarCouplings.HN-N.tbl</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"!!! DipolarCouplings.HN-CO.tbl</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">start_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Could not find HN-N RDC table in file"</span><span class="p">)</span>
 
-    <span class="n">rdc_block</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">end_idx</span> <span class="k">if</span> <span class="n">end_idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)]</span>
+    <span class="n">rdc_block</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">start_idx</span> <span class="p">:</span> <span class="n">end_idx</span> <span class="k">if</span> <span class="n">end_idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)]</span>
 
     <span class="n">rdc_data</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="n">rdc_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">rdc_block</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">current_res</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">'HN'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'and name'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">')'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"HN"</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s2">"and name"</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">")"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">res_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'resid\s+(\d+)\s+and\s+name'</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">res_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"resid\s+(\d+)\s+and\s+name"</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">res_match</span><span class="p">:</span>
                     <span class="n">current_res</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
                 <span class="n">nums</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">nums</span> <span class="ow">and</span> <span class="n">current_res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                        <span class="n">rdc_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'res_index'</span><span class="p">:</span> <span class="n">current_res</span><span class="p">,</span> <span class="s1">'D_exp'</span><span class="p">:</span> <span class="n">val</span><span class="p">})</span>
+                        <span class="n">rdc_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"res_index"</span><span class="p">:</span> <span class="n">current_res</span><span class="p">,</span> <span class="s2">"D_exp"</span><span class="p">:</span> <span class="n">val</span><span class="p">})</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="k">pass</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rdc_data</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'res_index'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rdc_data</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">"res_index"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"res_index"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
 <span class="n">df_rdc</span> <span class="o">=</span> <span class="n">extract_nh_rdcs_from_xplor</span><span class="p">(</span><span class="n">rdc_file</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_rdc</span><span class="p">)</span><span class="si">}</span><span class="s2"> experimental N-H RDCs from bicelles."</span><span class="p">)</span>
@@ -5493,36 +5500,37 @@ def extract_nh_rdcs_from_xplor(filepath):
         content = f.read()
 
     # Extract the block containing N-H RDCs in bicelles
-    start_idx = content.find('!!! DipolarCouplings.HN-N.tbl\n')
-    end_idx = content.find('!!! DipolarCouplings.HN-CO.tbl\n', start_idx)
+    start_idx = content.find("!!! DipolarCouplings.HN-N.tbl\n")
+    end_idx = content.find("!!! DipolarCouplings.HN-CO.tbl\n", start_idx)
 
     if start_idx == -1:
         raise ValueError("Could not find HN-N RDC table in file")
 
-    rdc_block = content[start_idx:end_idx if end_idx != -1 else len(content)]
+    rdc_block = content[start_idx : end_idx if end_idx != -1 else len(content)]
 
     rdc_data = []
-    lines = rdc_block.split('\n')
+    lines = rdc_block.split("\n")
 
     current_res = None
 
     for line in lines:
-        if 'HN' in line and 'and name' in line:
-            parts = line.split(')')
+        if "HN" in line and "and name" in line:
+            parts = line.split(")")
             if len(parts) &gt; 1:
-                res_match = re.search(r'resid\s+(\d+)\s+and\s+name', line)
+                res_match = re.search(r"resid\s+(\d+)\s+and\s+name", line)
                 if res_match:
                     current_res = int(res_match.group(1))
                 nums = parts[1].strip().split()
                 if nums and current_res is not None:
                     try:
                         val = float(nums[0])
-                        rdc_data.append({'res_index': current_res, 'D_exp': val})
+                        rdc_data.append({"res_index": current_res, "D_exp": val})
                     except ValueError:
                         pass
 
-    df = pd.DataFrame(rdc_data).drop_duplicates(subset=['res_index'])
-    return df.sort_values('res_index').reset_index(drop=True)
+    df = pd.DataFrame(rdc_data).drop_duplicates(subset=["res_index"])
+    return df.sort_values("res_index").reset_index(drop=True)
+
 
 df_rdc = extract_nh_rdcs_from_xplor(rdc_file)
 print(f"Extracted {len(df_rdc)} experimental N-H RDCs from bicelles.")
@@ -5568,8 +5576,8 @@ df_rdc.head()</div>
 <span class="n">pdb_struct</span> <span class="o">=</span> <span class="n">bpdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Extract N and H coordinates for the residues we have experimental data for</span>
-<span class="n">n_atoms</span> <span class="o">=</span> <span class="n">pdb_struct</span><span class="p">[</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'N'</span><span class="p">]</span>
-<span class="n">h_atoms</span> <span class="o">=</span> <span class="n">pdb_struct</span><span class="p">[(</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'H'</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'HN'</span><span class="p">)]</span>
+<span class="n">n_atoms</span> <span class="o">=</span> <span class="n">pdb_struct</span><span class="p">[</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"N"</span><span class="p">]</span>
+<span class="n">h_atoms</span> <span class="o">=</span> <span class="n">pdb_struct</span><span class="p">[(</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"H"</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">pdb_struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"HN"</span><span class="p">)]</span>
 
 <span class="c1"># Create a mapping of residue index to N-H bond vector</span>
 <span class="n">nh_vectors</span> <span class="o">=</span> <span class="p">{}</span>
@@ -5590,19 +5598,19 @@ df_rdc.head()</div>
 
 <span class="n">valid_res</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">_idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_rdc</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">res_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">])</span>
+    <span class="n">res_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"res_index"</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">nh_vectors</span><span class="p">:</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">nh_vectors</span><span class="p">[</span><span class="n">res_id</span><span class="p">]</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="c1"># Coefficients for the 5 independent elements: Sxx, Syy, Sxy, Sxz, Syz</span>
         <span class="c1"># Using the relation D = D_max * sum_i sum_j v_i S_ij v_j</span>
-        <span class="n">row_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="p">]</span>
+        <span class="n">row_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="n">z</span><span class="p">]</span>
         <span class="n">B</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_B</span><span class="p">)</span>
 
         <span class="c1"># D_max for N-H is approx -21700 Hz (assuming rigid bond length 1.04 A)</span>
         <span class="c1"># But we fit a scaled relative tensor directly to the experimental Hz</span>
-        <span class="n">D</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'D_exp'</span><span class="p">])</span>
+        <span class="n">D</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"D_exp"</span><span class="p">])</span>
         <span class="n">valid_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_id</span><span class="p">)</span>
 
 <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
@@ -5612,11 +5620,13 @@ df_rdc.head()</div>
 <span class="n">S_vec</span><span class="p">,</span> <span class="n">residuals</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
 <span class="c1"># Reconstruct the 3x3 symmetric Saupe Matrix (S)</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-    <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span>
-    <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">]],</span>
-    <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="o">-</span><span class="p">(</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="c1"># Trace is zero</span>
-<span class="p">])</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span>
+        <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">]],</span>
+        <span class="p">[</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="o">-</span><span class="p">(</span><span class="n">S_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">S_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span>  <span class="c1"># Trace is zero</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="c1"># Diagonalize the matrix to find Principal Axes and Eigenvalues</span>
 <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
@@ -5653,7 +5663,7 @@ df_rdc.head()</div>
 <span class="c1"># Now standard calculation works perfectly:</span>
 <span class="n">theoretical_rdcs</span> <span class="o">=</span> <span class="n">calculate_rdcs</span><span class="p">(</span><span class="n">rotated_struct</span><span class="p">,</span> <span class="n">da</span><span class="o">=</span><span class="n">Da</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">)</span>
 
-<span class="n">df_rdc</span><span class="p">[</span><span class="s1">'D_calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_rdc</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">theoretical_rdcs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+<span class="n">df_rdc</span><span class="p">[</span><span class="s2">"D_calc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_rdc</span><span class="p">[</span><span class="s2">"res_index"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">theoretical_rdcs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
 <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_rdc</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Compiled </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_clean</span><span class="p">)</span><span class="si">}</span><span class="s2"> aligned overlapping RDCs for validation."</span><span class="p">)</span>
 </pre></div>
@@ -5663,8 +5673,8 @@ df_rdc.head()</div>
 pdb_struct = bpdb.PDBFile.read(pdb_file).get_structure(model=1)
 
 # Extract N and H coordinates for the residues we have experimental data for
-n_atoms = pdb_struct[pdb_struct.atom_name == 'N']
-h_atoms = pdb_struct[(pdb_struct.atom_name == 'H') | (pdb_struct.atom_name == 'HN')]
+n_atoms = pdb_struct[pdb_struct.atom_name == "N"]
+h_atoms = pdb_struct[(pdb_struct.atom_name == "H") | (pdb_struct.atom_name == "HN")]
 
 # Create a mapping of residue index to N-H bond vector
 nh_vectors = {}
@@ -5685,19 +5695,19 @@ D = []
 
 valid_res = []
 for _idx, row in df_rdc.iterrows():
-    res_id = int(row['res_index'])
+    res_id = int(row["res_index"])
     if res_id in nh_vectors:
         v = nh_vectors[res_id]
         x, y, z = v[0], v[1], v[2]
 
         # Coefficients for the 5 independent elements: Sxx, Syy, Sxy, Sxz, Syz
         # Using the relation D = D_max * sum_i sum_j v_i S_ij v_j
-        row_B = [x**2 - z**2, y**2 - z**2, 2*x*y, 2*x*z, 2*y*z]
+        row_B = [x**2 - z**2, y**2 - z**2, 2 * x * y, 2 * x * z, 2 * y * z]
         B.append(row_B)
 
         # D_max for N-H is approx -21700 Hz (assuming rigid bond length 1.04 A)
         # But we fit a scaled relative tensor directly to the experimental Hz
-        D.append(row['D_exp'])
+        D.append(row["D_exp"])
         valid_res.append(res_id)
 
 B = np.array(B)
@@ -5707,11 +5717,13 @@ D = np.array(D)
 S_vec, residuals, rank, s = np.linalg.lstsq(B, D, rcond=None)
 
 # Reconstruct the 3x3 symmetric Saupe Matrix (S)
-S = np.array([
-    [S_vec[0], S_vec[2], S_vec[3]],
-    [S_vec[2], S_vec[1], S_vec[4]],
-    [S_vec[3], S_vec[4], -(S_vec[0] + S_vec[1])] # Trace is zero
-])
+S = np.array(
+    [
+        [S_vec[0], S_vec[2], S_vec[3]],
+        [S_vec[2], S_vec[1], S_vec[4]],
+        [S_vec[3], S_vec[4], -(S_vec[0] + S_vec[1])],  # Trace is zero
+    ]
+)
 
 # Diagonalize the matrix to find Principal Axes and Eigenvalues
 eigenvalues, eigenvectors = np.linalg.eigh(S)
@@ -5748,11 +5760,9 @@ rotated_struct.coord = np.dot(rotated_struct.coord, rotation_matrix)
 # Now standard calculation works perfectly:
 theoretical_rdcs = calculate_rdcs(rotated_struct, da=Da, r=R)
 
-df_rdc['D_calc'] = df_rdc['res_index'].map(lambda x: theoretical_rdcs.get(int(x), np.nan))
+df_rdc["D_calc"] = df_rdc["res_index"].map(lambda x: theoretical_rdcs.get(int(x), np.nan))
 df_clean = df_rdc.dropna().copy()
-print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
-
-</div>
+print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")</div>
 </div>
 </div>
 </div>
@@ -5791,11 +5801,11 @@ print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">pearsonr</span>
 
-<span class="n">D_exp</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s1">'D_exp'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="n">D_calc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s1">'D_calc'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">D_exp</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s2">"D_exp"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">D_calc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s2">"D_calc"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
 <span class="c1"># Q-Factor Calculation (Cornilescu et al. 1998)</span>
-<span class="n">rms_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">D_exp</span> <span class="o">-</span> <span class="n">D_calc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">rms_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">D_exp</span> <span class="o">-</span> <span class="n">D_calc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">rms_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">D_exp</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">q_factor</span> <span class="o">=</span> <span class="n">rms_diff</span> <span class="o">/</span> <span class="n">rms_exp</span>
 
@@ -5804,44 +5814,56 @@ print(f"Compiled {len(df_clean)} aligned overlapping RDCs for validation.")
 <span class="n">r_sq</span> <span class="o">=</span> <span class="n">r_val</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">D_exp</span><span class="p">,</span> <span class="n">D_calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'darkblue'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">D_exp</span><span class="p">,</span> <span class="n">D_calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"darkblue"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
 
 <span class="c1"># Diagonal parity line</span>
 <span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">D_exp</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">D_calc</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">-</span> <span class="mi">2</span>
 <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">D_exp</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">D_calc</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">+</span> <span class="mi">2</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s1">'k--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Perfect Agreement'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s2">"k--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Perfect Agreement"</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"synth-pdb Validation: Synthetic vs Experimental RDCs"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"synth-pdb Validation: Synthetic vs Experimental RDCs"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Experimental RDC $D_</span><span class="si">{HN}</span><span class="s2">$ (Hz)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"synth-pdb Calculated RDC $D_</span><span class="si">{HN}</span><span class="s2">$ (Hz)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
 <span class="c1"># Annotate stats</span>
-<span class="n">bbox_props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'boxstyle'</span><span class="p">:</span> <span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="s1">'fc'</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s1">'ec'</span><span class="p">:</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s1">'alpha'</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Cornilescu Q-Factor: </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-         <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">'monospace'</span><span class="p">)</span>
+<span class="n">bbox_props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"boxstyle"</span><span class="p">:</span> <span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="s2">"fc"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"ec"</span><span class="p">:</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+    <span class="n">min_val</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">max_val</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">"Cornilescu Q-Factor: </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span>
+    <span class="n">family</span><span class="o">=</span><span class="s2">"monospace"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"equal"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">🏆 SCIENTIFIC CONCLUSION:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">q_factor</span> <span class="o">&lt;</span> <span class="mf">0.25</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SUCCESS! The computed Q-factor is </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, which is well below the &lt;0.25 threshold."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"SUCCESS! The computed Q-factor is </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, which is well below the &lt;0.25 threshold."</span>
+    <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"This proves the `synth-pdb` orientation math and N-H vector extraction properly "</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">"recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool."</span>
+    <span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"WARNING. Q-factor is </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">. Further tuning of the alignment tensor may be required."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"WARNING. Q-factor is </span><span class="si">{</span><span class="n">q_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">. Further tuning of the alignment tensor may be required."</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-D_exp = df_clean['D_exp'].values
-D_calc = df_clean['D_calc'].values
+D_exp = df_clean["D_exp"].values
+D_calc = df_clean["D_calc"].values
 
 # Q-Factor Calculation (Cornilescu et al. 1998)
-rms_diff = np.sqrt(np.mean((D_exp - D_calc)**2))
+rms_diff = np.sqrt(np.mean((D_exp - D_calc) ** 2))
 rms_exp = np.sqrt(np.mean(D_exp**2))
 q_factor = rms_diff / rms_exp
 
@@ -5850,35 +5872,47 @@ r_val, _ = pearsonr(D_exp, D_calc)
 r_sq = r_val**2
 
 plt.figure(figsize=(8, 8))
-plt.scatter(D_exp, D_calc, color='darkblue', alpha=0.7, edgecolor='white', s=80)
+plt.scatter(D_exp, D_calc, color="darkblue", alpha=0.7, edgecolor="white", s=80)
 
 # Diagonal parity line
 min_val = min(D_exp.min(), D_calc.min()) - 2
 max_val = max(D_exp.max(), D_calc.max()) + 2
-plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, label='Perfect Agreement')
+plt.plot([min_val, max_val], [min_val, max_val], "k--", alpha=0.5, label="Perfect Agreement")
 
-plt.title("synth-pdb Validation: Synthetic vs Experimental RDCs", fontsize=14, fontweight='bold')
+plt.title("synth-pdb Validation: Synthetic vs Experimental RDCs", fontsize=14, fontweight="bold")
 plt.xlabel("Experimental RDC $D_{HN}$ (Hz)", fontsize=12)
 plt.ylabel("synth-pdb Calculated RDC $D_{HN}$ (Hz)", fontsize=12)
 
 # Annotate stats
-bbox_props = {'boxstyle': "round,pad=0.5", 'fc': "white", 'ec': "gray", 'alpha': 0.9}
-plt.text(min_val + 2, max_val - 5, f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
-         fontsize=12, bbox=bbox_props, family='monospace')
+bbox_props = {"boxstyle": "round,pad=0.5", "fc": "white", "ec": "gray", "alpha": 0.9}
+plt.text(
+    min_val + 2,
+    max_val - 5,
+    f"Cornilescu Q-Factor: {q_factor:.3f}\nPearson $R^2$: {r_sq:.3f}",
+    fontsize=12,
+    bbox=bbox_props,
+    family="monospace",
+)
 
 plt.grid(alpha=0.2)
-plt.axis('equal')
+plt.axis("equal")
 plt.legend()
 plt.show()
 
 print("\n🏆 SCIENTIFIC CONCLUSION:")
 print("=" * 60)
 if q_factor &lt; 0.25:
-    print(f"SUCCESS! The computed Q-factor is {q_factor:.3f}, which is well below the &lt;0.25 threshold.")
+    print(
+        f"SUCCESS! The computed Q-factor is {q_factor:.3f}, which is well below the &lt;0.25 threshold."
+    )
     print("This proves the `synth-pdb` orientation math and N-H vector extraction properly ")
-    print("recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool.")
+    print(
+        "recreates peer-reviewed measurable biology, demonstrating its validity as an NMR research tool."
+    )
 else:
-    print(f"WARNING. Q-factor is {q_factor:.3f}. Further tuning of the alignment tensor may be required.")</div>
+    print(
+        f"WARNING. Q-factor is {q_factor:.3f}. Further tuning of the alignment tensor may be required."
+    )</div>
 </div>
 </div>
 </div>

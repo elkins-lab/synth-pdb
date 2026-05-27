@@ -5643,7 +5643,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="c1"># Check if we are running in Google Colab</span>
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing dependencies..."</span><span class="p">)</span>
@@ -5667,7 +5667,7 @@ import sys
 from pathlib import Path
 
 # Check if we are running in Google Colab
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     print("[INFO] Running in Google Colab - Installing dependencies...")
@@ -5786,7 +5786,7 @@ print("[OK] All imports successful!")</div>
     <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># KEY: Energy minimization ON</span>
-    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
+    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Good structure ready!"</span><span class="p">)</span>
@@ -5803,7 +5803,7 @@ good_pdb = generate_pdb_content(
     structure=structure_def,
     optimize_sidechains=True,
     minimize_energy=True,  # KEY: Energy minimization ON
-    minimization_max_iter=200
+    minimization_max_iter=200,
 )
 
 print("[OK] Good structure ready!")
@@ -5839,9 +5839,9 @@ print(f"   Length: {len(good_pdb)} characters")</div>
 <span class="n">bad_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
     <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span>
-    <span class="n">drift</span><span class="o">=</span><span class="mf">139.0</span><span class="p">,</span>                <span class="c1"># KEY: Add torsion noise to create outliers</span>
+    <span class="n">drift</span><span class="o">=</span><span class="mf">139.0</span><span class="p">,</span>  <span class="c1"># KEY: Add torsion noise to create outliers</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># KEY: No optimization to create clashes</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span>       <span class="c1"># KEY: No minimization</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># KEY: No minimization</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Bad structure (Decoy) ready!"</span><span class="p">)</span>
@@ -5855,15 +5855,14 @@ print("[WARN] Generating BAD structure (Drifted Decoy)...")
 bad_pdb = generate_pdb_content(
     sequence_str=sequence,
     structure=structure_def,
-    drift=139.0,                # KEY: Add torsion noise to create outliers
+    drift=139.0,  # KEY: Add torsion noise to create outliers
     optimize_sidechains=False,  # KEY: No optimization to create clashes
-    minimize_energy=False       # KEY: No minimization
+    minimize_energy=False,  # KEY: No minimization
 )
 
 print("[OK] Bad structure (Decoy) ready!")
 print(f"   Length: {len(bad_pdb)} characters")
-print("\n[INFO] TIP: This 'decoy' has a realistic fold but is physically distorted.")
-</div>
+print("\n[INFO] TIP: This 'decoy' has a realistic fold but is physically distorted.")</div>
 </div>
 </div>
 </div>
@@ -5935,51 +5934,58 @@ print("\n[INFO] TIP: This 'decoy' has a realistic fold but is physically distort
 
             <span class="c1"># Color by region</span>
             <span class="k">if</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">30</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">120</span> <span class="o">&lt;</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">:</span>
-                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'blue'</span><span class="p">)</span>  <span class="c1"># Alpha favored/allowed</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"blue"</span><span class="p">)</span>  <span class="c1"># Alpha favored/allowed</span>
             <span class="k">elif</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">45</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">60</span> <span class="o">&lt;</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="mi">180</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">180</span> <span class="o">&lt;</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">140</span><span class="p">):</span>
-                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'red'</span><span class="p">)</span>   <span class="c1"># Beta favored/allowed</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"red"</span><span class="p">)</span>  <span class="c1"># Beta favored/allowed</span>
             <span class="k">elif</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'green'</span><span class="p">)</span> <span class="c1"># Left-handed (usually Glycine)</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"green"</span><span class="p">)</span>  <span class="c1"># Left-handed (usually Glycine)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'orange'</span><span class="p">)</span> <span class="c1"># Other/outlier</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"orange"</span><span class="p">)</span>  <span class="c1"># Other/outlier</span>
 
     <span class="c1"># Background regions</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">120</span><span class="p">),</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span>
-                                      <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Alpha/Gen Allowed'</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span>
-                                      <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Beta Allowed'</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">120</span><span class="p">),</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Alpha/Gen Allowed"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Beta Allowed"</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1"># Wraparound for beta</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">180</span><span class="p">),</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span>
-                                      <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="o">-</span><span class="mi">180</span><span class="p">),</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">))</span>
 
     <span class="c1"># Data points with small jitter</span>
     <span class="n">jitter_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">))</span>
     <span class="n">jitter_psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">psi_deg</span><span class="p">))</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">jitter_phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psi_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">jitter_psi</span><span class="p">,</span>
-                <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">jitter_phi</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">psi_deg</span><span class="p">)</span> <span class="o">+</span> <span class="n">jitter_psi</span><span class="p">,</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+        <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Phi (phi) degrees'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Psi (psi) degrees'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Phi (phi) degrees"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Psi (psi) degrees"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">'upper right'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 
     <span class="c1"># Calculate statistics</span>
     <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span>
-    <span class="n">favored</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'red'</span><span class="p">])</span>
-    <span class="n">outliers</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">'orange'</span><span class="p">)</span>
+    <span class="n">favored</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"blue"</span><span class="p">,</span> <span class="s2">"red"</span><span class="p">])</span>
+    <span class="n">outliers</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colors</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">"orange"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s1">'total'</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
-        <span class="s1">'favored'</span><span class="p">:</span> <span class="n">favored</span><span class="p">,</span>
-        <span class="s1">'favored_pct'</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">favored</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="s1">'outliers'</span><span class="p">:</span> <span class="n">outliers</span><span class="p">,</span>
-        <span class="s1">'outliers_pct'</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">outliers</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="s2">"total"</span><span class="p">:</span> <span class="n">total</span><span class="p">,</span>
+        <span class="s2">"favored"</span><span class="p">:</span> <span class="n">favored</span><span class="p">,</span>
+        <span class="s2">"favored_pct"</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">favored</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"outliers"</span><span class="p">:</span> <span class="n">outliers</span><span class="p">,</span>
+        <span class="s2">"outliers_pct"</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">outliers</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">}</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">def plot_ramachandran(pdb_content, title="Ramachandran Plot"):
@@ -6004,53 +6010,59 @@ print("\n[INFO] TIP: This 'decoy' has a realistic fold but is physically distort
 
             # Color by region
             if -180 &lt; p &lt; -30 and -120 &lt; s &lt; 60:
-                colors.append('blue')  # Alpha favored/allowed
+                colors.append("blue")  # Alpha favored/allowed
             elif -180 &lt; p &lt; -45 and (60 &lt; s &lt; 180 or -180 &lt; s &lt; -140):
-                colors.append('red')   # Beta favored/allowed
+                colors.append("red")  # Beta favored/allowed
             elif p &gt; 0:
-                colors.append('green') # Left-handed (usually Glycine)
+                colors.append("green")  # Left-handed (usually Glycine)
             else:
-                colors.append('orange') # Other/outlier
+                colors.append("orange")  # Other/outlier
 
     # Background regions
-    plt.gca().add_patch(plt.Rectangle((-180, -120), 150, 180,
-                                      color='blue', alpha=0.1, label='Alpha/Gen Allowed'))
-    plt.gca().add_patch(plt.Rectangle((-180, 60), 135, 120,
-                                      color='red', alpha=0.1, label='Beta Allowed'))
+    plt.gca().add_patch(
+        plt.Rectangle((-180, -120), 150, 180, color="blue", alpha=0.1, label="Alpha/Gen Allowed")
+    )
+    plt.gca().add_patch(
+        plt.Rectangle((-180, 60), 135, 120, color="red", alpha=0.1, label="Beta Allowed")
+    )
     # Wraparound for beta
-    plt.gca().add_patch(plt.Rectangle((-180, -180), 135, 40,
-                                      color='red', alpha=0.1))
+    plt.gca().add_patch(plt.Rectangle((-180, -180), 135, 40, color="red", alpha=0.1))
 
     # Data points with small jitter
     jitter_phi = np.random.normal(0, 1.5, size=len(phi_deg))
     jitter_psi = np.random.normal(0, 1.5, size=len(psi_deg))
-    plt.scatter(np.array(phi_deg) + jitter_phi, np.array(psi_deg) + jitter_psi,
-                c=colors, alpha=0.6, edgecolors='black', s=50)
+    plt.scatter(
+        np.array(phi_deg) + jitter_phi,
+        np.array(psi_deg) + jitter_psi,
+        c=colors,
+        alpha=0.6,
+        edgecolors="black",
+        s=50,
+    )
 
     plt.xlim(-180, 180)
     plt.ylim(-180, 180)
-    plt.axhline(0, color='black', linewidth=0.5, alpha=0.3)
-    plt.axvline(0, color='black', linewidth=0.5, alpha=0.3)
-    plt.xlabel('Phi (phi) degrees', fontsize=12)
-    plt.ylabel('Psi (psi) degrees', fontsize=12)
-    plt.title(title, fontsize=14, fontweight='bold')
+    plt.axhline(0, color="black", linewidth=0.5, alpha=0.3)
+    plt.axvline(0, color="black", linewidth=0.5, alpha=0.3)
+    plt.xlabel("Phi (phi) degrees", fontsize=12)
+    plt.ylabel("Psi (psi) degrees", fontsize=12)
+    plt.title(title, fontsize=14, fontweight="bold")
     plt.grid(True, alpha=0.2)
-    plt.legend(loc='upper right')
+    plt.legend(loc="upper right")
     plt.tight_layout()
 
     # Calculate statistics
     total = len(phi_deg)
-    favored = sum(1 for c in colors if c in ['blue', 'red'])
-    outliers = sum(1 for c in colors if c == 'orange')
+    favored = sum(1 for c in colors if c in ["blue", "red"])
+    outliers = sum(1 for c in colors if c == "orange")
 
     return {
-        'total': total,
-        'favored': favored,
-        'favored_pct': 100 * favored / total if total &gt; 0 else 0,
-        'outliers': outliers,
-        'outliers_pct': 100 * outliers / total if total &gt; 0 else 0
-    }
-</div>
+        "total": total,
+        "favored": favored,
+        "favored_pct": 100 * favored / total if total &gt; 0 else 0,
+        "outliers": outliers,
+        "outliers_pct": 100 * outliers / total if total &gt; 0 else 0,
+    }</div>
 </div>
 </div>
 </div>
@@ -6175,27 +6187,30 @@ print("   - 'Good' structures have been relaxed to resolve all steric clashes.")
     <span class="n">structure</span> <span class="o">=</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Get all heavy atoms (no hydrogens)</span>
-    <span class="n">heavy</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="n">structure</span><span class="o">.</span><span class="n">element</span> <span class="o">!=</span> <span class="s1">'H'</span><span class="p">]</span>
+    <span class="n">heavy</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="n">structure</span><span class="o">.</span><span class="n">element</span> <span class="o">!=</span> <span class="s2">"H"</span><span class="p">]</span>
 
     <span class="n">clashes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">n_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">heavy</span><span class="p">)</span>
 
     <span class="c1"># Pairwise distance check</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="mi">500</span><span class="p">)):</span>  <span class="c1"># Limit for speed</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="mi">500</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">,</span> <span class="mi">500</span><span class="p">)):</span>
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">heavy</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">heavy</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">clash_threshold</span><span class="p">:</span>
-                <span class="n">clashes</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                    <span class="s1">'atom1'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">atom_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-                    <span class="s1">'atom2'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">atom_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-                    <span class="s1">'distance'</span><span class="p">:</span> <span class="n">dist</span>
-                <span class="p">})</span>
+                <span class="n">clashes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"atom1"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">atom_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="s2">"atom2"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}{</span><span class="n">heavy</span><span class="o">.</span><span class="n">res_id</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">heavy</span><span class="o">.</span><span class="n">atom_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="s2">"distance"</span><span class="p">:</span> <span class="n">dist</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">clashes</span>
+
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Clash detection function ready!"</span><span class="p">)</span>
 </pre></div>
@@ -6205,27 +6220,30 @@ print("   - 'Good' structures have been relaxed to resolve all steric clashes.")
     structure = pdb_file.get_structure(model=1)
 
     # Get all heavy atoms (no hydrogens)
-    heavy = structure[structure.element != 'H']
+    heavy = structure[structure.element != "H"]
 
     clashes = []
     n_atoms = len(heavy)
 
     # Pairwise distance check
     for i in range(min(n_atoms, 500)):  # Limit for speed
-        for j in range(i+1, min(n_atoms, 500)):
+        for j in range(i + 1, min(n_atoms, 500)):
             if abs(heavy.res_id[i] - heavy.res_id[j]) &lt;= 1:
                 continue
 
             dist = np.linalg.norm(heavy.coord[i] - heavy.coord[j])
 
             if dist &lt; clash_threshold:
-                clashes.append({
-                    'atom1': f"{heavy.res_name[i]}{heavy.res_id[i]}:{heavy.atom_name[i]}",
-                    'atom2': f"{heavy.res_name[j]}{heavy.res_id[j]}:{heavy.atom_name[j]}",
-                    'distance': dist
-                })
+                clashes.append(
+                    {
+                        "atom1": f"{heavy.res_name[i]}{heavy.res_id[i]}:{heavy.atom_name[i]}",
+                        "atom2": f"{heavy.res_name[j]}{heavy.res_id[j]}:{heavy.atom_name[j]}",
+                        "distance": dist,
+                    }
+                )
 
     return clashes
+
 
 print("[OK] Clash detection function ready!")</div>
 </div>
@@ -6263,13 +6281,13 @@ print("[OK] Clash detection function ready!")</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[OK] GOOD Structure: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">good_clashes</span><span class="p">)</span><span class="si">}</span><span class="s2"> clashes detected"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">good_clashes</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"   Top 3 clashes:"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">good_clashes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">'distance'</span><span class="p">])[:</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">good_clashes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">"distance"</span><span class="p">])[:</span><span class="mi">3</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'atom1'</span><span class="p">]</span><span class="si">}</span><span class="s2"> &lt;-&gt; </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'atom2'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'distance'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> A"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[WARN] BAD Structure: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_clashes</span><span class="p">)</span><span class="si">}</span><span class="s2"> clashes detected"</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">bad_clashes</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"   Top 3 clashes:"</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bad_clashes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">'distance'</span><span class="p">])[:</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">clash</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bad_clashes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">"distance"</span><span class="p">])[:</span><span class="mi">3</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"     </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'atom1'</span><span class="p">]</span><span class="si">}</span><span class="s2"> &lt;-&gt; </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'atom2'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">clash</span><span class="p">[</span><span class="s1">'distance'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> A"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[INFO] INTERPRETATION:"</span><span class="p">)</span>
@@ -6288,13 +6306,13 @@ print("=" * 50)
 print(f"[OK] GOOD Structure: {len(good_clashes)} clashes detected")
 if good_clashes:
     print("   Top 3 clashes:")
-    for clash in sorted(good_clashes, key=lambda x: x['distance'])[:3]:
+    for clash in sorted(good_clashes, key=lambda x: x["distance"])[:3]:
         print(f"     {clash['atom1']} &lt;-&gt; {clash['atom2']}: {clash['distance']:.2f} A")
 
 print(f"\n[WARN] BAD Structure: {len(bad_clashes)} clashes detected")
 if bad_clashes:
     print("   Top 3 clashes:")
-    for clash in sorted(bad_clashes, key=lambda x: x['distance'])[:3]:
+    for clash in sorted(bad_clashes, key=lambda x: x["distance"])[:3]:
         print(f"     {clash['atom1']} &lt;-&gt; {clash['atom2']}: {clash['distance']:.2f} A")
 
 print("\n[INFO] INTERPRETATION:")
@@ -6342,7 +6360,7 @@ print("   &gt;50 clashes = Poor quality")</div>
 <span class="n">good_validator</span><span class="o">.</span><span class="n">validate_all</span><span class="p">()</span>
 <span class="n">good_violations</span> <span class="o">=</span> <span class="n">good_validator</span><span class="o">.</span><span class="n">get_violations</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="s1">'='</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="s1">'='</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">50</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">good_violations</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] No violations! Structure passes all checks."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
@@ -6350,7 +6368,7 @@ print("   &gt;50 clashes = Poor quality")</div>
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">good_violations</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">good_violations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">good_violations</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="si">}</span><span class="s2"> more"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">good_violations</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">5</span><span class="si">}</span><span class="s2"> more"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9"># Validate Good Structure
 print("[INFO] Validating GOOD structure...\n")
@@ -6358,7 +6376,7 @@ good_validator = PDBValidator(good_pdb)
 good_validator.validate_all()
 good_violations = good_validator.get_violations()
 
-print(f"\n{'='*50}")
+print(f"\n{'=' * 50}")
 if not good_violations:
     print("[OK] No violations! Structure passes all checks.")
 else:
@@ -6366,7 +6384,7 @@ else:
     for v in good_violations[:5]:
         print(f"   - {v}")
     if len(good_violations) &gt; 5:
-        print(f"   ... and {len(good_violations)-5} more")</div>
+        print(f"   ... and {len(good_violations) - 5} more")</div>
 </div>
 </div>
 </div>
@@ -6397,7 +6415,7 @@ else:
 <span class="n">bad_validator</span><span class="o">.</span><span class="n">validate_all</span><span class="p">()</span>
 <span class="n">bad_violations</span> <span class="o">=</span> <span class="n">bad_validator</span><span class="o">.</span><span class="n">get_violations</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="s1">'='</span><span class="o">*</span><span class="mi">50</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="si">{</span><span class="s1">'='</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">50</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">bad_violations</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] No violations! Structure passes all checks."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
@@ -6405,7 +6423,7 @@ else:
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">bad_violations</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_violations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_violations</span><span class="p">)</span><span class="o">-</span><span class="mi">5</span><span class="si">}</span><span class="s2"> more"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   ... and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_violations</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">5</span><span class="si">}</span><span class="s2"> more"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10"># Validate Bad Structure
 print("[INFO] Validating BAD structure...\n")
@@ -6413,7 +6431,7 @@ bad_validator = PDBValidator(bad_pdb)
 bad_validator.validate_all()
 bad_violations = bad_validator.get_violations()
 
-print(f"\n{'='*50}")
+print(f"\n{'=' * 50}")
 if not bad_violations:
     print("[OK] No violations! Structure passes all checks.")
 else:
@@ -6421,7 +6439,7 @@ else:
     for v in bad_violations[:5]:
         print(f"   - {v}")
     if len(bad_violations) &gt; 5:
-        print(f"   ... and {len(bad_violations)-5} more")</div>
+        print(f"   ... and {len(bad_violations) - 5} more")</div>
 </div>
 </div>
 </div>
@@ -6461,18 +6479,19 @@ else:
 
 <span class="c1"># Create toggle widget</span>
 <span class="n">structure_selector</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ToggleButtons</span><span class="p">(</span>
-    <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">'Good Structure [OK]'</span><span class="p">,</span> <span class="s1">'Bad Structure [WARN]'</span><span class="p">],</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">'View:'</span><span class="p">,</span>
-    <span class="n">button_style</span><span class="o">=</span><span class="s1">'info'</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">"Good Structure [OK]"</span><span class="p">,</span> <span class="s2">"Bad Structure [WARN]"</span><span class="p">],</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">"View:"</span><span class="p">,</span>
+    <span class="n">button_style</span><span class="o">=</span><span class="s2">"info"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">show_structure</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
         <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">'Good'</span> <span class="ow">in</span> <span class="n">structure_selector</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"Good"</span> <span class="ow">in</span> <span class="n">structure_selector</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="n">pdb_data</span> <span class="o">=</span> <span class="n">good_pdb</span>
             <span class="n">title</span> <span class="o">=</span> <span class="s2">"[OK] GOOD Structure (Minimized)"</span>
             <span class="n">stats</span> <span class="o">=</span> <span class="n">good_stats</span>
@@ -6487,8 +6506,8 @@ else:
 
         <span class="c1"># 3D Viewer</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_data</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">}})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_data</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}})</span>
         <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
         <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
@@ -6501,47 +6520,52 @@ else:
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total violations: </span><span class="si">{</span><span class="n">violations</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Overall grade</span>
-        <span class="k">if</span> <span class="n">clashes</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">[</span><span class="s1">'favored_pct'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">clashes</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">[</span><span class="s2">"favored_pct"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[AWARD] Overall Grade: EXCELLENT (Clash-free, physically relaxed)"</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">clashes</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">[</span><span class="s1">'favored_pct'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">clashes</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">stats</span><span class="p">[</span><span class="s2">"favored_pct"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[OK] Overall Grade: GOOD (Minor clashes)"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">clashes</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[WARN] Overall Grade: ACCEPTABLE (Needs refinement)"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[FAIL] Overall Grade: POOR (Severe steric clashes)"</span><span class="p">)</span>
 
-<span class="n">structure_selector</span><span class="o">.</span><span class="n">unobserve_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">'value'</span><span class="p">)</span>
-<span class="n">structure_selector</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">show_structure</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">'value'</span><span class="p">)</span>
+
+<span class="n">structure_selector</span><span class="o">.</span><span class="n">unobserve_all</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"value"</span><span class="p">)</span>
+<span class="n">structure_selector</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">show_structure</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">"value"</span><span class="p">)</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">structure_selector</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 
 <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">_HTML</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span> <span class="k">as</span> <span class="n">_disp</span>
-    <span class="n">_disp</span><span class="p">(</span><span class="n">_HTML</span><span class="p">(</span>
-        <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
-        <span class="s1">'border:1px dashed #555;border-radius:8px;'</span>
-        <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
-        <span class="s1">'[INFO] Click a button above to load the 3D structure'</span>
-        <span class="s1">'&lt;/div&gt;'</span>
-    <span class="p">))</span>
+
+    <span class="n">_disp</span><span class="p">(</span>
+        <span class="n">_HTML</span><span class="p">(</span>
+            <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
+            <span class="s2">"border:1px dashed #555;border-radius:8px;"</span>
+            <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
+            <span class="s2">"[INFO] Click a button above to load the 3D structure"</span>
+            <span class="s2">"&lt;/div&gt;"</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">import py3Dmol
 
 # Create toggle widget
 structure_selector = widgets.ToggleButtons(
-    options=['Good Structure [OK]', 'Bad Structure [WARN]'],
-    description='View:',
-    button_style='info'
+    options=["Good Structure [OK]", "Bad Structure [WARN]"],
+    description="View:",
+    button_style="info",
 )
 
 output = widgets.Output()
+
 
 def show_structure(change):
     with output:
         output.clear_output(wait=True)
 
-        if 'Good' in structure_selector.value:
+        if "Good" in structure_selector.value:
             pdb_data = good_pdb
             title = "[OK] GOOD Structure (Minimized)"
             stats = good_stats
@@ -6556,8 +6580,8 @@ def show_structure(change):
 
         # 3D Viewer
         view = py3Dmol.view(width=600, height=400)
-        view.addModel(pdb_data, 'pdb')
-        view.setStyle({'cartoon': {'color': 'spectrum'}})
+        view.addModel(pdb_data, "pdb")
+        view.setStyle({"cartoon": {"color": "spectrum"}})
         view.zoomTo()
         view.show()
 
@@ -6570,30 +6594,33 @@ def show_structure(change):
         print(f"Total violations: {violations}")
 
         # Overall grade
-        if clashes == 0 and stats['favored_pct'] &gt; 30:
+        if clashes == 0 and stats["favored_pct"] &gt; 30:
             print("\n[AWARD] Overall Grade: EXCELLENT (Clash-free, physically relaxed)")
-        elif clashes &lt; 5 and stats['favored_pct'] &gt; 50:
+        elif clashes &lt; 5 and stats["favored_pct"] &gt; 50:
             print("\n[OK] Overall Grade: GOOD (Minor clashes)")
         elif clashes &lt; 15:
             print("\n[WARN] Overall Grade: ACCEPTABLE (Needs refinement)")
         else:
             print("\n[FAIL] Overall Grade: POOR (Severe steric clashes)")
 
-structure_selector.unobserve_all(name='value')
-structure_selector.observe(show_structure, names='value')
+
+structure_selector.unobserve_all(name="value")
+structure_selector.observe(show_structure, names="value")
 
 display(structure_selector, output)
 
 with output:
     from IPython.display import HTML as _HTML
     from IPython.display import display as _disp
-    _disp(_HTML(
-        '<div style="text-align:center;padding:40px;color:#aaa;'
-        'border:1px dashed #555;border-radius:8px;'
-        'font-style:italic;background:#1a1a1a;">'
-        '[INFO] Click a button above to load the 3D structure'
-        '</div>'
-    ))</div>
+
+    _disp(
+        _HTML(
+            '<div #555;border-radius:8px;"="" 'font-style:italic;background:#1a1a1a;"="" border:1px="" dashed="" style="text-align:center;padding:40px;color:#aaa;'
+            ">'
+            "[INFO] Click a button above to load the 3D structure"
+            "</div>"
+        )
+    )</div>
 </div>
 </div>
 </div>
@@ -6674,26 +6701,36 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     <span class="n">report</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_quality_report</span><span class="p">()</span>
 
     <span class="n">criteria</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="s2">"Bond Z-score &lt; 3.0"</span><span class="p">,</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"geometric_z_scores"</span><span class="p">][</span><span class="s2">"mean_bond_zscore"</span><span class="p">],</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"geometric_z_scores"</span><span class="p">][</span><span class="s2">"mean_bond_zscore"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">,</span>
-         <span class="s2">".3f"</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">"Rotamers favored &gt; 80 %"</span><span class="p">,</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"rotamer_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"favored_rotamers_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"rotamer_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"favored_rotamers_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">80.0</span><span class="p">,</span>
-         <span class="s2">".1f"</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">"Ramachandran outliers &lt; 5 %"</span><span class="p">,</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"ramachandran_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outlier_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"ramachandran_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outlier_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">5.0</span><span class="p">,</span>
-         <span class="s2">".1f"</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">"Potential energy &lt; 1e5 kJ/mol"</span><span class="p">,</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"potential_energy_kj_mol"</span><span class="p">],</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"is_physically_plausible"</span><span class="p">],</span>
-         <span class="s2">".0f"</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">"Burial ratio &gt;= 0.8"</span><span class="p">,</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"hydrophobic_burial_ratio"</span><span class="p">],</span>
-         <span class="n">report</span><span class="p">[</span><span class="s2">"is_biophysically_plausible"</span><span class="p">],</span>
-         <span class="s2">".3f"</span><span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">"Bond Z-score &lt; 3.0"</span><span class="p">,</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"geometric_z_scores"</span><span class="p">][</span><span class="s2">"mean_bond_zscore"</span><span class="p">],</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"geometric_z_scores"</span><span class="p">][</span><span class="s2">"mean_bond_zscore"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="s2">".3f"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">"Rotamers favored &gt; 80 %"</span><span class="p">,</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"rotamer_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"favored_rotamers_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"rotamer_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"favored_rotamers_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">80.0</span><span class="p">,</span>
+            <span class="s2">".1f"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">"Ramachandran outliers &lt; 5 %"</span><span class="p">,</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"ramachandran_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outlier_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"ramachandran_stats"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"outlier_pct"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">5.0</span><span class="p">,</span>
+            <span class="s2">".1f"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">"Potential energy &lt; 1e5 kJ/mol"</span><span class="p">,</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"potential_energy_kj_mol"</span><span class="p">],</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"is_physically_plausible"</span><span class="p">],</span>
+            <span class="s2">".0f"</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">"Burial ratio &gt;= 0.8"</span><span class="p">,</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"hydrophobic_burial_ratio"</span><span class="p">],</span>
+            <span class="n">report</span><span class="p">[</span><span class="s2">"is_biophysically_plausible"</span><span class="p">],</span>
+            <span class="s2">".3f"</span><span class="p">,</span>
+        <span class="p">),</span>
     <span class="p">]</span>
 
     <span class="n">sep</span> <span class="o">=</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">54</span>
@@ -6703,7 +6740,7 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Scorecard: </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="s1">'Criterion'</span><span class="si">:</span><span class="s2">&lt;32</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Value'</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">  Status"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="s1">'-'</span><span class="o">*</span><span class="mi">32</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'-'</span><span class="o">*</span><span class="mi">10</span><span class="si">}</span><span class="s2">  ------"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="s1">'-'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">32</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'-'</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">10</span><span class="si">}</span><span class="s2">  ------"</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">passes</span><span class="p">,</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="n">criteria</span><span class="p">:</span>
         <span class="n">tick</span> <span class="o">=</span> <span class="s2">"[OK]"</span> <span class="k">if</span> <span class="n">passes</span> <span class="k">else</span> <span class="s2">"[FAIL]"</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;32</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">fmt</span><span class="p">))</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">tick</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -6715,8 +6752,9 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     <span class="nb">print</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">report</span>
 
+
 <span class="n">good_report</span> <span class="o">=</span> <span class="n">print_scorecard</span><span class="p">(</span><span class="s2">"GOOD Structure (minimized)"</span><span class="p">,</span> <span class="n">good_pdb</span><span class="p">)</span>
-<span class="n">bad_report</span>  <span class="o">=</span> <span class="n">print_scorecard</span><span class="p">(</span><span class="s2">"BAD Structure (drifted decoy)"</span><span class="p">,</span> <span class="n">bad_pdb</span><span class="p">)</span>
+<span class="n">bad_report</span> <span class="o">=</span> <span class="n">print_scorecard</span><span class="p">(</span><span class="s2">"BAD Structure (drifted decoy)"</span><span class="p">,</span> <span class="n">bad_pdb</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-12">def print_scorecard(label, pdb_content):
     """Run get_quality_report() and render a pass/fail scorecard."""
@@ -6724,26 +6762,36 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     report = v.get_quality_report()
 
     criteria = [
-        ("Bond Z-score &lt; 3.0",
-         report["geometric_z_scores"]["mean_bond_zscore"],
-         report["geometric_z_scores"]["mean_bond_zscore"] &lt; 3.0,
-         ".3f"),
-        ("Rotamers favored &gt; 80 %",
-         report["rotamer_stats"].get("favored_rotamers_pct", 0.0),
-         report["rotamer_stats"].get("favored_rotamers_pct", 0.0) &gt; 80.0,
-         ".1f"),
-        ("Ramachandran outliers &lt; 5 %",
-         report["ramachandran_stats"].get("outlier_pct", 0.0),
-         report["ramachandran_stats"].get("outlier_pct", 0.0) &lt; 5.0,
-         ".1f"),
-        ("Potential energy &lt; 1e5 kJ/mol",
-         report["potential_energy_kj_mol"],
-         report["is_physically_plausible"],
-         ".0f"),
-        ("Burial ratio &gt;= 0.8",
-         report["hydrophobic_burial_ratio"],
-         report["is_biophysically_plausible"],
-         ".3f"),
+        (
+            "Bond Z-score &lt; 3.0",
+            report["geometric_z_scores"]["mean_bond_zscore"],
+            report["geometric_z_scores"]["mean_bond_zscore"] &lt; 3.0,
+            ".3f",
+        ),
+        (
+            "Rotamers favored &gt; 80 %",
+            report["rotamer_stats"].get("favored_rotamers_pct", 0.0),
+            report["rotamer_stats"].get("favored_rotamers_pct", 0.0) &gt; 80.0,
+            ".1f",
+        ),
+        (
+            "Ramachandran outliers &lt; 5 %",
+            report["ramachandran_stats"].get("outlier_pct", 0.0),
+            report["ramachandran_stats"].get("outlier_pct", 0.0) &lt; 5.0,
+            ".1f",
+        ),
+        (
+            "Potential energy &lt; 1e5 kJ/mol",
+            report["potential_energy_kj_mol"],
+            report["is_physically_plausible"],
+            ".0f",
+        ),
+        (
+            "Burial ratio &gt;= 0.8",
+            report["hydrophobic_burial_ratio"],
+            report["is_biophysically_plausible"],
+            ".3f",
+        ),
     ]
 
     sep = "=" * 54
@@ -6753,7 +6801,7 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     print(f"  Scorecard: {label}")
     print(sep)
     print(f"  {'Criterion':&lt;32} {'Value':&gt;10}  Status")
-    print(f"  {'-'*32} {'-'*10}  ------")
+    print(f"  {'-' * 32} {'-' * 10}  ------")
     for name, value, passes, fmt in criteria:
         tick = "[OK]" if passes else "[FAIL]"
         print(f"  {name:&lt;32} {str(format(value, fmt)):&gt;10}  {tick}")
@@ -6765,9 +6813,9 @@ composite verdict: <strong><code>is_overall_scientifically_defensible</code></st
     print(sep)
     return report
 
+
 good_report = print_scorecard("GOOD Structure (minimized)", good_pdb)
-bad_report  = print_scorecard("BAD Structure (drifted decoy)", bad_pdb)
-</div>
+bad_report = print_scorecard("BAD Structure (drifted decoy)", bad_pdb)</div>
 </div>
 </div>
 </div>

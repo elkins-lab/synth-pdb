@@ -5295,7 +5295,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
 
 <span class="c1"># 1. Determine environment</span>
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="c1"># 2. Setup path and dependencies</span>
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
@@ -5303,7 +5303,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">biotite</span> <span class="n">py3Dmol</span> <span class="n">ipywidgets</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running locally"</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="c1"># 3. Imports</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
@@ -5327,7 +5327,7 @@ import sys
 from io import StringIO
 
 # 1. Determine environment
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 # 2. Setup path and dependencies
 if IN_COLAB:
@@ -5335,7 +5335,7 @@ if IN_COLAB:
     %pip install -q biotite py3Dmol ipywidgets synth-pdb
 else:
     print("💻 Running locally")
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 # 3. Imports
 import biotite.structure as struc
@@ -5390,40 +5390,34 @@ print("✅ Setup complete and imports successful!")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 1. Define previous 3 atoms (The 'Reference Frame')</span>
 <span class="c1"># Units: Angstroms</span>
-<span class="n">pos_n</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">])</span>
+<span class="n">pos_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">])</span>
 <span class="n">pos_ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.46</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">])</span>
-<span class="n">pos_c</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.01</span><span class="p">,</span> <span class="mf">1.34</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">])</span>
+<span class="n">pos_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.01</span><span class="p">,</span> <span class="mf">1.34</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">])</span>
 
 <span class="c1"># 2. Define geometry for the NEXT atom (another Nitrogen)</span>
-<span class="n">bond_len</span> <span class="o">=</span> <span class="mf">1.33</span>    <span class="c1"># C-N peptide bond</span>
-<span class="n">angle</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">116.0</span><span class="p">)</span> <span class="c1"># C-alpha-C-N angle</span>
-<span class="n">dihedral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">180.0</span><span class="p">)</span> <span class="c1"># Trans-peptide bond</span>
+<span class="n">bond_len</span> <span class="o">=</span> <span class="mf">1.33</span>  <span class="c1"># C-N peptide bond</span>
+<span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">116.0</span><span class="p">)</span>  <span class="c1"># C-alpha-C-N angle</span>
+<span class="n">dihedral</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mf">180.0</span><span class="p">)</span>  <span class="c1"># Trans-peptide bond</span>
 
 <span class="c1"># 3. Reconstruct position</span>
-<span class="n">next_n_pos</span> <span class="o">=</span> <span class="n">position_atom_3d_from_internal_coords</span><span class="p">(</span>
-    <span class="n">pos_n</span><span class="p">,</span> <span class="n">pos_ca</span><span class="p">,</span> <span class="n">pos_c</span><span class="p">,</span>
-    <span class="n">bond_len</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">dihedral</span>
-<span class="p">)</span>
+<span class="n">next_n_pos</span> <span class="o">=</span> <span class="n">position_atom_3d_from_internal_coords</span><span class="p">(</span><span class="n">pos_n</span><span class="p">,</span> <span class="n">pos_ca</span><span class="p">,</span> <span class="n">pos_c</span><span class="p">,</span> <span class="n">bond_len</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">dihedral</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Reconstructed N Position: </span><span class="si">{</span><span class="n">next_n_pos</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Bond Check (Expected 1.33): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">next_n_pos</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">pos_c</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># 1. Define previous 3 atoms (The 'Reference Frame')
 # Units: Angstroms
-pos_n  = np.array([0.00, 0.00, 0.00])
+pos_n = np.array([0.00, 0.00, 0.00])
 pos_ca = np.array([1.46, 0.00, 0.00])
-pos_c  = np.array([2.01, 1.34, 0.00])
+pos_c = np.array([2.01, 1.34, 0.00])
 
 # 2. Define geometry for the NEXT atom (another Nitrogen)
-bond_len = 1.33    # C-N peptide bond
-angle    = np.radians(116.0) # C-alpha-C-N angle
-dihedral = np.radians(180.0) # Trans-peptide bond
+bond_len = 1.33  # C-N peptide bond
+angle = np.radians(116.0)  # C-alpha-C-N angle
+dihedral = np.radians(180.0)  # Trans-peptide bond
 
 # 3. Reconstruct position
-next_n_pos = position_atom_3d_from_internal_coords(
-    pos_n, pos_ca, pos_c,
-    bond_len, angle, dihedral
-)
+next_n_pos = position_atom_3d_from_internal_coords(pos_n, pos_ca, pos_c, bond_len, angle, dihedral)
 
 print(f"Reconstructed N Position: {next_n_pos}")
 print(f"Bond Check (Expected 1.33): {np.linalg.norm(next_n_pos - pos_c):.3f} Å")</div>
@@ -5466,17 +5460,15 @@ print(f"Bond Check (Expected 1.33): {np.linalg.norm(next_n_pos - pos_c):.3f} Å"
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># 1. Fetch reference (1UBQ)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># Attempt local load from examples</span>
-    <span class="n">ubq_file</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">'../../examples/1UBQ.pdb'</span><span class="p">)</span>
+    <span class="n">ubq_file</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"../../examples/1UBQ.pdb"</span><span class="p">)</span>
     <span class="n">ubq_ref</span> <span class="o">=</span> <span class="n">ubq_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">ca_ref</span> <span class="o">=</span> <span class="n">ubq_ref</span><span class="p">[</span><span class="n">ubq_ref</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'CA'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span>
+    <span class="n">ca_ref</span> <span class="o">=</span> <span class="n">ubq_ref</span><span class="p">[</span><span class="n">ubq_ref</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span>
 
     <span class="c1"># 2. Scramble the coordinates (Rotate 45° and Translate)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
-    <span class="n">R_scramble</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span>  <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="p">])</span>
+    <span class="n">R_scramble</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+    <span class="p">)</span>
     <span class="n">ca_mobile</span> <span class="o">=</span> <span class="p">(</span><span class="n">R_scramble</span> <span class="o">@</span> <span class="n">ca_ref</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial RMSD (Scrambled): </span><span class="si">{</span><span class="n">calculate_rmsd</span><span class="p">(</span><span class="n">ca_mobile</span><span class="p">,</span><span class="w"> </span><span class="n">ca_ref</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
@@ -5490,12 +5482,23 @@ print(f"Bond Check (Expected 1.33): {np.linalg.norm(next_n_pos - pos_c):.3f} Å"
     <span class="c1"># Visual confirmation</span>
     <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
     <span class="c1"># We'll use spheres to visualize the point cloud alignment</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ca_ref</span><span class="p">[:</span><span class="mi">20</span><span class="p">]):</span> <span class="c1"># Show first 20 atoms</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">addSphere</span><span class="p">({</span><span class="s1">'center'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s1">'y'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s1">'z'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])},</span>
-                        <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">})</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ca_ref</span><span class="p">[:</span><span class="mi">20</span><span class="p">]):</span>  <span class="c1"># Show first 20 atoms</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">addSphere</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"center"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"z"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])},</span>
+                <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"blue"</span><span class="p">,</span>
+                <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ca_aligned</span><span class="p">[:</span><span class="mi">20</span><span class="p">]):</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">addSphere</span><span class="p">({</span><span class="s1">'center'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'x'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s1">'y'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s1">'z'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])},</span>
-                        <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'red'</span><span class="p">})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">addSphere</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"center"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s2">"z"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])},</span>
+                <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+                <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"red"</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
 
     <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5507,17 +5510,15 @@ print(f"Bond Check (Expected 1.33): {np.linalg.norm(next_n_pos - pos_c):.3f} Å"
 <div class="clipboard-copy-txt" id="cell-3"># 1. Fetch reference (1UBQ)
 try:
     # Attempt local load from examples
-    ubq_file = pdb.PDBFile.read('../../examples/1UBQ.pdb')
+    ubq_file = pdb.PDBFile.read("../../examples/1UBQ.pdb")
     ubq_ref = ubq_file.get_structure(model=1)
-    ca_ref = ubq_ref[ubq_ref.atom_name == 'CA'].coord
+    ca_ref = ubq_ref[ubq_ref.atom_name == "CA"].coord
 
     # 2. Scramble the coordinates (Rotate 45° and Translate)
     theta = np.radians(45)
-    R_scramble = np.array([
-        [np.cos(theta), -np.sin(theta), 0],
-        [np.sin(theta),  np.cos(theta), 0],
-        [0, 0, 1]
-    ])
+    R_scramble = np.array(
+        [[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]]
+    )
     ca_mobile = (R_scramble @ ca_ref.T).T + np.array([50, -20, 10])
 
     print(f"Initial RMSD (Scrambled): {calculate_rmsd(ca_mobile, ca_ref):.2f} Å")
@@ -5531,12 +5532,23 @@ try:
     # Visual confirmation
     view = py3Dmol.view(width=800, height=400)
     # We'll use spheres to visualize the point cloud alignment
-    for i, pos in enumerate(ca_ref[:20]): # Show first 20 atoms
-        view.addSphere({'center': {'x': float(pos[0]), 'y': float(pos[1]), 'z': float(pos[2])},
-                        'radius': 0.5, 'color': 'blue', 'opacity': 0.5})
+    for i, pos in enumerate(ca_ref[:20]):  # Show first 20 atoms
+        view.addSphere(
+            {
+                "center": {"x": float(pos[0]), "y": float(pos[1]), "z": float(pos[2])},
+                "radius": 0.5,
+                "color": "blue",
+                "opacity": 0.5,
+            }
+        )
     for i, pos in enumerate(ca_aligned[:20]):
-        view.addSphere({'center': {'x': float(pos[0]), 'y': float(pos[1]), 'z': float(pos[2])},
-                        'radius': 0.3, 'color': 'red'})
+        view.addSphere(
+            {
+                "center": {"x": float(pos[0]), "y": float(pos[1]), "z": float(pos[2])},
+                "radius": 0.3,
+                "color": "red",
+            }
+        )
 
     view.zoomTo()
     view.show()
@@ -5581,15 +5593,15 @@ except Exception as e:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Example: Measuring the Psi (ψ) angle of the first residue in Ubiquitin</span>
-<span class="k">if</span> <span class="s1">'ubq_ref'</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+<span class="k">if</span> <span class="s2">"ubq_ref"</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
     <span class="n">res1</span> <span class="o">=</span> <span class="n">ubq_ref</span><span class="p">[</span><span class="n">ubq_ref</span><span class="o">.</span><span class="n">res_id</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
     <span class="n">res2</span> <span class="o">=</span> <span class="n">ubq_ref</span><span class="p">[</span><span class="n">ubq_ref</span><span class="o">.</span><span class="n">res_id</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
 
     <span class="c1"># Psi is defined by N(i) - CA(i) - C(i) - N(i+1)</span>
-    <span class="n">n1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'N'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">ca1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'CA'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">c1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'C'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">n2</span> <span class="o">=</span> <span class="n">res2</span><span class="p">[</span><span class="n">res2</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'N'</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"N"</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ca1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">res1</span><span class="p">[</span><span class="n">res1</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"C"</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="n">res2</span><span class="p">[</span><span class="n">res2</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"N"</span><span class="p">]</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">psi</span> <span class="o">=</span> <span class="n">calculate_dihedral</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">ca1</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Measured ψ for Res 1: </span><span class="si">{</span><span class="n">psi</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°"</span><span class="p">)</span>
@@ -5600,15 +5612,15 @@ except Exception as e:
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Result: Likely helical or coiled."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Example: Measuring the Psi (ψ) angle of the first residue in Ubiquitin
-if 'ubq_ref' in locals():
+if "ubq_ref" in locals():
     res1 = ubq_ref[ubq_ref.res_id == 1]
     res2 = ubq_ref[ubq_ref.res_id == 2]
 
     # Psi is defined by N(i) - CA(i) - C(i) - N(i+1)
-    n1 = res1[res1.atom_name == 'N'].coord[0]
-    ca1 = res1[res1.atom_name == 'CA'].coord[0]
-    c1 = res1[res1.atom_name == 'C'].coord[0]
-    n2 = res2[res2.atom_name == 'N'].coord[0]
+    n1 = res1[res1.atom_name == "N"].coord[0]
+    ca1 = res1[res1.atom_name == "CA"].coord[0]
+    c1 = res1[res1.atom_name == "C"].coord[0]
+    n2 = res2[res2.atom_name == "N"].coord[0]
 
     psi = calculate_dihedral(n1, ca1, c1, n2)
     print(f"Measured ψ for Res 1: {psi:.2f}°")
@@ -5654,8 +5666,8 @@ if 'ubq_ref' in locals():
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Rotate a point (Gamma atom) 120° around the CA-CB bond axis</span>
 <span class="n">p_ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-<span class="n">p_cb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">])</span> <span class="c1"># Axis of rotation</span>
-<span class="n">p_cg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">]])</span> <span class="c1"># Points to rotate (N, 3)</span>
+<span class="n">p_cb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">])</span>  <span class="c1"># Axis of rotation</span>
+<span class="n">p_cg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">]])</span>  <span class="c1"># Points to rotate (N, 3)</span>
 
 <span class="n">rotated_cg</span> <span class="o">=</span> <span class="n">rotate_points</span><span class="p">(</span><span class="n">p_cg</span><span class="p">,</span> <span class="n">p_ca</span><span class="p">,</span> <span class="n">p_cb</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">)</span>
 
@@ -5664,8 +5676,8 @@ if 'ubq_ref' in locals():
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5"># Rotate a point (Gamma atom) 120° around the CA-CB bond axis
 p_ca = np.array([0.0, 0.0, 0.0])
-p_cb = np.array([0.0, 0.0, 1.54]) # Axis of rotation
-p_cg = np.array([[1.0, 0.0, 1.54]]) # Points to rotate (N, 3)
+p_cb = np.array([0.0, 0.0, 1.54])  # Axis of rotation
+p_cg = np.array([[1.0, 0.0, 1.54]])  # Points to rotate (N, 3)
 
 rotated_cg = rotate_points(p_cg, p_ca, p_cb, 120.0)
 

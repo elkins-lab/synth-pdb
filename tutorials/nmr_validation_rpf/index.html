@@ -5337,26 +5337,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5433,14 +5433,25 @@ print("✅ Environment configured!")</div>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>  <span class="c1"># already installed (e.g. via pip in a previous run)</span>
+
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb and dependencies..."</span><span class="p">)</span>
         <span class="c1"># synth-nmr provides calculate_synthetic_noes; biotite is a core dep.</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">,</span>
-             <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"synth-nmr"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">,</span> <span class="s2">"matplotlib"</span><span class="p">],</span>
+            <span class="p">[</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+                <span class="s2">"-m"</span><span class="p">,</span>
+                <span class="s2">"pip"</span><span class="p">,</span>
+                <span class="s2">"install"</span><span class="p">,</span>
+                <span class="s2">"-q"</span><span class="p">,</span>
+                <span class="s2">"synth-pdb"</span><span class="p">,</span>
+                <span class="s2">"synth-nmr"</span><span class="p">,</span>
+                <span class="s2">"biotite"</span><span class="p">,</span>
+                <span class="s2">"matplotlib"</span><span class="p">,</span>
+            <span class="p">],</span>
             <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
@@ -5466,14 +5477,25 @@ if IN_COLAB:
     print("🌐 Running in Google Colab")
     try:
         import synth_pdb  # already installed (e.g. via pip in a previous run)
+
         print("   ✅ synth-pdb already installed")
     except ImportError:
         print("   📦 Installing synth-pdb and dependencies...")
         # synth-nmr provides calculate_synthetic_noes; biotite is a core dep.
         import subprocess
+
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-q",
-             "synth-pdb", "synth-nmr", "biotite", "matplotlib"],
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "-q",
+                "synth-pdb",
+                "synth-nmr",
+                "biotite",
+                "matplotlib",
+            ],
             check=True,
         )
         print("   ✅ Installation complete")
@@ -5755,91 +5777,147 @@ many atom pairs that are <em>newly</em> close together but unsupported by any NO
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">))</span>
 
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Recall"</span><span class="p">,</span> <span class="s2">"Precision"</span><span class="p">,</span> <span class="s2">"F-measure"</span><span class="p">]</span>
-<span class="n">keys</span>    <span class="o">=</span> <span class="p">[</span><span class="s2">"recall"</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">,</span> <span class="s2">"f_measure"</span><span class="p">]</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"recall"</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">,</span> <span class="s2">"f_measure"</span><span class="p">]</span>
 
-<span class="n">ground_truth_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>          <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
-<span class="n">collapsed_vals</span>    <span class="o">=</span> <span class="p">[</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+<span class="n">ground_truth_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+<span class="n">collapsed_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
 
 <span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metrics</span><span class="p">))</span>
 <span class="n">width</span> <span class="o">=</span> <span class="mf">0.35</span>
 
-<span class="n">bars_gt</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">ground_truth_vals</span><span class="p">,</span>
-                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ground Truth"</span><span class="p">,</span>    <span class="n">color</span><span class="o">=</span><span class="s2">"#2ecc71"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-<span class="n">bars_co</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span> <span class="n">collapsed_vals</span><span class="p">,</span>
-                 <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Collapsed Model"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#e74c3c"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">bars_gt</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span>
+    <span class="n">ground_truth_vals</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Ground Truth"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"#2ecc71"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">bars_co</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">width</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">],</span>
+    <span class="n">collapsed_vals</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Collapsed Model"</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"#e74c3c"</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Value labels on each bar</span>
 <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">bars_gt</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">bars_co</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.015</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
-            <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span> <span class="o">+</span> <span class="mf">0.015</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="c1"># Community acceptance threshold</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gold"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
-           <span class="n">label</span><span class="o">=</span><span class="s2">"BMRB acceptance threshold (F ≥ 0.70)"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span>  <span class="n">linestyle</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span>  <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+    <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">"gold"</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"BMRB acceptance threshold (F ≥ 0.70)"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.22</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Score"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"RPF Scores: Ground Truth vs Over-Compacted Model"</span><span class="p">,</span>
-             <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+    <span class="s2">"RPF Scores: Ground Truth vs Over-Compacted Model"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">14</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">precision_drop</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Precision drop: </span><span class="si">{</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> → "</span>
-      <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> "</span>
-      <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">precision_drop</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> percentage points)"</span><span class="p">)</span>
+<span class="n">precision_drop</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"precision"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"precision"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Precision drop: </span><span class="si">{</span><span class="n">scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> → "</span>
+    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collapsed_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'precision'</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> "</span>
+    <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="n">precision_drop</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> percentage points)"</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">plt.style.use("dark_background")
 fig, ax = plt.subplots(figsize=(9, 5.5))
 
 metrics = ["Recall", "Precision", "F-measure"]
-keys    = ["recall", "precision", "f_measure"]
+keys = ["recall", "precision", "f_measure"]
 
-ground_truth_vals = [scores.get(k, 0.0)          for k in keys]
-collapsed_vals    = [collapsed_scores.get(k, 0.0) for k in keys]
+ground_truth_vals = [scores.get(k, 0.0) for k in keys]
+collapsed_vals = [collapsed_scores.get(k, 0.0) for k in keys]
 
 x = range(len(metrics))
 width = 0.35
 
-bars_gt = ax.bar([i - width/2 for i in x], ground_truth_vals,
-                 width, label="Ground Truth",    color="#2ecc71", alpha=0.9)
-bars_co = ax.bar([i + width/2 for i in x], collapsed_vals,
-                 width, label="Collapsed Model", color="#e74c3c", alpha=0.9)
+bars_gt = ax.bar(
+    [i - width / 2 for i in x],
+    ground_truth_vals,
+    width,
+    label="Ground Truth",
+    color="#2ecc71",
+    alpha=0.9,
+)
+bars_co = ax.bar(
+    [i + width / 2 for i in x],
+    collapsed_vals,
+    width,
+    label="Collapsed Model",
+    color="#e74c3c",
+    alpha=0.9,
+)
 
 # Value labels on each bar
 for bar in list(bars_gt) + list(bars_co):
-    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.015,
-            f"{bar.get_height():.3f}", ha="center", va="bottom",
-            fontsize=10, fontweight="bold", color="white")
+    ax.text(
+        bar.get_x() + bar.get_width() / 2,
+        bar.get_height() + 0.015,
+        f"{bar.get_height():.3f}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+        fontweight="bold",
+        color="white",
+    )
 
 # Community acceptance threshold
-ax.axhline(0.7, color="gold", linestyle="--", linewidth=1.2, alpha=0.8,
-           label="BMRB acceptance threshold (F ≥ 0.70)")
-ax.axhline(1.0, color="gray",  linestyle=":",  linewidth=0.8, alpha=0.5)
+ax.axhline(
+    0.7,
+    color="gold",
+    linestyle="--",
+    linewidth=1.2,
+    alpha=0.8,
+    label="BMRB acceptance threshold (F ≥ 0.70)",
+)
+ax.axhline(1.0, color="gray", linestyle=":", linewidth=0.8, alpha=0.5)
 
 ax.set_xticks(list(x))
 ax.set_xticklabels(metrics, fontsize=13)
 ax.set_ylim(0, 1.22)
 ax.set_ylabel("Score", fontsize=12)
-ax.set_title("RPF Scores: Ground Truth vs Over-Compacted Model",
-             fontsize=14, fontweight="bold", pad=14)
+ax.set_title(
+    "RPF Scores: Ground Truth vs Over-Compacted Model", fontsize=14, fontweight="bold", pad=14
+)
 ax.legend(fontsize=10, loc="upper right")
 ax.grid(axis="y", alpha=0.2)
 
 plt.tight_layout()
 plt.show()
 
-precision_drop = scores.get('precision', 0) - collapsed_scores.get('precision', 0)
-print(f"\nPrecision drop: {scores.get('precision',0):.3f} → "
-      f"{collapsed_scores.get('precision',0):.3f} "
-      f"({precision_drop*100:.1f} percentage points)")</div>
+precision_drop = scores.get("precision", 0) - collapsed_scores.get("precision", 0)
+print(
+    f"\nPrecision drop: {scores.get('precision', 0):.3f} → "
+    f"{collapsed_scores.get('precision', 0):.3f} "
+    f"({precision_drop * 100:.1f} percentage points)"
+)</div>
 </div>
 </div>
 </div>

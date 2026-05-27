@@ -5408,16 +5408,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'[INFO] Running in Google Colab - Installing dependencies...'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing dependencies..."</span><span class="p">)</span>
     <span class="c1"># Increase timeout for large packages like OpenMM</span>
     <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">default</span><span class="o">-</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span> <span class="n">ipywidgets</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
-    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">'colab'</span>
+
+    <span class="n">pio</span><span class="o">.</span><span class="n">renderers</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">"colab"</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'[INFO] Running in local environment'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in local environment"</span><span class="p">)</span>
     <span class="c1"># Robust path detection: find repo root by looking for 'synth_pdb' directory</span>
     <span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
     <span class="k">while</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span> <span class="o">!=</span> <span class="n">repo_root</span><span class="p">:</span>
@@ -5426,23 +5427,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="k">break</span>
         <span class="n">repo_root</span> <span class="o">=</span> <span class="n">repo_root</span><span class="o">.</span><span class="n">parent</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'[OK] Environment configured!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># [CONFIG] Environment Detection &amp; Setup
 import os
 import sys
 from pathlib import Path
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('[INFO] Running in Google Colab - Installing dependencies...')
+    print("[INFO] Running in Google Colab - Installing dependencies...")
     # Increase timeout for large packages like OpenMM
     %pip install --upgrade --default-timeout=1000 -q synth-pdb py3Dmol biotite ipywidgets
     import plotly.io as pio
-    pio.renderers.default = 'colab'
+
+    pio.renderers.default = "colab"
 else:
-    print('[INFO] Running in local environment')
+    print("[INFO] Running in local environment")
     # Robust path detection: find repo root by looking for 'synth_pdb' directory
     repo_root = Path(os.getcwd())
     while repo_root.parent != repo_root:
@@ -5451,7 +5453,7 @@ else:
             break
         repo_root = repo_root.parent
 
-print('[OK] Environment configured!')</div>
+print("[OK] Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5488,9 +5490,9 @@ print('[OK] Environment configured!')</div>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeptideGenerator</span>
 
-<span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="s1">'ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'[OK] NeRF Geometry Lab Ready!'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'   Loaded: 10-residue polyalanine alpha-helix'</span><span class="p">)</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">PeptideGenerator</span><span class="p">(</span><span class="s2">"ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"[OK] NeRF Geometry Lab Ready!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"   Loaded: 10-residue polyalanine alpha-helix"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import io
 
@@ -5504,9 +5506,9 @@ from plotly.subplots import make_subplots
 
 from synth_pdb import PeptideGenerator
 
-gen = PeptideGenerator('ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA')
-print('[OK] NeRF Geometry Lab Ready!')
-print('   Loaded: 10-residue polyalanine alpha-helix')</div>
+gen = PeptideGenerator("ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA-ALA")
+print("[OK] NeRF Geometry Lab Ready!")
+print("   Loaded: 10-residue polyalanine alpha-helix")</div>
 </div>
 </div>
 </div>
@@ -5623,19 +5625,25 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
 
     <span class="c1"># Sliders with enhanced styling</span>
     <span class="n">phi_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
-        <span class="nb">min</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">'delta phi:'</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"delta phi:"</span><span class="p">,</span>
         <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">'description_width'</span><span class="p">:</span> <span class="s1">'50px'</span><span class="p">},</span>
-        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">'500px'</span><span class="p">)</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"description_width"</span><span class="p">:</span> <span class="s2">"50px"</span><span class="p">},</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">"500px"</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="n">psi_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
-        <span class="nb">min</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">'delta psi:'</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"delta psi:"</span><span class="p">,</span>
         <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">'description_width'</span><span class="p">:</span> <span class="s1">'50px'</span><span class="p">},</span>
-        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">'500px'</span><span class="p">)</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"description_width"</span><span class="p">:</span> <span class="s2">"50px"</span><span class="p">},</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">"500px"</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="c1"># Track initialization</span>
@@ -5647,7 +5655,7 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
             <span class="k">return</span>
 
         <span class="n">phi</span><span class="p">,</span> <span class="n">psi</span> <span class="o">=</span> <span class="n">phi_slider</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">psi_slider</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">phis</span><span class="p">,</span> <span class="n">psis</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">57.0</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">47.0</span><span class="p">]</span><span class="o">*</span><span class="mi">10</span>
+        <span class="n">phis</span><span class="p">,</span> <span class="n">psis</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">57.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">47.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
         <span class="n">phis</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+=</span> <span class="n">phi</span>
         <span class="n">psis</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+=</span> <span class="n">psi</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">phi_list</span><span class="o">=</span><span class="n">phis</span><span class="p">,</span> <span class="n">psi_list</span><span class="o">=</span><span class="n">psis</span><span class="p">)</span>
@@ -5656,26 +5664,27 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
         <span class="n">final_psi</span> <span class="o">=</span> <span class="o">-</span><span class="mf">47.0</span> <span class="o">+</span> <span class="n">psi</span>
 
         <span class="c1"># Determine region</span>
-        <span class="n">region</span> <span class="o">=</span> <span class="s1">'Unknown'</span>
-        <span class="n">region_color</span> <span class="o">=</span> <span class="s1">'#FFD700'</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="s2">"Unknown"</span>
+        <span class="n">region_color</span> <span class="o">=</span> <span class="s2">"#FFD700"</span>
         <span class="k">if</span> <span class="o">-</span><span class="mi">90</span> <span class="o">&lt;</span> <span class="n">final_phi</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">30</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">70</span> <span class="o">&lt;</span> <span class="n">final_psi</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">20</span><span class="p">:</span>
-            <span class="n">region</span> <span class="o">=</span> <span class="s1">'alpha-helix [OK]'</span>
-            <span class="n">region_color</span> <span class="o">=</span> <span class="s1">'#00FF00'</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">"alpha-helix [OK]"</span>
+            <span class="n">region_color</span> <span class="o">=</span> <span class="s2">"#00FF00"</span>
         <span class="k">elif</span> <span class="o">-</span><span class="mi">150</span> <span class="o">&lt;</span> <span class="n">final_phi</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span> <span class="ow">and</span> <span class="mi">90</span> <span class="o">&lt;</span> <span class="n">final_psi</span> <span class="o">&lt;</span> <span class="mi">150</span><span class="p">:</span>
-            <span class="n">region</span> <span class="o">=</span> <span class="s1">'beta-sheet [OK]'</span>
-            <span class="n">region_color</span> <span class="o">=</span> <span class="s1">'#87CEEB'</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">"beta-sheet [OK]"</span>
+            <span class="n">region_color</span> <span class="o">=</span> <span class="s2">"#87CEEB"</span>
         <span class="k">elif</span> <span class="o">-</span><span class="mi">90</span> <span class="o">&lt;</span> <span class="n">final_phi</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">60</span> <span class="ow">and</span> <span class="mi">120</span> <span class="o">&lt;</span> <span class="n">final_psi</span> <span class="o">&lt;</span> <span class="mi">170</span><span class="p">:</span>
-            <span class="n">region</span> <span class="o">=</span> <span class="s1">'PPII [OK]'</span>
-            <span class="n">region_color</span> <span class="o">=</span> <span class="s1">'#90EE90'</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">"PPII [OK]"</span>
+            <span class="n">region_color</span> <span class="o">=</span> <span class="s2">"#90EE90"</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">region</span> <span class="o">=</span> <span class="s1">'Non-canonical [WARN]'</span>
-            <span class="n">region_color</span> <span class="o">=</span> <span class="s1">'#FF6B6B'</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="s2">"Non-canonical [WARN]"</span>
+            <span class="n">region_color</span> <span class="o">=</span> <span class="s2">"#FF6B6B"</span>
 
         <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">clear_output</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="c1"># Info panel</span>
-            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
+            <span class="n">display</span><span class="p">(</span>
+                <span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">            &lt;div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);</span>
 <span class="s2">                        color: white; padding: 15px; border-radius: 10px;</span>
 <span class="s2">                        font-family: monospace; box-shadow: 0 4px 6px rgba(0,0,0,0.3);</span>
@@ -5684,7 +5693,8 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
 <span class="s2">                phi = </span><span class="si">{</span><span class="n">final_phi</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> degrees | psi = </span><span class="si">{</span><span class="n">final_psi</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> degrees&lt;br&gt;</span>
 <span class="s2">                &lt;b&gt;Region:&lt;/b&gt; &lt;span style='color: </span><span class="si">{</span><span class="n">region_color</span><span class="si">}</span><span class="s2">;'&gt;</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
 <span class="s2">            &lt;/div&gt;</span>
-<span class="s2">            """</span><span class="p">))</span>
+<span class="s2">            """</span><span class="p">)</span>
+            <span class="p">)</span>
 
             <span class="c1"># 3D structure</span>
             <span class="n">pf</span> <span class="o">=</span> <span class="n">PDBFile</span><span class="p">()</span>
@@ -5692,68 +5702,103 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
             <span class="n">s</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
             <span class="n">pf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="s1">'pdb'</span><span class="p">)</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'colorscheme'</span><span class="p">:</span> <span class="s1">'chainHetatm'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">}})</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resi'</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'red'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}})</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s1">'#1a1a1a'</span><span class="p">)</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="s2">"pdb"</span><span class="p">)</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"colorscheme"</span><span class="p">:</span> <span class="s2">"chainHetatm"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">}})</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"resi"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"red"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}})</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">setBackgroundColor</span><span class="p">(</span><span class="s2">"#1a1a1a"</span><span class="p">)</span>
             <span class="n">v</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
             <span class="n">display</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">show</span><span class="p">())</span>
 
             <span class="c1"># Plots</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
-                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span><span class="s1">'Ramachandran Plot'</span><span class="p">,</span> <span class="s1">'Ca Distance Matrix'</span><span class="p">)</span>
+                <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">subplot_titles</span><span class="o">=</span><span class="p">(</span><span class="s2">"Ramachandran Plot"</span><span class="p">,</span> <span class="s2">"Ca Distance Matrix"</span><span class="p">)</span>
             <span class="p">)</span>
 
             <span class="c1"># Ramachandran with regions</span>
             <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'rect'</span><span class="p">,</span> <span class="s1">'x0'</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="s1">'x1'</span><span class="p">:</span> <span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="s1">'y0'</span><span class="p">:</span> <span class="o">-</span><span class="mi">70</span><span class="p">,</span> <span class="s1">'y1'</span><span class="p">:</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
-                     <span class="s1">'fillcolor'</span><span class="p">:</span> <span class="s1">'rgba(0,100,200,0.2)'</span><span class="p">,</span> <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'width'</span><span class="p">:</span> <span class="mi">0</span><span class="p">}},</span>
-                <span class="p">{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'rect'</span><span class="p">,</span> <span class="s1">'x0'</span><span class="p">:</span> <span class="o">-</span><span class="mi">150</span><span class="p">,</span> <span class="s1">'x1'</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="s1">'y0'</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span> <span class="s1">'y1'</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
-                     <span class="s1">'fillcolor'</span><span class="p">:</span> <span class="s1">'rgba(200,100,0,0.2)'</span><span class="p">,</span> <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'width'</span><span class="p">:</span> <span class="mi">0</span><span class="p">}},</span>
-                <span class="p">{</span><span class="s1">'type'</span><span class="p">:</span> <span class="s1">'rect'</span><span class="p">,</span> <span class="s1">'x0'</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="s1">'x1'</span><span class="p">:</span> <span class="o">-</span><span class="mi">60</span><span class="p">,</span> <span class="s1">'y0'</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span> <span class="s1">'y1'</span><span class="p">:</span> <span class="mi">170</span><span class="p">,</span>
-                     <span class="s1">'fillcolor'</span><span class="p">:</span> <span class="s1">'rgba(100,200,0,0.2)'</span><span class="p">,</span> <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'width'</span><span class="p">:</span> <span class="mi">0</span><span class="p">}}</span>
+                <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"rect"</span><span class="p">,</span>
+                    <span class="s2">"x0"</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span>
+                    <span class="s2">"x1"</span><span class="p">:</span> <span class="o">-</span><span class="mi">30</span><span class="p">,</span>
+                    <span class="s2">"y0"</span><span class="p">:</span> <span class="o">-</span><span class="mi">70</span><span class="p">,</span>
+                    <span class="s2">"y1"</span><span class="p">:</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span>
+                    <span class="s2">"fillcolor"</span><span class="p">:</span> <span class="s2">"rgba(0,100,200,0.2)"</span><span class="p">,</span>
+                    <span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"rect"</span><span class="p">,</span>
+                    <span class="s2">"x0"</span><span class="p">:</span> <span class="o">-</span><span class="mi">150</span><span class="p">,</span>
+                    <span class="s2">"x1"</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span>
+                    <span class="s2">"y0"</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span>
+                    <span class="s2">"y1"</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+                    <span class="s2">"fillcolor"</span><span class="p">:</span> <span class="s2">"rgba(200,100,0,0.2)"</span><span class="p">,</span>
+                    <span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"rect"</span><span class="p">,</span>
+                    <span class="s2">"x0"</span><span class="p">:</span> <span class="o">-</span><span class="mi">90</span><span class="p">,</span>
+                    <span class="s2">"x1"</span><span class="p">:</span> <span class="o">-</span><span class="mi">60</span><span class="p">,</span>
+                    <span class="s2">"y0"</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span>
+                    <span class="s2">"y1"</span><span class="p">:</span> <span class="mi">170</span><span class="p">,</span>
+                    <span class="s2">"fillcolor"</span><span class="p">:</span> <span class="s2">"rgba(100,200,0,0.2)"</span><span class="p">,</span>
+                    <span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                <span class="p">},</span>
             <span class="p">]</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
                 <span class="n">fig</span><span class="o">.</span><span class="n">add_shape</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
-                <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">final_phi</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">final_psi</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s1">'markers'</span><span class="p">,</span>
-                <span class="n">marker</span><span class="o">=</span><span class="p">{</span><span class="s1">'size'</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'red'</span><span class="p">,</span> <span class="s1">'symbol'</span><span class="p">:</span> <span class="s1">'star'</span><span class="p">,</span>
-                           <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}},</span>
-                <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">'phi: %</span><span class="si">{x:.1f}</span><span class="s1"> degrees&lt;br&gt;psi: %</span><span class="si">{y:.1f}</span><span class="s1"> degrees&lt;extra&gt;&lt;/extra&gt;'</span>
-            <span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">final_phi</span><span class="p">],</span>
+                    <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">final_psi</span><span class="p">],</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">"markers"</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">"size"</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                        <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"red"</span><span class="p">,</span>
+                        <span class="s2">"symbol"</span><span class="p">:</span> <span class="s2">"star"</span><span class="p">,</span>
+                        <span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"width"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                    <span class="p">},</span>
+                    <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"phi: %</span><span class="si">{x:.1f}</span><span class="s2"> degrees&lt;br&gt;psi: %</span><span class="si">{y:.1f}</span><span class="s2"> degrees&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
 
-            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">'Phi phi (degrees)'</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span><span class="mi">180</span><span class="p">],</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">'Psi psi (degrees)'</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span><span class="mi">180</span><span class="p">],</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span>
+                <span class="n">title_text</span><span class="o">=</span><span class="s2">"Phi phi (degrees)"</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span>
+                <span class="n">title_text</span><span class="o">=</span><span class="s2">"Psi psi (degrees)"</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
 
             <span class="c1"># Distance matrix</span>
-            <span class="n">ca</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">atom_name</span><span class="o">==</span><span class="s1">'CA'</span><span class="p">]</span>
+            <span class="n">ca</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span>
             <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ca</span><span class="p">)</span>
-            <span class="n">dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-                    <span class="n">dm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ca</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                    <span class="n">dm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">ca</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
-            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Heatmap</span><span class="p">(</span>
-                <span class="n">z</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">colorscale</span><span class="o">=</span><span class="s1">'Viridis'</span><span class="p">,</span>
-                <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s1">'title'</span><span class="p">:</span> <span class="s1">'Distance (A)'</span><span class="p">},</span>
-                <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">'Residue %</span><span class="si">{x}</span><span class="s1"> &lt;-&gt; %</span><span class="si">{y}</span><span class="s1">&lt;br&gt;Distance: %</span><span class="si">{z:.1f}</span><span class="s1"> A&lt;extra&gt;&lt;/extra&gt;'</span>
-            <span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">'Residue'</span><span class="p">,</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">'Residue'</span><span class="p">,</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-            <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-                <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
-                <span class="n">template</span><span class="o">=</span><span class="s1">'plotly_dark'</span><span class="p">,</span>
-                <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Heatmap</span><span class="p">(</span>
+                    <span class="n">z</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span>
+                    <span class="n">colorscale</span><span class="o">=</span><span class="s2">"Viridis"</span><span class="p">,</span>
+                    <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">"Distance (A)"</span><span class="p">},</span>
+                    <span class="n">hovertemplate</span><span class="o">=</span><span class="s2">"Residue %</span><span class="si">{x}</span><span class="s2"> &lt;-&gt; %</span><span class="si">{y}</span><span class="s2">&lt;br&gt;Distance: %</span><span class="si">{z:.1f}</span><span class="s2"> A&lt;extra&gt;&lt;/extra&gt;"</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="p">)</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">"Residue"</span><span class="p">,</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">"Residue"</span><span class="p">,</span> <span class="n">dtick</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">"plotly_dark"</span><span class="p">,</span> <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">display</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 
     <span class="c1"># Connect sliders</span>
-    <span class="n">phi_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">)</span>
-    <span class="n">psi_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">)</span>
+    <span class="n">phi_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">psi_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
 
     <span class="c1"># Display UI</span>
     <span class="n">display</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">phi_slider</span><span class="p">,</span> <span class="n">psi_slider</span><span class="p">,</span> <span class="n">out</span><span class="p">]))</span>
@@ -5763,13 +5808,16 @@ $$omega_i = text{dihedral}(C alpha_i, C_i, N_{i+1}, C alpha_{i+1})$$</p>
     <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span> <span class="k">as</span> <span class="n">_HTML</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">display</span> <span class="k">as</span> <span class="n">_disp</span>
-        <span class="n">_disp</span><span class="p">(</span><span class="n">_HTML</span><span class="p">(</span>
-            <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
-            <span class="s1">'border:1px dashed #555;border-radius:8px;'</span>
-            <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
-            <span class="s1">'[INFO] Move a slider above to load the 3D structure'</span>
-            <span class="s1">'&lt;/div&gt;'</span>
-        <span class="p">))</span>
+
+        <span class="n">_disp</span><span class="p">(</span>
+            <span class="n">_HTML</span><span class="p">(</span>
+                <span class="s1">'&lt;div style="text-align:center;padding:40px;color:#aaa;'</span>
+                <span class="s2">"border:1px dashed #555;border-radius:8px;"</span>
+                <span class="s1">'font-style:italic;background:#1a1a1a;"&gt;'</span>
+                <span class="s2">"[INFO] Move a slider above to load the 3D structure"</span>
+                <span class="s2">"&lt;/div&gt;"</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import os
 
@@ -5781,19 +5829,25 @@ if not IN_CI:
 
     # Sliders with enhanced styling
     phi_slider = widgets.FloatSlider(
-        min=-180, max=180, step=10, value=0,
-        description='delta phi:',
+        min=-180,
+        max=180,
+        step=10,
+        value=0,
+        description="delta phi:",
         continuous_update=False,
-        style={'description_width': '50px'},
-        layout=widgets.Layout(width='500px')
+        style={"description_width": "50px"},
+        layout=widgets.Layout(width="500px"),
     )
 
     psi_slider = widgets.FloatSlider(
-        min=-180, max=180, step=10, value=0,
-        description='delta psi:',
+        min=-180,
+        max=180,
+        step=10,
+        value=0,
+        description="delta psi:",
         continuous_update=False,
-        style={'description_width': '50px'},
-        layout=widgets.Layout(width='500px')
+        style={"description_width": "50px"},
+        layout=widgets.Layout(width="500px"),
     )
 
     # Track initialization
@@ -5805,7 +5859,7 @@ if not IN_CI:
             return
 
         phi, psi = phi_slider.value, psi_slider.value
-        phis, psis = [-57.0]*10, [-47.0]*10
+        phis, psis = [-57.0] * 10, [-47.0] * 10
         phis[4] += phi
         psis[4] += psi
         res = gen.generate(phi_list=phis, psi_list=psis)
@@ -5814,26 +5868,27 @@ if not IN_CI:
         final_psi = -47.0 + psi
 
         # Determine region
-        region = 'Unknown'
-        region_color = '#FFD700'
+        region = "Unknown"
+        region_color = "#FFD700"
         if -90 &lt; final_phi &lt; -30 and -70 &lt; final_psi &lt; -20:
-            region = 'alpha-helix [OK]'
-            region_color = '#00FF00'
+            region = "alpha-helix [OK]"
+            region_color = "#00FF00"
         elif -150 &lt; final_phi &lt; -90 and 90 &lt; final_psi &lt; 150:
-            region = 'beta-sheet [OK]'
-            region_color = '#87CEEB'
+            region = "beta-sheet [OK]"
+            region_color = "#87CEEB"
         elif -90 &lt; final_phi &lt; -60 and 120 &lt; final_psi &lt; 170:
-            region = 'PPII [OK]'
-            region_color = '#90EE90'
+            region = "PPII [OK]"
+            region_color = "#90EE90"
         else:
-            region = 'Non-canonical [WARN]'
-            region_color = '#FF6B6B'
+            region = "Non-canonical [WARN]"
+            region_color = "#FF6B6B"
 
         with out:
             clear_output(wait=True)
 
             # Info panel
-            display(HTML(f"""
+            display(
+                HTML(f"""
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                         color: white; padding: 15px; border-radius: 10px;
                         font-family: monospace; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -5842,7 +5897,8 @@ if not IN_CI:
                 phi = {final_phi:.1f} degrees | psi = {final_psi:.1f} degrees<br/>
 <b>Region:</b> <span style="color: {region_color};">{region}</span>
 </div>
-            """))
+            """)
+            )
 
             # 3D structure
             pf = PDBFile()
@@ -5850,68 +5906,103 @@ if not IN_CI:
             s = io.StringIO()
             pf.write(s)
             v = py3Dmol.view(width=700, height=400)
-            v.addModel(s.getvalue(), 'pdb')
-            v.setStyle({'stick': {'colorscheme': 'chainHetatm', 'radius': 0.15}})
-            v.setStyle({'resi': 5}, {'stick': {'color': 'red', 'radius': 0.25}})
-            v.setBackgroundColor('#1a1a1a')
+            v.addModel(s.getvalue(), "pdb")
+            v.setStyle({"stick": {"colorscheme": "chainHetatm", "radius": 0.15}})
+            v.setStyle({"resi": 5}, {"stick": {"color": "red", "radius": 0.25}})
+            v.setBackgroundColor("#1a1a1a")
             v.zoomTo()
             display(v.show())
 
             # Plots
             fig = make_subplots(
-                rows=1, cols=2,
-                subplot_titles=('Ramachandran Plot', 'Ca Distance Matrix')
+                rows=1, cols=2, subplot_titles=("Ramachandran Plot", "Ca Distance Matrix")
             )
 
             # Ramachandran with regions
             regions = [
-                {'type': 'rect', 'x0': -90, 'x1': -30, 'y0': -70, 'y1': -20,
-                     'fillcolor': 'rgba(0,100,200,0.2)', 'line': {'width': 0}},
-                {'type': 'rect', 'x0': -150, 'x1': -90, 'y0': 90, 'y1': 150,
-                     'fillcolor': 'rgba(200,100,0,0.2)', 'line': {'width': 0}},
-                {'type': 'rect', 'x0': -90, 'x1': -60, 'y0': 120, 'y1': 170,
-                     'fillcolor': 'rgba(100,200,0,0.2)', 'line': {'width': 0}}
+                {
+                    "type": "rect",
+                    "x0": -90,
+                    "x1": -30,
+                    "y0": -70,
+                    "y1": -20,
+                    "fillcolor": "rgba(0,100,200,0.2)",
+                    "line": {"width": 0},
+                },
+                {
+                    "type": "rect",
+                    "x0": -150,
+                    "x1": -90,
+                    "y0": 90,
+                    "y1": 150,
+                    "fillcolor": "rgba(200,100,0,0.2)",
+                    "line": {"width": 0},
+                },
+                {
+                    "type": "rect",
+                    "x0": -90,
+                    "x1": -60,
+                    "y0": 120,
+                    "y1": 170,
+                    "fillcolor": "rgba(100,200,0,0.2)",
+                    "line": {"width": 0},
+                },
             ]
             for r in regions:
                 fig.add_shape(r, row=1, col=1)
 
-            fig.add_trace(go.Scatter(
-                x=[final_phi], y=[final_psi], mode='markers',
-                marker={'size': 15, 'color': 'red', 'symbol': 'star',
-                           'line': {'color': 'white', 'width': 2}},
-                hovertemplate='phi: %{x:.1f} degrees<br/>psi: %{y:.1f} degrees<extra></extra>'
-            ), row=1, col=1)
+            fig.add_trace(
+                go.Scatter(
+                    x=[final_phi],
+                    y=[final_psi],
+                    mode="markers",
+                    marker={
+                        "size": 15,
+                        "color": "red",
+                        "symbol": "star",
+                        "line": {"color": "white", "width": 2},
+                    },
+                    hovertemplate="phi: %{x:.1f} degrees<br/>psi: %{y:.1f} degrees<extra></extra>",
+                ),
+                row=1,
+                col=1,
+            )
 
-            fig.update_xaxes(title_text='Phi phi (degrees)', range=[-180,180], dtick=60, row=1, col=1)
-            fig.update_yaxes(title_text='Psi psi (degrees)', range=[-180,180], dtick=60, row=1, col=1)
+            fig.update_xaxes(
+                title_text="Phi phi (degrees)", range=[-180, 180], dtick=60, row=1, col=1
+            )
+            fig.update_yaxes(
+                title_text="Psi psi (degrees)", range=[-180, 180], dtick=60, row=1, col=1
+            )
 
             # Distance matrix
-            ca = res.structure[res.structure.atom_name=='CA']
+            ca = res.structure[res.structure.atom_name == "CA"]
             n = len(ca)
-            dm = np.zeros((n,n))
+            dm = np.zeros((n, n))
             for i in range(n):
                 for j in range(n):
-                    dm[i,j] = np.linalg.norm(ca.coord[i] - ca.coord[j])
+                    dm[i, j] = np.linalg.norm(ca.coord[i] - ca.coord[j])
 
-            fig.add_trace(go.Heatmap(
-                z=dm, colorscale='Viridis',
-                colorbar={'title': 'Distance (A)'},
-                hovertemplate='Residue %{x} &lt;-&gt; %{y}<br/>Distance: %{z:.1f} A<extra></extra>'
-            ), row=1, col=2)
-
-            fig.update_xaxes(title_text='Residue', dtick=1, row=1, col=2)
-            fig.update_yaxes(title_text='Residue', dtick=1, row=1, col=2)
-
-            fig.update_layout(
-                height=400, width=900,
-                template='plotly_dark',
-                showlegend=False
+            fig.add_trace(
+                go.Heatmap(
+                    z=dm,
+                    colorscale="Viridis",
+                    colorbar={"title": "Distance (A)"},
+                    hovertemplate="Residue %{x} &lt;-&gt; %{y}<br/>Distance: %{z:.1f} A<extra></extra>",
+                ),
+                row=1,
+                col=2,
             )
+
+            fig.update_xaxes(title_text="Residue", dtick=1, row=1, col=2)
+            fig.update_yaxes(title_text="Residue", dtick=1, row=1, col=2)
+
+            fig.update_layout(height=400, width=900, template="plotly_dark", showlegend=False)
             display(fig)
 
     # Connect sliders
-    phi_slider.observe(update, 'value')
-    psi_slider.observe(update, 'value')
+    phi_slider.observe(update, "value")
+    psi_slider.observe(update, "value")
 
     # Display UI
     display(widgets.VBox([phi_slider, psi_slider, out]))
@@ -5921,14 +6012,15 @@ if not IN_CI:
     with out:
         from IPython.display import HTML as _HTML
         from IPython.display import display as _disp
-        _disp(_HTML(
-            '<div style="text-align:center;padding:40px;color:#aaa;'
-            'border:1px dashed #555;border-radius:8px;'
-            'font-style:italic;background:#1a1a1a;">'
-            '[INFO] Move a slider above to load the 3D structure'
-            '</div>'
-        ))
-</div>
+
+        _disp(
+            _HTML(
+                '<div #555;border-radius:8px;"="" 'font-style:italic;background:#1a1a1a;"="" border:1px="" dashed="" style="text-align:center;padding:40px;color:#aaa;'
+                ">'
+                "[INFO] Move a slider above to load the 3D structure"
+                "</div>"
+            )
+        )</div>
 </div>
 </div>
 </div>
@@ -5986,10 +6078,7 @@ if not IN_CI:
 <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Generating minimized structure (200 iterations)... "</span><span class="p">)</span>
 
 <span class="n">res_phys</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span>
-    <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimization_max_iter</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span>
 <span class="n">struct_phys</span> <span class="o">=</span> <span class="n">PeptideResult</span><span class="p">(</span><span class="n">res_phys</span><span class="p">)</span><span class="o">.</span><span class="n">structure</span>
 
@@ -6021,10 +6110,7 @@ struct_geom = PeptideResult(res_geom).structure
 print("[INFO] Generating minimized structure (200 iterations)... ")
 
 res_phys = generate_pdb_content(
-    sequence_str=seq,
-    conformation="alpha",
-    minimize_energy=True,
-    minimization_max_iter=200
+    sequence_str=seq, conformation="alpha", minimize_energy=True, minimization_max_iter=200
 )
 struct_phys = PeptideResult(res_phys).structure
 

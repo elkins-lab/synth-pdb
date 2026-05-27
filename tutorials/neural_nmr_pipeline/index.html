@@ -5313,10 +5313,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb torch numpy matplotlib py3Dmol biotite'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span>
+            <span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb torch numpy matplotlib py3Dmol biotite"</span>
+        <span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5327,6 +5329,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
@@ -5344,10 +5347,12 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb torch numpy matplotlib py3Dmol biotite')
+        get_ipython().run_line_magic(
+            "pip", "install synth-pdb torch numpy matplotlib py3Dmol biotite"
+        )
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5358,6 +5363,7 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
+
     print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__}")</div>
 </div>
 </div>
@@ -5438,7 +5444,7 @@ print("Magnetic Resonance Engine: ONLINE ⚡")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># FIX: Use explicit hyphenation to avoid 'ASPTRP' merging errors</span>
-<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"-"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"TRP-PHE-TYR-HIS-LYS-GLU-ASP"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># 21 residues, rich in Aromatics</span>
+<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"-"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"TRP-PHE-TYR-HIS-LYS-GLU-ASP"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># 21 residues, rich in Aromatics</span>
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🚀 Generating </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> synchronized multi-modal structural samples..."</span><span class="p">)</span>
@@ -5450,7 +5456,7 @@ print("Magnetic Resonance Engine: ONLINE ⚡")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"⚡ Predicting Chemical Shifts (SPARTA-Lite + Ring Currents)..."</span><span class="p">)</span>
 
 <span class="n">all_shifts</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span> <span class="c1"># We'll analyze the first 5 in detail for the demo</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>  <span class="c1"># We'll analyze the first 5 in detail for the demo</span>
     <span class="c1"># Access the model directly from the ensemble stack</span>
     <span class="n">struct</span> <span class="o">=</span> <span class="n">ensemble</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="n">shifts</span> <span class="o">=</span> <span class="n">predict_chemical_shifts</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
@@ -5459,7 +5465,7 @@ print("Magnetic Resonance Engine: ONLINE ⚡")</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Paired Data Ready. Sample 0 Chain A Res 1 chemical shifts: </span><span class="si">{</span><span class="n">all_shifts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'A'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># FIX: Use explicit hyphenation to avoid 'ASPTRP' merging errors
-sequence = "-".join(["TRP-PHE-TYR-HIS-LYS-GLU-ASP"] * 3) # 21 residues, rich in Aromatics
+sequence = "-".join(["TRP-PHE-TYR-HIS-LYS-GLU-ASP"] * 3)  # 21 residues, rich in Aromatics
 n_samples = 100
 
 print(f"🚀 Generating {n_samples} synchronized multi-modal structural samples...")
@@ -5471,7 +5477,7 @@ print("✅ Structural Tensors Generated.")
 print("⚡ Predicting Chemical Shifts (SPARTA-Lite + Ring Currents)...")
 
 all_shifts = []
-for i in range(5): # We'll analyze the first 5 in detail for the demo
+for i in range(5):  # We'll analyze the first 5 in detail for the demo
     # Access the model directly from the ensemble stack
     struct = ensemble[i]
     shifts = predict_chemical_shifts(struct)
@@ -5520,13 +5526,15 @@ print(f"✅ Paired Data Ready. Sample 0 Chain A Res 1 chemical shifts: {all_shif
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Extract CA secondary shifts for Sample 0</span>
 <span class="n">sample_idx</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">res_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_shifts</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">][</span><span class="s1">'A'</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="n">ca_deltas</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_shifts</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">][</span><span class="s1">'A'</span><span class="p">][</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'CA'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">52.5</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res_ids</span><span class="p">]</span> <span class="c1"># Relative to generic Ala baseline for visual</span>
+<span class="n">res_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_shifts</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">][</span><span class="s2">"A"</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">ca_deltas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">all_shifts</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">][</span><span class="s2">"A"</span><span class="p">][</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CA"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">52.5</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res_ids</span>
+<span class="p">]</span>  <span class="c1"># Relative to generic Ala baseline for visual</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">res_ids</span><span class="p">,</span> <span class="n">ca_deltas</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#9b59b6'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Delta-CA (Secondary Shift)"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Helix Threshold"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Sheet Threshold"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">res_ids</span><span class="p">,</span> <span class="n">ca_deltas</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#9b59b6"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Delta-CA (Secondary Shift)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Helix Threshold"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Sheet Threshold"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"The Magnetic Footprint of Protein Folding"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue Number"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"CSI Deviation (ppm)"</span><span class="p">)</span>
@@ -5534,17 +5542,21 @@ print(f"✅ Paired Data Ready. Sample 0 Chain A Res 1 chemical shifts: {all_shif
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: Note how consistent positive deviations signal a stable secondary structure."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Educational Insight: Note how consistent positive deviations signal a stable secondary structure."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Extract CA secondary shifts for Sample 0
 sample_idx = 0
-res_ids = sorted(all_shifts[sample_idx]['A'].keys())
-ca_deltas = [all_shifts[sample_idx]['A'][r].get('CA', 0) - 52.5 for r in res_ids] # Relative to generic Ala baseline for visual
+res_ids = sorted(all_shifts[sample_idx]["A"].keys())
+ca_deltas = [
+    all_shifts[sample_idx]["A"][r].get("CA", 0) - 52.5 for r in res_ids
+]  # Relative to generic Ala baseline for visual
 
 plt.figure(figsize=(12, 4))
-plt.bar(res_ids, ca_deltas, color='#9b59b6', alpha=0.7, label="Delta-CA (Secondary Shift)")
-plt.axhline(0.7, color='red', linestyle='--', alpha=0.3, label="Helix Threshold")
-plt.axhline(-0.7, color='blue', linestyle='--', alpha=0.3, label="Sheet Threshold")
+plt.bar(res_ids, ca_deltas, color="#9b59b6", alpha=0.7, label="Delta-CA (Secondary Shift)")
+plt.axhline(0.7, color="red", linestyle="--", alpha=0.3, label="Helix Threshold")
+plt.axhline(-0.7, color="blue", linestyle="--", alpha=0.3, label="Sheet Threshold")
 plt.title("The Magnetic Footprint of Protein Folding")
 plt.xlabel("Residue Number")
 plt.ylabel("CSI Deviation (ppm)")
@@ -5552,7 +5564,9 @@ plt.legend()
 plt.grid(alpha=0.2)
 plt.show()
 
-print("Educational Insight: Note how consistent positive deviations signal a stable secondary structure.")</div>
+print(
+    "Educational Insight: Note how consistent positive deviations signal a stable secondary structure."
+)</div>
 </div>
 </div>
 </div>
@@ -5602,19 +5616,21 @@ print("Educational Insight: Note how consistent positive deviations signal a sta
 <span class="n">pdb_str</span> <span class="o">=</span> <span class="n">out_string</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
 
 <span class="c1"># 1. Highlight the Aromatic Rings</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="p">{</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#667eea'</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">}})</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'PHE'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'TRP'</span><span class="p">]},</span> <span class="p">{</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#ffcc00'</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span> <span class="p">{</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#667eea"</span><span class="p">,</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">}})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"resn"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"PHE"</span><span class="p">,</span> <span class="s2">"TYR"</span><span class="p">,</span> <span class="s2">"TRP"</span><span class="p">]},</span> <span class="p">{</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#ffcc00"</span><span class="p">}})</span>
 
 <span class="c1"># 2. Show the "Magnetic Cloud"</span>
 <span class="c1"># We'll put a surface around aromatics to visualize the 'Influence Zone'</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addSurface</span><span class="p">(</span><span class="n">py3Dmol</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span> <span class="p">{</span><span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">'color'</span><span class="p">:</span> <span class="s1">'#ffcc00'</span><span class="p">},</span> <span class="p">{</span><span class="s1">'resn'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'PHE'</span><span class="p">,</span> <span class="s1">'TYR'</span><span class="p">,</span> <span class="s1">'TRP'</span><span class="p">]})</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addSurface</span><span class="p">(</span><span class="n">py3Dmol</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span> <span class="p">{</span><span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#ffcc00"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"PHE"</span><span class="p">,</span> <span class="s2">"TYR"</span><span class="p">,</span> <span class="s2">"TRP"</span><span class="p">]})</span>
 
 <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Yellow regions indicate Aromatic hubs that distort the local magnetic field of nearby nuclei."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"Yellow regions indicate Aromatic hubs that distort the local magnetic field of nearby nuclei."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">view = py3Dmol.view(width=800, height=400)
 view.setBackgroundColor("#fdfdfd")
@@ -5630,19 +5646,21 @@ f.write(out_string)
 pdb_str = out_string.getvalue()
 
 # 1. Highlight the Aromatic Rings
-view.addModel(pdb_str, 'pdb')
-view.setStyle({'model': 0}, {'cartoon': {'color': '#667eea', 'opacity': 0.6}})
-view.setStyle({'resn': ['PHE', 'TYR', 'TRP']}, {'stick': {'radius': 0.25, 'color': '#ffcc00'}})
+view.addModel(pdb_str, "pdb")
+view.setStyle({"model": 0}, {"cartoon": {"color": "#667eea", "opacity": 0.6}})
+view.setStyle({"resn": ["PHE", "TYR", "TRP"]}, {"stick": {"radius": 0.25, "color": "#ffcc00"}})
 
 # 2. Show the "Magnetic Cloud"
 # We'll put a surface around aromatics to visualize the 'Influence Zone'
-view.addSurface(py3Dmol.MS, {'opacity': 0.2, 'color': '#ffcc00'}, {'resn': ['PHE', 'TYR', 'TRP']})
+view.addSurface(py3Dmol.MS, {"opacity": 0.2, "color": "#ffcc00"}, {"resn": ["PHE", "TYR", "TRP"]})
 
 view.zoomTo()
 view.center()
 view.show()
 
-print("Yellow regions indicate Aromatic hubs that distort the local magnetic field of nearby nuclei.")</div>
+print(
+    "Yellow regions indicate Aromatic hubs that distort the local magnetic field of nearby nuclei."
+)</div>
 </div>
 </div>
 </div>
@@ -5683,25 +5701,27 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
         <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
         <span class="c1"># Tensorize the 'CA' and 'HA' shifts as features</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shifts_list</span><span class="p">)</span>
-        <span class="n">n_res</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">4</span> <span class="c1"># Approximate for backbone clusters</span>
+        <span class="n">n_res</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">4</span>  <span class="c1"># Approximate for backbone clusters</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_res</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="c1"># [CA_shift, HA_shift]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_res</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># [CA_shift, HA_shift]</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="c1"># Only use chain A for the demo</span>
-            <span class="k">if</span> <span class="s1">'A'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">shifts_list</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="k">continue</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="n">shifts_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">'A'</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"A"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">shifts_list</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">shifts_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">"A"</span><span class="p">]</span>
             <span class="n">sorted_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">r_idx</span><span class="p">,</span> <span class="n">r_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_keys</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">r_idx</span> <span class="o">&lt;</span> <span class="n">n_res</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'CA'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'HA'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"CA"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">r_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"HA"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmr_features</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
 
 <span class="c1"># Create the synchronized dataset</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">MultiModalProteinDataset</span><span class="p">(</span><span class="n">ensemble</span><span class="o">.</span><span class="n">coord</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="n">all_shifts</span><span class="p">)</span>
@@ -5717,25 +5737,27 @@ print("Yellow regions indicate Aromatic hubs that distort the local magnetic fie
         self.coords = torch.from_numpy(coords).float()
         # Tensorize the 'CA' and 'HA' shifts as features
         n_samples = len(shifts_list)
-        n_res = coords.shape[1] // 4 # Approximate for backbone clusters
+        n_res = coords.shape[1] // 4  # Approximate for backbone clusters
 
-        self.nmr_features = torch.zeros((n_samples, n_res, 2)) # [CA_shift, HA_shift]
+        self.nmr_features = torch.zeros((n_samples, n_res, 2))  # [CA_shift, HA_shift]
 
         for i in range(n_samples):
             # Only use chain A for the demo
-            if 'A' not in shifts_list[i]: continue
-            s = shifts_list[i]['A']
+            if "A" not in shifts_list[i]:
+                continue
+            s = shifts_list[i]["A"]
             sorted_keys = sorted(s.keys())
             for r_idx, r_id in enumerate(sorted_keys):
                 if r_idx &lt; n_res:
-                    self.nmr_features[i, r_idx, 0] = s[r_id].get('CA', 0.0)
-                    self.nmr_features[i, r_idx, 1] = s[r_id].get('HA', 0.0)
+                    self.nmr_features[i, r_idx, 0] = s[r_id].get("CA", 0.0)
+                    self.nmr_features[i, r_idx, 1] = s[r_id].get("HA", 0.0)
 
     def __len__(self):
         return len(self.coords)
 
     def __getitem__(self, idx):
         return self.coords[idx], self.nmr_features[idx]
+
 
 # Create the synchronized dataset
 ds = MultiModalProteinDataset(ensemble.coord[:5], all_shifts)

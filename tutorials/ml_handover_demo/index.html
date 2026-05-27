@@ -5408,10 +5408,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb py3Dmol'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb py3Dmol"</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5423,7 +5423,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
 import os
@@ -5441,10 +5444,10 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb py3Dmol')
+        get_ipython().run_line_magic("pip", "install synth-pdb py3Dmol")
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5456,7 +5459,10 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
-    print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}")</div>
+
+    print(
+        f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}"
+    )</div>
 </div>
 </div>
 </div>
@@ -5553,8 +5559,7 @@ generator = BatchedGenerator(sequence, n_batch=n_batch, full_atom=False)
 
 start = time.time()
 batch = generator.generate_batch(drift=5.0)
-print(f"Generated {n_batch} structures.")
-</div>
+print(f"Generated {n_batch} structures.")</div>
 </div>
 </div>
 </div>
@@ -5605,26 +5610,36 @@ print(f"Generated {n_batch} structures.")
 
     <span class="k">return</span> <span class="n">serial_dt</span><span class="p">,</span> <span class="n">batched_dt</span>
 
+
 <span class="n">n_test</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">s_time</span><span class="p">,</span> <span class="n">b_time</span> <span class="o">=</span> <span class="n">run_benchmark</span><span class="p">(</span><span class="n">n_test</span><span class="p">)</span>
 
-<span class="n">s_1k</span> <span class="o">=</span> <span class="n">s_time</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">n_test</span><span class="p">)</span>
-<span class="n">b_1k</span> <span class="o">=</span> <span class="n">b_time</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="n">n_batch</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_batch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">b_time</span>
+<span class="n">s_1k</span> <span class="o">=</span> <span class="n">s_time</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="n">n_test</span><span class="p">)</span>
+<span class="n">b_1k</span> <span class="o">=</span> <span class="n">b_time</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="n">n_batch</span><span class="p">)</span> <span class="k">if</span> <span class="n">n_batch</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">b_time</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">bars</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="s2">"Traditional Serial"</span><span class="p">,</span> <span class="s2">"synth-pdb Batched"</span><span class="p">],</span> <span class="p">[</span><span class="n">s_1k</span><span class="p">,</span> <span class="n">b_time</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"#ff9999"</span><span class="p">,</span> <span class="s2">"#667eea"</span><span class="p">])</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">"Traditional Serial"</span><span class="p">,</span> <span class="s2">"synth-pdb Batched"</span><span class="p">],</span> <span class="p">[</span><span class="n">s_1k</span><span class="p">,</span> <span class="n">b_time</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">"#ff9999"</span><span class="p">,</span> <span class="s2">"#667eea"</span><span class="p">]</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Seconds per 1,000 Structures"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Real-World Performance Comparison"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">"y"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">bar</span> <span class="ow">in</span> <span class="n">bars</span><span class="p">:</span>
     <span class="n">yval</span> <span class="o">=</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">yval</span> <span class="o">+</span> <span class="p">(</span><span class="n">s_1k</span><span class="o">*</span><span class="mf">0.02</span><span class="p">),</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">yval</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">bar</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">bar</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="n">yval</span> <span class="o">+</span> <span class="p">(</span><span class="n">s_1k</span> <span class="o">*</span> <span class="mf">0.02</span><span class="p">),</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">yval</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">"bottom"</span><span class="p">,</span>
+        <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Vectorization Speedup: </span><span class="si">{</span><span class="n">s_1k</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Theoretical throughput: </span><span class="si">{</span><span class="mi">1000</span><span class="o">/</span><span class="n">b_time</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> structures/sec"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Theoretical throughput: </span><span class="si">{</span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">b_time</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> structures/sec"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from synth_pdb.generator import generate_pdb_content
 
@@ -5641,26 +5656,36 @@ def run_benchmark(n=100):
 
     return serial_dt, batched_dt
 
+
 n_test = 100
 s_time, b_time = run_benchmark(n_test)
 
-s_1k = s_time * (1000/n_test)
-b_1k = b_time * (1000/n_batch) if n_batch &gt; 0 else b_time
+s_1k = s_time * (1000 / n_test)
+b_1k = b_time * (1000 / n_batch) if n_batch &gt; 0 else b_time
 
 plt.figure(figsize=(8, 4))
-bars = plt.bar(["Traditional Serial", "synth-pdb Batched"], [s_1k, b_time], color=["#ff9999", "#667eea"])
+bars = plt.bar(
+    ["Traditional Serial", "synth-pdb Batched"], [s_1k, b_time], color=["#ff9999", "#667eea"]
+)
 plt.ylabel("Seconds per 1,000 Structures")
 plt.title("Real-World Performance Comparison")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 
 for bar in bars:
     yval = bar.get_height()
-    plt.text(bar.get_x() + bar.get_width()/2, yval + (s_1k*0.02), f"{yval:.3f}s", ha="center", va="bottom", fontweight="bold")
+    plt.text(
+        bar.get_x() + bar.get_width() / 2,
+        yval + (s_1k * 0.02),
+        f"{yval:.3f}s",
+        ha="center",
+        va="bottom",
+        fontweight="bold",
+    )
 
 plt.show()
 
 print(f"Vectorization Speedup: {s_1k / b_time:.1f}x")
-print(f"Theoretical throughput: {1000/b_time:.0f} structures/sec")</div>
+print(f"Theoretical throughput: {1000 / b_time:.0f} structures/sec")</div>
 </div>
 </div>
 </div>
@@ -5823,7 +5848,12 @@ except ImportError:
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Model </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Model </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Ensemble Drift: Structural Noise for ML Training"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"X (Å)"</span><span class="p">)</span>
@@ -5833,7 +5863,12 @@ except ImportError:
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">plt.figure(figsize=(10, 6))
 for i in range(10):
-    plt.plot(batch.coords[i, :, 0], batch.coords[i, :, 1], alpha=0.3, label=f"Model {i}" if i==0 else "")
+    plt.plot(
+        batch.coords[i, :, 0],
+        batch.coords[i, :, 1],
+        alpha=0.3,
+        label=f"Model {i}" if i == 0 else "",
+    )
 
 plt.title("Ensemble Drift: Structural Noise for ML Training")
 plt.xlabel("X (Å)")
@@ -5892,7 +5927,7 @@ plt.show()</div>
         <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
         <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
     <span class="p">)</span>
 
     <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
@@ -5926,7 +5961,7 @@ plt.show()</div>
         c_centered[np.newaxis, ...],
         batch.sequence,
         np.array(batch.atom_names)[mask].tolist(),
-        np.array(batch.residue_indices)[mask].tolist()
+        np.array(batch.residue_indices)[mask].tolist(),
     )
 
     view = py3Dmol.view(width=800, height=400)

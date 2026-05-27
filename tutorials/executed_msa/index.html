@@ -5281,26 +5281,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5338,7 +5338,7 @@ print("✅ Environment configured!")</div>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.msa</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_msa</span>
 
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'synth_pdb'</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"synth_pdb"</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Libraries loaded. Ready to simulate evolution."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># Suppress verbose logging from synth_pdb for the notebook
@@ -5352,7 +5352,7 @@ from synth_pdb.contact import compute_contact_map
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.msa import generate_msa
 
-logging.getLogger('synth_pdb').setLevel(logging.WARNING)
+logging.getLogger("synth_pdb").setLevel(logging.WARNING)
 print("Libraries loaded. Ready to simulate evolution.")</div>
 </div>
 </div>
@@ -5419,7 +5419,7 @@ print("Libraries loaded. Ready to simulate evolution.")</div>
 
 <span class="c1"># Vizualize Ground Truth Fold</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"3D Contact Map (Ground Truth Constraints)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Contact Present (True/False)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
@@ -5443,7 +5443,7 @@ contact_map = (distogram &gt; 0) &amp; (distogram &lt;= 8.0)
 
 # Vizualize Ground Truth Fold
 plt.figure(figsize=(6, 5))
-plt.imshow(contact_map, cmap='Blues')
+plt.imshow(contact_map, cmap="Blues")
 plt.title("3D Contact Map (Ground Truth Constraints)")
 plt.colorbar(label="Contact Present (True/False)")
 plt.xlabel("Residue i")
@@ -5511,7 +5511,7 @@ plt.show()</div>
     <span class="n">contact_map</span><span class="o">=</span><span class="n">contact_map</span><span class="p">,</span>
     <span class="n">num_sequences</span><span class="o">=</span><span class="n">n_sequences</span><span class="p">,</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">evolution_temp</span><span class="p">,</span>
-    <span class="n">steps_between_samples</span><span class="o">=</span><span class="mi">100</span>
+    <span class="n">steps_between_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Sample of evolved sequences:"</span><span class="p">)</span>
@@ -5527,7 +5527,7 @@ msa_list = generate_msa(
     contact_map=contact_map,
     num_sequences=n_sequences,
     temperature=evolution_temp,
-    steps_between_samples=100
+    steps_between_samples=100,
 )
 
 print("Sample of evolved sequences:")
@@ -5610,13 +5610,13 @@ We quantify this using <strong>Shannon Mutual Information (MI)</strong>:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">contact_map</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Ground Truth 3D Contacts"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Residue j"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mi_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mi_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"magma"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"MSA Mutual Information (MI)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Bits"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue i"</span><span class="p">)</span>
@@ -5640,13 +5640,13 @@ for i in range(L):
 plt.figure(figsize=(12, 5))
 
 plt.subplot(1, 2, 1)
-plt.imshow(contact_map, cmap='Blues')
+plt.imshow(contact_map, cmap="Blues")
 plt.title("Ground Truth 3D Contacts")
 plt.xlabel("Residue i")
 plt.ylabel("Residue j")
 
 plt.subplot(1, 2, 2)
-plt.imshow(mi_matrix, cmap='magma')
+plt.imshow(mi_matrix, cmap="magma")
 plt.title("MSA Mutual Information (MI)")
 plt.colorbar(label="Bits")
 plt.xlabel("Residue i")

@@ -5339,10 +5339,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb torch numpy matplotlib py3Dmol'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb torch numpy matplotlib py3Dmol"</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5354,7 +5354,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
 import os
@@ -5372,10 +5375,10 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb torch numpy matplotlib py3Dmol')
+        get_ipython().run_line_magic("pip", "install synth-pdb torch numpy matplotlib py3Dmol")
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5387,7 +5390,10 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
-    print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}")</div>
+
+    print(
+        f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__} from {synth_pdb.__file__}"
+    )</div>
 </div>
 </div>
 </div>
@@ -5472,7 +5478,7 @@ print("Libraries Loaded. Accelerating with PyTorch! 🚀")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10000</span>
 <span class="c1"># FIX: Use explicit hyphenation for the whole sequence to avoid 'METALA' merging errors</span>
-<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"-"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"ALA-GLY-SER-LEU-VAL-ILE-MET"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># 28 residues</span>
+<span class="n">sequence</span> <span class="o">=</span> <span class="s2">"-"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">"ALA-GLY-SER-LEU-VAL-ILE-MET"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># 28 residues</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🚀 Generating </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> structures..."</span><span class="p">)</span>
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -5482,11 +5488,11 @@ print("Libraries Loaded. Accelerating with PyTorch! 🚀")</div>
 
 <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Done! </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> structures generated in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Throughput: </span><span class="si">{</span><span class="n">n_samples</span><span class="o">/</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> structures/sec"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Throughput: </span><span class="si">{</span><span class="n">n_samples</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> structures/sec"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">n_samples = 10000
 # FIX: Use explicit hyphenation for the whole sequence to avoid 'METALA' merging errors
-sequence = "-".join(["ALA-GLY-SER-LEU-VAL-ILE-MET"] * 4) # 28 residues
+sequence = "-".join(["ALA-GLY-SER-LEU-VAL-ILE-MET"] * 4)  # 28 residues
 
 print(f"🚀 Generating {n_samples} structures...")
 start = time.time()
@@ -5496,7 +5502,7 @@ batch = generator.generate_batch(drift=5.0)
 
 elapsed = time.time() - start
 print(f"✅ Done! {n_samples} structures generated in {elapsed:.3f}s")
-print(f"Throughput: {n_samples/elapsed:.0f} structures/sec")</div>
+print(f"Throughput: {n_samples / elapsed:.0f} structures/sec")</div>
 </div>
 </div>
 </div>
@@ -5536,8 +5542,8 @@ print(f"Throughput: {n_samples/elapsed:.0f} structures/sec")</div>
 <span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#667eea'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Positional Variance"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">variance</span><span class="p">)),</span> <span class="n">variance</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#667eea'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#667eea"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Positional Variance"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">variance</span><span class="p">)),</span> <span class="n">variance</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#667eea"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"The Entropy Profile: Data Diversity across the Chain"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue Number"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Variance (Å²)"</span><span class="p">)</span>
@@ -5546,14 +5552,16 @@ print(f"Throughput: {n_samples/elapsed:.0f} structures/sec")</div>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Educational Insight: Notice how variance typically increases at the 'tail' of the peptide?"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"This is the 'Propagating Error' of structural drift—a key feature for generating negative samples."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s2">"This is the 'Propagating Error' of structural drift—a key feature for generating negative samples."</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Calculate the variance of CA positions across the batch
 variance = np.var(batch.coords, axis=0).mean(axis=1)
 
 plt.figure(figsize=(10, 5))
-plt.plot(variance, color='#667eea', linewidth=3, label="Positional Variance")
-plt.fill_between(range(len(variance)), variance, alpha=0.2, color='#667eea')
+plt.plot(variance, color="#667eea", linewidth=3, label="Positional Variance")
+plt.fill_between(range(len(variance)), variance, alpha=0.2, color="#667eea")
 plt.title("The Entropy Profile: Data Diversity across the Chain")
 plt.xlabel("Residue Number")
 plt.ylabel("Variance (Å²)")
@@ -5562,7 +5570,9 @@ plt.legend()
 plt.show()
 
 print("Educational Insight: Notice how variance typically increases at the 'tail' of the peptide?")
-print("This is the 'Propagating Error' of structural drift—a key feature for generating negative samples.")</div>
+print(
+    "This is the 'Propagating Error' of structural drift—a key feature for generating negative samples."
+)</div>
 </div>
 </div>
 </div>
@@ -5606,10 +5616,11 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
         <span class="c1"># 1. Clean and mask coordinates with strict zero-tolerance</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Strip zeros and ghost atoms</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Strip zeros and ghost atoms</span>
         <span class="n">c_clean</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_clean</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_clean</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
 
         <span class="c1"># 2. Individual Centering (Per-Model Anchor)</span>
         <span class="c1"># Using CA centroid for much better stability than min/max</span>
@@ -5626,19 +5637,22 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
             <span class="n">c_centered</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
             <span class="n">batch</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">atom_names</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">residue_indices</span><span class="p">)[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
         <span class="p">)</span>
 
-        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">p_tmp</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">'pdb'</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">p_tmp</span><span class="o">.</span><span class="n">to_pdb</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s2">"pdb"</span><span class="p">)</span>
         <span class="c1"># HIGH-VISIBILITY STYLE: Large Spheres (radius 0.3) + Thick Sticks</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span> <span class="p">{</span>
-            <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
-            <span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
-            <span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"scale"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
-        <span class="p">})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"model"</span><span class="p">:</span> <span class="n">i</span><span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+                <span class="s2">"stick"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
+                <span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">"scale"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
 
     <span class="c1"># 3. Aggressive manual zoom targeting model 0 to ensure viewport is filled</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
     <span class="n">view</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="n">view</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5658,10 +5672,11 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
     for i in range(5):
         # 1. Clean and mask coordinates with strict zero-tolerance
         c = batch.coords[i].copy()
-        mask = np.any(np.abs(c) &gt; 1e-4, axis=1) # Strip zeros and ghost atoms
+        mask = np.any(np.abs(c) &gt; 1e-4, axis=1)  # Strip zeros and ghost atoms
         c_clean = c[mask]
 
-        if len(c_clean) == 0: continue
+        if len(c_clean) == 0:
+            continue
 
         # 2. Individual Centering (Per-Model Anchor)
         # Using CA centroid for much better stability than min/max
@@ -5678,19 +5693,22 @@ print("This is the 'Propagating Error' of structural drift—a key feature for g
             c_centered[np.newaxis, ...],
             batch.sequence,
             np.array(batch.atom_names)[mask].tolist(),
-            np.array(batch.residue_indices)[mask].tolist()
+            np.array(batch.residue_indices)[mask].tolist(),
         )
 
-        view.addModel(p_tmp.to_pdb(0), 'pdb')
+        view.addModel(p_tmp.to_pdb(0), "pdb")
         # HIGH-VISIBILITY STYLE: Large Spheres (radius 0.3) + Thick Sticks
-        view.setStyle({'model': i}, {
-            "cartoon": {"color": colors[i], "opacity": 0.5},
-            "stick": {"color": colors[i], "radius": 0.3},
-            "sphere": {"color": colors[i], "scale": 0.3}
-        })
+        view.setStyle(
+            {"model": i},
+            {
+                "cartoon": {"color": colors[i], "opacity": 0.5},
+                "stick": {"color": colors[i], "radius": 0.3},
+                "sphere": {"color": colors[i], "scale": 0.3},
+            },
+        )
 
     # 3. Aggressive manual zoom targeting model 0 to ensure viewport is filled
-    view.zoomTo({'model': 0})
+    view.zoomTo({"model": 0})
     view.zoom(2.0)
     view.center()
     view.show()
@@ -5740,15 +5758,11 @@ except Exception as e:
 <span class="n">dataset_path</span> <span class="o">=</span> <span class="s2">"dataset_factory/batch_001.npz"</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Saving to compressed NPZ..."</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span>
-    <span class="n">dataset_path</span><span class="p">,</span>
-    <span class="n">coords</span><span class="o">=</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
-    <span class="n">sequence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sequence</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">batch</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sequence</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">))</span>
 
 <span class="c1"># Benchmark Loading</span>
 <span class="n">start_npz</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">tensor_npz</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)[</span><span class="s1">'coords'</span><span class="p">])</span>
+<span class="n">tensor_npz</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)[</span><span class="s2">"coords"</span><span class="p">])</span>
 <span class="n">npz_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_npz</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ NPZ Load (10k samples): </span><span class="si">{</span><span class="n">npz_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
@@ -5757,15 +5771,11 @@ except Exception as e:
 dataset_path = "dataset_factory/batch_001.npz"
 
 print("Saving to compressed NPZ...")
-np.savez_compressed(
-    dataset_path,
-    coords=batch.coords,
-    sequence=np.array([sequence] * n_samples)
-)
+np.savez_compressed(dataset_path, coords=batch.coords, sequence=np.array([sequence] * n_samples))
 
 # Benchmark Loading
 start_npz = time.time()
-tensor_npz = torch.from_numpy(np.load(dataset_path)['coords'])
+tensor_npz = torch.from_numpy(np.load(dataset_path)["coords"])
 npz_time = time.time() - start_npz
 
 print(f"✅ NPZ Load (10k samples): {npz_time:.4f}s")</div>
@@ -5807,13 +5817,14 @@ print(f"✅ NPZ Load (10k samples): {npz_time:.4f}s")</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SyntheticProteinDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">npz_path</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">npz_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">'coords'</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">"coords"</span><span class="p">])</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
 
 <span class="n">ds</span> <span class="o">=</span> <span class="n">SyntheticProteinDataset</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">)</span>
 <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -5824,13 +5835,14 @@ print(f"✅ NPZ Load (10k samples): {npz_time:.4f}s")</div>
 <div class="clipboard-copy-txt" id="cell-7">class SyntheticProteinDataset(Dataset):
     def __init__(self, npz_path):
         data = np.load(npz_path)
-        self.coords = torch.from_numpy(data['coords']).float()
+        self.coords = torch.from_numpy(data["coords"]).float()
 
     def __len__(self):
         return len(self.coords)
 
     def __getitem__(self, idx):
         return self.coords[idx]
+
 
 ds = SyntheticProteinDataset(dataset_path)
 loader = DataLoader(ds, batch_size=64, shuffle=True)

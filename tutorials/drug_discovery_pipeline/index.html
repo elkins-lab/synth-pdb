@@ -5733,6 +5733,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">google.colab</span>
+
     <span class="n">IN_COLAB</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">biotite</span> <span class="n">py3Dmol</span> <span class="n">pandas</span> <span class="n">seaborn</span>
@@ -5746,6 +5747,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 try:
     import google.colab
+
     IN_COLAB = True
     print("🌐 Running in Google Colab")
     !pip install -q synth-pdb matplotlib numpy biotite py3Dmol pandas seaborn
@@ -5788,7 +5790,7 @@ print("✅ Setup complete!")</div>
 
 <span class="c1"># Set style</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">"whitegrid"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'figure.dpi'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">"figure.dpi"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"📦 All imports successful!"</span><span class="p">)</span>
 </pre></div>
@@ -5802,7 +5804,7 @@ from synth_pdb.generator import generate_pdb_content
 
 # Set style
 sns.set_style("whitegrid")
-plt.rcParams['figure.dpi'] = 100
+plt.rcParams["figure.dpi"] = 100
 
 print("📦 All imports successful!")</div>
 </div>
@@ -5854,12 +5856,13 @@ print("📦 All imports successful!")</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Define amino acid library (drug-like bias)</span>
 <span class="n">AA_LIBRARY</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'hydrophobic'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'L'</span><span class="p">,</span> <span class="s1">'V'</span><span class="p">,</span> <span class="s1">'I'</span><span class="p">,</span> <span class="s1">'F'</span><span class="p">,</span> <span class="s1">'W'</span><span class="p">,</span> <span class="s1">'A'</span><span class="p">],</span>
-    <span class="s1">'polar'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'S'</span><span class="p">,</span> <span class="s1">'T'</span><span class="p">,</span> <span class="s1">'N'</span><span class="p">,</span> <span class="s1">'Q'</span><span class="p">],</span>
-    <span class="s1">'positive'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'K'</span><span class="p">,</span> <span class="s1">'R'</span><span class="p">],</span>
-    <span class="s1">'negative'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'D'</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">],</span>
-    <span class="s1">'special'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'P'</span><span class="p">,</span> <span class="s1">'G'</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">]</span>
+    <span class="s2">"hydrophobic"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"L"</span><span class="p">,</span> <span class="s2">"V"</span><span class="p">,</span> <span class="s2">"I"</span><span class="p">,</span> <span class="s2">"F"</span><span class="p">,</span> <span class="s2">"W"</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">],</span>
+    <span class="s2">"polar"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"S"</span><span class="p">,</span> <span class="s2">"T"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">,</span> <span class="s2">"Q"</span><span class="p">],</span>
+    <span class="s2">"positive"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"K"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">],</span>
+    <span class="s2">"negative"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"D"</span><span class="p">,</span> <span class="s2">"E"</span><span class="p">],</span>
+    <span class="s2">"special"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"P"</span><span class="p">,</span> <span class="s2">"G"</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">],</span>
 <span class="p">}</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_peptide_sequence</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Generate a random peptide sequence with drug-like composition."""</span>
@@ -5868,15 +5871,16 @@ print("📦 All imports successful!")</div>
 
     <span class="c1"># Composition bias (percentages)</span>
     <span class="n">composition</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s1">'hydrophobic'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span>  <span class="c1"># 40%</span>
-        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s1">'polar'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span>         <span class="c1"># 30%</span>
-        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s1">'positive'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span>      <span class="c1"># 10%</span>
-        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s1">'negative'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">+</span>      <span class="c1"># 10%</span>
-        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s1">'special'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>         <span class="c1"># 10%</span>
+        <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s2">"hydrophobic"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span>  <span class="c1"># 40%</span>
+        <span class="o">+</span> <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s2">"polar"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># 30%</span>
+        <span class="o">+</span> <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s2">"positive"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>  <span class="c1"># 10%</span>
+        <span class="o">+</span> <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s2">"negative"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>  <span class="c1"># 10%</span>
+        <span class="o">+</span> <span class="n">AA_LIBRARY</span><span class="p">[</span><span class="s2">"special"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1</span>  <span class="c1"># 10%</span>
     <span class="p">)</span>
 
-    <span class="n">sequence</span> <span class="o">=</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">length</span><span class="p">))</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">length</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">sequence</span>
+
 
 <span class="c1"># Generate library</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating peptide library...</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
@@ -5886,11 +5890,7 @@ print("📦 All imports successful!")</div>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">LIBRARY_SIZE</span><span class="p">):</span>
     <span class="n">length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
     <span class="n">seq</span> <span class="o">=</span> <span class="n">generate_peptide_sequence</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">library</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-        <span class="s1">'id'</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"PEP</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-        <span class="s1">'sequence'</span><span class="p">:</span> <span class="n">seq</span><span class="p">,</span>
-        <span class="s1">'length'</span><span class="p">:</span> <span class="n">length</span>
-    <span class="p">})</span>
+    <span class="n">library</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"id"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"PEP</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"sequence"</span><span class="p">:</span> <span class="n">seq</span><span class="p">,</span> <span class="s2">"length"</span><span class="p">:</span> <span class="n">length</span><span class="p">})</span>
 
 <span class="c1"># Convert to DataFrame</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">library</span><span class="p">)</span>
@@ -5903,12 +5903,13 @@ print("📦 All imports successful!")</div>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># Define amino acid library (drug-like bias)
 AA_LIBRARY = {
-    'hydrophobic': ['L', 'V', 'I', 'F', 'W', 'A'],
-    'polar': ['S', 'T', 'N', 'Q'],
-    'positive': ['K', 'R'],
-    'negative': ['D', 'E'],
-    'special': ['P', 'G', 'C']
+    "hydrophobic": ["L", "V", "I", "F", "W", "A"],
+    "polar": ["S", "T", "N", "Q"],
+    "positive": ["K", "R"],
+    "negative": ["D", "E"],
+    "special": ["P", "G", "C"],
 }
+
 
 def generate_peptide_sequence(length=10, seed=None):
     """Generate a random peptide sequence with drug-like composition."""
@@ -5917,15 +5918,16 @@ def generate_peptide_sequence(length=10, seed=None):
 
     # Composition bias (percentages)
     composition = (
-        AA_LIBRARY['hydrophobic'] * 4 +  # 40%
-        AA_LIBRARY['polar'] * 3 +         # 30%
-        AA_LIBRARY['positive'] * 1 +      # 10%
-        AA_LIBRARY['negative'] * 1 +      # 10%
-        AA_LIBRARY['special'] * 1         # 10%
+        AA_LIBRARY["hydrophobic"] * 4  # 40%
+        + AA_LIBRARY["polar"] * 3  # 30%
+        + AA_LIBRARY["positive"] * 1  # 10%
+        + AA_LIBRARY["negative"] * 1  # 10%
+        + AA_LIBRARY["special"] * 1  # 10%
     )
 
-    sequence = ''.join(random.choices(composition, k=length))
+    sequence = "".join(random.choices(composition, k=length))
     return sequence
+
 
 # Generate library
 print("🧬 Generating peptide library...\n")
@@ -5935,11 +5937,7 @@ library = []
 for i in range(LIBRARY_SIZE):
     length = random.randint(8, 12)
     seq = generate_peptide_sequence(length, seed=i)
-    library.append({
-        'id': f"PEP{i+1:03d}",
-        'sequence': seq,
-        'length': length
-    })
+    library.append({"id": f"PEP{i + 1:03d}", "sequence": seq, "length": length})
 
 # Convert to DataFrame
 df = pd.DataFrame(library)
@@ -5998,16 +5996,54 @@ for idx, row in df.head().iterrows():
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Amino acid properties</span>
-<span class="n">AA_MW</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="mi">89</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">:</span> <span class="mi">121</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="mi">133</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">:</span> <span class="mi">147</span><span class="p">,</span> <span class="s1">'F'</span><span class="p">:</span> <span class="mi">165</span><span class="p">,</span> <span class="s1">'G'</span><span class="p">:</span> <span class="mi">75</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">:</span> <span class="mi">155</span><span class="p">,</span>
-         <span class="s1">'I'</span><span class="p">:</span> <span class="mi">131</span><span class="p">,</span> <span class="s1">'K'</span><span class="p">:</span> <span class="mi">146</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mi">131</span><span class="p">,</span> <span class="s1">'M'</span><span class="p">:</span> <span class="mi">149</span><span class="p">,</span> <span class="s1">'N'</span><span class="p">:</span> <span class="mi">132</span><span class="p">,</span> <span class="s1">'P'</span><span class="p">:</span> <span class="mi">115</span><span class="p">,</span> <span class="s1">'Q'</span><span class="p">:</span> <span class="mi">146</span><span class="p">,</span>
-         <span class="s1">'R'</span><span class="p">:</span> <span class="mi">174</span><span class="p">,</span> <span class="s1">'S'</span><span class="p">:</span> <span class="mi">105</span><span class="p">,</span> <span class="s1">'T'</span><span class="p">:</span> <span class="mi">119</span><span class="p">,</span> <span class="s1">'V'</span><span class="p">:</span> <span class="mi">117</span><span class="p">,</span> <span class="s1">'W'</span><span class="p">:</span> <span class="mi">204</span><span class="p">,</span> <span class="s1">'Y'</span><span class="p">:</span> <span class="mi">181</span><span class="p">}</span>
+<span class="n">AA_MW</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"A"</span><span class="p">:</span> <span class="mi">89</span><span class="p">,</span>
+    <span class="s2">"C"</span><span class="p">:</span> <span class="mi">121</span><span class="p">,</span>
+    <span class="s2">"D"</span><span class="p">:</span> <span class="mi">133</span><span class="p">,</span>
+    <span class="s2">"E"</span><span class="p">:</span> <span class="mi">147</span><span class="p">,</span>
+    <span class="s2">"F"</span><span class="p">:</span> <span class="mi">165</span><span class="p">,</span>
+    <span class="s2">"G"</span><span class="p">:</span> <span class="mi">75</span><span class="p">,</span>
+    <span class="s2">"H"</span><span class="p">:</span> <span class="mi">155</span><span class="p">,</span>
+    <span class="s2">"I"</span><span class="p">:</span> <span class="mi">131</span><span class="p">,</span>
+    <span class="s2">"K"</span><span class="p">:</span> <span class="mi">146</span><span class="p">,</span>
+    <span class="s2">"L"</span><span class="p">:</span> <span class="mi">131</span><span class="p">,</span>
+    <span class="s2">"M"</span><span class="p">:</span> <span class="mi">149</span><span class="p">,</span>
+    <span class="s2">"N"</span><span class="p">:</span> <span class="mi">132</span><span class="p">,</span>
+    <span class="s2">"P"</span><span class="p">:</span> <span class="mi">115</span><span class="p">,</span>
+    <span class="s2">"Q"</span><span class="p">:</span> <span class="mi">146</span><span class="p">,</span>
+    <span class="s2">"R"</span><span class="p">:</span> <span class="mi">174</span><span class="p">,</span>
+    <span class="s2">"S"</span><span class="p">:</span> <span class="mi">105</span><span class="p">,</span>
+    <span class="s2">"T"</span><span class="p">:</span> <span class="mi">119</span><span class="p">,</span>
+    <span class="s2">"V"</span><span class="p">:</span> <span class="mi">117</span><span class="p">,</span>
+    <span class="s2">"W"</span><span class="p">:</span> <span class="mi">204</span><span class="p">,</span>
+    <span class="s2">"Y"</span><span class="p">:</span> <span class="mi">181</span><span class="p">,</span>
+<span class="p">}</span>
 
-<span class="n">AA_HYDRO</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'A'</span><span class="p">:</span> <span class="mf">1.8</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span> <span class="s1">'D'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="s1">'F'</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span> <span class="s1">'G'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span>
-            <span class="s1">'H'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">,</span> <span class="s1">'I'</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span> <span class="s1">'K'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.9</span><span class="p">,</span> <span class="s1">'L'</span><span class="p">:</span> <span class="mf">3.8</span><span class="p">,</span> <span class="s1">'M'</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s1">'N'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
-            <span class="s1">'P'</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span> <span class="s1">'Q'</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="s1">'R'</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="s1">'S'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="s1">'T'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="s1">'V'</span><span class="p">:</span> <span class="mf">4.2</span><span class="p">,</span>
-            <span class="s1">'W'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">,</span> <span class="s1">'Y'</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.3</span><span class="p">}</span>
+<span class="n">AA_HYDRO</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"A"</span><span class="p">:</span> <span class="mf">1.8</span><span class="p">,</span>
+    <span class="s2">"C"</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+    <span class="s2">"D"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+    <span class="s2">"E"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+    <span class="s2">"F"</span><span class="p">:</span> <span class="mf">2.8</span><span class="p">,</span>
+    <span class="s2">"G"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span>
+    <span class="s2">"H"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">,</span>
+    <span class="s2">"I"</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span>
+    <span class="s2">"K"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.9</span><span class="p">,</span>
+    <span class="s2">"L"</span><span class="p">:</span> <span class="mf">3.8</span><span class="p">,</span>
+    <span class="s2">"M"</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span>
+    <span class="s2">"N"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+    <span class="s2">"P"</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span>
+    <span class="s2">"Q"</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">,</span>
+    <span class="s2">"R"</span><span class="p">:</span> <span class="o">-</span><span class="mf">4.5</span><span class="p">,</span>
+    <span class="s2">"S"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="s2">"T"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="s2">"V"</span><span class="p">:</span> <span class="mf">4.2</span><span class="p">,</span>
+    <span class="s2">"W"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">,</span>
+    <span class="s2">"Y"</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.3</span><span class="p">,</span>
+<span class="p">}</span>
 
-<span class="n">AA_CHARGE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'D'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'E'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'K'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'R'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>  <span class="c1"># at pH 7</span>
+<span class="n">AA_CHARGE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"D"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"E"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"K"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>  <span class="c1"># at pH 7</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">calculate_properties</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Calculate physicochemical properties."""</span>
@@ -6021,27 +6057,29 @@ for idx, row in df.head().iterrows():
     <span class="n">gravy</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">AA_HYDRO</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aa</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
     <span class="c1"># Aromatic content</span>
-    <span class="n">aromatic</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s1">'FWY'</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="n">aromatic</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s2">"FWY"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
     <span class="c1"># Instability index (simplified)</span>
     <span class="c1"># Real calculation uses dipeptide instability weights</span>
-    <span class="n">unstable_pairs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'DP'</span><span class="p">,</span> <span class="s1">'PD'</span><span class="p">,</span> <span class="s1">'DD'</span><span class="p">,</span> <span class="s1">'EE'</span><span class="p">])</span>
+    <span class="n">unstable_pairs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"DP"</span><span class="p">,</span> <span class="s2">"PD"</span><span class="p">,</span> <span class="s2">"DD"</span><span class="p">,</span> <span class="s2">"EE"</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">instability</span> <span class="o">=</span> <span class="p">(</span><span class="n">unstable_pairs</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s1">'mw'</span><span class="p">:</span> <span class="n">mw</span><span class="p">,</span>
-        <span class="s1">'charge'</span><span class="p">:</span> <span class="n">charge</span><span class="p">,</span>
-        <span class="s1">'gravy'</span><span class="p">:</span> <span class="n">gravy</span><span class="p">,</span>
-        <span class="s1">'aromatic_pct'</span><span class="p">:</span> <span class="n">aromatic</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-        <span class="s1">'instability'</span><span class="p">:</span> <span class="n">instability</span>
+        <span class="s2">"mw"</span><span class="p">:</span> <span class="n">mw</span><span class="p">,</span>
+        <span class="s2">"charge"</span><span class="p">:</span> <span class="n">charge</span><span class="p">,</span>
+        <span class="s2">"gravy"</span><span class="p">:</span> <span class="n">gravy</span><span class="p">,</span>
+        <span class="s2">"aromatic_pct"</span><span class="p">:</span> <span class="n">aromatic</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">"instability"</span><span class="p">:</span> <span class="n">instability</span><span class="p">,</span>
     <span class="p">}</span>
+
 
 <span class="c1"># Calculate for all peptides</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"📊 Calculating ADME properties...</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">props</span> <span class="o">=</span> <span class="n">calculate_properties</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">])</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">calculate_properties</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">])</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -6053,16 +6091,54 @@ for idx, row in df.head().iterrows():
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Instability: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">'instability'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">'instability'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Amino acid properties
-AA_MW = {'A': 89, 'C': 121, 'D': 133, 'E': 147, 'F': 165, 'G': 75, 'H': 155,
-         'I': 131, 'K': 146, 'L': 131, 'M': 149, 'N': 132, 'P': 115, 'Q': 146,
-         'R': 174, 'S': 105, 'T': 119, 'V': 117, 'W': 204, 'Y': 181}
+AA_MW = {
+    "A": 89,
+    "C": 121,
+    "D": 133,
+    "E": 147,
+    "F": 165,
+    "G": 75,
+    "H": 155,
+    "I": 131,
+    "K": 146,
+    "L": 131,
+    "M": 149,
+    "N": 132,
+    "P": 115,
+    "Q": 146,
+    "R": 174,
+    "S": 105,
+    "T": 119,
+    "V": 117,
+    "W": 204,
+    "Y": 181,
+}
 
-AA_HYDRO = {'A': 1.8, 'C': 2.5, 'D': -3.5, 'E': -3.5, 'F': 2.8, 'G': -0.4,
-            'H': -3.2, 'I': 4.5, 'K': -3.9, 'L': 3.8, 'M': 1.9, 'N': -3.5,
-            'P': -1.6, 'Q': -3.5, 'R': -4.5, 'S': -0.8, 'T': -0.7, 'V': 4.2,
-            'W': -0.9, 'Y': -1.3}
+AA_HYDRO = {
+    "A": 1.8,
+    "C": 2.5,
+    "D": -3.5,
+    "E": -3.5,
+    "F": 2.8,
+    "G": -0.4,
+    "H": -3.2,
+    "I": 4.5,
+    "K": -3.9,
+    "L": 3.8,
+    "M": 1.9,
+    "N": -3.5,
+    "P": -1.6,
+    "Q": -3.5,
+    "R": -4.5,
+    "S": -0.8,
+    "T": -0.7,
+    "V": 4.2,
+    "W": -0.9,
+    "Y": -1.3,
+}
 
-AA_CHARGE = {'D': -1, 'E': -1, 'K': 1, 'R': 1}  # at pH 7
+AA_CHARGE = {"D": -1, "E": -1, "K": 1, "R": 1}  # at pH 7
+
 
 def calculate_properties(sequence):
     """Calculate physicochemical properties."""
@@ -6076,27 +6152,29 @@ def calculate_properties(sequence):
     gravy = sum(AA_HYDRO.get(aa, 0) for aa in sequence) / len(sequence)
 
     # Aromatic content
-    aromatic = sum(1 for aa in sequence if aa in 'FWY') / len(sequence)
+    aromatic = sum(1 for aa in sequence if aa in "FWY") / len(sequence)
 
     # Instability index (simplified)
     # Real calculation uses dipeptide instability weights
-    unstable_pairs = sum(1 for i in range(len(sequence)-1)
-                        if sequence[i:i+2] in ['DP', 'PD', 'DD', 'EE'])
+    unstable_pairs = sum(
+        1 for i in range(len(sequence) - 1) if sequence[i : i + 2] in ["DP", "PD", "DD", "EE"]
+    )
     instability = (unstable_pairs / len(sequence)) * 100
 
     return {
-        'mw': mw,
-        'charge': charge,
-        'gravy': gravy,
-        'aromatic_pct': aromatic * 100,
-        'instability': instability
+        "mw": mw,
+        "charge": charge,
+        "gravy": gravy,
+        "aromatic_pct": aromatic * 100,
+        "instability": instability,
     }
+
 
 # Calculate for all peptides
 print("📊 Calculating ADME properties...\n")
 
 for idx, row in df.iterrows():
-    props = calculate_properties(row['sequence'])
+    props = calculate_properties(row["sequence"])
     for key, value in props.items():
         df.at[idx, key] = value
 
@@ -6161,26 +6239,26 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
     <span class="k">if</span> <span class="n">target_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Default: hydrophobic pocket with some charged residues</span>
         <span class="n">target_profile</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">'prefers_hydrophobic'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s1">'prefers_aromatic'</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="s1">'charge_preference'</span><span class="p">:</span> <span class="o">+</span><span class="mi">1</span>  <span class="c1"># Prefers positive ligands</span>
+            <span class="s2">"prefers_hydrophobic"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"prefers_aromatic"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"charge_preference"</span><span class="p">:</span> <span class="o">+</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Prefers positive ligands</span>
         <span class="p">}</span>
 
     <span class="n">score</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="c1"># Hydrophobic contribution</span>
-    <span class="n">hydrophobic_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s1">'LVIFWA'</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">target_profile</span><span class="p">[</span><span class="s1">'prefers_hydrophobic'</span><span class="p">]:</span>
+    <span class="n">hydrophobic_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s2">"LVIFWA"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target_profile</span><span class="p">[</span><span class="s2">"prefers_hydrophobic"</span><span class="p">]:</span>
         <span class="n">score</span> <span class="o">-=</span> <span class="n">hydrophobic_count</span> <span class="o">*</span> <span class="mf">0.5</span>  <span class="c1"># Favorable</span>
 
     <span class="c1"># Aromatic contribution</span>
-    <span class="n">aromatic_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s1">'FWY'</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">target_profile</span><span class="p">[</span><span class="s1">'prefers_aromatic'</span><span class="p">]:</span>
+    <span class="n">aromatic_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">aa</span> <span class="ow">in</span> <span class="s2">"FWY"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target_profile</span><span class="p">[</span><span class="s2">"prefers_aromatic"</span><span class="p">]:</span>
         <span class="n">score</span> <span class="o">-=</span> <span class="n">aromatic_count</span> <span class="o">*</span> <span class="mf">0.8</span>  <span class="c1"># Very favorable</span>
 
     <span class="c1"># Charge complementarity</span>
     <span class="n">net_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">AA_CHARGE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aa</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">)</span>
-    <span class="n">charge_match</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">net_charge</span> <span class="o">-</span> <span class="n">target_profile</span><span class="p">[</span><span class="s1">'charge_preference'</span><span class="p">])</span>
+    <span class="n">charge_match</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">net_charge</span> <span class="o">-</span> <span class="n">target_profile</span><span class="p">[</span><span class="s2">"charge_preference"</span><span class="p">])</span>
     <span class="n">score</span> <span class="o">+=</span> <span class="n">charge_match</span> <span class="o">*</span> <span class="mf">0.3</span>  <span class="c1"># Penalty for mismatch</span>
 
     <span class="c1"># Size penalty (entropic cost)</span>
@@ -6192,18 +6270,19 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
 
     <span class="k">return</span> <span class="n">score</span>
 
+
 <span class="c1"># Calculate binding scores</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🎯 Estimating binding affinities...</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">score</span> <span class="o">=</span> <span class="n">estimate_binding_score</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">])</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">'binding_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">estimate_binding_score</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">])</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">"binding_score"</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Binding scores calculated!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Best score: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Worst score: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Top 5 binders:"</span><span class="p">)</span>
-<span class="n">top5</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">'binding_score'</span><span class="p">)[[</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'sequence'</span><span class="p">,</span> <span class="s1">'binding_score'</span><span class="p">]]</span>
+<span class="n">top5</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">"binding_score"</span><span class="p">)[[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"sequence"</span><span class="p">,</span> <span class="s2">"binding_score"</span><span class="p">]]</span>
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">top5</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (score: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 </pre></div>
@@ -6214,26 +6293,26 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
     if target_profile is None:
         # Default: hydrophobic pocket with some charged residues
         target_profile = {
-            'prefers_hydrophobic': True,
-            'prefers_aromatic': True,
-            'charge_preference': +1  # Prefers positive ligands
+            "prefers_hydrophobic": True,
+            "prefers_aromatic": True,
+            "charge_preference": +1,  # Prefers positive ligands
         }
 
     score = 0.0
 
     # Hydrophobic contribution
-    hydrophobic_count = sum(1 for aa in sequence if aa in 'LVIFWA')
-    if target_profile['prefers_hydrophobic']:
+    hydrophobic_count = sum(1 for aa in sequence if aa in "LVIFWA")
+    if target_profile["prefers_hydrophobic"]:
         score -= hydrophobic_count * 0.5  # Favorable
 
     # Aromatic contribution
-    aromatic_count = sum(1 for aa in sequence if aa in 'FWY')
-    if target_profile['prefers_aromatic']:
+    aromatic_count = sum(1 for aa in sequence if aa in "FWY")
+    if target_profile["prefers_aromatic"]:
         score -= aromatic_count * 0.8  # Very favorable
 
     # Charge complementarity
     net_charge = sum(AA_CHARGE.get(aa, 0) for aa in sequence)
-    charge_match = abs(net_charge - target_profile['charge_preference'])
+    charge_match = abs(net_charge - target_profile["charge_preference"])
     score += charge_match * 0.3  # Penalty for mismatch
 
     # Size penalty (entropic cost)
@@ -6245,18 +6324,19 @@ print(f"   Instability: {df['instability'].min():.1f} - {df['instability'].max()
 
     return score
 
+
 # Calculate binding scores
 print("🎯 Estimating binding affinities...\n")
 
 for idx, row in df.iterrows():
-    score = estimate_binding_score(row['sequence'])
-    df.at[idx, 'binding_score'] = score
+    score = estimate_binding_score(row["sequence"])
+    df.at[idx, "binding_score"] = score
 
 print("✅ Binding scores calculated!")
 print(f"   Best score: {df['binding_score'].min():.2f}")
 print(f"   Worst score: {df['binding_score'].max():.2f}")
 print("\nTop 5 binders:")
-top5 = df.nsmallest(5, 'binding_score')[['id', 'sequence', 'binding_score']]
+top5 = df.nsmallest(5, "binding_score")[["id", "sequence", "binding_score"]]
 for idx, row in top5.iterrows():
     print(f"   {row['id']}: {row['sequence']} (score: {row['binding_score']:.2f})")</div>
 </div>
@@ -6298,12 +6378,13 @@ for idx, row in top5.iterrows():
 <span class="k">def</span><span class="w"> </span><span class="nf">is_druglike</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Check if peptide meets drug-like criteria."""</span>
     <span class="n">checks</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">'mw_ok'</span><span class="p">:</span> <span class="mi">800</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'mw'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1500</span><span class="p">,</span>
-        <span class="s1">'charge_ok'</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'charge'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s1">'gravy_ok'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'gravy'</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">,</span>
-        <span class="s1">'stable'</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">'instability'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">40</span>
+        <span class="s2">"mw_ok"</span><span class="p">:</span> <span class="mi">800</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"mw"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1500</span><span class="p">,</span>
+        <span class="s2">"charge_ok"</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"charge"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"gravy_ok"</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"gravy"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">"stable"</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">"instability"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">checks</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">checks</span>
+
 
 <span class="c1"># Apply filters</span>
 <span class="n">druglike_flags</span> <span class="o">=</span> <span class="p">[]</span>
@@ -6311,50 +6392,50 @@ for idx, row in top5.iterrows():
     <span class="n">is_dl</span><span class="p">,</span> <span class="n">checks</span> <span class="o">=</span> <span class="n">is_druglike</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
     <span class="n">druglike_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">is_dl</span><span class="p">)</span>
 
-<span class="n">df</span><span class="p">[</span><span class="s1">'druglike'</span><span class="p">]</span> <span class="o">=</span> <span class="n">druglike_flags</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">"druglike"</span><span class="p">]</span> <span class="o">=</span> <span class="n">druglike_flags</span>
 
 <span class="c1"># Summary</span>
-<span class="n">n_druglike</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'druglike'</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">n_druglike</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"druglike"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"📊 Drug-Likeness Filtering Results"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total library: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> peptides"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Drug-like: </span><span class="si">{</span><span class="n">n_druglike</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="mi">100</span><span class="o">*</span><span class="n">n_druglike</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Drug-like: </span><span class="si">{</span><span class="n">n_druglike</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_druglike</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Filtered out: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">n_druglike</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Visualize</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 
 <span class="c1"># MW distribution</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'mw'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Min threshold'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Max threshold'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Molecular Weight (Da)'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Count'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Molecular Weight Distribution'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"mw"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Min threshold"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">1500</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Max threshold"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Molecular Weight (Da)"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Molecular Weight Distribution"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 <span class="c1"># Charge distribution</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'charge'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Net Charge'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Count'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Charge Distribution'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"charge"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Net Charge"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Charge Distribution"</span><span class="p">)</span>
 
 <span class="c1"># GRAVY distribution</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'gravy'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'GRAVY Score'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Count'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Hydrophobicity Distribution'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"gravy"</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">"--"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"GRAVY Score"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Hydrophobicity Distribution"</span><span class="p">)</span>
 
 <span class="c1"># Binding score vs MW</span>
-<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'green'</span> <span class="k">if</span> <span class="n">dl</span> <span class="k">else</span> <span class="s1">'red'</span> <span class="k">for</span> <span class="n">dl</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">'druglike'</span><span class="p">]]</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'mw'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">'black'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Molecular Weight (Da)'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Binding Score'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Binding vs Size (Green=Drug-like)'</span><span class="p">)</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"green"</span> <span class="k">if</span> <span class="n">dl</span> <span class="k">else</span> <span class="s2">"red"</span> <span class="k">for</span> <span class="n">dl</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">"druglike"</span><span class="p">]]</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"mw"</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">"binding_score"</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"black"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Molecular Weight (Da)"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Binding Score"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Binding vs Size (Green=Drug-like)"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -6363,12 +6444,13 @@ for idx, row in top5.iterrows():
 def is_druglike(row):
     """Check if peptide meets drug-like criteria."""
     checks = {
-        'mw_ok': 800 &lt;= row['mw'] &lt;= 1500,
-        'charge_ok': -2 &lt;= row['charge'] &lt;= 3,
-        'gravy_ok': -0.5 &lt;= row['gravy'] &lt;= 0.5,
-        'stable': row['instability'] &lt; 40
+        "mw_ok": 800 &lt;= row["mw"] &lt;= 1500,
+        "charge_ok": -2 &lt;= row["charge"] &lt;= 3,
+        "gravy_ok": -0.5 &lt;= row["gravy"] &lt;= 0.5,
+        "stable": row["instability"] &lt; 40,
     }
     return all(checks.values()), checks
+
 
 # Apply filters
 druglike_flags = []
@@ -6376,50 +6458,50 @@ for idx, row in df.iterrows():
     is_dl, checks = is_druglike(row)
     druglike_flags.append(is_dl)
 
-df['druglike'] = druglike_flags
+df["druglike"] = druglike_flags
 
 # Summary
-n_druglike = df['druglike'].sum()
+n_druglike = df["druglike"].sum()
 print("📊 Drug-Likeness Filtering Results")
 print("=" * 50)
 print(f"Total library: {len(df)} peptides")
-print(f"Drug-like: {n_druglike} ({100*n_druglike/len(df):.1f}%)")
+print(f"Drug-like: {n_druglike} ({100 * n_druglike / len(df):.1f}%)")
 print(f"Filtered out: {len(df) - n_druglike}")
 
 # Visualize
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
 # MW distribution
-axes[0,0].hist(df['mw'], bins=20, alpha=0.7, edgecolor='black')
-axes[0,0].axvline(800, color='red', linestyle='--', label='Min threshold')
-axes[0,0].axvline(1500, color='red', linestyle='--', label='Max threshold')
-axes[0,0].set_xlabel('Molecular Weight (Da)')
-axes[0,0].set_ylabel('Count')
-axes[0,0].set_title('Molecular Weight Distribution')
-axes[0,0].legend()
+axes[0, 0].hist(df["mw"], bins=20, alpha=0.7, edgecolor="black")
+axes[0, 0].axvline(800, color="red", linestyle="--", label="Min threshold")
+axes[0, 0].axvline(1500, color="red", linestyle="--", label="Max threshold")
+axes[0, 0].set_xlabel("Molecular Weight (Da)")
+axes[0, 0].set_ylabel("Count")
+axes[0, 0].set_title("Molecular Weight Distribution")
+axes[0, 0].legend()
 
 # Charge distribution
-axes[0,1].hist(df['charge'], bins=range(-3, 6), alpha=0.7, edgecolor='black')
-axes[0,1].axvline(-2, color='red', linestyle='--')
-axes[0,1].axvline(3, color='red', linestyle='--')
-axes[0,1].set_xlabel('Net Charge')
-axes[0,1].set_ylabel('Count')
-axes[0,1].set_title('Charge Distribution')
+axes[0, 1].hist(df["charge"], bins=range(-3, 6), alpha=0.7, edgecolor="black")
+axes[0, 1].axvline(-2, color="red", linestyle="--")
+axes[0, 1].axvline(3, color="red", linestyle="--")
+axes[0, 1].set_xlabel("Net Charge")
+axes[0, 1].set_ylabel("Count")
+axes[0, 1].set_title("Charge Distribution")
 
 # GRAVY distribution
-axes[1,0].hist(df['gravy'], bins=20, alpha=0.7, edgecolor='black')
-axes[1,0].axvline(-0.5, color='red', linestyle='--')
-axes[1,0].axvline(0.5, color='red', linestyle='--')
-axes[1,0].set_xlabel('GRAVY Score')
-axes[1,0].set_ylabel('Count')
-axes[1,0].set_title('Hydrophobicity Distribution')
+axes[1, 0].hist(df["gravy"], bins=20, alpha=0.7, edgecolor="black")
+axes[1, 0].axvline(-0.5, color="red", linestyle="--")
+axes[1, 0].axvline(0.5, color="red", linestyle="--")
+axes[1, 0].set_xlabel("GRAVY Score")
+axes[1, 0].set_ylabel("Count")
+axes[1, 0].set_title("Hydrophobicity Distribution")
 
 # Binding score vs MW
-colors = ['green' if dl else 'red' for dl in df['druglike']]
-axes[1,1].scatter(df['mw'], df['binding_score'], c=colors, alpha=0.6, edgecolors='black')
-axes[1,1].set_xlabel('Molecular Weight (Da)')
-axes[1,1].set_ylabel('Binding Score')
-axes[1,1].set_title('Binding vs Size (Green=Drug-like)')
+colors = ["green" if dl else "red" for dl in df["druglike"]]
+axes[1, 1].scatter(df["mw"], df["binding_score"], c=colors, alpha=0.6, edgecolors="black")
+axes[1, 1].set_xlabel("Molecular Weight (Da)")
+axes[1, 1].set_ylabel("Binding Score")
+axes[1, 1].set_title("Binding vs Size (Green=Drug-like)")
 
 plt.tight_layout()
 plt.show()</div>
@@ -6459,10 +6541,10 @@ plt.show()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Filter to drug-like candidates</span>
-<span class="n">candidates</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">'druglike'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">candidates</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"druglike"</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <span class="c1"># Rank by binding score (lower = better)</span>
-<span class="n">candidates</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'binding_score'</span><span class="p">)</span>
+<span class="n">candidates</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"binding_score"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🏆 TOP 10 LEAD CANDIDATES"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
@@ -6470,18 +6552,20 @@ plt.show()</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">candidates</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rank</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2"> "</span>
-          <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'mw'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.0f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'charge'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.0f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rank</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;15</span><span class="si">}</span><span class="s2"> "</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'mw'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.0f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'charge'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.0f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'binding_score'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8.2f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
 
 <span class="c1"># Save top candidates</span>
 <span class="n">top_candidates</span> <span class="o">=</span> <span class="n">candidates</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ Selected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">top_candidates</span><span class="p">)</span><span class="si">}</span><span class="s2"> leads for further optimization"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7"># Filter to drug-like candidates
-candidates = df[df['druglike']].copy()
+candidates = df[df["druglike"]].copy()
 
 # Rank by binding score (lower = better)
-candidates = candidates.sort_values('binding_score')
+candidates = candidates.sort_values("binding_score")
 
 print("🏆 TOP 10 LEAD CANDIDATES")
 print("=" * 80)
@@ -6489,8 +6573,10 @@ print(f"{'Rank':&lt;6} {'ID':&lt;8} {'Sequence':&lt;15} {'MW':&lt;8} {'Charge':&
 print("=" * 80)
 
 for rank, (idx, row) in enumerate(candidates.head(10).iterrows(), 1):
-    print(f"{rank:&lt;6} {row['id']:&lt;8} {row['sequence']:&lt;15} "
-          f"{row['mw']:&lt;8.0f} {row['charge']:&lt;8.0f} {row['binding_score']:&lt;8.2f}")
+    print(
+        f"{rank:&lt;6} {row['id']:&lt;8} {row['sequence']:&lt;15} "
+        f"{row['mw']:&lt;8.0f} {row['charge']:&lt;8.0f} {row['binding_score']:&lt;8.2f}"
+    )
 
 # Save top candidates
 top_candidates = candidates.head(10)
@@ -6550,19 +6636,19 @@ print(f"\n✅ Selected {len(top_candidates)} leads for further optimization")</d
 
 <span class="c1"># Generate linear structure</span>
 <span class="n">linear_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">top_peptide</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">],</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">top_peptide</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">],</span>
     <span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>  <span class="c1"># Random coil</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Generate cyclic structure</span>
 <span class="n">cyclic_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">top_peptide</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">],</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">top_peptide</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">],</span>
     <span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span>
     <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Head-to-tail cyclization</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Structures generated!"</span><span class="p">)</span>
@@ -6577,19 +6663,19 @@ print("\n⏳ This may take a minute...\n")
 
 # Generate linear structure
 linear_pdb = generate_pdb_content(
-    sequence_str=top_peptide['sequence'],
+    sequence_str=top_peptide["sequence"],
     conformation="random",  # Random coil
     optimize_sidechains=True,
-    minimize_energy=True
+    minimize_energy=True,
 )
 
 # Generate cyclic structure
 cyclic_pdb = generate_pdb_content(
-    sequence_str=top_peptide['sequence'],
+    sequence_str=top_peptide["sequence"],
     conformation="random",
     cyclic=True,  # Head-to-tail cyclization
     optimize_sidechains=True,
-    minimize_energy=True
+    minimize_energy=True,
 )
 
 print("✅ Structures generated!")</div>
@@ -6625,19 +6711,21 @@ print("✅ Structures generated!")</div>
 <span class="c1"># Linear structure</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Linear Peptide:"</span><span class="p">)</span>
 <span class="n">view1</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">view1</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">linear_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">}})</span>
-<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="n">top_peptide</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">][</span><span class="mi">0</span><span class="p">]},</span>
-               <span class="p">{</span><span class="s1">'sphere'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'red'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}})</span>  <span class="c1"># N-terminus</span>
-<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'resn'</span><span class="p">:</span> <span class="n">top_peptide</span><span class="p">[</span><span class="s1">'sequence'</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]},</span>
-               <span class="p">{</span><span class="s1">'sphere'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}})</span>  <span class="c1"># C-terminus</span>
+<span class="n">view1</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">linear_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}})</span>
+<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="n">top_peptide</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">][</span><span class="mi">0</span><span class="p">]},</span> <span class="p">{</span><span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"red"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}}</span>
+<span class="p">)</span>  <span class="c1"># N-terminus</span>
+<span class="n">view1</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">"resn"</span><span class="p">:</span> <span class="n">top_peptide</span><span class="p">[</span><span class="s2">"sequence"</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]},</span> <span class="p">{</span><span class="s2">"sphere"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">}}</span>
+<span class="p">)</span>  <span class="c1"># C-terminus</span>
 <span class="n">view1</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Cyclic Peptide (head-to-tail):"</span><span class="p">)</span>
 <span class="n">view2</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">view2</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">cyclic_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-<span class="n">view2</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'cartoon'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">}})</span>
+<span class="n">view2</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">cyclic_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+<span class="n">view2</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"cartoon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">}})</span>
 <span class="n">view2</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
 <span class="n">view2</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
@@ -6652,19 +6740,21 @@ print("🔬 3D Structure Comparison\n")
 # Linear structure
 print("Linear Peptide:")
 view1 = py3Dmol.view(width=400, height=300)
-view1.addModel(linear_pdb, 'pdb')
-view1.setStyle({'cartoon': {'color': 'spectrum'}})
-view1.setStyle({'resn': top_peptide['sequence'][0]},
-               {'sphere': {'color': 'red', 'radius': 0.5}})  # N-terminus
-view1.setStyle({'resn': top_peptide['sequence'][-1]},
-               {'sphere': {'color': 'blue', 'radius': 0.5}})  # C-terminus
+view1.addModel(linear_pdb, "pdb")
+view1.setStyle({"cartoon": {"color": "spectrum"}})
+view1.setStyle(
+    {"resn": top_peptide["sequence"][0]}, {"sphere": {"color": "red", "radius": 0.5}}
+)  # N-terminus
+view1.setStyle(
+    {"resn": top_peptide["sequence"][-1]}, {"sphere": {"color": "blue", "radius": 0.5}}
+)  # C-terminus
 view1.zoomTo()
 view1.show()
 
 print("\nCyclic Peptide (head-to-tail):")
 view2 = py3Dmol.view(width=400, height=300)
-view2.addModel(cyclic_pdb, 'pdb')
-view2.setStyle({'cartoon': {'color': 'spectrum'}})
+view2.addModel(cyclic_pdb, "pdb")
+view2.setStyle({"cartoon": {"color": "spectrum"}})
 view2.zoomTo()
 view2.show()
 
@@ -6706,15 +6796,16 @@ print("   This makes it resistant to exopeptidases!")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Export summary</span>
-<span class="n">export_df</span> <span class="o">=</span> <span class="n">top_candidates</span><span class="p">[[</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'sequence'</span><span class="p">,</span> <span class="s1">'length'</span><span class="p">,</span> <span class="s1">'mw'</span><span class="p">,</span> <span class="s1">'charge'</span><span class="p">,</span>
-                            <span class="s1">'gravy'</span><span class="p">,</span> <span class="s1">'binding_score'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">export_df</span> <span class="o">=</span> <span class="n">top_candidates</span><span class="p">[</span>
+    <span class="p">[</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"sequence"</span><span class="p">,</span> <span class="s2">"length"</span><span class="p">,</span> <span class="s2">"mw"</span><span class="p">,</span> <span class="s2">"charge"</span><span class="p">,</span> <span class="s2">"gravy"</span><span class="p">,</span> <span class="s2">"binding_score"</span><span class="p">]</span>
+<span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"📄 Exportable Results</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">export_df</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
 <span class="c1"># Save to CSV (if running locally)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="n">export_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">'lead_peptides.csv'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">export_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">"lead_peptides.csv"</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ Saved to lead_peptides.csv"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💡 In Colab: Copy the table above for your records"</span><span class="p">)</span>
@@ -6726,15 +6817,16 @@ print("   This makes it resistant to exopeptidases!")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"   Ready for molecular dynamics or docking studies!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10"># Export summary
-export_df = top_candidates[['id', 'sequence', 'length', 'mw', 'charge',
-                            'gravy', 'binding_score']].copy()
+export_df = top_candidates[
+    ["id", "sequence", "length", "mw", "charge", "gravy", "binding_score"]
+].copy()
 
 print("📄 Exportable Results\n")
 print(export_df.to_string(index=False))
 
 # Save to CSV (if running locally)
 if not IN_COLAB:
-    export_df.to_csv('lead_peptides.csv', index=False)
+    export_df.to_csv("lead_peptides.csv", index=False)
     print("\n✅ Saved to lead_peptides.csv")
 else:
     print("\n💡 In Colab: Copy the table above for your records")

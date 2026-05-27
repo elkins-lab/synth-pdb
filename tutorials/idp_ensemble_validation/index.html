@@ -5437,43 +5437,45 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ synth-pdb already installed'</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   📦 Installing synth-pdb and dependencies...'</span><span class="p">)</span>
-        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ Installation complete'</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb and dependencies..."</span><span class="p">)</span>
+        <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">py3Dmol</span> <span class="n">biotite</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Detection &amp; Setup
 import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     try:
         import synth_pdb
-        print('   ✅ synth-pdb already installed')
-    except ImportError:
-        print('   📦 Installing synth-pdb and dependencies...')
-        !pip install -q synth-pdb py3Dmol biotite
-        print('   ✅ Installation complete')
-else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
 
-print('✅ Environment configured!')</div>
+        print("   ✅ synth-pdb already installed")
+    except ImportError:
+        print("   📦 Installing synth-pdb and dependencies...")
+        !pip install -q synth-pdb py3Dmol biotite
+        print("   ✅ Installation complete")
+else:
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
+
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5534,8 +5536,7 @@ import py3Dmol
 from synth_pdb.batch_generator import BatchedGenerator
 from synth_pdb.generator import generate_pdb_content
 
-print("📦 All imports successful!")
-</div>
+print("📦 All imports successful!")</div>
 </div>
 </div>
 </div>
@@ -5564,7 +5565,7 @@ print("📦 All imports successful!")
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s1">'https://3dmol.csb.pitt.edu/build/3Dmol.js'</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s2">"https://3dmol.csb.pitt.edu/build/3Dmol.js"</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Could not contact 3Dmol.js server: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
@@ -5572,10 +5573,9 @@ print("📦 All imports successful!")
 import urllib.request
 
 try:
-    urllib.request.urlopen('https://3dmol.csb.pitt.edu/build/3Dmol.js', timeout=2)
+    urllib.request.urlopen("https://3dmol.csb.pitt.edu/build/3Dmol.js", timeout=2)
 except Exception as e:
-    print(f"Warning: Could not contact 3Dmol.js server: {e}")
-</div>
+    print(f"Warning: Could not contact 3Dmol.js server: {e}")</div>
 </div>
 </div>
 </div>
@@ -5617,7 +5617,9 @@ except Exception as e:
 <span class="n">structure_def</span> <span class="o">=</span> <span class="s2">"1-30:random"</span>
 
 <span class="c1"># Generate a single static structure (analogous to what a naive ML model might predict)</span>
-<span class="n">single_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">single_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">structure_def</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Single 'static' baseline structure generated!"</span><span class="p">)</span>
 </pre></div>
@@ -5627,7 +5629,9 @@ sequence = "GSGSGSGSSGGSGSGSSGSGGSGSGSSGGS"
 structure_def = "1-30:random"
 
 # Generate a single static structure (analogous to what a naive ML model might predict)
-single_pdb = generate_pdb_content(sequence_str=sequence, structure=structure_def, minimize_energy=False)
+single_pdb = generate_pdb_content(
+    sequence_str=sequence, structure=structure_def, minimize_energy=False
+)
 
 print("✅ Single 'static' baseline structure generated!")</div>
 </div>
@@ -5724,30 +5728,29 @@ print(f"✅ Ensemble of {len(ensemble_pdbs)} structures ready!")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">viewergrid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">linked</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">single_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'linewidth'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">viewergrid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">linked</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">single_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"blue"</span><span class="p">,</span> <span class="s2">"linewidth"</span><span class="p">:</span> <span class="mi">3</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
-<span class="k">for</span> <span class="n">pdb_data</span> <span class="ow">in</span> <span class="n">ensemble_pdbs</span><span class="p">[:</span><span class="mi">20</span><span class="p">]:</span> <span class="c1"># Show first 20 subsets for visual clarity</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_data</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">,</span> <span class="s1">'linewidth'</span><span class="p">:</span> <span class="mi">2</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">pdb_data</span> <span class="ow">in</span> <span class="n">ensemble_pdbs</span><span class="p">[:</span><span class="mi">20</span><span class="p">]:</span>  <span class="c1"># Show first 20 subsets for visual clarity</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">pdb_data</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">,</span> <span class="s2">"linewidth"</span><span class="p">:</span> <span class="mi">2</span><span class="p">}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Single Structure (Left) vs. Dynamic Ensemble (Right)"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">view = py3Dmol.view(width=800, height=300, viewergrid=(1,2), linked=False)
-view.addModel(single_pdb, 'pdb', viewer=(0,0))
-view.setStyle({'line': {'color': 'blue', 'linewidth': 3}}, viewer=(0,0))
-view.zoomTo(viewer=(0,0))
+<div class="clipboard-copy-txt" id="cell-6">view = py3Dmol.view(width=800, height=300, viewergrid=(1, 2), linked=False)
+view.addModel(single_pdb, "pdb", viewer=(0, 0))
+view.setStyle({"line": {"color": "blue", "linewidth": 3}}, viewer=(0, 0))
+view.zoomTo(viewer=(0, 0))
 
-for pdb_data in ensemble_pdbs[:20]: # Show first 20 subsets for visual clarity
-    view.addModel(pdb_data, 'pdb', viewer=(0,1))
-view.setStyle({'line': {'color': 'spectrum', 'linewidth': 2}}, viewer=(0,1))
-view.zoomTo(viewer=(0,1))
+for pdb_data in ensemble_pdbs[:20]:  # Show first 20 subsets for visual clarity
+    view.addModel(pdb_data, "pdb", viewer=(0, 1))
+view.setStyle({"line": {"color": "spectrum", "linewidth": 2}}, viewer=(0, 1))
+view.zoomTo(viewer=(0, 1))
 
-print("Single Structure (Left) vs. Dynamic Ensemble (Right)")
-</div>
+print("Single Structure (Left) vs. Dynamic Ensemble (Right)")</div>
 </div>
 </div>
 </div>
@@ -5790,8 +5793,7 @@ print("Single Structure (Left) vs. Dynamic Ensemble (Right)")
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7"># Render interactive widgets globally to avoid Jupyter context stripping
-view.show()
-</div>
+view.show()</div>
 </div>
 </div>
 </div>
@@ -5837,11 +5839,12 @@ view.show()
 <span class="sd">    Gamma is proportional to &lt;r^-6&gt;.</span>
 <span class="sd">    """</span>
     <span class="n">struct</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">pdb_str</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">ca_atoms</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="n">struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'CA'</span><span class="p">]</span>
+    <span class="n">ca_atoms</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="n">struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span>
 
     <span class="c1"># Get coordinates of the label site</span>
     <span class="n">label_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ca_atoms</span><span class="o">.</span><span class="n">res_id</span> <span class="o">==</span> <span class="n">label_resi</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca_atoms</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ca_atoms</span><span class="p">))</span>
     <span class="n">label_coord</span> <span class="o">=</span> <span class="n">ca_atoms</span><span class="o">.</span><span class="n">coord</span><span class="p">[</span><span class="n">label_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
     <span class="n">intensities</span> <span class="o">=</span> <span class="p">[]</span>
@@ -5853,7 +5856,7 @@ view.show()
 
         <span class="c1"># Phenomenological 1/r^6 relaxation rate addition</span>
         <span class="c1"># Calibrated numerically to give I/I0 ~ 0.5 at 15 Angstroms</span>
-        <span class="n">pre_rate</span> <span class="o">=</span> <span class="mf">1.1e8</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span> <span class="o">**</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">pre_rate</span> <span class="o">=</span> <span class="mf">1.1e8</span> <span class="o">/</span> <span class="p">(</span><span class="n">r</span><span class="o">**</span><span class="mi">6</span><span class="p">)</span>
 
         <span class="c1"># Intensity ratio I/I0 = R2 / (R2 + Gamma)</span>
         <span class="c1"># We assume intrinsic R2 of 10 Hz for an unfolded polypeptide</span>
@@ -5861,6 +5864,7 @@ view.show()
         <span class="n">intensities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i_ratio</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensities</span><span class="p">)</span>
+
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Phenomenological PRE 1/r^6 physics engine initialized."</span><span class="p">)</span>
 </pre></div>
@@ -5870,11 +5874,12 @@ view.show()
     Gamma is proportional to <r^-6>.
     """
     struct = pdb.PDBFile.read(io.StringIO(pdb_str)).get_structure(model=1)
-    ca_atoms = struct[struct.atom_name == 'CA']
+    ca_atoms = struct[struct.atom_name == "CA"]
 
     # Get coordinates of the label site
     label_idx = np.where(ca_atoms.res_id == label_resi)[0]
-    if len(label_idx) == 0: return np.ones(len(ca_atoms))
+    if len(label_idx) == 0:
+        return np.ones(len(ca_atoms))
     label_coord = ca_atoms.coord[label_idx[0]]
 
     intensities = []
@@ -5886,7 +5891,7 @@ view.show()
 
         # Phenomenological 1/r^6 relaxation rate addition
         # Calibrated numerically to give I/I0 ~ 0.5 at 15 Angstroms
-        pre_rate = 1.1e8 / (r ** 6)
+        pre_rate = 1.1e8 / (r**6)
 
         # Intensity ratio I/I0 = R2 / (R2 + Gamma)
         # We assume intrinsic R2 of 10 Hz for an unfolded polypeptide
@@ -5894,6 +5899,7 @@ view.show()
         intensities.append(i_ratio)
 
     return np.array(intensities)
+
 
 print("✅ Phenomenological PRE 1/r^6 physics engine initialized.")</r^-6></div>
 </div>
@@ -5942,8 +5948,7 @@ ensemble_pres = [calculate_pre_profile(p) for p in ensemble_pdbs]
 # Crucially, NMR averages in the fast-exchange limit, meaning the RATES average,
 # not the final intensities. For simplicity in this tutorial, we visualize the
 # direct average of the profiles to see the long-range smearing effect.
-averaged_pre = np.mean(ensemble_pres, axis=0)
-</div>
+averaged_pre = np.mean(ensemble_pres, axis=0)</div>
 </div>
 </div>
 </div>
@@ -5983,18 +5988,32 @@ averaged_pre = np.mean(ensemble_pres, axis=0)
 
 <span class="c1"># Plot all individual ensemble microstates lightly in the background</span>
 <span class="k">for</span> <span class="n">pre</span> <span class="ow">in</span> <span class="n">ensemble_pres</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">pre</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">pre</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># Plot the single static structure</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">single_pre</span><span class="p">,</span> <span class="s1">'b--o'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Single Static Model (Fails to match NMR)"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+    <span class="n">single_pre</span><span class="p">,</span>
+    <span class="s2">"b--o"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Single Static Model (Fails to match NMR)"</span><span class="p">,</span>
+    <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Plot the Ensemble Average</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span> <span class="n">averaged_pre</span><span class="p">,</span> <span class="s1">'r-s'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Ensemble Average (Matches in vitro NMR)"</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+    <span class="n">averaged_pre</span><span class="p">,</span>
+    <span class="s2">"r-s"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Ensemble Average (Matches in vitro NMR)"</span><span class="p">,</span>
+    <span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">':'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Spin Label Site (Residue 15)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Spin Label Site (Residue 15)"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Residue Number"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"PRE Intensity Ratio $(I/I_0)$"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"The Need for Ensembles: PRE Profiles in IDPs"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"The Need for Ensembles: PRE Profiles in IDPs"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
@@ -6016,18 +6035,32 @@ averaged_pre = np.mean(ensemble_pres, axis=0)
 
 # Plot all individual ensemble microstates lightly in the background
 for pre in ensemble_pres:
-    plt.plot(range(1, 31), pre, color='gray', alpha=0.15, linewidth=1)
+    plt.plot(range(1, 31), pre, color="gray", alpha=0.15, linewidth=1)
 
 # Plot the single static structure
-plt.plot(range(1, 31), single_pre, 'b--o', label="Single Static Model (Fails to match NMR)", markersize=6, linewidth=2)
+plt.plot(
+    range(1, 31),
+    single_pre,
+    "b--o",
+    label="Single Static Model (Fails to match NMR)",
+    markersize=6,
+    linewidth=2,
+)
 
 # Plot the Ensemble Average
-plt.plot(range(1, 31), averaged_pre, 'r-s', label="Ensemble Average (Matches in vitro NMR)", markersize=8, linewidth=3)
+plt.plot(
+    range(1, 31),
+    averaged_pre,
+    "r-s",
+    label="Ensemble Average (Matches in vitro NMR)",
+    markersize=8,
+    linewidth=3,
+)
 
-plt.axvline(15, color='black', linestyle=':', label='Spin Label Site (Residue 15)')
+plt.axvline(15, color="black", linestyle=":", label="Spin Label Site (Residue 15)")
 plt.xlabel("Residue Number", fontsize=12)
 plt.ylabel("PRE Intensity Ratio $(I/I_0)$", fontsize=12)
-plt.title("The Need for Ensembles: PRE Profiles in IDPs", fontsize=14, fontweight='bold')
+plt.title("The Need for Ensembles: PRE Profiles in IDPs", fontsize=14, fontweight="bold")
 plt.legend(fontsize=10)
 plt.grid(alpha=0.3)
 plt.xlim(1, 30)
@@ -6094,11 +6127,14 @@ print("generation to model disordered biology.")</div>
 <span class="n">avg_intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">all_intensities</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Calculate averaged dimensions</span>
-<span class="n">rg_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">calculate_radius_of_gyration</span><span class="p">(</span><span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">ensemble_pdbs</span><span class="p">]</span>
+<span class="n">rg_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">calculate_radius_of_gyration</span><span class="p">(</span><span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">ensemble_pdbs</span>
+<span class="p">]</span>
 <span class="n">avg_rg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rg_list</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">avg_intensity</span><span class="p">,</span> <span class="s1">'r-'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"IDP Ensemble Average"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">avg_intensity</span><span class="p">,</span> <span class="s2">"r-"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"IDP Ensemble Average"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"q (Å⁻¹)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"$q^2 \cdot I(q)$"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Kratky Plot (IDP Simulation) | Average $R_g$ = </span><span class="si">{</span><span class="n">avg_rg</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
@@ -6125,11 +6161,14 @@ for pdb_str in ensemble_pdbs:
 avg_intensity = np.mean(all_intensities, axis=0)
 
 # Calculate averaged dimensions
-rg_list = [calculate_radius_of_gyration(pdb.PDBFile.read(io.StringIO(p)).get_structure(model=1)) for p in ensemble_pdbs]
+rg_list = [
+    calculate_radius_of_gyration(pdb.PDBFile.read(io.StringIO(p)).get_structure(model=1))
+    for p in ensemble_pdbs
+]
 avg_rg = np.mean(rg_list)
 
 plt.figure(figsize=(10, 5))
-plt.plot(q, (q**2) * avg_intensity, 'r-', linewidth=3, label="IDP Ensemble Average")
+plt.plot(q, (q**2) * avg_intensity, "r-", linewidth=3, label="IDP Ensemble Average")
 plt.xlabel("q (Å⁻¹)", fontsize=12)
 plt.ylabel(r"$q^2 \cdot I(q)$", fontsize=12)
 plt.title(f"Kratky Plot (IDP Simulation) | Average $R_g$ = {avg_rg:.2f} Å", fontsize=14)

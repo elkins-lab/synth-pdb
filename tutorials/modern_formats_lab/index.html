@@ -5296,14 +5296,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in Google Colab - Installing dependencies..."</span><span class="p">)</span>
     <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"[INFO] Running in local environment"</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span><span class="p">,</span> <span class="n">PeptideResult</span>
 
@@ -5316,14 +5316,14 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     print("[INFO] Running in Google Colab - Installing dependencies...")
     %pip install -q synth-pdb biotite
 else:
     print("[INFO] Running in local environment")
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 from synth_pdb.generator import generate_pdb_content, PeptideResult
 
@@ -5442,9 +5442,9 @@ if n_atoms &gt; 99999:
 <span class="n">cif_text</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">test_len</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">"cif"</span><span class="p">)</span>
 <span class="n">bcif_bin</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">test_len</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">"bcif"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[MEASURE] mmCIF Size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cif_text</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> KB"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[MEASURE] BinaryCIF Size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bcif_bin</span><span class="p">)</span><span class="o">/</span><span class="mi">1024</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> KB"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[RESULT] Compression Ratio: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cif_text</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">bcif_bin</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[MEASURE] mmCIF Size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cif_text</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> KB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[MEASURE] BinaryCIF Size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bcif_bin</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1024</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> KB"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[RESULT] Compression Ratio: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cif_text</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">bcif_bin</span><span class="p">)</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x"</span><span class="p">)</span>
 
 <span class="c1"># 2. Compare Parsing Speed</span>
 <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -5457,7 +5457,7 @@ if n_atoms &gt; 99999:
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">[SPEED] mmCIF Parse: </span><span class="si">{</span><span class="n">t_cif</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[SPEED] BinaryCIF Parse: </span><span class="si">{</span><span class="n">t_bcif</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[RESULT] BinaryCIF is </span><span class="si">{</span><span class="n">t_cif</span><span class="o">/</span><span class="n">t_bcif</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x faster to parse!"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[RESULT] BinaryCIF is </span><span class="si">{</span><span class="n">t_cif</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">t_bcif</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x faster to parse!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import time
 
@@ -5466,9 +5466,9 @@ test_len = 1000 if TEST_MODE else 5000
 cif_text = generate_pdb_content(length=test_len, output_format="cif")
 bcif_bin = generate_pdb_content(length=test_len, output_format="bcif")
 
-print(f"[MEASURE] mmCIF Size: {len(cif_text)/1024:.1f} KB")
-print(f"[MEASURE] BinaryCIF Size: {len(bcif_bin)/1024:.1f} KB")
-print(f"[RESULT] Compression Ratio: {len(cif_text)/len(bcif_bin):.1f}x")
+print(f"[MEASURE] mmCIF Size: {len(cif_text) / 1024:.1f} KB")
+print(f"[MEASURE] BinaryCIF Size: {len(bcif_bin) / 1024:.1f} KB")
+print(f"[RESULT] Compression Ratio: {len(cif_text) / len(bcif_bin):.1f}x")
 
 # 2. Compare Parsing Speed
 start = time.time()
@@ -5481,7 +5481,7 @@ t_bcif = time.time() - start
 
 print(f"\n[SPEED] mmCIF Parse: {t_cif:.4f}s")
 print(f"[SPEED] BinaryCIF Parse: {t_bcif:.4f}s")
-print(f"[RESULT] BinaryCIF is {t_cif/t_bcif:.1f}x faster to parse!")</div>
+print(f"[RESULT] BinaryCIF is {t_cif / t_bcif:.1f}x faster to parse!")</div>
 </div>
 </div>
 </div>

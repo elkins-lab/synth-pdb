@@ -5212,13 +5212,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">struc</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">mrcfile</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">biotite</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="c1"># Local development path</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.batch_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchedGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.cryo_em</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_density_map</span><span class="p">,</span> <span class="n">save_mrc_file</span>
@@ -5235,13 +5235,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import biotite.structure as struc
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     !pip install -q synth-pdb mrcfile matplotlib numpy scipy biotite
 else:
     # Local development path
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 from synth_pdb.batch_generator import BatchedGenerator
 from synth_pdb.cryo_em import generate_density_map, save_mrc_file
@@ -5288,7 +5288,7 @@ print("✅ Environment configured!")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">seq</span> <span class="o">=</span> <span class="s2">"MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"</span> <span class="c1"># Ubiquitin</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">seq</span> <span class="o">=</span> <span class="s2">"MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"</span>  <span class="c1"># Ubiquitin</span>
 <span class="n">n_models</span> <span class="o">=</span> <span class="mi">50</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 Generating Folded Ensemble (Alpha Helix)..."</span><span class="p">)</span>
@@ -5297,11 +5297,13 @@ print("✅ Environment configured!")</div>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 Generating Disordered Ensemble (IDP-like)..."</span><span class="p">)</span>
 <span class="n">bg_disordered</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="n">n_models</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ensemble_disordered</span> <span class="o">=</span> <span class="n">bg_disordered</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
+<span class="n">ensemble_disordered</span> <span class="o">=</span> <span class="n">bg_disordered</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span>
+    <span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">drift</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_stack</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Generated two ensembles with </span><span class="si">{</span><span class="n">n_models</span><span class="si">}</span><span class="s2"> models each."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">seq = "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG" # Ubiquitin
+<div class="clipboard-copy-txt" id="cell-2">seq = "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"  # Ubiquitin
 n_models = 50
 
 print("🚀 Generating Folded Ensemble (Alpha Helix)...")
@@ -5310,7 +5312,9 @@ ensemble_folded = bg_folded.generate_batch(conformation="alpha", drift=1.0, seed
 
 print("🚀 Generating Disordered Ensemble (IDP-like)...")
 bg_disordered = BatchedGenerator(seq, n_batch=n_models, full_atom=True)
-ensemble_disordered = bg_disordered.generate_batch(conformation="random", drift=10.0, seed=42).to_stack()
+ensemble_disordered = bg_disordered.generate_batch(
+    conformation="random", drift=10.0, seed=42
+).to_stack()
 
 print(f"✅ Generated two ensembles with {n_models} models each.")</div>
 </div>
@@ -5360,16 +5364,17 @@ print(f"✅ Generated two ensembles with {n_models} models each.")</div>
         <span class="n">intensities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">intensities</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
+
 <span class="n">q</span><span class="p">,</span> <span class="n">i_folded</span> <span class="o">=</span> <span class="n">get_avg_saxs</span><span class="p">(</span><span class="n">ensemble_folded</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">i_disordered</span> <span class="o">=</span> <span class="n">get_avg_saxs</span><span class="p">(</span><span class="n">ensemble_disordered</span><span class="p">)</span>
 
 <span class="c1"># Visualize both in a professional Kratky plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_folded</span><span class="p">,</span> <span class="s1">'g-'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Folded (Alpha Helix)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_disordered</span><span class="p">,</span> <span class="s1">'r--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Disordered (Random Coil)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'q (Å⁻¹)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">'$q^2 \cdot I(q)$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Kratky Plot: Folded vs. Disordered Ensembles'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_folded</span><span class="p">,</span> <span class="s2">"g-"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Folded (Alpha Helix)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="p">(</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">i_disordered</span><span class="p">,</span> <span class="s2">"r--"</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Disordered (Random Coil)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"q (Å⁻¹)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"$q^2 \cdot I(q)$"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Kratky Plot: Folded vs. Disordered Ensembles"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5381,16 +5386,17 @@ print(f"✅ Generated two ensembles with {n_models} models each.")</div>
         intensities.append(I)
     return q, np.mean(intensities, axis=0)
 
+
 q, i_folded = get_avg_saxs(ensemble_folded)
 _, i_disordered = get_avg_saxs(ensemble_disordered)
 
 # Visualize both in a professional Kratky plot
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(q, (q**2) * i_folded, 'g-', linewidth=2, label='Folded (Alpha Helix)')
-ax.plot(q, (q**2) * i_disordered, 'r--', linewidth=2, label='Disordered (Random Coil)')
-ax.set_xlabel('q (Å⁻¹)', fontsize=12)
-ax.set_ylabel(r'$q^2 \cdot I(q)$', fontsize=12)
-ax.set_title('Kratky Plot: Folded vs. Disordered Ensembles', fontsize=14)
+ax.plot(q, (q**2) * i_folded, "g-", linewidth=2, label="Folded (Alpha Helix)")
+ax.plot(q, (q**2) * i_disordered, "r--", linewidth=2, label="Disordered (Random Coil)")
+ax.set_xlabel("q (Å⁻¹)", fontsize=12)
+ax.set_ylabel(r"$q^2 \cdot I(q)$", fontsize=12)
+ax.set_title("Kratky Plot: Folded vs. Disordered Ensembles", fontsize=14)
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.show()</div>
@@ -5436,7 +5442,9 @@ plt.show()</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Average Rg (Disordered): </span><span class="si">{</span><span class="n">rg_disordered</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">rg_disordered</span> <span class="o">&gt;</span> <span class="n">rg_folded</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💡 As expected, the disordered ensemble occupies a much larger volume than the compact helix!"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">"</span><span class="se">\n</span><span class="s2">💡 As expected, the disordered ensemble occupies a much larger volume than the compact helix!"</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">rg_folded = np.mean([calculate_radius_of_gyration(m) for m in ensemble_folded])
 rg_disordered = np.mean([calculate_radius_of_gyration(m) for m in ensemble_disordered])
@@ -5445,7 +5453,9 @@ print(f"Average Rg (Folded):     {rg_folded:.2f} Å")
 print(f"Average Rg (Disordered): {rg_disordered:.2f} Å")
 
 if rg_disordered &gt; rg_folded:
-    print("\n💡 As expected, the disordered ensemble occupies a much larger volume than the compact helix!")</div>
+    print(
+        "\n💡 As expected, the disordered ensemble occupies a much larger volume than the compact helix!"
+    )</div>
 </div>
 </div>
 </div>
@@ -5488,13 +5498,13 @@ if rg_disordered &gt; rg_folded:
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">density_folded</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Folded Ensemble (</span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s1">Å)</span><span class="se">\n</span><span class="s1">Clear Helical Envelope'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">density_folded</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"magma"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Folded Ensemble (</span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s2">Å)</span><span class="se">\n</span><span class="s2">Clear Helical Envelope"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
 
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">density_disordered</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'magma'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Disordered Ensemble (</span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s1">Å)</span><span class="se">\n</span><span class="s1">Smeared/Diffuse Density'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">density_disordered</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"magma"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Disordered Ensemble (</span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s2">Å)</span><span class="se">\n</span><span class="s2">Smeared/Diffuse Density"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"off"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5508,13 +5518,13 @@ density_disordered, origin = generate_density_map(ensemble_disordered, resolutio
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-axes[0].imshow(np.max(density_folded, axis=0), cmap='magma')
-axes[0].set_title(f'Folded Ensemble ({res}Å)\nClear Helical Envelope')
-axes[0].axis('off')
+axes[0].imshow(np.max(density_folded, axis=0), cmap="magma")
+axes[0].set_title(f"Folded Ensemble ({res}Å)\nClear Helical Envelope")
+axes[0].axis("off")
 
-axes[1].imshow(np.max(density_disordered, axis=0), cmap='magma')
-axes[1].set_title(f'Disordered Ensemble ({res}Å)\nSmeared/Diffuse Density')
-axes[1].axis('off')
+axes[1].imshow(np.max(density_disordered, axis=0), cmap="magma")
+axes[1].set_title(f"Disordered Ensemble ({res}Å)\nSmeared/Diffuse Density")
+axes[1].axis("off")
 
 plt.tight_layout()
 plt.show()

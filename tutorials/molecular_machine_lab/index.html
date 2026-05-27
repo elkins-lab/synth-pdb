@@ -5116,26 +5116,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5172,7 +5172,7 @@ print("✅ Environment configured!")</div>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
 <span class="c1"># Create a directory to store our trajectory</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'hinge_trajectory'</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">"hinge_trajectory"</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 import numpy as np
@@ -5184,7 +5184,7 @@ from synth_pdb.cd_simulator import CDSimulator
 import tempfile
 
 # Create a directory to store our trajectory
-os.makedirs('hinge_trajectory', exist_ok=True)</div>
+os.makedirs("hinge_trajectory", exist_ok=True)</div>
 </div>
 </div>
 </div>
@@ -5224,57 +5224,51 @@ os.makedirs('hinge_trajectory', exist_ok=True)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s1">'AEQLLKALEQA'</span> <span class="o">+</span> <span class="s1">'GGSGG'</span> <span class="o">+</span> <span class="s1">'AEQLLKALEQA'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"AEQLLKALEQA"</span> <span class="o">+</span> <span class="s2">"GGSGG"</span> <span class="o">+</span> <span class="s2">"AEQLLKALEQA"</span>
 
 <span class="c1"># State A: Open Hinge</span>
-<span class="n">open_spec</span> <span class="o">=</span> <span class="s1">'1-11:alpha,12-16:extended,17-27:alpha'</span>
+<span class="n">open_spec</span> <span class="o">=</span> <span class="s2">"1-11:alpha,12-16:extended,17-27:alpha"</span>
 <span class="n">open_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
-    <span class="n">conformation</span><span class="o">=</span><span class="s1">'alpha'</span><span class="p">,</span> <span class="c1"># fallback</span>
+    <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span>  <span class="c1"># fallback</span>
     <span class="n">structure</span><span class="o">=</span><span class="n">open_spec</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'hinge_trajectory/open_state.pdb'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"hinge_trajectory/open_state.pdb"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">open_pdb</span><span class="p">)</span>
 
 <span class="c1"># State B: Closed Hinge</span>
-<span class="n">closed_spec</span> <span class="o">=</span> <span class="s1">'1-11:alpha,12-16:random,17-27:alpha'</span> <span class="c1"># random for flexibility, or we can use beta turn, let's use beta-turn if available or just random</span>
+<span class="n">closed_spec</span> <span class="o">=</span> <span class="s2">"1-11:alpha,12-16:random,17-27:alpha"</span>  <span class="c1"># random for flexibility, or we can use beta turn, let's use beta-turn if available or just random</span>
 <span class="n">closed_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
-    <span class="n">conformation</span><span class="o">=</span><span class="s1">'alpha'</span><span class="p">,</span>
-    <span class="n">structure</span><span class="o">=</span><span class="n">closed_spec</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">closed_spec</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'hinge_trajectory/closed_state.pdb'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"hinge_trajectory/closed_state.pdb"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">closed_pdb</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Generated Open and Closed states.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Generated Open and Closed states."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">sequence = 'AEQLLKALEQA' + 'GGSGG' + 'AEQLLKALEQA'
+<div class="clipboard-copy-txt" id="cell-3">sequence = "AEQLLKALEQA" + "GGSGG" + "AEQLLKALEQA"
 
 # State A: Open Hinge
-open_spec = '1-11:alpha,12-16:extended,17-27:alpha'
+open_spec = "1-11:alpha,12-16:extended,17-27:alpha"
 open_pdb = generate_pdb_content(
     sequence_str=sequence,
-    conformation='alpha', # fallback
+    conformation="alpha",  # fallback
     structure=open_spec,
-    minimize_energy=True
+    minimize_energy=True,
 )
-with open('hinge_trajectory/open_state.pdb', 'w') as f:
+with open("hinge_trajectory/open_state.pdb", "w") as f:
     f.write(open_pdb)
 
 # State B: Closed Hinge
-closed_spec = '1-11:alpha,12-16:random,17-27:alpha' # random for flexibility, or we can use beta turn, let's use beta-turn if available or just random
+closed_spec = "1-11:alpha,12-16:random,17-27:alpha"  # random for flexibility, or we can use beta turn, let's use beta-turn if available or just random
 closed_pdb = generate_pdb_content(
-    sequence_str=sequence,
-    conformation='alpha',
-    structure=closed_spec,
-    minimize_energy=True
+    sequence_str=sequence, conformation="alpha", structure=closed_spec, minimize_energy=True
 )
-with open('hinge_trajectory/closed_state.pdb', 'w') as f:
+with open("hinge_trajectory/closed_state.pdb", "w") as f:
     f.write(closed_pdb)
 
-print('Generated Open and Closed states.')</div>
+print("Generated Open and Closed states.")</div>
 </div>
 </div>
 </div>
@@ -5311,28 +5305,28 @@ print('Generated Open and Closed states.')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">steps</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">output_prefix</span> <span class="o">=</span> <span class="s1">'hinge_trajectory/morph'</span>
+<span class="n">output_prefix</span> <span class="o">=</span> <span class="s2">"hinge_trajectory/morph"</span>
 
 <span class="c1"># Perform linear interpolation in torsion space</span>
 <span class="n">interpolate_structures</span><span class="p">(</span>
-    <span class="s1">'hinge_trajectory/open_state.pdb'</span><span class="p">,</span>
-    <span class="s1">'hinge_trajectory/closed_state.pdb'</span><span class="p">,</span>
+    <span class="s2">"hinge_trajectory/open_state.pdb"</span><span class="p">,</span>
+    <span class="s2">"hinge_trajectory/closed_state.pdb"</span><span class="p">,</span>
     <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
-    <span class="n">output_prefix</span><span class="o">=</span><span class="n">output_prefix</span>
+    <span class="n">output_prefix</span><span class="o">=</span><span class="n">output_prefix</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Trajectory generation complete.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Trajectory generation complete."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">steps = 10
-output_prefix = 'hinge_trajectory/morph'
+output_prefix = "hinge_trajectory/morph"
 
 # Perform linear interpolation in torsion space
 interpolate_structures(
-    'hinge_trajectory/open_state.pdb',
-    'hinge_trajectory/closed_state.pdb',
+    "hinge_trajectory/open_state.pdb",
+    "hinge_trajectory/closed_state.pdb",
     steps=steps,
-    output_prefix=output_prefix
+    output_prefix=output_prefix,
 )
-print('Trajectory generation complete.')</div>
+print("Trajectory generation complete.")</div>
 </div>
 </div>
 </div>
@@ -5372,18 +5366,18 @@ print('Trajectory generation complete.')</div>
 <span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="n">frame_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.pdb'</span>
+    <span class="n">frame_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">output_prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.pdb"</span>
     <span class="n">pdb_file</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">frame_path</span><span class="p">)</span>
     <span class="n">structure</span> <span class="o">=</span> <span class="n">pdb_file</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">cd_sim</span> <span class="o">=</span> <span class="n">CDSimulator</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
-    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">cd_sim</span><span class="o">.</span><span class="n">get_spectrum</span><span class="p">(</span><span class="n">noise_level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># remove noise for clear trend</span>
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">cd_sim</span><span class="o">.</span><span class="n">get_spectrum</span><span class="p">(</span><span class="n">noise_level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># remove noise for clear trend</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">190</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Frame </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">190</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">spectrum</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Frame </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'Dynamic CD Spectra during Hinge Motion'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'Wavelength (nm)'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Molar Ellipticity'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Dynamic CD Spectra during Hinge Motion"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Wavelength (nm)"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Molar Ellipticity"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -5391,18 +5385,18 @@ print('Trajectory generation complete.')</div>
 colors = plt.cm.viridis(np.linspace(0, 1, steps + 1))
 
 for i in range(steps + 1):
-    frame_path = f'{output_prefix}_{i}.pdb'
+    frame_path = f"{output_prefix}_{i}.pdb"
     pdb_file = pdb.PDBFile.read(frame_path)
     structure = pdb_file.get_structure(model=1)
 
     cd_sim = CDSimulator(structure)
-    spectrum = cd_sim.get_spectrum(noise_level=0) # remove noise for clear trend
+    spectrum = cd_sim.get_spectrum(noise_level=0)  # remove noise for clear trend
 
-    plt.plot(np.arange(190, 251, 1), spectrum, color=colors[i], alpha=0.7, label=f'Frame {i}')
+    plt.plot(np.arange(190, 251, 1), spectrum, color=colors[i], alpha=0.7, label=f"Frame {i}")
 
-plt.title('Dynamic CD Spectra during Hinge Motion')
-plt.xlabel('Wavelength (nm)')
-plt.ylabel('Molar Ellipticity')
+plt.title("Dynamic CD Spectra during Hinge Motion")
+plt.xlabel("Wavelength (nm)")
+plt.ylabel("Molar Ellipticity")
 plt.grid(alpha=0.3)
 plt.show()</div>
 </div>

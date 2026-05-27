@@ -5403,10 +5403,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
     <span class="k">pass</span>
 
-<span class="k">if</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
+<span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">get_ipython</span><span class="p">()):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Running on Google Colab. Installing dependencies..."</span><span class="p">)</span>
-        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install synth-pdb numpy matplotlib py3Dmol biotite'</span><span class="p">)</span>
+        <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_line_magic</span><span class="p">(</span><span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install synth-pdb numpy matplotlib py3Dmol biotite"</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"installed.marker"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
@@ -5417,6 +5417,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dependencies Ready."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Running locally. Using synth-pdb version: </span><span class="si">{</span><span class="n">synth_pdb</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># @title Setup &amp; Installation { display-mode: "form" }
@@ -5434,10 +5435,10 @@ try:
 except Exception:
     pass
 
-if 'google.colab' in str(get_ipython()):
+if "google.colab" in str(get_ipython()):
     if not os.path.exists("installed.marker"):
         print("Running on Google Colab. Installing dependencies...")
-        get_ipython().run_line_magic('pip', 'install synth-pdb numpy matplotlib py3Dmol biotite')
+        get_ipython().run_line_magic("pip", "install synth-pdb numpy matplotlib py3Dmol biotite")
 
         with open("installed.marker", "w") as f:
             f.write("done")
@@ -5448,8 +5449,8 @@ if 'google.colab' in str(get_ipython()):
         print("✅ Dependencies Ready.")
 else:
     import synth_pdb
-    print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__}")
-</div>
+
+    print(f"✅ Running locally. Using synth-pdb version: {synth_pdb.__version__}")</div>
 </div>
 </div>
 </div>
@@ -5484,8 +5485,7 @@ else:
 
 from synth_pdb.batch_generator import BatchedGenerator
 
-print("Geometric kernels loaded. Ready to compute orientograms. 📐")
-</div>
+print("Geometric kernels loaded. Ready to compute orientograms. 📐")</div>
 </div>
 </div>
 </div>
@@ -5526,9 +5526,9 @@ print("Geometric kernels loaded. Ready to compute orientograms. 📐")
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"ALA-VAL-LEU-ILE-SER-GLY-MET-TRP"</span> <span class="o">*</span> <span class="mi">4</span> <span class="c1"># 32 residues</span>
-<span class="n">generator</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Backbone only</span>
-<span class="n">batch</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s1">'beta'</span><span class="p">)</span> <span class="c1"># Beta sheets have distinctive 6D signals</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">sequence</span> <span class="o">=</span> <span class="s2">"ALA-VAL-LEU-ILE-SER-GLY-MET-TRP"</span> <span class="o">*</span> <span class="mi">4</span>  <span class="c1"># 32 residues</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">BatchedGenerator</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">n_batch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">full_atom</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># Backbone only</span>
+<span class="n">batch</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate_batch</span><span class="p">(</span><span class="n">conformation</span><span class="o">=</span><span class="s2">"beta"</span><span class="p">)</span>  <span class="c1"># Beta sheets have distinctive 6D signals</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Structure Batch Generated."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Computing 6D Orientations..."</span><span class="p">)</span>
@@ -5537,17 +5537,16 @@ print("Geometric kernels loaded. Ready to compute orientograms. 📐")
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Orientations computed for </span><span class="si">{</span><span class="n">batch</span><span class="o">.</span><span class="n">n_residues</span><span class="si">}</span><span class="s2"> residues."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Tensors available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">orientations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">sequence = "ALA-VAL-LEU-ILE-SER-GLY-MET-TRP" * 4 # 32 residues
-generator = BatchedGenerator(sequence, n_batch=1, full_atom=False) # Backbone only
-batch = generator.generate_batch(conformation='beta') # Beta sheets have distinctive 6D signals
+<div class="clipboard-copy-txt" id="cell-3">sequence = "ALA-VAL-LEU-ILE-SER-GLY-MET-TRP" * 4  # 32 residues
+generator = BatchedGenerator(sequence, n_batch=1, full_atom=False)  # Backbone only
+batch = generator.generate_batch(conformation="beta")  # Beta sheets have distinctive 6D signals
 
 print("Structure Batch Generated.")
 print("Computing 6D Orientations...")
 
 orientations = batch.get_6d_orientations()
 print(f"Orientations computed for {batch.n_residues} residues.")
-print(f"Tensors available: {list(orientations.keys())}")
-</div>
+print(f"Tensors available: {list(orientations.keys())}")</div>
 </div>
 </div>
 </div>
@@ -5601,28 +5600,30 @@ Below we plot the four tensors as $L \times L$ heatmaps.</li>
 
 <span class="c1"># Using raw strings (r"...") to ensure Python 3.12 compatibility with LaTeX</span>
 <span class="n">titles</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'dist'</span><span class="p">:</span> <span class="sa">r</span><span class="s1">'A. Distance Map (C-beta) ($d$) [$\AA$]'</span><span class="p">,</span>
-    <span class="s1">'omega'</span><span class="p">:</span> <span class="sa">r</span><span class="s1">'B. Omega Dihedral (Torsion) ($\omega$) [$^\circ$]'</span><span class="p">,</span>
-    <span class="s1">'theta'</span><span class="p">:</span> <span class="sa">r</span><span class="s1">'C. Theta Angle (Plane) ($\theta$) [$^\circ$]'</span><span class="p">,</span>
-    <span class="s1">'phi'</span><span class="p">:</span> <span class="sa">r</span><span class="s1">'D. Phi Dihedral (Polar) ($\phi$) [$^\circ$]'</span>
+    <span class="s2">"dist"</span><span class="p">:</span> <span class="sa">r</span><span class="s2">"A. Distance Map (C-beta) ($d$) [$\AA$]"</span><span class="p">,</span>
+    <span class="s2">"omega"</span><span class="p">:</span> <span class="sa">r</span><span class="s2">"B. Omega Dihedral (Torsion) ($\omega$) [$^\circ$]"</span><span class="p">,</span>
+    <span class="s2">"theta"</span><span class="p">:</span> <span class="sa">r</span><span class="s2">"C. Theta Angle (Plane) ($\theta$) [$^\circ$]"</span><span class="p">,</span>
+    <span class="s2">"phi"</span><span class="p">:</span> <span class="sa">r</span><span class="s2">"D. Phi Dihedral (Polar) ($\phi$) [$^\circ$]"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">cmaps</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'dist'</span><span class="p">:</span> <span class="s1">'viridis_r'</span><span class="p">,</span> <span class="s1">'omega'</span><span class="p">:</span> <span class="s1">'hsv'</span><span class="p">,</span> <span class="s1">'theta'</span><span class="p">:</span> <span class="s1">'magma'</span><span class="p">,</span> <span class="s1">'phi'</span><span class="p">:</span> <span class="s1">'twilight'</span><span class="p">}</span>
+<span class="n">cmaps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"dist"</span><span class="p">:</span> <span class="s2">"viridis_r"</span><span class="p">,</span> <span class="s2">"omega"</span><span class="p">:</span> <span class="s2">"hsv"</span><span class="p">,</span> <span class="s2">"theta"</span><span class="p">:</span> <span class="s2">"magma"</span><span class="p">,</span> <span class="s2">"phi"</span><span class="p">:</span> <span class="s2">"twilight"</span><span class="p">}</span>
 
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">'dist'</span><span class="p">,</span> <span class="s1">'omega'</span><span class="p">,</span> <span class="s1">'theta'</span><span class="p">,</span> <span class="s1">'phi'</span><span class="p">]):</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">"dist"</span><span class="p">,</span> <span class="s2">"omega"</span><span class="p">,</span> <span class="s2">"theta"</span><span class="p">,</span> <span class="s2">"phi"</span><span class="p">]):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">orientations</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># First batch member</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">orientations</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># First batch member</span>
 
-    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">'dist'</span><span class="p">:</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span> <span class="c1"># Cap distance for visual clarity</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"dist"</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span>  <span class="c1"># Cap distance for visual clarity</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># For periodic angles, clarify -180 to 180</span>
         <span class="c1"># Angular values wrap from -180 to 180</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">180</span><span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titles</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titles</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"The 6D Orientogram: A 'Computer Vision' View of Protein Structure"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s2">"The 6D Orientogram: A 'Computer Vision' View of Protein Structure"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.95</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">fig, axes = plt.subplots(2, 2, figsize=(12, 11))
@@ -5630,28 +5631,30 @@ plt.subplots_adjust(hspace=0.3, wspace=0.2)
 
 # Using raw strings (r"...") to ensure Python 3.12 compatibility with LaTeX
 titles = {
-    'dist': r'A. Distance Map (C-beta) ($d$) [$\AA$]',
-    'omega': r'B. Omega Dihedral (Torsion) ($\omega$) [$^\circ$]',
-    'theta': r'C. Theta Angle (Plane) ($\theta$) [$^\circ$]',
-    'phi': r'D. Phi Dihedral (Polar) ($\phi$) [$^\circ$]'
+    "dist": r"A. Distance Map (C-beta) ($d$) [$\AA$]",
+    "omega": r"B. Omega Dihedral (Torsion) ($\omega$) [$^\circ$]",
+    "theta": r"C. Theta Angle (Plane) ($\theta$) [$^\circ$]",
+    "phi": r"D. Phi Dihedral (Polar) ($\phi$) [$^\circ$]",
 }
-cmaps = {'dist': 'viridis_r', 'omega': 'hsv', 'theta': 'magma', 'phi': 'twilight'}
+cmaps = {"dist": "viridis_r", "omega": "hsv", "theta": "magma", "phi": "twilight"}
 
-for i, key in enumerate(['dist', 'omega', 'theta', 'phi']):
+for i, key in enumerate(["dist", "omega", "theta", "phi"]):
     ax = axes[i // 2, i % 2]
-    data = orientations[key][0] # First batch member
+    data = orientations[key][0]  # First batch member
 
-    if key == 'dist':
-        im = ax.imshow(data, cmap=cmaps[key], vmax=15.0) # Cap distance for visual clarity
+    if key == "dist":
+        im = ax.imshow(data, cmap=cmaps[key], vmax=15.0)  # Cap distance for visual clarity
     else:
         # For periodic angles, clarify -180 to 180
         # Angular values wrap from -180 to 180
         im = ax.imshow(data, cmap=cmaps[key], vmin=-180, vmax=180)
 
-    ax.set_title(titles[key], fontweight='bold')
+    ax.set_title(titles[key], fontweight="bold")
     fig.colorbar(im, ax=ax, shrink=0.8)
 
-plt.suptitle("The 6D Orientogram: A 'Computer Vision' View of Protein Structure", fontsize=16, y=0.95)
+plt.suptitle(
+    "The 6D Orientogram: A 'Computer Vision' View of Protein Structure", fontsize=16, y=0.95
+)
 plt.show()</div>
 </div>
 </div>
@@ -5696,9 +5699,9 @@ plt.show()</div>
 
 <span class="c1"># Look at distance to neighboring residues for a GLY entry</span>
 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">gly_res_idx</span><span class="p">[:</span><span class="mi">1</span><span class="p">]:</span>
-    <span class="n">dist_row</span> <span class="o">=</span> <span class="n">orientations</span><span class="p">[</span><span class="s1">'dist'</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">🔎 Virtual C-beta mapping for GLY </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Distances to neighbors: </span><span class="si">{</span><span class="n">dist_row</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span><span class="nb">min</span><span class="p">(</span><span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">dist_row</span><span class="p">))]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">dist_row</span> <span class="o">=</span> <span class="n">orientations</span><span class="p">[</span><span class="s2">"dist"</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">🔎 Virtual C-beta mapping for GLY </span><span class="si">{</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Distances to neighbors: </span><span class="si">{</span><span class="n">dist_row</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">dist_row</span><span class="p">))]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Note how the values are consistent with the rest of the chain!"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Virtual C-beta mapping successful."</span><span class="p">)</span>
 </pre></div>
@@ -5707,12 +5710,11 @@ print(f"Analyzing Glycine at indices: {gly_res_idx}")
 
 # Look at distance to neighboring residues for a GLY entry
 for idx in gly_res_idx[:1]:
-    dist_row = orientations['dist'][0, idx, :]
-    print(f"\n🔎 Virtual C-beta mapping for GLY {idx+1}:")
-    print(f"Distances to neighbors: {dist_row[max(0, idx-2):min(idx+3, len(dist_row))]}")
+    dist_row = orientations["dist"][0, idx, :]
+    print(f"\n🔎 Virtual C-beta mapping for GLY {idx + 1}:")
+    print(f"Distances to neighbors: {dist_row[max(0, idx - 2) : min(idx + 3, len(dist_row))]}")
     print("Note how the values are consistent with the rest of the chain!")
-print("✅ Virtual C-beta mapping successful.")
-</div>
+print("✅ Virtual C-beta mapping successful.")</div>
 </div>
 </div>
 </div>

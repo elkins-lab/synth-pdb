@@ -5369,26 +5369,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5422,15 +5422,13 @@ print("✅ Environment configured!")</div>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.patches</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpatches</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
 
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_pdb_content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.score</span><span class="w"> </span><span class="kn">import</span> <span class="n">score_structure</span><span class="p">,</span> <span class="n">score_batch</span><span class="p">,</span> <span class="n">QualityScore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.benchmark_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">extract_ca_coords</span><span class="p">,</span> <span class="n">tm_score</span><span class="p">,</span> <span class="n">lddt</span><span class="p">,</span> <span class="n">gdt_ts</span><span class="p">,</span> <span class="n">superpose_kabsch</span>
-<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">synth_pdb.benchmark_metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_ca_coords</span><span class="p">,</span> <span class="n">tm_score</span><span class="p">,</span> <span class="n">lddt</span><span class="p">,</span> <span class="n">gdt_ts</span><span class="p">,</span> <span class="n">superpose_kabsch</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ All imports successful'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ All imports successful"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 import sys
@@ -5439,15 +5437,13 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.colors import LinearSegmentedColormap
 
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath("../../"))
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.score import score_structure, score_batch, QualityScore
-from synth_pdb.benchmark_metrics import (
-    extract_ca_coords, tm_score, lddt, gdt_ts, superpose_kabsch
-)
+from synth_pdb.benchmark_metrics import extract_ca_coords, tm_score, lddt, gdt_ts, superpose_kabsch
 
-print('✅ All imports successful')</div>
+print("✅ All imports successful")</div>
 </div>
 </div>
 </div>
@@ -5509,17 +5505,17 @@ print('✅ All imports successful')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Generating structures...'</span><span class="p">)</span>
-<span class="n">helix_pdb</span>  <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s1">'alpha'</span><span class="p">,</span>  <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">decoy_pdb</span>  <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s1">'random'</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">beta_pdb</span>   <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s1">'beta'</span><span class="p">,</span>   <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Done — 3 structures generated'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Generating structures..."</span><span class="p">)</span>
+<span class="n">helix_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">decoy_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">beta_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"beta"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Done — 3 structures generated"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">print('Generating structures...')
-helix_pdb  = generate_pdb_content(length=30, conformation='alpha',  minimize_energy=False)
-decoy_pdb  = generate_pdb_content(length=30, conformation='random', minimize_energy=False)
-beta_pdb   = generate_pdb_content(length=30, conformation='beta',   minimize_energy=False)
-print('✅ Done — 3 structures generated')</div>
+<div class="clipboard-copy-txt" id="cell-3">print("Generating structures...")
+helix_pdb = generate_pdb_content(length=30, conformation="alpha", minimize_energy=False)
+decoy_pdb = generate_pdb_content(length=30, conformation="random", minimize_energy=False)
+beta_pdb = generate_pdb_content(length=30, conformation="beta", minimize_energy=False)
+print("✅ Done — 3 structures generated")</div>
 </div>
 </div>
 </div>
@@ -5558,23 +5554,31 @@ It returns a <code>QualityScore</code> dataclass with <strong>global</strong> an
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">helix_score</span> <span class="o">=</span> <span class="n">score_structure</span><span class="p">(</span><span class="n">helix_pdb</span><span class="p">)</span>
 <span class="n">decoy_score</span> <span class="o">=</span> <span class="n">score_structure</span><span class="p">(</span><span class="n">decoy_pdb</span><span class="p">)</span>
-<span class="n">beta_score</span>  <span class="o">=</span> <span class="n">score_structure</span><span class="p">(</span><span class="n">beta_pdb</span><span class="p">)</span>
+<span class="n">beta_score</span> <span class="o">=</span> <span class="n">score_structure</span><span class="p">(</span><span class="n">beta_pdb</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'GLOBAL QUALITY SCORES'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'='</span><span class="o">*</span><span class="mi">45</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">'Alpha-helix'</span><span class="p">,</span> <span class="n">helix_score</span><span class="p">),</span> <span class="p">(</span><span class="s1">'Random decoy'</span><span class="p">,</span> <span class="n">decoy_score</span><span class="p">),</span> <span class="p">(</span><span class="s1">'Beta-strand'</span><span class="p">,</span> <span class="n">beta_score</span><span class="p">)]:</span>
-    <span class="n">bar</span> <span class="o">=</span> <span class="s1">'█'</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">global_score</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s1">14s</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">global_score</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">  </span><span class="si">{</span><span class="n">bar</span><span class="si">}</span><span class="s1">  [</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s1">]'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"GLOBAL QUALITY SCORES"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"Alpha-helix"</span><span class="p">,</span> <span class="n">helix_score</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"Random decoy"</span><span class="p">,</span> <span class="n">decoy_score</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"Beta-strand"</span><span class="p">,</span> <span class="n">beta_score</span><span class="p">),</span>
+<span class="p">]:</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="s2">"█"</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">global_score</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">:</span><span class="s2">14s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">global_score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">bar</span><span class="si">}</span><span class="s2">  [</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2">]"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">helix_score = score_structure(helix_pdb)
 decoy_score = score_structure(decoy_pdb)
-beta_score  = score_structure(beta_pdb)
+beta_score = score_structure(beta_pdb)
 
-print('GLOBAL QUALITY SCORES')
-print('='*45)
-for label, r in [('Alpha-helix', helix_score), ('Random decoy', decoy_score), ('Beta-strand', beta_score)]:
-    bar = '█' * int(r.global_score * 20)
-    print(f'{label:14s}: {r.global_score:.3f}  {bar}  [{r.label}]')</div>
+print("GLOBAL QUALITY SCORES")
+print("=" * 45)
+for label, r in [
+    ("Alpha-helix", helix_score),
+    ("Random decoy", decoy_score),
+    ("Beta-strand", beta_score),
+]:
+    bar = "█" * int(r.global_score * 20)
+    print(f"{label:14s}: {r.global_score:.3f}  {bar}  [{r.label}]")</div>
 </div>
 </div>
 </div>
@@ -5647,74 +5651,88 @@ for label, r in [('Alpha-helix', helix_score), ('Random decoy', decoy_score), ('
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">PLDDT_CMAP</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
-    <span class="s1">'plddt'</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="s1">'#FF7D45'</span><span class="p">),(</span><span class="mf">0.5</span><span class="p">,</span><span class="s1">'#FFDB13'</span><span class="p">),(</span><span class="mf">0.7</span><span class="p">,</span><span class="s1">'#65CBF3'</span><span class="p">),(</span><span class="mf">0.9</span><span class="p">,</span><span class="s1">'#0053D6'</span><span class="p">),(</span><span class="mi">1</span><span class="p">,</span><span class="s1">'#0053D6'</span><span class="p">)]</span>
+    <span class="s2">"plddt"</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"#FF7D45"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="s2">"#FFDB13"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="s2">"#65CBF3"</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="s2">"#0053D6"</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"#0053D6"</span><span class="p">)]</span>
 <span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">'Per-Residue pLDDT Confidence (AlphaFold colour scheme)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s2">"Per-Residue pLDDT Confidence (AlphaFold colour scheme)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span>
+<span class="p">)</span>
 
-<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s1">'Alpha-helix (Good)'</span><span class="p">,</span> <span class="n">helix_score</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'Beta-strand (Good)'</span><span class="p">,</span> <span class="n">beta_score</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">'Random Decoy (Bad)'</span><span class="p">,</span> <span class="n">decoy_score</span><span class="p">),</span>
-<span class="p">]):</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <span class="n">axes</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s2">"Alpha-helix (Good)"</span><span class="p">,</span> <span class="n">helix_score</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"Beta-strand (Good)"</span><span class="p">,</span> <span class="n">beta_score</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">"Random Decoy (Bad)"</span><span class="p">,</span> <span class="n">decoy_score</span><span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">):</span>
     <span class="n">scores</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">per_residue</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">PLDDT_CMAP</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">]</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">scores</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#0053D6'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Very High (0.90)'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#65CBF3'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'High (0.70)'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#FFDB13'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Uncertain (0.50)'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">scores</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#0053D6"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Very High (0.90)"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#65CBF3"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"High (0.70)"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#FFDB13"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Uncertain (0.50)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'pLDDT'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">  |  mean pLDDT = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">  |  global = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">global_score</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue number'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"pLDDT"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">  |  mean pLDDT = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  global = </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">global_score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue number"</span><span class="p">)</span>
 
 <span class="n">patches</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#0053D6'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Very High (≥0.90)'</span><span class="p">),</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#65CBF3'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'High (0.70–0.90)'</span><span class="p">),</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#FFDB13'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Uncertain (0.50–0.70)'</span><span class="p">),</span>
-    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">'#FF7D45'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Low (&lt;0.50)'</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#0053D6"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Very High (≥0.90)"</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#65CBF3"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"High (0.70–0.90)"</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#FFDB13"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Uncertain (0.50–0.70)"</span><span class="p">),</span>
+    <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">"#FF7D45"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Low (&lt;0.50)"</span><span class="p">),</span>
 <span class="p">]</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">patches</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'lower center'</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.06</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">patches</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"lower center"</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'💡 Blue = high confidence (like AlphaFold DB).  Orange = disordered or bad geometry.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"💡 Blue = high confidence (like AlphaFold DB).  Orange = disordered or bad geometry."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">PLDDT_CMAP = LinearSegmentedColormap.from_list(
-    'plddt', [(0,'#FF7D45'),(0.5,'#FFDB13'),(0.7,'#65CBF3'),(0.9,'#0053D6'),(1,'#0053D6')]
+    "plddt", [(0, "#FF7D45"), (0.5, "#FFDB13"), (0.7, "#65CBF3"), (0.9, "#0053D6"), (1, "#0053D6")]
 )
 
 fig, axes = plt.subplots(3, 1, figsize=(14, 7), sharex=False)
-fig.suptitle('Per-Residue pLDDT Confidence (AlphaFold colour scheme)', fontsize=14, fontweight='bold')
+fig.suptitle(
+    "Per-Residue pLDDT Confidence (AlphaFold colour scheme)", fontsize=14, fontweight="bold"
+)
 
-for ax, (name, result) in zip(axes, [
-    ('Alpha-helix (Good)', helix_score),
-    ('Beta-strand (Good)', beta_score),
-    ('Random Decoy (Bad)', decoy_score),
-]):
+for ax, (name, result) in zip(
+    axes,
+    [
+        ("Alpha-helix (Good)", helix_score),
+        ("Beta-strand (Good)", beta_score),
+        ("Random Decoy (Bad)", decoy_score),
+    ],
+):
     scores = result.per_residue
     n = len(scores)
     colors = [PLDDT_CMAP(s) for s in scores]
-    ax.bar(range(1, n+1), scores, color=colors, edgecolor='none', width=1.0)
-    ax.axhline(0.9, color='#0053D6', ls='--', lw=0.8, alpha=0.5, label='Very High (0.90)')
-    ax.axhline(0.7, color='#65CBF3', ls='--', lw=0.8, alpha=0.5, label='High (0.70)')
-    ax.axhline(0.5, color='#FFDB13', ls='--', lw=0.8, alpha=0.5, label='Uncertain (0.50)')
+    ax.bar(range(1, n + 1), scores, color=colors, edgecolor="none", width=1.0)
+    ax.axhline(0.9, color="#0053D6", ls="--", lw=0.8, alpha=0.5, label="Very High (0.90)")
+    ax.axhline(0.7, color="#65CBF3", ls="--", lw=0.8, alpha=0.5, label="High (0.70)")
+    ax.axhline(0.5, color="#FFDB13", ls="--", lw=0.8, alpha=0.5, label="Uncertain (0.50)")
     ax.set_ylim(0, 1.05)
-    ax.set_ylabel('pLDDT')
-    ax.set_title(f'{name}  |  mean pLDDT = {np.mean(scores):.3f}  |  global = {result.global_score:.3f}')
-    ax.set_xlabel('Residue number')
+    ax.set_ylabel("pLDDT")
+    ax.set_title(
+        f"{name}  |  mean pLDDT = {np.mean(scores):.3f}  |  global = {result.global_score:.3f}"
+    )
+    ax.set_xlabel("Residue number")
 
 patches = [
-    mpatches.Patch(color='#0053D6', label='Very High (≥0.90)'),
-    mpatches.Patch(color='#65CBF3', label='High (0.70–0.90)'),
-    mpatches.Patch(color='#FFDB13', label='Uncertain (0.50–0.70)'),
-    mpatches.Patch(color='#FF7D45', label='Low (&lt;0.50)'),
+    mpatches.Patch(color="#0053D6", label="Very High (≥0.90)"),
+    mpatches.Patch(color="#65CBF3", label="High (0.70–0.90)"),
+    mpatches.Patch(color="#FFDB13", label="Uncertain (0.50–0.70)"),
+    mpatches.Patch(color="#FF7D45", label="Low (&lt;0.50)"),
 ]
-fig.legend(handles=patches, loc='lower center', ncol=4, fontsize=9, frameon=True)
-plt.tight_layout(rect=[0,0.06,1,1])
+fig.legend(handles=patches, loc="lower center", ncol=4, fontsize=9, frameon=True)
+plt.tight_layout(rect=[0, 0.06, 1, 1])
 plt.show()
-print('💡 Blue = high confidence (like AlphaFold DB).  Orange = disordered or bad geometry.')</div>
+print("💡 Blue = high confidence (like AlphaFold DB).  Orange = disordered or bad geometry.")</div>
 </div>
 </div>
 </div>
@@ -5750,35 +5768,35 @@ print('💡 Blue = high confidence (like AlphaFold DB).  Orange = disordered or 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Generating 10 structures for batch scoring...'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Generating 10 structures for batch scoring..."</span><span class="p">)</span>
 <span class="n">pdbs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">20</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s1">'alpha'</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">20</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="p">]</span>
 <span class="n">pdbs</span> <span class="o">+=</span> <span class="p">[</span>
-    <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">20</span><span class="o">+</span><span class="n">i</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s1">'random'</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">generate_pdb_content</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">20</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"random"</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="p">]</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="n">score_batch</span><span class="p">(</span><span class="n">pdbs</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Scored </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s1"> structures</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  High Quality: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="o">==</span><span class="s2">"High Quality"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  Low Quality:  </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="o">==</span><span class="s2">"Low Quality"</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Scored </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> structures</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  High Quality: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'High Quality'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Low Quality:  </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">r</span><span class="o">.</span><span class="n">label</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'Low Quality'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">print('Generating 10 structures for batch scoring...')
+<div class="clipboard-copy-txt" id="cell-6">print("Generating 10 structures for batch scoring...")
 pdbs = [
-    generate_pdb_content(length=20+i*3, conformation='alpha', minimize_energy=False)
+    generate_pdb_content(length=20 + i * 3, conformation="alpha", minimize_energy=False)
     for i in range(5)
 ]
 pdbs += [
-    generate_pdb_content(length=20+i*3, conformation='random', minimize_energy=False)
+    generate_pdb_content(length=20 + i * 3, conformation="random", minimize_energy=False)
     for i in range(5)
 ]
 
 results = score_batch(pdbs)
-print(f'Scored {len(results)} structures\n')
-print(f'  High Quality: {sum(1 for r in results if r.label=="High Quality")}')
-print(f'  Low Quality:  {sum(1 for r in results if r.label=="Low Quality")}')</div>
+print(f"Scored {len(results)} structures\n")
+print(f"  High Quality: {sum(1 for r in results if r.label == 'High Quality')}")
+print(f"  Low Quality:  {sum(1 for r in results if r.label == 'Low Quality')}")</div>
 </div>
 </div>
 </div>
@@ -5853,40 +5871,40 @@ print(f'  Low Quality:  {sum(1 for r in results if r.label=="Low Quality")}')</d
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Use helix as 'reference' and a noisy version as 'prediction'</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">ca_ref</span> <span class="o">=</span> <span class="n">extract_ca_coords</span><span class="p">(</span><span class="n">helix_pdb</span><span class="p">)</span>
-<span class="n">noise</span>  <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">ca_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-<span class="n">ca_noisy</span> <span class="o">=</span> <span class="n">ca_ref</span> <span class="o">+</span> <span class="n">noise</span>   <span class="c1"># simulated imperfect prediction</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">ca_ref</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">ca_noisy</span> <span class="o">=</span> <span class="n">ca_ref</span> <span class="o">+</span> <span class="n">noise</span>  <span class="c1"># simulated imperfect prediction</span>
 
 <span class="c1"># Compute all metrics</span>
-<span class="n">tm</span>     <span class="o">=</span> <span class="n">tm_score</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
-<span class="n">gdt</span>    <span class="o">=</span> <span class="n">gdt_ts</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
+<span class="n">tm</span> <span class="o">=</span> <span class="n">tm_score</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
+<span class="n">gdt</span> <span class="o">=</span> <span class="n">gdt_ts</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
 <span class="n">lddt_r</span> <span class="o">=</span> <span class="n">lddt</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
 <span class="n">_</span><span class="p">,</span> <span class="n">rmsd</span> <span class="o">=</span> <span class="n">superpose_kabsch</span><span class="p">(</span><span class="n">ca_noisy</span><span class="p">,</span> <span class="n">ca_ref</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'STRUCTURAL COMPARISON METRICS'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'='</span><span class="o">*</span><span class="mi">45</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  TM-score : </span><span class="si">{</span><span class="n">tm</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (</span><span class="si">{</span><span class="s2">"same fold"</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">tm</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">"different fold"</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  GDT-TS   : </span><span class="si">{</span><span class="n">gdt</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  lDDT     : </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">  (mean over </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">}</span><span class="s1"> residues)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  Cα-RMSD  : </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"STRUCTURAL COMPARISON METRICS"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  TM-score : </span><span class="si">{</span><span class="n">tm</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="s1">'same fold'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">tm</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'different fold'</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  GDT-TS   : </span><span class="si">{</span><span class="n">gdt</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  lDDT     : </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">  (mean over </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Cα-RMSD  : </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7"># Use helix as 'reference' and a noisy version as 'prediction'
 rng = np.random.default_rng(42)
 ca_ref = extract_ca_coords(helix_pdb)
-noise  = rng.normal(0, 1.5, ca_ref.shape).astype(np.float32)
-ca_noisy = ca_ref + noise   # simulated imperfect prediction
+noise = rng.normal(0, 1.5, ca_ref.shape).astype(np.float32)
+ca_noisy = ca_ref + noise  # simulated imperfect prediction
 
 # Compute all metrics
-tm     = tm_score(ca_noisy, ca_ref)
-gdt    = gdt_ts(ca_noisy, ca_ref)
+tm = tm_score(ca_noisy, ca_ref)
+gdt = gdt_ts(ca_noisy, ca_ref)
 lddt_r = lddt(ca_noisy, ca_ref)
 _, rmsd = superpose_kabsch(ca_noisy, ca_ref)
 
-print('STRUCTURAL COMPARISON METRICS')
-print('='*45)
-print(f'  TM-score : {tm:.4f}  ({"same fold" if tm&gt;0.5 else "different fold"})')
-print(f'  GDT-TS   : {gdt:.4f}')
-print(f'  lDDT     : {np.mean(lddt_r):.4f}  (mean over {len(lddt_r)} residues)')
-print(f'  Cα-RMSD  : {rmsd:.2f} Å')</div>
+print("STRUCTURAL COMPARISON METRICS")
+print("=" * 45)
+print(f"  TM-score : {tm:.4f}  ({'same fold' if tm &gt; 0.5 else 'different fold'})")
+print(f"  GDT-TS   : {gdt:.4f}")
+print(f"  lDDT     : {np.mean(lddt_r):.4f}  (mean over {len(lddt_r)} residues)")
+print(f"  Cα-RMSD  : {rmsd:.2f} Å")</div>
 </div>
 </div>
 </div>
@@ -5913,29 +5931,33 @@ print(f'  Cα-RMSD  : {rmsd:.2f} Å')</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Plot per-residue lDDT</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lddt_r</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'none'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'Mean lDDT = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">lddt_r</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Mean lDDT = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lddt_r</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue number'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'lDDT score'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Per-Residue lDDT: Reference vs Noisy Prediction'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue number"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lDDT score"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Per-Residue lDDT: Reference vs Noisy Prediction"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'💡 Low lDDT residues have local distance geometry that differs from the reference.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"💡 Low lDDT residues have local distance geometry that differs from the reference."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-8"># Plot per-residue lDDT
 fig, ax = plt.subplots(figsize=(12, 4))
-ax.bar(range(1, len(lddt_r)+1), lddt_r, color='steelblue', edgecolor='none')
-ax.axhline(np.mean(lddt_r), color='red', ls='--', lw=1.5, label=f'Mean lDDT = {np.mean(lddt_r):.3f}')
+ax.bar(range(1, len(lddt_r) + 1), lddt_r, color="steelblue", edgecolor="none")
+ax.axhline(
+    np.mean(lddt_r), color="red", ls="--", lw=1.5, label=f"Mean lDDT = {np.mean(lddt_r):.3f}"
+)
 ax.set_ylim(0, 1.05)
-ax.set_xlabel('Residue number')
-ax.set_ylabel('lDDT score')
-ax.set_title('Per-Residue lDDT: Reference vs Noisy Prediction')
+ax.set_xlabel("Residue number")
+ax.set_ylabel("lDDT score")
+ax.set_title("Per-Residue lDDT: Reference vs Noisy Prediction")
 ax.legend()
 plt.tight_layout()
 plt.show()
-print('💡 Low lDDT residues have local distance geometry that differs from the reference.')</div>
+print("💡 Low lDDT residues have local distance geometry that differs from the reference.")</div>
 </div>
 </div>
 </div>
@@ -6020,22 +6042,22 @@ print('💡 Low lDDT residues have local distance geometry that differs from the
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_align</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">plddt_vals</span><span class="p">[:</span><span class="n">n_align</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#0053D6'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_align</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">plddt_vals</span><span class="p">[:</span><span class="n">n_align</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#0053D6"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'GNN pLDDT (internal model confidence)'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Confidence'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"GNN pLDDT (internal model confidence)"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Confidence"</span><span class="p">)</span>
 
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_align</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lddt_r</span><span class="p">[:</span><span class="n">n_align</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">'steelblue'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_align</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">lddt_r</span><span class="p">[:</span><span class="n">n_align</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Computed lDDT vs noisy reference'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue'</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'lDDT'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Computed lDDT vs noisy reference"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue"</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"lDDT"</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">'GNN pLDDT vs Computed lDDT'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"GNN pLDDT vs Computed lDDT"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Note: GNN pLDDT is a model confidence score; lDDT requires a reference structure.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Note: GNN pLDDT is a model confidence score; lDDT requires a reference structure."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9"># Side-by-side: GNN pLDDT vs computed lDDT for the helix
 # lDDT of helix vs itself = 1.0 everywhere; vs noisy = varies
@@ -6044,22 +6066,22 @@ n_align = min(len(plddt_vals), len(lddt_r))
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 4))
 
-axes[0].bar(range(1, n_align+1), plddt_vals[:n_align], color='#0053D6', alpha=0.8)
+axes[0].bar(range(1, n_align + 1), plddt_vals[:n_align], color="#0053D6", alpha=0.8)
 axes[0].set_ylim(0, 1.05)
-axes[0].set_title('GNN pLDDT (internal model confidence)')
-axes[0].set_xlabel('Residue')
-axes[0].set_ylabel('Confidence')
+axes[0].set_title("GNN pLDDT (internal model confidence)")
+axes[0].set_xlabel("Residue")
+axes[0].set_ylabel("Confidence")
 
-axes[1].bar(range(1, n_align+1), lddt_r[:n_align], color='steelblue', alpha=0.8)
+axes[1].bar(range(1, n_align + 1), lddt_r[:n_align], color="steelblue", alpha=0.8)
 axes[1].set_ylim(0, 1.05)
-axes[1].set_title('Computed lDDT vs noisy reference')
-axes[1].set_xlabel('Residue')
-axes[1].set_ylabel('lDDT')
+axes[1].set_title("Computed lDDT vs noisy reference")
+axes[1].set_xlabel("Residue")
+axes[1].set_ylabel("lDDT")
 
-plt.suptitle('GNN pLDDT vs Computed lDDT', fontsize=13, fontweight='bold')
+plt.suptitle("GNN pLDDT vs Computed lDDT", fontsize=13, fontweight="bold")
 plt.tight_layout()
 plt.show()
-print('Note: GNN pLDDT is a model confidence score; lDDT requires a reference structure.')</div>
+print("Note: GNN pLDDT is a model confidence score; lDDT requires a reference structure.")</div>
 </div>
 </div>
 </div>
@@ -6111,21 +6133,21 @@ print('Note: GNN pLDDT is a model confidence score; lDDT requires a reference st
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Tutorial complete! 🎉'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Tutorial complete! 🎉"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Quick reference:'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  from synth_pdb.score import score_structure'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Quick reference:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  from synth_pdb.score import score_structure"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'  result = score_structure("my_protein.pdb")'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  print(result.global_score, result.label)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  print(result.per_residue)   # pLDDT per residue'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  print(result.global_score, result.label)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  print(result.per_residue)   # pLDDT per residue"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">print('Tutorial complete! 🎉')
+<div class="clipboard-copy-txt" id="cell-10">print("Tutorial complete! 🎉")
 print()
-print('Quick reference:')
-print('  from synth_pdb.score import score_structure')
+print("Quick reference:")
+print("  from synth_pdb.score import score_structure")
 print('  result = score_structure("my_protein.pdb")')
-print('  print(result.global_score, result.label)')
-print('  print(result.per_residue)   # pLDDT per residue')</div>
+print("  print(result.global_score, result.label)")
+print("  print(result.per_residue)   # pLDDT per residue")</div>
 </div>
 </div>
 </div>

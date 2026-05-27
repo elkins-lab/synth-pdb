@@ -5299,32 +5299,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">pandas</span> <span class="n">scipy</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Setup
 import os
 import sys
 import urllib.request
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     !pip install -q synth-pdb synth-nmr biotite matplotlib numpy pandas scipy
 else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
 
-print('✅ Environment configured!')</div>
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5364,15 +5364,18 @@ print('✅ Environment configured!')</div>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">biotite.structure.io.pdb</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpdb</span>
 
-<span class="n">pdb_file</span> <span class="o">=</span> <span class="s1">'1D3Z.pdb'</span>
+<span class="n">pdb_file</span> <span class="o">=</span> <span class="s2">"1D3Z.pdb"</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading 1D3Z.pdb..."</span><span class="p">)</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s1">'https://files.rcsb.org/download/1D3Z.pdb'</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">"https://files.rcsb.org/download/1D3Z.pdb"</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
 
-<span class="n">mr_file</span> <span class="o">=</span> <span class="s1">'1d3z_mr.str'</span>
+<span class="n">mr_file</span> <span class="o">=</span> <span class="s2">"1d3z_mr.str"</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mr_file</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading 1d3z MR restraints..."</span><span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz"</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="s2">"curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz"</span><span class="p">,</span>
+        <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"gunzip -f 1d3z_mr.str.gz"</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Load the Biotite structure</span>
@@ -5383,15 +5386,18 @@ print('✅ Environment configured!')</div>
 
 import biotite.structure.io.pdb as bpdb
 
-pdb_file = '1D3Z.pdb'
+pdb_file = "1D3Z.pdb"
 if not os.path.exists(pdb_file):
     print("Downloading 1D3Z.pdb...")
-    urllib.request.urlretrieve('https://files.rcsb.org/download/1D3Z.pdb', pdb_file)
+    urllib.request.urlretrieve("https://files.rcsb.org/download/1D3Z.pdb", pdb_file)
 
-mr_file = '1d3z_mr.str'
+mr_file = "1d3z_mr.str"
 if not os.path.exists(mr_file):
     print("Downloading 1d3z MR restraints...")
-    subprocess.run("curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz", shell=True)
+    subprocess.run(
+        "curl -L -o 1d3z_mr.str.gz https://files.wwpdb.org/pub/pdb/data/structures/all/nmr_restraints/1d3z.mr.gz",
+        shell=True,
+    )
     subprocess.run("gunzip -f 1d3z_mr.str.gz", shell=True)
 
 # Load the Biotite structure
@@ -5443,39 +5449,40 @@ print("✅ Structural and experimental data ready.")</div>
         <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
     <span class="n">extracted_data</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
     <span class="n">current_target_res</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">in_target_section</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">'!remark hnha, phi coupling'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">"!remark hnha, phi coupling"</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">in_target_section</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">continue</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">in_target_section</span><span class="p">:</span>
             <span class="k">continue</span>
 
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'!remark'</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">'coupling'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'hnha'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"!remark"</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"coupling"</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s2">"hnha"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="k">break</span>
 
-        <span class="n">res_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'resid\s+(\d+)\s+and\s+name\s+ca\b'</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">res_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"resid\s+(\d+)\s+and\s+name\s+ca\b"</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">res_match</span><span class="p">:</span>
             <span class="n">current_target_res</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">current_target_res</span> <span class="ow">and</span> <span class="s1">')'</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s1">'assign'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">')'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_target_res</span> <span class="ow">and</span> <span class="s2">")"</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s2">"assign"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">")"</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">numbers</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">numbers</span> <span class="ow">and</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">'!'</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">numbers</span> <span class="ow">and</span> <span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"!"</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">j_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                        <span class="n">extracted_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">'res_index'</span><span class="p">:</span> <span class="n">current_target_res</span><span class="p">,</span> <span class="s1">'J_exp'</span><span class="p">:</span> <span class="n">j_val</span><span class="p">})</span>
+                        <span class="n">extracted_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"res_index"</span><span class="p">:</span> <span class="n">current_target_res</span><span class="p">,</span> <span class="s2">"J_exp"</span><span class="p">:</span> <span class="n">j_val</span><span class="p">})</span>
                         <span class="n">current_target_res</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="k">pass</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">extracted_data</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'res_index'</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"res_index"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
 <span class="n">df_j</span> <span class="o">=</span> <span class="n">extract_hnha_jcouplings</span><span class="p">(</span><span class="n">mr_file</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Extracted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_j</span><span class="p">)</span><span class="si">}</span><span class="s2"> experimental J-Couplings."</span><span class="p">)</span>
@@ -5492,39 +5499,40 @@ def extract_hnha_jcouplings(filepath):
         content = f.read()
 
     extracted_data = []
-    lines = content.split('\n')
+    lines = content.split("\n")
     current_target_res = None
     in_target_section = False
 
     for line in lines:
-        if '!remark hnha, phi coupling' in line:
+        if "!remark hnha, phi coupling" in line:
             in_target_section = True
             continue
 
         if not in_target_section:
             continue
 
-        if line.startswith('!remark') and 'coupling' in line and 'hnha' not in line:
+        if line.startswith("!remark") and "coupling" in line and "hnha" not in line:
             break
 
-        res_match = re.search(r'resid\s+(\d+)\s+and\s+name\s+ca\b', line)
+        res_match = re.search(r"resid\s+(\d+)\s+and\s+name\s+ca\b", line)
         if res_match:
             current_target_res = int(res_match.group(1))
 
-        if current_target_res and ')' in line and 'assign' not in line:
-            parts = line.split(')')
+        if current_target_res and ")" in line and "assign" not in line:
+            parts = line.split(")")
             if len(parts) &gt; 1:
                 numbers = parts[-1].strip().split()
-                if numbers and numbers[0] != '!':
+                if numbers and numbers[0] != "!":
                     try:
                         j_val = float(numbers[0])
-                        extracted_data.append({'res_index': current_target_res, 'J_exp': j_val})
+                        extracted_data.append({"res_index": current_target_res, "J_exp": j_val})
                         current_target_res = None
                     except ValueError:
                         pass
 
     df = pd.DataFrame(extracted_data).drop_duplicates()
-    return df.sort_values('res_index').reset_index(drop=True)
+    return df.sort_values("res_index").reset_index(drop=True)
+
 
 df_j = extract_hnha_jcouplings(mr_file)
 print(f"Extracted {len(df_j)} experimental J-Couplings.")
@@ -5580,14 +5588,14 @@ print(df_j.head())</div>
 
 <span class="c1"># Merge into our dataframe</span>
 <span class="n">calc_vals</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">df_j</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">df_j</span><span class="p">[</span><span class="s2">"res_index"</span><span class="p">]:</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">res_id_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">res_id_int</span> <span class="ow">in</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="p">{}):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res_id_int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res_id_int</span> <span class="ow">in</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"A"</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">theoretical_couplings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"A"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">res_id_int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     <span class="n">calc_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-<span class="n">df_j</span><span class="p">[</span><span class="s1">'J_calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_vals</span>
+<span class="n">df_j</span><span class="p">[</span><span class="s2">"J_calc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_vals</span>
 <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_j</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Compiled </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_clean</span><span class="p">)</span><span class="si">}</span><span class="s2"> validated couplings for statistical analysis."</span><span class="p">)</span>
@@ -5608,14 +5616,14 @@ theoretical_couplings = predict_couplings_from_structure(pdb_struct)
 
 # Merge into our dataframe
 calc_vals = []
-for res_id in df_j['res_index']:
+for res_id in df_j["res_index"]:
     val = np.nan
     res_id_int = int(res_id)
-    if res_id_int in theoretical_couplings.get('A', {}):
-        val = theoretical_couplings.get('A', {}).get(res_id_int, np.nan)
+    if res_id_int in theoretical_couplings.get("A", {}):
+        val = theoretical_couplings.get("A", {}).get(res_id_int, np.nan)
     calc_vals.append(val)
 
-df_j['J_calc'] = calc_vals
+df_j["J_calc"] = calc_vals
 df_clean = df_j.dropna().copy()
 
 print(f"Compiled {len(df_clean)} validated couplings for statistical analysis.")</div>
@@ -5657,32 +5665,40 @@ print(f"Compiled {len(df_clean)} validated couplings for statistical analysis.")
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">pearsonr</span>
 
-<span class="n">J_exp</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s1">'J_exp'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-<span class="n">J_calc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s1">'J_calc'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">J_exp</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s2">"J_exp"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">J_calc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="s2">"J_calc"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-<span class="n">rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">J_exp</span> <span class="o">-</span> <span class="n">J_calc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">J_exp</span> <span class="o">-</span> <span class="n">J_calc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">r_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">J_exp</span><span class="p">,</span> <span class="n">J_calc</span><span class="p">)</span>
 <span class="n">r_sq</span> <span class="o">=</span> <span class="n">r_val</span><span class="o">**</span><span class="mi">2</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">J_exp</span><span class="p">,</span> <span class="n">J_calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'darkred'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">J_exp</span><span class="p">,</span> <span class="n">J_calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"darkred"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
 
 <span class="n">min_val</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">max_val</span> <span class="o">=</span> <span class="mi">11</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s1">'k--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Perfect Agreement'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s2">"k--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Perfect Agreement"</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"synth-pdb Validation: Synthetic vs Experimental J-Couplings"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+    <span class="s2">"synth-pdb Validation: Synthetic vs Experimental J-Couplings"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Experimental $^3J_{H^N,H^\alpha}$ (Hz)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">"synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
-<span class="n">bbox_props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'boxstyle'</span><span class="p">:</span> <span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="s1">'fc'</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s1">'ec'</span><span class="p">:</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s1">'alpha'</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">min_val</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-         <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">'monospace'</span><span class="p">)</span>
+<span class="n">bbox_props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"boxstyle"</span><span class="p">:</span> <span class="s2">"round,pad=0.5"</span><span class="p">,</span> <span class="s2">"fc"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"ec"</span><span class="p">:</span> <span class="s2">"gray"</span><span class="p">,</span> <span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+    <span class="n">min_val</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">max_val</span> <span class="o">-</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s2">"RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz</span><span class="se">\n</span><span class="s2">Pearson $R^2$: </span><span class="si">{</span><span class="n">r_sq</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">bbox</span><span class="o">=</span><span class="n">bbox_props</span><span class="p">,</span>
+    <span class="n">family</span><span class="o">=</span><span class="s2">"monospace"</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">"equal"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="c1">#plt.show()</span>
+<span class="c1"># plt.show()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">🏆 SCIENTIFIC CONCLUSION:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
@@ -5691,37 +5707,47 @@ print(f"Compiled {len(df_clean)} validated couplings for statistical analysis.")
     <span class="nb">print</span><span class="p">(</span><span class="s2">"This is considered excellent theoretical agreement, heavily outperforming standard "</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"molecular dynamics approximations and verifying our internal geometry engine."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"WARNING. High error rate (</span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz). Back-propagation of phi angles requires tuning."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"WARNING. High error rate (</span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Hz). Back-propagation of phi angles requires tuning."</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-J_exp = df_clean['J_exp'].values
-J_calc = df_clean['J_calc'].values
+J_exp = df_clean["J_exp"].values
+J_calc = df_clean["J_calc"].values
 
-rmsd = np.sqrt(np.mean((J_exp - J_calc)**2))
+rmsd = np.sqrt(np.mean((J_exp - J_calc) ** 2))
 r_val, _ = pearsonr(J_exp, J_calc)
 r_sq = r_val**2
 
 plt.figure(figsize=(8, 8))
-plt.scatter(J_exp, J_calc, color='darkred', alpha=0.7, edgecolor='white', s=80)
+plt.scatter(J_exp, J_calc, color="darkred", alpha=0.7, edgecolor="white", s=80)
 
 min_val = 2
 max_val = 11
-plt.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5, label='Perfect Agreement')
+plt.plot([min_val, max_val], [min_val, max_val], "k--", alpha=0.5, label="Perfect Agreement")
 
-plt.title("synth-pdb Validation: Synthetic vs Experimental J-Couplings", fontsize=14, fontweight='bold')
+plt.title(
+    "synth-pdb Validation: Synthetic vs Experimental J-Couplings", fontsize=14, fontweight="bold"
+)
 plt.xlabel(r"Experimental $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 plt.ylabel(r"synth-pdb Calculated $^3J_{H^N,H^\alpha}$ (Hz)", fontsize=12)
 
-bbox_props = {'boxstyle': "round,pad=0.5", 'fc': "white", 'ec': "gray", 'alpha': 0.9}
-plt.text(min_val + 0.5, max_val - 1.5, f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}",
-         fontsize=12, bbox=bbox_props, family='monospace')
+bbox_props = {"boxstyle": "round,pad=0.5", "fc": "white", "ec": "gray", "alpha": 0.9}
+plt.text(
+    min_val + 0.5,
+    max_val - 1.5,
+    f"RMSD: {rmsd:.3f} Hz\nPearson $R^2$: {r_sq:.3f}",
+    fontsize=12,
+    bbox=bbox_props,
+    family="monospace",
+)
 
 plt.grid(alpha=0.3)
-plt.axis('equal')
+plt.axis("equal")
 plt.legend()
-#plt.show()
+# plt.show()
 
 print("\n🏆 SCIENTIFIC CONCLUSION:")
 print("=" * 60)
@@ -5730,7 +5756,9 @@ if rmsd &lt; 1.1:
     print("This is considered excellent theoretical agreement, heavily outperforming standard ")
     print("molecular dynamics approximations and verifying our internal geometry engine.")
 else:
-    print(f"WARNING. High error rate ({rmsd:.3f} Hz). Back-propagation of phi angles requires tuning.")</div>
+    print(
+        f"WARNING. High error rate ({rmsd:.3f} Hz). Back-propagation of phi angles requires tuning."
+    )</div>
 </div>
 </div>
 </div>

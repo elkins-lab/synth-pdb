@@ -5463,26 +5463,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5520,61 +5520,63 @@ print("✅ Environment configured!")</div>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">synth_pdb.main</span>  <span class="c1"># Test availability via main module</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ synth-pdb already installed'</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ synth-pdb already installed"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   📦 Installing synth-pdb and dependencies...'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   📦 Installing synth-pdb and dependencies..."</span><span class="p">)</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
         <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">'-m'</span><span class="p">,</span> <span class="s1">'pip'</span><span class="p">,</span> <span class="s1">'install'</span><span class="p">,</span> <span class="s1">'-q'</span><span class="p">,</span>
-             <span class="s1">'synth-pdb'</span><span class="p">,</span> <span class="s1">'biotite'</span><span class="p">,</span> <span class="s1">'py3Dmol'</span><span class="p">],</span>
-            <span class="n">check</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"pip"</span><span class="p">,</span> <span class="s2">"install"</span><span class="p">,</span> <span class="s2">"-q"</span><span class="p">,</span> <span class="s2">"synth-pdb"</span><span class="p">,</span> <span class="s2">"biotite"</span><span class="p">,</span> <span class="s2">"py3Dmol"</span><span class="p">],</span>
+            <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'   ✅ Installation complete'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"   ✅ Installation complete"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
     <span class="c1"># This notebook lives at examples/interactive_tutorials/ — two levels below repo root</span>
-    <span class="n">_repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">'../..'</span><span class="p">))</span>
+    <span class="n">_repo_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">"../.."</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">_repo_root</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_repo_root</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   📌 Added repo root: </span><span class="si">{</span><span class="n">_repo_root</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   📌 Added repo root: </span><span class="si">{</span><span class="n">_repo_root</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2"># 🔧 Environment Detection &amp; Setup
 import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     try:
         import synth_pdb.main  # Test availability via main module
-        print('   ✅ synth-pdb already installed')
+
+        print("   ✅ synth-pdb already installed")
     except ImportError:
-        print('   📦 Installing synth-pdb and dependencies...')
+        print("   📦 Installing synth-pdb and dependencies...")
         import subprocess
+
         subprocess.run(
-            [sys.executable, '-m', 'pip', 'install', '-q',
-             'synth-pdb', 'biotite', 'py3Dmol'],
-            check=True
+            [sys.executable, "-m", "pip", "install", "-q", "synth-pdb", "biotite", "py3Dmol"],
+            check=True,
         )
-        print('   ✅ Installation complete')
+        print("   ✅ Installation complete")
 else:
-    print('💻 Running in local Jupyter environment')
+    print("💻 Running in local Jupyter environment")
     # This notebook lives at examples/interactive_tutorials/ — two levels below repo root
-    _repo_root = os.path.abspath(os.path.join(os.getcwd(), '../..'))
+    _repo_root = os.path.abspath(os.path.join(os.getcwd(), "../.."))
     if _repo_root not in sys.path:
         sys.path.insert(0, _repo_root)
-        print(f'   📌 Added repo root: {_repo_root}')
+        print(f"   📌 Added repo root: {_repo_root}")
 
-print('✅ Environment configured!')</div>
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5611,12 +5613,13 @@ print('✅ Environment configured!')</div>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">py3Dmol</span>
+
     <span class="n">HAS_PY3DMOL</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">HAS_PY3DMOL</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'ℹ️  py3Dmol not found — 3D viewer will be skipped.'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️  py3Dmol not found — 3D viewer will be skipped."</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'📦 All imports successful!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"📦 All imports successful!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import io
 
@@ -5630,12 +5633,13 @@ from synth_pdb.physics import simulate_trajectory
 
 try:
     import py3Dmol
+
     HAS_PY3DMOL = True
 except ImportError:
     HAS_PY3DMOL = False
-    print('ℹ️  py3Dmol not found — 3D viewer will be skipped.')
+    print("ℹ️  py3Dmol not found — 3D viewer will be skipped.")
 
-print('📦 All imports successful!')</div>
+print("📦 All imports successful!")</div>
 </div>
 </div>
 </div>
@@ -5673,40 +5677,40 @@ print('📦 All imports successful!')</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Sequence: Helix (15) - Flexible Loop (15) - Helix (15)</span>
-<span class="n">SEQUENCE</span>      <span class="o">=</span> <span class="s2">"MEAAAQAAAAEAAAK"</span> <span class="o">+</span> <span class="s2">"GSGSGSGSSGGSGSG"</span> <span class="o">+</span> <span class="s2">"MAAAAQAAAAEAAAK"</span>
+<span class="n">SEQUENCE</span> <span class="o">=</span> <span class="s2">"MEAAAQAAAAEAAAK"</span> <span class="o">+</span> <span class="s2">"GSGSGSGSSGGSGSG"</span> <span class="o">+</span> <span class="s2">"MAAAAQAAAAEAAAK"</span>
 <span class="n">STRUCTURE_DEF</span> <span class="o">=</span> <span class="s2">"1-15:alpha, 16-30:random, 31-45:alpha"</span>
 
 <span class="c1"># Region boundaries (0-indexed, for numpy slicing later)</span>
 <span class="n">HELIX1</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">LOOP</span>   <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">LOOP</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
 <span class="n">HELIX2</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'🧬 Generating initial structure and minimizing energy...'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🧬 Generating initial structure and minimizing energy..."</span><span class="p">)</span>
 <span class="n">initial_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
     <span class="n">sequence_str</span><span class="o">=</span><span class="n">SEQUENCE</span><span class="p">,</span>
     <span class="n">structure</span><span class="o">=</span><span class="n">STRUCTURE_DEF</span><span class="p">,</span>
     <span class="n">optimize_sidechains</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Baseline structure ready!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Baseline structure ready!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4"># Sequence: Helix (15) - Flexible Loop (15) - Helix (15)
-SEQUENCE      = "MEAAAQAAAAEAAAK" + "GSGSGSGSSGGSGSG" + "MAAAAQAAAAEAAAK"
+SEQUENCE = "MEAAAQAAAAEAAAK" + "GSGSGSGSSGGSGSG" + "MAAAAQAAAAEAAAK"
 STRUCTURE_DEF = "1-15:alpha, 16-30:random, 31-45:alpha"
 
 # Region boundaries (0-indexed, for numpy slicing later)
 HELIX1 = slice(0, 15)
-LOOP   = slice(15, 30)
+LOOP = slice(15, 30)
 HELIX2 = slice(30, 45)
 
-print('🧬 Generating initial structure and minimizing energy...')
+print("🧬 Generating initial structure and minimizing energy...")
 initial_pdb = generate_pdb_content(
     sequence_str=SEQUENCE,
     structure=STRUCTURE_DEF,
     optimize_sidechains=True,
     minimize_energy=True,
 )
-print('✅ Baseline structure ready!')</div>
+print("✅ Baseline structure ready!")</div>
 </div>
 </div>
 </div>
@@ -5747,23 +5751,23 @@ fluctuations, which are sufficient to demonstrate the flexibility gradient.</em>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'🔥 Running MD simulation (10–30 s on CPU)...'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"🔥 Running MD simulation (10–30 s on CPU)..."</span><span class="p">)</span>
 <span class="n">trajectory_pdbs</span> <span class="o">=</span> <span class="n">simulate_trajectory</span><span class="p">(</span>
     <span class="n">pdb_content</span><span class="o">=</span><span class="n">initial_pdb</span><span class="p">,</span>
     <span class="n">temperature_kelvin</span><span class="o">=</span><span class="mf">350.0</span><span class="p">,</span>
     <span class="n">steps</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span>
-    <span class="n">report_interval</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>   <span class="c1"># Save 100 frames</span>
+    <span class="n">report_interval</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>  <span class="c1"># Save 100 frames</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'✅ Simulation complete! Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trajectory_pdbs</span><span class="p">)</span><span class="si">}</span><span class="s1"> trajectory frames.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Simulation complete! Captured </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trajectory_pdbs</span><span class="p">)</span><span class="si">}</span><span class="s2"> trajectory frames."</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">print('🔥 Running MD simulation (10–30 s on CPU)...')
+<div class="clipboard-copy-txt" id="cell-5">print("🔥 Running MD simulation (10–30 s on CPU)...")
 trajectory_pdbs = simulate_trajectory(
     pdb_content=initial_pdb,
     temperature_kelvin=350.0,
     steps=5000,
-    report_interval=50,   # Save 100 frames
+    report_interval=50,  # Save 100 frames
 )
-print(f'✅ Simulation complete! Captured {len(trajectory_pdbs)} trajectory frames.')</div>
+print(f"✅ Simulation complete! Captured {len(trajectory_pdbs)} trajectory frames.")</div>
 </div>
 </div>
 </div>
@@ -5804,37 +5808,37 @@ stack tightly while the central loop fans out in a "spaghetti cloud".</p>
     <span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
     <span class="c1"># Starting structure as a white reference tube</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">initial_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'tube'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'white'</span><span class="p">,</span> <span class="s1">'radius'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s1">'opacity'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}})</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">initial_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+    <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"tube"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"radius"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">"opacity"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">}})</span>
 
     <span class="c1"># Trajectory frames as spectrum-coloured lines (N→C blue→red)</span>
     <span class="k">for</span> <span class="n">frame_pdb</span> <span class="ow">in</span> <span class="n">trajectory_pdbs</span><span class="p">[::</span><span class="mi">2</span><span class="p">]:</span>  <span class="c1"># every other frame for speed</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">frame_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">)</span>
-        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'model'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'spectrum'</span><span class="p">,</span> <span class="s1">'linewidth'</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">}})</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">frame_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">)</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"model"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s2">"line"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"color"</span><span class="p">:</span> <span class="s2">"spectrum"</span><span class="p">,</span> <span class="s2">"linewidth"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">}})</span>
 
     <span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">()</span>
     <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'White tube = starting position. Rainbow lines = thermal motion frames.'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"White tube = starting position. Rainbow lines = thermal motion frames."</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'(py3Dmol viewer skipped — install py3Dmol for interactive 3D display)'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"(py3Dmol viewer skipped — install py3Dmol for interactive 3D display)"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">if HAS_PY3DMOL and trajectory_pdbs:
     view = py3Dmol.view(width=800, height=500)
 
     # Starting structure as a white reference tube
-    view.addModel(initial_pdb, 'pdb')
-    view.setStyle({'model': -1}, {'tube': {'color': 'white', 'radius': 0.4, 'opacity': 0.4}})
+    view.addModel(initial_pdb, "pdb")
+    view.setStyle({"model": -1}, {"tube": {"color": "white", "radius": 0.4, "opacity": 0.4}})
 
     # Trajectory frames as spectrum-coloured lines (N→C blue→red)
     for frame_pdb in trajectory_pdbs[::2]:  # every other frame for speed
-        view.addModel(frame_pdb, 'pdb')
-        view.setStyle({'model': -1}, {'line': {'color': 'spectrum', 'linewidth': 1.5}})
+        view.addModel(frame_pdb, "pdb")
+        view.setStyle({"model": -1}, {"line": {"color": "spectrum", "linewidth": 1.5}})
 
     view.zoomTo()
     view.show()
-    print('White tube = starting position. Rainbow lines = thermal motion frames.')
+    print("White tube = starting position. Rainbow lines = thermal motion frames.")
 else:
-    print('(py3Dmol viewer skipped — install py3Dmol for interactive 3D display)')</div>
+    print("(py3Dmol viewer skipped — install py3Dmol for interactive 3D display)")</div>
 </div>
 </div>
 </div>
@@ -5913,7 +5917,7 @@ of the protein would dominate the signal and wash out local flexibility.</p>
     <span class="n">ca_coords</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">trajectory_pdbs</span><span class="p">:</span>
         <span class="n">struct</span> <span class="o">=</span> <span class="n">bpdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">ca</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="n">struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'CA'</span><span class="p">]</span>
+        <span class="n">ca</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="n">struct</span><span class="o">.</span><span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"CA"</span><span class="p">]</span>
         <span class="n">ca_coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ca</span><span class="o">.</span><span class="n">coord</span><span class="p">)</span>
 
     <span class="n">ca_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ca_coords</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>  <span class="c1"># (F, N, 3)</span>
@@ -5932,15 +5936,15 @@ of the protein would dominate the signal and wash out local flexibility.</p>
 
     <span class="c1"># --- RMSF ---</span>
     <span class="n">sq_dev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">aligned</span> <span class="o">-</span> <span class="n">aligned_mean</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># (F, N)</span>
-    <span class="n">rmsf</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sq_dev</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>                   <span class="c1"># (N,)</span>
+    <span class="n">rmsf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sq_dev</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>  <span class="c1"># (N,)</span>
     <span class="k">return</span> <span class="n">rmsf</span>
 
 
 <span class="n">rmsf_profile</span> <span class="o">=</span> <span class="n">calculate_ca_rmsf_aligned</span><span class="p">(</span><span class="n">trajectory_pdbs</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'✅ RMSF calculation complete (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rmsf_profile</span><span class="p">)</span><span class="si">}</span><span class="s1"> residues).'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Mean RMSF helix 1 : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">HELIX1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Mean RMSF loop    : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'   Mean RMSF helix 2 : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">HELIX2</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> Å'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ RMSF calculation complete (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rmsf_profile</span><span class="p">)</span><span class="si">}</span><span class="s2"> residues)."</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Mean RMSF helix 1 : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">HELIX1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Mean RMSF loop    : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Mean RMSF helix 2 : </span><span class="si">{</span><span class="n">rmsf_profile</span><span class="p">[</span><span class="n">HELIX2</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> Å"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">def calculate_ca_rmsf_aligned(trajectory_pdbs):
     """Compute per-residue Cα RMSF with Kabsch alignment of every frame.
@@ -5955,7 +5959,7 @@ of the protein would dominate the signal and wash out local flexibility.</p>
     ca_coords = []
     for frame in trajectory_pdbs:
         struct = bpdb.PDBFile.read(io.StringIO(frame)).get_structure(model=1)
-        ca = struct[struct.atom_name == 'CA']
+        ca = struct[struct.atom_name == "CA"]
         ca_coords.append(ca.coord)
 
     ca_coords = np.array(ca_coords, dtype=np.float64)  # (F, N, 3)
@@ -5974,15 +5978,15 @@ of the protein would dominate the signal and wash out local flexibility.</p>
 
     # --- RMSF ---
     sq_dev = np.sum((aligned - aligned_mean) ** 2, axis=2)  # (F, N)
-    rmsf   = np.sqrt(sq_dev.mean(axis=0))                   # (N,)
+    rmsf = np.sqrt(sq_dev.mean(axis=0))  # (N,)
     return rmsf
 
 
 rmsf_profile = calculate_ca_rmsf_aligned(trajectory_pdbs)
-print(f'✅ RMSF calculation complete ({len(rmsf_profile)} residues).')
-print(f'   Mean RMSF helix 1 : {rmsf_profile[HELIX1].mean():.3f} Å')
-print(f'   Mean RMSF loop    : {rmsf_profile[LOOP].mean():.3f} Å')
-print(f'   Mean RMSF helix 2 : {rmsf_profile[HELIX2].mean():.3f} Å')</div>
+print(f"✅ RMSF calculation complete ({len(rmsf_profile)} residues).")
+print(f"   Mean RMSF helix 1 : {rmsf_profile[HELIX1].mean():.3f} Å")
+print(f"   Mean RMSF loop    : {rmsf_profile[LOOP].mean():.3f} Å")
+print(f"   Mean RMSF helix 2 : {rmsf_profile[HELIX2].mean():.3f} Å")</div>
 </div>
 </div>
 </div>
@@ -6007,40 +6011,40 @@ print(f'   Mean RMSF helix 2 : {rmsf_profile[HELIX2].mean():.3f} Å')</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'dark_background'</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"dark_background"</span><span class="p">)</span>
 <span class="n">residues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmsf_profile</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">rmsf_profile</span><span class="p">,</span> <span class="s1">'o-'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#a78bfa'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'CA RMSF (Å)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">rmsf_profile</span><span class="p">,</span> <span class="s2">"o-"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#a78bfa"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"CA RMSF (Å)"</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#3b82f6'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Helix 1 (rigid)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#f97316'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Disordered Loop (flexible)'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#22c55e'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Helix 2 (rigid)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#3b82f6"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Helix 1 (rigid)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#f97316"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Disordered Loop (flexible)"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#22c55e"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Helix 2 (rigid)"</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue Number'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'RMSF (Å)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Per-Residue Cα Flexibility from MD Trajectory'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'upper right'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue Number"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"RMSF (Å)"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"Per-Residue Cα Flexibility from MD Trajectory"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">plt.style.use('dark_background')
+<div class="clipboard-copy-txt" id="cell-8">plt.style.use("dark_background")
 residues = np.arange(1, len(rmsf_profile) + 1)
 
 fig, ax = plt.subplots(figsize=(11, 5))
-ax.plot(residues, rmsf_profile, 'o-', color='#a78bfa', lw=2, ms=5, label='CA RMSF (Å)')
+ax.plot(residues, rmsf_profile, "o-", color="#a78bfa", lw=2, ms=5, label="CA RMSF (Å)")
 
-ax.axvspan(1,  15, color='#3b82f6', alpha=0.15, label='Helix 1 (rigid)')
-ax.axvspan(16, 30, color='#f97316', alpha=0.15, label='Disordered Loop (flexible)')
-ax.axvspan(31, 45, color='#22c55e', alpha=0.15, label='Helix 2 (rigid)')
+ax.axvspan(1, 15, color="#3b82f6", alpha=0.15, label="Helix 1 (rigid)")
+ax.axvspan(16, 30, color="#f97316", alpha=0.15, label="Disordered Loop (flexible)")
+ax.axvspan(31, 45, color="#22c55e", alpha=0.15, label="Helix 2 (rigid)")
 
-ax.set_xlabel('Residue Number', fontsize=12)
-ax.set_ylabel('RMSF (Å)', fontsize=12)
-ax.set_title('Per-Residue Cα Flexibility from MD Trajectory', fontsize=14, fontweight='bold')
-ax.legend(fontsize=10, loc='upper right')
+ax.set_xlabel("Residue Number", fontsize=12)
+ax.set_ylabel("RMSF (Å)", fontsize=12)
+ax.set_title("Per-Residue Cα Flexibility from MD Trajectory", fontsize=14, fontweight="bold")
+ax.legend(fontsize=10, loc="upper right")
 ax.set_xlim(1, 45)
 ax.set_ylim(bottom=0)
 ax.grid(alpha=0.15)
@@ -6096,55 +6100,63 @@ secondary structure labels and overlay all three observables.</p>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="n">plddt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
 <span class="n">plddt</span><span class="p">[</span><span class="n">HELIX1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plddt</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span>   <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">plddt</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
 <span class="n">plddt</span><span class="p">[</span><span class="n">HELIX2</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
 <span class="n">plddt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">plddt</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># ── Plot ─────────────────────────────────────────────────────────────────────</span>
 <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">'The Three-Way Correlation: MD Flexibility, NMR $S^2$, and AlphaFold pLDDT'</span><span class="p">,</span>
-             <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span>
+    <span class="s2">"The Three-Way Correlation: MD Flexibility, NMR $S^2$, and AlphaFold pLDDT"</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+    <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Region shading helper</span>
 <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#3b82f6'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#f97316'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#22c55e'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#3b82f6"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#f97316"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#22c55e"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
 
 <span class="c1"># Top panel — S²</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">s2_profile</span><span class="p">,</span> <span class="s1">'s-'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#60a5fa'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Synthetic $S^2$'</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#3b82f6'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Helix benchmark ($S^2$=0.85)'</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#f97316'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Loop benchmark ($S^2$=0.45)'</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Order Parameter $S^2$'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">s2_profile</span><span class="p">,</span> <span class="s2">"s-"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#60a5fa"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Synthetic $S^2$"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#3b82f6"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Helix benchmark ($S^2$=0.85)"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#f97316"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">"--"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Loop benchmark ($S^2$=0.45)"</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Order Parameter $S^2$"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'lower right'</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">)</span>
 
 <span class="c1"># Bottom panel — pLDDT</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">plddt</span><span class="p">,</span> <span class="s1">'o-'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'#f59e0b'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Simulated pLDDT'</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'gray'</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">':'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'pLDDT=70 (confidence threshold)'</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Residue Number'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'pLDDT Score'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">residues</span><span class="p">,</span> <span class="n">plddt</span><span class="p">,</span> <span class="s2">"o-"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#f59e0b"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Simulated pLDDT"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">":"</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"pLDDT=70 (confidence threshold)"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Residue Number"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"pLDDT Score"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">110</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">'lower right'</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"lower right"</span><span class="p">)</span>
 
 <span class="c1"># Region labels on top panel</span>
-<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">lbl</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">'Helix 1'</span><span class="p">,</span> <span class="s1">'#93c5fd'</span><span class="p">),</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="s1">'Disordered</span><span class="se">\n</span><span class="s1">Loop'</span><span class="p">,</span> <span class="s1">'#fdba74'</span><span class="p">),</span> <span class="p">(</span><span class="mi">38</span><span class="p">,</span> <span class="s1">'Helix 2'</span><span class="p">,</span> <span class="s1">'#86efac'</span><span class="p">)]:</span>
-    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.07</span><span class="p">,</span> <span class="n">lbl</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'center'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">lbl</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">"Helix 1"</span><span class="p">,</span> <span class="s2">"#93c5fd"</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="s2">"Disordered</span><span class="se">\n</span><span class="s2">Loop"</span><span class="p">,</span> <span class="s2">"#fdba74"</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">38</span><span class="p">,</span> <span class="s2">"Helix 2"</span><span class="p">,</span> <span class="s2">"#86efac"</span><span class="p">),</span>
+<span class="p">]:</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.07</span><span class="p">,</span> <span class="n">lbl</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">💡 CONCLUSION:'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'='</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  Helix mean S²  : </span><span class="si">{</span><span class="n">s2_profile</span><span class="p">[</span><span class="n">HELIX1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> (rigid — high pLDDT expected)'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  Loop  mean S²  : </span><span class="si">{</span><span class="n">s2_profile</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">   (flexible — low pLDDT expected)'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💡 CONCLUSION:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Helix mean S²  : </span><span class="si">{</span><span class="n">s2_profile</span><span class="p">[</span><span class="n">HELIX1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (rigid — high pLDDT expected)"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Loop  mean S²  : </span><span class="si">{</span><span class="n">s2_profile</span><span class="p">[</span><span class="n">LOOP</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">   (flexible — low pLDDT expected)"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  The loop</span><span class="se">\'</span><span class="s1">s low S² directly mirrors its low simulated pLDDT.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  The loop's low S² directly mirrors its low simulated pLDDT."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'  AlphaFold is not "failing" on disordered regions — it is correctly'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  predicting that they have low structural confidence because they are'</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'  physically disordered. Low pLDDT = low S² = high RMSF.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  predicting that they have low structural confidence because they are"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  physically disordered. Low pLDDT = low S² = high RMSF."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9"># ── S² from RMSF ────────────────────────────────────────────────────────────
 rmsf_max = rmsf_profile.max() + 1e-9
@@ -6155,55 +6167,63 @@ s2_profile = np.clip(1.0 - (rmsf_profile / rmsf_max) ** 2, 0.0, 1.0)
 rng = np.random.default_rng(42)
 plddt = np.empty(45)
 plddt[HELIX1] = rng.normal(90, 4, 15)
-plddt[LOOP]   = rng.normal(45, 7, 15)
+plddt[LOOP] = rng.normal(45, 7, 15)
 plddt[HELIX2] = rng.normal(90, 4, 15)
 plddt = np.clip(plddt, 0, 100)
 
 # ── Plot ─────────────────────────────────────────────────────────────────────
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
-fig.suptitle('The Three-Way Correlation: MD Flexibility, NMR $S^2$, and AlphaFold pLDDT',
-             fontsize=14, fontweight='bold', y=1.01)
+fig.suptitle(
+    "The Three-Way Correlation: MD Flexibility, NMR $S^2$, and AlphaFold pLDDT",
+    fontsize=14,
+    fontweight="bold",
+    y=1.01,
+)
 
 # Region shading helper
 for ax in (ax1, ax2):
-    ax.axvspan(1,  15, color='#3b82f6', alpha=0.10)
-    ax.axvspan(16, 30, color='#f97316', alpha=0.10)
-    ax.axvspan(31, 45, color='#22c55e', alpha=0.10)
+    ax.axvspan(1, 15, color="#3b82f6", alpha=0.10)
+    ax.axvspan(16, 30, color="#f97316", alpha=0.10)
+    ax.axvspan(31, 45, color="#22c55e", alpha=0.10)
     ax.set_xlim(1, 45)
     ax.grid(alpha=0.15)
 
 # Top panel — S²
-ax1.plot(residues, s2_profile, 's-', color='#60a5fa', lw=2, ms=5, label='Synthetic $S^2$')
-ax1.axhline(0.85, color='#3b82f6', ls='--', lw=1, alpha=0.7, label='Helix benchmark ($S^2$=0.85)')
-ax1.axhline(0.45, color='#f97316', ls='--', lw=1, alpha=0.7, label='Loop benchmark ($S^2$=0.45)')
-ax1.set_ylabel('Order Parameter $S^2$', fontsize=11)
+ax1.plot(residues, s2_profile, "s-", color="#60a5fa", lw=2, ms=5, label="Synthetic $S^2$")
+ax1.axhline(0.85, color="#3b82f6", ls="--", lw=1, alpha=0.7, label="Helix benchmark ($S^2$=0.85)")
+ax1.axhline(0.45, color="#f97316", ls="--", lw=1, alpha=0.7, label="Loop benchmark ($S^2$=0.45)")
+ax1.set_ylabel("Order Parameter $S^2$", fontsize=11)
 ax1.set_ylim(0, 1.15)
-ax1.legend(fontsize=9, loc='lower right')
+ax1.legend(fontsize=9, loc="lower right")
 
 # Bottom panel — pLDDT
-ax2.plot(residues, plddt, 'o-', color='#f59e0b', lw=2, ms=5, label='Simulated pLDDT')
-ax2.axhline(70, color='gray', ls=':', lw=1.2, alpha=0.8, label='pLDDT=70 (confidence threshold)')
-ax2.set_xlabel('Residue Number', fontsize=12)
-ax2.set_ylabel('pLDDT Score', fontsize=11)
+ax2.plot(residues, plddt, "o-", color="#f59e0b", lw=2, ms=5, label="Simulated pLDDT")
+ax2.axhline(70, color="gray", ls=":", lw=1.2, alpha=0.8, label="pLDDT=70 (confidence threshold)")
+ax2.set_xlabel("Residue Number", fontsize=12)
+ax2.set_ylabel("pLDDT Score", fontsize=11)
 ax2.set_ylim(0, 110)
-ax2.legend(fontsize=9, loc='lower right')
+ax2.legend(fontsize=9, loc="lower right")
 
 # Region labels on top panel
-for x, lbl, col in [(8, 'Helix 1', '#93c5fd'), (23, 'Disordered\nLoop', '#fdba74'), (38, 'Helix 2', '#86efac')]:
-    ax1.text(x, 1.07, lbl, ha='center', fontsize=8, color=col)
+for x, lbl, col in [
+    (8, "Helix 1", "#93c5fd"),
+    (23, "Disordered\nLoop", "#fdba74"),
+    (38, "Helix 2", "#86efac"),
+]:
+    ax1.text(x, 1.07, lbl, ha="center", fontsize=8, color=col)
 
 plt.tight_layout()
 plt.show()
 
-print('\n💡 CONCLUSION:')
-print('=' * 60)
-print(f'  Helix mean S²  : {s2_profile[HELIX1].mean():.2f} (rigid — high pLDDT expected)')
-print(f'  Loop  mean S²  : {s2_profile[LOOP].mean():.2f}   (flexible — low pLDDT expected)')
+print("\n💡 CONCLUSION:")
+print("=" * 60)
+print(f"  Helix mean S²  : {s2_profile[HELIX1].mean():.2f} (rigid — high pLDDT expected)")
+print(f"  Loop  mean S²  : {s2_profile[LOOP].mean():.2f}   (flexible — low pLDDT expected)")
 print()
-print('  The loop\'s low S² directly mirrors its low simulated pLDDT.')
+print("  The loop's low S² directly mirrors its low simulated pLDDT.")
 print('  AlphaFold is not "failing" on disordered regions — it is correctly')
-print('  predicting that they have low structural confidence because they are')
-print('  physically disordered. Low pLDDT = low S² = high RMSF.')</div>
+print("  predicting that they have low structural confidence because they are")
+print("  physically disordered. Low pLDDT = low S² = high RMSF.")</div>
 </div>
 </div>
 </div>

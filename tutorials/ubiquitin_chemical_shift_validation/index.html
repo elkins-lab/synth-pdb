@@ -5337,32 +5337,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'🌐 Running in Google Colab'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"🌐 Running in Google Colab"</span><span class="p">)</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">synth</span><span class="o">-</span><span class="n">nmr</span> <span class="n">pynmrstar</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">pandas</span> <span class="n">scipy</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">'💻 Running in local Jupyter environment'</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"💻 Running in local Jupyter environment"</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'✅ Environment configured!'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1"># 🔧 Environment Setup
 import os
 import sys
 import urllib.request
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
-    print('🌐 Running in Google Colab')
+    print("🌐 Running in Google Colab")
     !pip install -q synth-pdb synth-nmr pynmrstar biotite matplotlib numpy pandas scipy scikit-learn
 else:
-    print('💻 Running in local Jupyter environment')
-    sys.path.append(os.path.abspath('../../'))
+    print("💻 Running in local Jupyter environment")
+    sys.path.append(os.path.abspath("../../"))
 
-print('✅ Environment configured!')</div>
+print("✅ Environment configured!")</div>
 </div>
 </div>
 </div>
@@ -5406,10 +5406,10 @@ print('✅ Environment configured!')</div>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pynmrstar</span>
 
 <span class="c1"># Download 1D3Z structure if not present</span>
-<span class="n">pdb_file</span> <span class="o">=</span> <span class="s1">'1D3Z.pdb'</span>
+<span class="n">pdb_file</span> <span class="o">=</span> <span class="s2">"1D3Z.pdb"</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading 1D3Z.pdb..."</span><span class="p">)</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s1">'https://files.rcsb.org/download/1D3Z.pdb'</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">"https://files.rcsb.org/download/1D3Z.pdb"</span><span class="p">,</span> <span class="n">pdb_file</span><span class="p">)</span>
 
 <span class="c1"># Load 1D3Z into a Biotite AtomArray for the prediction step</span>
 <span class="n">pdb_struct</span> <span class="o">=</span> <span class="n">bpdb</span><span class="o">.</span><span class="n">PDBFile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">pdb_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -5420,10 +5420,10 @@ print('✅ Environment configured!')</div>
 import pynmrstar
 
 # Download 1D3Z structure if not present
-pdb_file = '1D3Z.pdb'
+pdb_file = "1D3Z.pdb"
 if not os.path.exists(pdb_file):
     print("Downloading 1D3Z.pdb...")
-    urllib.request.urlretrieve('https://files.rcsb.org/download/1D3Z.pdb', pdb_file)
+    urllib.request.urlretrieve("https://files.rcsb.org/download/1D3Z.pdb", pdb_file)
 
 # Load 1D3Z into a Biotite AtomArray for the prediction step
 pdb_struct = bpdb.PDBFile.read(pdb_file).get_structure(model=1)
@@ -5468,34 +5468,32 @@ print("✅ Structural data downloaded and atom array parsed.")</div>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Downloading BMRB 6457 chemical shift assignment table..."</span><span class="p">)</span>
-<span class="n">entry</span> <span class="o">=</span> <span class="n">pynmrstar</span><span class="o">.</span><span class="n">Entry</span><span class="o">.</span><span class="n">from_database</span><span class="p">(</span><span class="s1">'6457'</span><span class="p">)</span>
+<span class="n">entry</span> <span class="o">=</span> <span class="n">pynmrstar</span><span class="o">.</span><span class="n">Entry</span><span class="o">.</span><span class="n">from_database</span><span class="p">(</span><span class="s2">"6457"</span><span class="p">)</span>
 
-<span class="n">cs_loops</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get_saveframes_by_category</span><span class="p">(</span><span class="s1">'assigned_chemical_shifts'</span><span class="p">)</span>
+<span class="n">cs_loops</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get_saveframes_by_category</span><span class="p">(</span><span class="s2">"assigned_chemical_shifts"</span><span class="p">)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">cs_loops</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No assigned chemical shifts found in BMRB entry."</span><span class="p">)</span>
 
-<span class="n">cs_loop</span> <span class="o">=</span> <span class="n">cs_loops</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_loop_by_category</span><span class="p">(</span><span class="s1">'Atom_chem_shift'</span><span class="p">)</span>
+<span class="n">cs_loop</span> <span class="o">=</span> <span class="n">cs_loops</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_loop_by_category</span><span class="p">(</span><span class="s2">"Atom_chem_shift"</span><span class="p">)</span>
 
 <span class="n">experimental_data</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cs_loop</span><span class="o">.</span><span class="n">get_tag</span><span class="p">([</span><span class="s1">'Comp_index_ID'</span><span class="p">,</span> <span class="s1">'Comp_ID'</span><span class="p">,</span> <span class="s1">'Atom_ID'</span><span class="p">,</span> <span class="s1">'Val'</span><span class="p">]):</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cs_loop</span><span class="o">.</span><span class="n">get_tag</span><span class="p">([</span><span class="s2">"Comp_index_ID"</span><span class="p">,</span> <span class="s2">"Comp_ID"</span><span class="p">,</span> <span class="s2">"Atom_ID"</span><span class="p">,</span> <span class="s2">"Val"</span><span class="p">]):</span>
     <span class="n">res_index</span><span class="p">,</span> <span class="n">res_name</span><span class="p">,</span> <span class="n">atom_name</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">row</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># The BMRB labels backbone amide protons as 'H' or 'HN' interchangeably; standardize to 'H'</span>
-        <span class="k">if</span> <span class="n">atom_name</span> <span class="o">==</span> <span class="s1">'HN'</span><span class="p">:</span>
-            <span class="n">atom_name</span> <span class="o">=</span> <span class="s1">'H'</span>
+        <span class="k">if</span> <span class="n">atom_name</span> <span class="o">==</span> <span class="s2">"HN"</span><span class="p">:</span>
+            <span class="n">atom_name</span> <span class="o">=</span> <span class="s2">"H"</span>
 
-        <span class="n">experimental_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">'res_index'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_index</span><span class="p">),</span>
-            <span class="s1">'atom'</span><span class="p">:</span> <span class="n">atom_name</span><span class="p">,</span>
-            <span class="s1">'exp'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">experimental_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"res_index"</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">res_index</span><span class="p">),</span> <span class="s2">"atom"</span><span class="p">:</span> <span class="n">atom_name</span><span class="p">,</span> <span class="s2">"exp"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)}</span>
+        <span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="k">pass</span>
 
 <span class="c1"># Convert to DataFrame and isolate standard backbone atoms only to match classical empirical predictors</span>
 <span class="n">df_exp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">experimental_data</span><span class="p">)</span>
-<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'H'</span><span class="p">,</span> <span class="s1">'HA'</span><span class="p">,</span> <span class="s1">'N'</span><span class="p">,</span> <span class="s1">'C'</span><span class="p">,</span> <span class="s1">'CA'</span><span class="p">,</span> <span class="s1">'CB'</span><span class="p">]</span>
-<span class="n">df_exp</span> <span class="o">=</span> <span class="n">df_exp</span><span class="p">[</span><span class="n">df_exp</span><span class="p">[</span><span class="s1">'atom'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">targets</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"H"</span><span class="p">,</span> <span class="s2">"HA"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">,</span> <span class="s2">"CA"</span><span class="p">,</span> <span class="s2">"CB"</span><span class="p">]</span>
+<span class="n">df_exp</span> <span class="o">=</span> <span class="n">df_exp</span><span class="p">[</span><span class="n">df_exp</span><span class="p">[</span><span class="s2">"atom"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">targets</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Parsed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_exp</span><span class="p">)</span><span class="si">}</span><span class="s2"> relevant backbone experimental chemical shifts."</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">df_exp</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
@@ -5504,34 +5502,32 @@ print("✅ Structural data downloaded and atom array parsed.")</div>
 import pandas as pd
 
 print("Downloading BMRB 6457 chemical shift assignment table...")
-entry = pynmrstar.Entry.from_database('6457')
+entry = pynmrstar.Entry.from_database("6457")
 
-cs_loops = entry.get_saveframes_by_category('assigned_chemical_shifts')
+cs_loops = entry.get_saveframes_by_category("assigned_chemical_shifts")
 if not cs_loops:
     raise ValueError("No assigned chemical shifts found in BMRB entry.")
 
-cs_loop = cs_loops[0].get_loop_by_category('Atom_chem_shift')
+cs_loop = cs_loops[0].get_loop_by_category("Atom_chem_shift")
 
 experimental_data = []
-for row in cs_loop.get_tag(['Comp_index_ID', 'Comp_ID', 'Atom_ID', 'Val']):
+for row in cs_loop.get_tag(["Comp_index_ID", "Comp_ID", "Atom_ID", "Val"]):
     res_index, res_name, atom_name, val = row
     try:
         # The BMRB labels backbone amide protons as 'H' or 'HN' interchangeably; standardize to 'H'
-        if atom_name == 'HN':
-            atom_name = 'H'
+        if atom_name == "HN":
+            atom_name = "H"
 
-        experimental_data.append({
-            'res_index': int(res_index),
-            'atom': atom_name,
-            'exp': float(val)
-        })
+        experimental_data.append(
+            {"res_index": int(res_index), "atom": atom_name, "exp": float(val)}
+        )
     except ValueError:
         pass
 
 # Convert to DataFrame and isolate standard backbone atoms only to match classical empirical predictors
 df_exp = pd.DataFrame(experimental_data)
-targets = ['H', 'HA', 'N', 'C', 'CA', 'CB']
-df_exp = df_exp[df_exp['atom'].isin(targets)].copy()
+targets = ["H", "HA", "N", "C", "CA", "CB"]
+df_exp = df_exp[df_exp["atom"].isin(targets)].copy()
 
 print(f"Parsed {len(df_exp)} relevant backbone experimental chemical shifts.")
 print(df_exp.head())</div>
@@ -5578,13 +5574,13 @@ print(df_exp.head())</div>
 <span class="n">prediction_results</span> <span class="o">=</span> <span class="n">predict_chemical_shifts</span><span class="p">(</span><span class="n">pdb_struct</span><span class="p">)</span>
 
 <span class="c1"># 1D3Z has a single chain, so we extract the mapping for Chain A</span>
-<span class="n">calc_shifts</span> <span class="o">=</span> <span class="n">prediction_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'A'</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">calc_shifts</span> <span class="o">=</span> <span class="n">prediction_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"A"</span><span class="p">,</span> <span class="p">{})</span>
 
 <span class="c1"># Merge predictions into the pandas dataframe</span>
 <span class="n">calc_values</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">_idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_exp</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">res_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'res_index'</span><span class="p">]</span>
-    <span class="n">atom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'atom'</span><span class="p">]</span>
+    <span class="n">res_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"res_index"</span><span class="p">]</span>
+    <span class="n">atom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"atom"</span><span class="p">]</span>
 
     <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="k">if</span> <span class="n">res_id</span> <span class="ow">in</span> <span class="n">calc_shifts</span> <span class="ow">and</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">calc_shifts</span><span class="p">[</span><span class="n">res_id</span><span class="p">]:</span>
@@ -5592,7 +5588,7 @@ print(df_exp.head())</div>
 
     <span class="n">calc_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-<span class="n">df_exp</span><span class="p">[</span><span class="s1">'calc'</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_values</span>
+<span class="n">df_exp</span><span class="p">[</span><span class="s2">"calc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_values</span>
 <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_exp</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Matched </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_clean</span><span class="p">)</span><span class="si">}</span><span class="s2"> aligned theoretical/experimental pairs."</span><span class="p">)</span>
 </pre></div>
@@ -5604,13 +5600,13 @@ print("Running chemical shift prediction pipeline...\n")
 prediction_results = predict_chemical_shifts(pdb_struct)
 
 # 1D3Z has a single chain, so we extract the mapping for Chain A
-calc_shifts = prediction_results.get('A', {})
+calc_shifts = prediction_results.get("A", {})
 
 # Merge predictions into the pandas dataframe
 calc_values = []
 for _idx, row in df_exp.iterrows():
-    res_id = row['res_index']
-    atom = row['atom']
+    res_id = row["res_index"]
+    atom = row["atom"]
 
     val = np.nan
     if res_id in calc_shifts and atom in calc_shifts[res_id]:
@@ -5618,7 +5614,7 @@ for _idx, row in df_exp.iterrows():
 
     calc_values.append(val)
 
-df_exp['calc'] = calc_values
+df_exp["calc"] = calc_values
 df_clean = df_exp.dropna().copy()
 print(f"Matched {len(df_clean)} aligned theoretical/experimental pairs.")</div>
 </div>
@@ -5662,17 +5658,17 @@ print(f"Matched {len(df_clean)} aligned theoretical/experimental pairs.")</div>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-<span class="n">nuclei</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'C'</span><span class="p">,</span> <span class="s1">'CA'</span><span class="p">,</span> <span class="s1">'CB'</span><span class="p">,</span> <span class="s1">'N'</span><span class="p">,</span> <span class="s1">'H'</span><span class="p">,</span> <span class="s1">'HA'</span><span class="p">]</span>
+<span class="n">nuclei</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"C"</span><span class="p">,</span> <span class="s2">"CA"</span><span class="p">,</span> <span class="s2">"CB"</span><span class="p">,</span> <span class="s2">"N"</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"HA"</span><span class="p">]</span>
 <span class="n">rmsds</span> <span class="o">=</span> <span class="p">{}</span>
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nuc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nuclei</span><span class="p">):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">df_nuc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">df_clean</span><span class="p">[</span><span class="s1">'atom'</span><span class="p">]</span> <span class="o">==</span> <span class="n">nuc</span><span class="p">]</span>
+    <span class="n">df_nuc</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">df_clean</span><span class="p">[</span><span class="s2">"atom"</span><span class="p">]</span> <span class="o">==</span> <span class="n">nuc</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">df_nuc</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="k">continue</span>
 
-    <span class="n">exp</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s1">'exp'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">calc</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s1">'calc'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s2">"exp"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">calc</span> <span class="o">=</span> <span class="n">df_nuc</span><span class="p">[</span><span class="s2">"calc"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
     <span class="c1"># Calculate Error Metrics</span>
     <span class="n">rmsd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">exp</span> <span class="o">-</span> <span class="n">calc</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
@@ -5680,19 +5676,19 @@ print(f"Matched {len(df_clean)} aligned theoretical/experimental pairs.")</div>
     <span class="n">rmsds</span><span class="p">[</span><span class="n">nuc</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmsd</span>
 
     <span class="c1"># Scatter Plot</span>
-    <span class="n">color</span> <span class="o">=</span> <span class="s1">'tab:blue'</span> <span class="k">if</span> <span class="s1">'C'</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="p">(</span><span class="s1">'tab:green'</span> <span class="k">if</span> <span class="s1">'N'</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="s1">'tab:orange'</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'white'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s2">"tab:blue"</span> <span class="k">if</span> <span class="s2">"C"</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="p">(</span><span class="s2">"tab:green"</span> <span class="k">if</span> <span class="s2">"N"</span> <span class="ow">in</span> <span class="n">nuc</span> <span class="k">else</span> <span class="s2">"tab:orange"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">calc</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"white"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 
     <span class="c1"># Regression line parity</span>
     <span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">calc</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">calc</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s1">'k--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">],</span> <span class="s2">"k--"</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nucleus: </span><span class="si">{</span><span class="n">nuc</span><span class="si">}</span><span class="s2"> | RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ppm"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Nucleus: </span><span class="si">{</span><span class="n">nuc</span><span class="si">}</span><span class="s2"> | RMSD: </span><span class="si">{</span><span class="n">rmsd</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> ppm"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Experimental (ppm)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"synth-pdb Calculated (ppm)"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">"equal"</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5712,17 +5708,17 @@ from scipy.stats import pearsonr
 fig, axes = plt.subplots(2, 3, figsize=(16, 10))
 axes = axes.flatten()
 
-nuclei = ['C', 'CA', 'CB', 'N', 'H', 'HA']
+nuclei = ["C", "CA", "CB", "N", "H", "HA"]
 rmsds = {}
 
 for i, nuc in enumerate(nuclei):
     ax = axes[i]
-    df_nuc = df_clean[df_clean['atom'] == nuc]
+    df_nuc = df_clean[df_clean["atom"] == nuc]
     if df_nuc.empty:
         continue
 
-    exp = df_nuc['exp'].values
-    calc = df_nuc['calc'].values
+    exp = df_nuc["exp"].values
+    calc = df_nuc["calc"].values
 
     # Calculate Error Metrics
     rmsd = np.sqrt(np.mean((exp - calc) ** 2))
@@ -5730,19 +5726,19 @@ for i, nuc in enumerate(nuclei):
     rmsds[nuc] = rmsd
 
     # Scatter Plot
-    color = 'tab:blue' if 'C' in nuc else ('tab:green' if 'N' in nuc else 'tab:orange')
-    ax.scatter(exp, calc, color=color, alpha=0.7, edgecolor='white', s=60)
+    color = "tab:blue" if "C" in nuc else ("tab:green" if "N" in nuc else "tab:orange")
+    ax.scatter(exp, calc, color=color, alpha=0.7, edgecolor="white", s=60)
 
     # Regression line parity
     min_val = min(exp.min(), calc.min()) - 1
     max_val = max(exp.max(), calc.max()) + 1
-    ax.plot([min_val, max_val], [min_val, max_val], 'k--', alpha=0.5)
+    ax.plot([min_val, max_val], [min_val, max_val], "k--", alpha=0.5)
 
-    ax.set_title(f"Nucleus: {nuc} | RMSD: {rmsd:.3f} ppm", fontsize=12, fontweight='bold')
+    ax.set_title(f"Nucleus: {nuc} | RMSD: {rmsd:.3f} ppm", fontsize=12, fontweight="bold")
     ax.set_xlabel("Experimental (ppm)")
     ax.set_ylabel("synth-pdb Calculated (ppm)")
     ax.grid(alpha=0.3)
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
 
 plt.tight_layout()
 plt.show()

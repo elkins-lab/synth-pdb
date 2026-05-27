@@ -5117,26 +5117,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
-<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s1">'google.colab'</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">IN_COLAB</span> <span class="o">=</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
 
 <span class="k">if</span> <span class="n">IN_COLAB</span><span class="p">:</span>
     <span class="c1"># @title Environment Setup</span>
     <span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">synth</span><span class="o">-</span><span class="n">pdb</span> <span class="n">biotite</span> <span class="n">matplotlib</span> <span class="n">numpy</span> <span class="n">scipy</span> <span class="n">py3Dmol</span> <span class="n">openmm</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">'../../'</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">"../../"</span><span class="p">))</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Environment configured!"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import os
 import sys
 
-IN_COLAB = 'google.colab' in sys.modules
+IN_COLAB = "google.colab" in sys.modules
 
 if IN_COLAB:
     # @title Environment Setup
     !pip install -q synth-pdb biotite matplotlib numpy scipy py3Dmol openmm
 else:
-    sys.path.append(os.path.abspath('../../'))
+    sys.path.append(os.path.abspath("../../"))
 
 print("✅ Environment configured!")</div>
 </div>
@@ -5206,46 +5206,34 @@ from synth_pdb.validator import PDBValidator</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># L-Peptide</span>
-<span class="n">l_sequence</span> <span class="o">=</span> <span class="s1">'RGDSPA'</span> <span class="c1"># A common integrin-binding motif</span>
+<span class="n">l_sequence</span> <span class="o">=</span> <span class="s2">"RGDSPA"</span>  <span class="c1"># A common integrin-binding motif</span>
 <span class="n">l_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">l_sequence</span><span class="p">,</span>
-    <span class="n">conformation</span><span class="o">=</span><span class="s1">'extended'</span><span class="p">,</span>
-    <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">l_sequence</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"extended"</span><span class="p">,</span> <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
 <span class="c1"># D-Peptide</span>
 <span class="c1"># We use the D- prefix for each residue</span>
-<span class="n">d_sequence</span> <span class="o">=</span> <span class="s1">'D-ARG-D-GLY-D-ASP-D-SER-D-PRO-D-ALA'</span>
+<span class="n">d_sequence</span> <span class="o">=</span> <span class="s2">"D-ARG-D-GLY-D-ASP-D-SER-D-PRO-D-ALA"</span>
 <span class="n">d_pdb</span> <span class="o">=</span> <span class="n">generate_pdb_content</span><span class="p">(</span>
-    <span class="n">sequence_str</span><span class="o">=</span><span class="n">d_sequence</span><span class="p">,</span>
-    <span class="n">conformation</span><span class="o">=</span><span class="s1">'extended'</span><span class="p">,</span>
-    <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">sequence_str</span><span class="o">=</span><span class="n">d_sequence</span><span class="p">,</span> <span class="n">conformation</span><span class="o">=</span><span class="s2">"extended"</span><span class="p">,</span> <span class="n">cyclic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">minimize_energy</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">'Generated L and D peptides.'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Generated L and D peptides."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3"># L-Peptide
-l_sequence = 'RGDSPA' # A common integrin-binding motif
+l_sequence = "RGDSPA"  # A common integrin-binding motif
 l_pdb = generate_pdb_content(
-    sequence_str=l_sequence,
-    conformation='extended',
-    cyclic=True,
-    minimize_energy=True
+    sequence_str=l_sequence, conformation="extended", cyclic=True, minimize_energy=True
 )
 
 # D-Peptide
 # We use the D- prefix for each residue
-d_sequence = 'D-ARG-D-GLY-D-ASP-D-SER-D-PRO-D-ALA'
+d_sequence = "D-ARG-D-GLY-D-ASP-D-SER-D-PRO-D-ALA"
 d_pdb = generate_pdb_content(
-    sequence_str=d_sequence,
-    conformation='extended',
-    cyclic=True,
-    minimize_energy=True
+    sequence_str=d_sequence, conformation="extended", cyclic=True, minimize_energy=True
 )
 
-print('Generated L and D peptides.')</div>
+print("Generated L and D peptides.")</div>
 </div>
 </div>
 </div>
@@ -5283,27 +5271,27 @@ print('Generated L and D peptides.')</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">validator_l</span> <span class="o">=</span> <span class="n">PDBValidator</span><span class="p">(</span><span class="n">pdb_content</span><span class="o">=</span><span class="n">l_pdb</span><span class="p">)</span>
 <span class="n">l_stats</span> <span class="o">=</span> <span class="n">validator_l</span><span class="o">.</span><span class="n">get_ramachandran_statistics</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'L-Peptide Ramachandran Stats:'</span><span class="p">,</span> <span class="n">l_stats</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"L-Peptide Ramachandran Stats:"</span><span class="p">,</span> <span class="n">l_stats</span><span class="p">)</span>
 
 <span class="n">validator_d</span> <span class="o">=</span> <span class="n">PDBValidator</span><span class="p">(</span><span class="n">pdb_content</span><span class="o">=</span><span class="n">d_pdb</span><span class="p">)</span>
 <span class="n">d_stats</span> <span class="o">=</span> <span class="n">validator_d</span><span class="o">.</span><span class="n">get_ramachandran_statistics</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'D-Peptide Ramachandran Stats:'</span><span class="p">,</span> <span class="n">d_stats</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"D-Peptide Ramachandran Stats:"</span><span class="p">,</span> <span class="n">d_stats</span><span class="p">)</span>
 
 <span class="c1"># Check Z-scores for geometry</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'L Geometry Z-score:'</span><span class="p">,</span> <span class="n">validator_l</span><span class="o">.</span><span class="n">get_geometric_z_scores</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'D Geometry Z-score:'</span><span class="p">,</span> <span class="n">validator_d</span><span class="o">.</span><span class="n">get_geometric_z_scores</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"L Geometry Z-score:"</span><span class="p">,</span> <span class="n">validator_l</span><span class="o">.</span><span class="n">get_geometric_z_scores</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"D Geometry Z-score:"</span><span class="p">,</span> <span class="n">validator_d</span><span class="o">.</span><span class="n">get_geometric_z_scores</span><span class="p">())</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">validator_l = PDBValidator(pdb_content=l_pdb)
 l_stats = validator_l.get_ramachandran_statistics()
-print('L-Peptide Ramachandran Stats:', l_stats)
+print("L-Peptide Ramachandran Stats:", l_stats)
 
 validator_d = PDBValidator(pdb_content=d_pdb)
 d_stats = validator_d.get_ramachandran_statistics()
-print('D-Peptide Ramachandran Stats:', d_stats)
+print("D-Peptide Ramachandran Stats:", d_stats)
 
 # Check Z-scores for geometry
-print('L Geometry Z-score:', validator_l.get_geometric_z_scores())
-print('D Geometry Z-score:', validator_d.get_geometric_z_scores())</div>
+print("L Geometry Z-score:", validator_l.get_geometric_z_scores())
+print("D Geometry Z-score:", validator_d.get_geometric_z_scores())</div>
 </div>
 </div>
 </div>
@@ -5339,31 +5327,31 @@ print('D Geometry Z-score:', validator_d.get_geometric_z_scores())</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">linked</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">viewergrid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">view</span> <span class="o">=</span> <span class="n">py3Dmol</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">linked</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">viewergrid</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
 <span class="c1"># Left: L-Peptide</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">l_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">l_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
 <span class="c1"># Right: D-Peptide</span>
-<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">d_pdb</span><span class="p">,</span> <span class="s1">'pdb'</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s1">'stick'</span><span class="p">:</span> <span class="p">{}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">addModel</span><span class="p">(</span><span class="n">d_pdb</span><span class="p">,</span> <span class="s2">"pdb"</span><span class="p">,</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">setStyle</span><span class="p">({</span><span class="s2">"stick"</span><span class="p">:</span> <span class="p">{}},</span> <span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">view</span><span class="o">.</span><span class="n">zoomTo</span><span class="p">(</span><span class="n">viewer</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
 <span class="n">view</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">view = py3Dmol.view(width=800, height=400, linked=False, viewergrid=(1,2))
+<div class="clipboard-copy-txt" id="cell-5">view = py3Dmol.view(width=800, height=400, linked=False, viewergrid=(1, 2))
 
 # Left: L-Peptide
-view.addModel(l_pdb, 'pdb', viewer=(0,0))
-view.setStyle({'stick': {}}, viewer=(0,0))
-view.zoomTo(viewer=(0,0))
+view.addModel(l_pdb, "pdb", viewer=(0, 0))
+view.setStyle({"stick": {}}, viewer=(0, 0))
+view.zoomTo(viewer=(0, 0))
 
 # Right: D-Peptide
-view.addModel(d_pdb, 'pdb', viewer=(0,1))
-view.setStyle({'stick': {}}, viewer=(0,1))
-view.zoomTo(viewer=(0,1))
+view.addModel(d_pdb, "pdb", viewer=(0, 1))
+view.setStyle({"stick": {}}, viewer=(0, 1))
+view.zoomTo(viewer=(0, 1))
 
 view.show()</div>
 </div>
