@@ -130,7 +130,7 @@ def apply_transformation(
         >>> np.allclose(transformed, coords + t)
         True
     """
-    return (rotation @ coords.T).T + translation
+    return np.asarray((rotation @ coords.T).T + translation, dtype=np.float64)
 
 
 def superimpose_structures(
