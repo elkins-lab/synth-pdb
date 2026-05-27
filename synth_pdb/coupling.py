@@ -147,7 +147,8 @@ def predict_couplings_from_structure(
                 if p_angle is not None and not np.isnan(p_angle):
                     # J_D(phi) = J_L(-phi) due to stereochemical inversion.
                     # We round to 2 decimal places to match typical NMR precision.
-                    j_val = float(round(_j.calculate_hn_ha_coupling_from_phi(-p_angle), 2))
+                    # Use np.round().item() for maximum compatibility with all NumPy versions.
+                    j_val = np.round(_j.calculate_hn_ha_coupling_from_phi(-p_angle), 2).item()
 
             filtered_chain[res_id] = j_val
 
