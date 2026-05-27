@@ -157,7 +157,7 @@ Check out the [Incubator README](./incubator/README.md) for the full roadmap of 
 - **Salt Bridge Stabilization**: Automatic detection of ionic interactions with harmonic restraints in OpenMM.
 - **Advanced Chemical Shifts**: SPARTA-lite prediction + **Ring Current Effects** (shielding/deshielding from aromatic rings).
 - **Relaxation Rates**: Lipari-Szabo Model-Free formalism with **SASA-modulated Order Parameters** ($S^2$), allowing "buried" residues to be more rigid than "exposed" ones.
-- **Biophysical Realism**: 
+- **Biophysical Realism**:
     - **Backbone-Dependent Rotamers**: Chi angles depend on secondary structure.
     - **Pre-Proline Bias**: Residues preceding Proline automatically adopt restricted conformations (extended/beta).
     - **Cis-Proline Isomerization**: X-Pro bonds can adopt cis conformations (~5% probability).
@@ -211,15 +211,15 @@ Check out the [Incubator README](./incubator/README.md) for the full roadmap of 
 **synth-pdb** generates structures with realistic properties that mimic real experimental data:
 
 #### 🌡️ B-factors (Temperature Factors)
-**What**: Measure atomic mobility/flexibility (columns 61-66)  
-**Formula**: B = 8π²⟨u²⟩ (mean square displacement)  
-**Range**: 5-60 Ų  
+**What**: Measure atomic mobility/flexibility (columns 61-66)
+**Formula**: B = 8π²⟨u²⟩ (mean square displacement)
+**Range**: 5-60 Ų
 **Pattern**: Backbone (15-25) < Side chains (20-35) < Termini (30-50)
 
-#### 📊 Occupancy Values  
-**What**: Fraction of molecules with atom at position (columns 55-60)  
-**Range**: 0.85-1.00  
-**Correlation**: High B-factor ↔ Low occupancy  
+#### 📊 Occupancy Values
+**What**: Fraction of molecules with atom at position (columns 55-60)
+**Range**: 0.85-1.00
+**Correlation**: High B-factor ↔ Low occupancy
 **Pattern**: Backbone (0.95-1.00) > Side chains (0.85-0.95)
 
 #### 🔄 Backbone-Dependent Rotamer Libraries
@@ -249,8 +249,8 @@ The preferred shape of a side chain strongly depends on the shape of the backbon
 **Implementation**: **synth-pdb** mirrors sidechain coordinates across the N-CA-C backbone plane and uses standard PDB 3-letter codes (e.g., `DAL`, `DPH`).
 
 #### 🧬 Secondary Structures
-**What**: Regular backbone patterns (helices, sheets)  
-**Control**: Per-region via `--structure` parameter  
+**What**: Regular backbone patterns (helices, sheets)
+**Control**: Per-region via `--structure` parameter
 **Example**: `--structure "1-10:alpha,11-15:random,16-25:alpha"`
 
 #### 🧪 Residue-Specific Ramachandran Validation (MolProbity-Style)
@@ -263,9 +263,9 @@ The preferred shape of a side chain strongly depends on the shape of the backbon
 - **Precision**: Uses point-in-polygon algorithms for accurate classification (Favored, Allowed, Outlier).
 
 #### 📐 NeRF Geometry (The Construction Engine)
-**What**: Natural Extension Reference Frame algorithm  
-**Term**: Building 3D structures from "Internal Coordinates" (Z-Matrix)  
-**Mechanism**: Places each atom (N, CA, C, O) relative to the local coordinate system of the three previous atoms.  
+**What**: Natural Extension Reference Frame algorithm
+**Term**: Building 3D structures from "Internal Coordinates" (Z-Matrix)
+**Mechanism**: Places each atom (N, CA, C, O) relative to the local coordinate system of the three previous atoms.
 **Educational Value**: Teaches how math converts 1D sequences + 2D angles into 3D shapes.
 
 #### ⛓️ Metal Coordination (Cofactors)
@@ -293,7 +293,7 @@ The preferred shape of a side chain strongly depends on the shape of the backbon
 
 ### Educational Philosophy & Integrity
 
-`synth-pdb` is built on the principle of **"Code as Textbook"**. 
+`synth-pdb` is built on the principle of **"Code as Textbook"**.
 
 *   **Pedagogical Comments**: Key source files (`generator.py`, `test_bfactor.py`) contain detailed block comments explaining the *why* alongside the *how* (e.g., explaining Lipari-Szabo stiffness vs. B-factor flexibility).
 *   **Integrity Safeguards**: We include a specialized test suite (`tests/test_docs_integrity.py`) that strictly enforces the presence of these educational notes. This ensures that future refactoring never accidentally deletes the scientific context.
@@ -440,7 +440,7 @@ This effectively demonstrates:
   - Example: `--length 50`
 
 - `--sequence <SEQUENCE>`: Specify an exact amino acid sequence
-  - Formats: 
+  - Formats:
     - 1-letter codes: `"ACDEFG"`
     - 3-letter codes: `"ALA-CYS-ASP-GLU-PHE-GLY"`
   - Overrides `--length`
@@ -471,7 +471,7 @@ synth-pdb --mode dataset --dataset-format npz --num-samples 1000 --output my_tra
 ```
 
 **Features:**
-*   **Formats**: 
+*   **Formats**:
     *   `npz`: (Recommended) Compressed NumPy archives. Contains `coords` (L,5,3), `sequence` (One-hot), and `contact_map` (LxL). Ideal for PyTorch/TensorFlow dataloaders.
     *   `pdb`: Writes individual PDB files and CASP contact maps (slower, for legacy tools).
 *   **Multiprocessing**: Automatically uses all available CPU cores.
@@ -570,7 +570,7 @@ my_training_data/
 
 #### **Synthetic NMR Data**
 
-> **📦 NMR Functionality Powered by [`synth-nmr`](https://github.com/elkins/synth-nmr)**  
+> **📦 NMR Functionality Powered by [`synth-nmr`](https://github.com/elkins/synth-nmr)**
 > As of version 1.17.0, all NMR-related functionality (NOE calculation, relaxation rates, chemical shifts, J-couplings) is provided by the standalone [`synth-nmr`](https://pypi.org/project/synth-nmr/) package. This package can be used independently for NMR data generation in your own projects. The integration is fully backward compatible—all existing code continues to work without changes.
 
 
@@ -670,13 +670,13 @@ my_training_data/
 - `--metal-ions {auto,none}`: Control metal ion coordination.
   - `auto` (default): Scans for binding sites and injects ions.
   - `none`: Disables automatic coordination.
-  
+
 - `--phosphorylation-rate <FLOAT>`: Probability of phosphorylating S/T/Y residues.
   - Value between 0.0 and 1.0.
   - Converts SER->SEP, THR->TPO, TYR->PTR.
   - Mimics kinase activity for regulatory simulation.
   - Example: `--phosphorylation-rate 0.5`
-  
+
 - `--cis-proline-frequency <FLOAT>`: Probability of X-Pro peptide bond being Cis.
   - Default: `0.05` (5%)
   - Cis-Proline is critical for tight turns and folding.
@@ -769,7 +769,7 @@ synth-pdb --sequence ALA-PRO-GLY --minimize --solvent explicit --solvent-padding
 synth-pdb --sequence TRP-TYR-PHE --minimize --solvent explicit --solvent-padding 1.5 --keep-solvent --output full_water_box.pdb
 
 # 🚀 EXTREME Hardware Limit Test
-# Generate a large 50-residue sequence, bury it in a massive 2.5 nm water box, 
+# Generate a large 50-residue sequence, bury it in a massive 2.5 nm water box,
 # and run 10,000 steps of Langevin Dynamics equilibration.
 # WARNING: This will generate >50,000 atoms and heavily tax your CPU/GPU!
 synth-pdb --length 50 --conformation random --minimize --equilibrate --md-steps 10000 --solvent explicit --solvent-padding 2.5 --keep-solvent --output extreme_limit_test.pdb
@@ -1222,7 +1222,7 @@ Real protein structures require sophisticated methods like:
 
 ### Structural Limitations
 
-1. **Topology**: 
+1. **Topology**:
    - Primarily generates **linear** variations or simple **disulfide-bonded** loops.
    - Does not perform *de novo* folding (prediction of tertiary structure from sequence).
    - Multi-chain complexes are currently limited to simple docking preparations.
@@ -1634,14 +1634,40 @@ This project's validation logic is inspired by the foundational work of the **Ri
 
 ### Foundational Papers
 
-*   **Ramachandran Validation (Top8000)**:  
+*   **Ramachandran Validation (Top8000)**:
     Lovell, S. C., et al. (2003). "Structure validation by Calpha geometry: phi,psi and Cbeta deviation." *Proteins: Structure, Function, and Bioinformatics*, 50(3), 437–450.
     > Used for: `PDBValidator` Ramachandran polygons.
 
-*   **MolProbity**:  
+*   **MolProbity**:
     Chen, V. B., et al. (2010). "MolProbity: all-atom structure validation for macromolecular crystallography." *Acta Crystallographica Section D*, 66(1), 12–21.
     > Used for: Validation philosophy (favored/allowed/outlier classification).
 
-*   **Backbone-Dependent Rotamers**:  
+*   **Backbone-Dependent Rotamers**:
     Dunbrack, R. L., & Cohen, F. E. (1997). "Bayesian statistical analysis of protein side-chain rotamer preferences." *Protein Science*, 6(8), 1661–1681.
     > Used for: `synth_pdb.data.BACKBONE_DEPENDENT_ROTAMER_LIBRARY`.
+
+## Related Projects
+
+`synth-pdb` is the **foundation** of a broader ecosystem for synthetic biophysics data generation:
+
+| Project | Purpose |
+|---|---|
+| [synth-nmr](https://github.com/elkins/synth-nmr) | NMR observables (NOE, RDC, chemical shifts, J-couplings, relaxation) |
+| [synth-saxs](https://github.com/elkins/synth-saxs) | SAXS profile simulation via Debye formula |
+| [synth-cryo-em](https://github.com/elkins/synth-cryo-em) | Cryo-EM density map generation with CTF/noise modeling |
+| [synth-dynamics](https://github.com/georgeelkins/synth-dynamics) | ANM/Langevin dynamics for conformational ensembles |
+| [diff-biophys](https://github.com/elkins/diff-biophys) | Differentiable JAX implementations of all biophysics kernels |
+| [diff-ensemble](https://github.com/elkins/diff-ensemble) | VAE-based IDP structural ensemble prediction |
+| [TorsionTuner](https://github.com/elkins/TorsionTuner) | GNN structure refinement in torsional space |
+| [resonance-flow](https://github.com/elkins/resonance-flow) | End-to-end NMR-guided structure prediction |
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Open an issue to discuss the change before submitting a large PR.
+2. Run `pre-commit run --all-files` (Ruff + Mypy) before submitting.
+3. Add or update tests for any new functionality.
+4. Follow the existing docstring style.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) if present, or open a GitHub Discussion for questions.

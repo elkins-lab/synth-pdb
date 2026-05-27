@@ -45,7 +45,7 @@ def measure_probability(sequence, n_trials=100):
     print("\n" + "-" * 60)
     print(f"Trials: {n_trials}")
     print(f"Successes: {ssbond_hits}")
-    print(f"Probability: {ssbond_hits/n_trials * 100:.1f}%")
+    print(f"Probability: {ssbond_hits / n_trials * 100:.1f}%")
 
 
 if __name__ == "__main__":

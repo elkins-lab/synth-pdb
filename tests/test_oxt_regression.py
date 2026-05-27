@@ -27,7 +27,7 @@ def test_oxt_residue_numbering_regression():
         if len(matching_warnings) > 0:
             print("\nAll caught warnings:")
             for i, warning in enumerate(w):
-                print(f"{i+1}: {warning.category.__name__}: {warning.message}")
+                print(f"{i + 1}: {warning.category.__name__}: {warning.message}")
 
         assert len(matching_warnings) == 0, (
             f"Regression detected: Found 'two consecutive residues with same number' "

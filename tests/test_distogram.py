@@ -22,7 +22,6 @@ def create_triangle_structure():
 
 
 class TestDistogramExport:
-
     def test_distogram_calculation(self):
         """Test calculation of NxN distance matrix."""
         atoms = create_triangle_structure()

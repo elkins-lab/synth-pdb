@@ -18,7 +18,6 @@ def create_his_peptide():
 
 
 class TestBiophysics:
-
     def test_ph_titration_low_ph(self):
         """Test HIS -> HIP conversion at low pH."""
         atoms = create_his_peptide()

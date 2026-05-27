@@ -66,9 +66,9 @@ def test_karplus_analytical_values(phi_deg, expected, label):
     """
     result = calculate_hn_ha_coupling(phi_deg)
     print(f"\n  {label}: phi={phi_deg}deg  J_ref={expected:.3f} Hz  J_calc={result:.3f} Hz")
-    assert (
-        abs(result - expected) < 0.3
-    ), f"{label}: got {result:.3f} Hz, expected {expected:.3f} Hz (tol 0.3 Hz)"
+    assert abs(result - expected) < 0.3, (
+        f"{label}: got {result:.3f} Hz, expected {expected:.3f} Hz (tol 0.3 Hz)"
+    )
 
 
 def test_alpha_helix_coupling_is_small():
@@ -101,9 +101,9 @@ def test_coupling_physically_bounded():
     """3J(HN-HA) must stay within physical bounds [0, 12] Hz for all phi."""
     for phi in range(-180, 181, 5):
         j = calculate_hn_ha_coupling(float(phi))
-        assert (
-            0.0 <= j <= 12.0
-        ), f"Coupling {j:.3f} Hz at phi={phi}deg is outside physical bounds [0, 12] Hz"
+        assert 0.0 <= j <= 12.0, (
+            f"Coupling {j:.3f} Hz at phi={phi}deg is outside physical bounds [0, 12] Hz"
+        )
 
 
 def test_coupling_periodicity():
@@ -111,9 +111,9 @@ def test_coupling_periodicity():
     for phi in [-170.0, -90.0, 0.0, 45.0, 120.0]:
         j1 = calculate_hn_ha_coupling(phi)
         j2 = calculate_hn_ha_coupling(phi + 360.0)
-        assert (
-            abs(j1 - j2) < 1e-6
-        ), f"Karplus not periodic at phi={phi}deg: J({phi})={j1:.4f}, J({phi+360})={j2:.4f}"
+        assert abs(j1 - j2) < 1e-6, (
+            f"Karplus not periodic at phi={phi}deg: J({phi})={j1:.4f}, J({phi + 360})={j2:.4f}"
+        )
 
 
 def test_helix_sheet_coupling_ordering():
@@ -124,6 +124,6 @@ def test_helix_sheet_coupling_ordering():
     """
     j_helix = calculate_hn_ha_coupling(-60.0)
     j_sheet = calculate_hn_ha_coupling(-135.0)
-    assert (
-        j_sheet > j_helix + 3.0
-    ), f"Sheet J ({j_sheet:.2f} Hz) should exceed helix J ({j_helix:.2f} Hz) by > 3 Hz"
+    assert j_sheet > j_helix + 3.0, (
+        f"Sheet J ({j_sheet:.2f} Hz) should exceed helix J ({j_helix:.2f} Hz) by > 3 Hz"
+    )

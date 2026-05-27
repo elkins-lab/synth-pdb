@@ -72,6 +72,6 @@ def test_bfactor_loop_vs_helix():
 
     # Loop should be more flexible (higher B-factor)
     # We use a small delta to ensure it's meaningfully higher, or just > if we use enough residues
-    assert (
-        loop_bfactor > helix_bfactor
-    ), f"Loop regions ({loop_bfactor:.2f}) should have higher B-factors than helices ({helix_bfactor:.2f})"
+    assert loop_bfactor > helix_bfactor, (
+        f"Loop regions ({loop_bfactor:.2f}) should have higher B-factors than helices ({helix_bfactor:.2f})"
+    )

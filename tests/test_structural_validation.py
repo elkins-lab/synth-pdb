@@ -113,9 +113,9 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
         min_backbone = struc.AtomArray(len(min_backbone_coords))
         min_backbone.coord = min_backbone_coords
 
-    assert len(exp_backbone) == len(
-        min_backbone
-    ), f"Atom count mismatch: {len(exp_backbone)} vs {len(min_backbone)}"
+    assert len(exp_backbone) == len(min_backbone), (
+        f"Atom count mismatch: {len(exp_backbone)} vs {len(min_backbone)}"
+    )
 
     superimposed, transformation = struc.superimpose(exp_backbone, min_backbone)
     rmsd = struc.rmsd(exp_backbone, superimposed)
@@ -179,9 +179,9 @@ def test_ubiquitin_structural_fidelity(experimental_pdb, tmp_path):
         print(f"  Violation: {v}")
 
     # We expect 0 major violations after minimization
-    assert (
-        len(important_violations) == 0
-    ), f"Found structural violations after minimization: {important_violations}"
+    assert len(important_violations) == 0, (
+        f"Found structural violations after minimization: {important_violations}"
+    )
 
 
 @pytest.mark.network

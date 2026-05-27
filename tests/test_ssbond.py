@@ -151,9 +151,9 @@ class TestDisulfideBonds:
 
             # Extended conformation should have no close CYS pairs
             # (CYS 1 and CYS 9 are far apart)
-            assert (
-                len(disulfides) == 0
-            ), f"Should not detect disulfides in extended structure, but found {len(disulfides)}"
+            assert len(disulfides) == 0, (
+                f"Should not detect disulfides in extended structure, but found {len(disulfides)}"
+            )
         finally:
             os.remove(temp_path)
 
@@ -280,9 +280,9 @@ class TestDisulfideBonds:
                 ss_conect_found = True
                 break
 
-        assert (
-            ss_conect_found
-        ), f"No CONECT record found between SG1 ({sg1_idx}) and SG6 ({sg6_idx})"
+        assert ss_conect_found, (
+            f"No CONECT record found between SG1 ({sg1_idx}) and SG6 ({sg6_idx})"
+        )
 
     def test_handles_no_cysteines_gracefully(self):
         """Test that structures without cysteines don't cause errors.

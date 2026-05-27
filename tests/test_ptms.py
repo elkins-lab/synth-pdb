@@ -24,7 +24,8 @@ class TestPTMs:
         # NOTE: API not implemented yet
         try:
             pdb_content = generate_pdb_content(
-                sequence_str=seq, phosphorylation_rate=1.0  # 100% conversion
+                sequence_str=seq,
+                phosphorylation_rate=1.0,  # 100% conversion
             )
         except TypeError:
             pytest.fail("generate_pdb_content() does not accept 'phosphorylation_rate' kwarg.")

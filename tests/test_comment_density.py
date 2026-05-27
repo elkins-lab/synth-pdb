@@ -129,6 +129,6 @@ def test_library_documentation_density(file_path: str, min_ratio: float) -> None
         full_path = file_path
 
     ratio = calculate_comment_ratio(full_path)
-    assert (
-        ratio >= min_ratio
-    ), f"Documentation density for {file_path} is {ratio:.2f}, which is below the required {min_ratio}"
+    assert ratio >= min_ratio, (
+        f"Documentation density for {file_path} is {ratio:.2f}, which is below the required {min_ratio}"
+    )

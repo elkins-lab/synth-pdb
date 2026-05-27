@@ -343,7 +343,7 @@ class TestGenerator(unittest.TestCase):
                     self.assertEqual(
                         atom_array.res_id[atom_idx],
                         atom_array.res_id[atom_idx - 1] + 1,
-                        f"Residue ID not sequential: {atom_array.res_id[atom_idx-1]} -> {atom_array.res_id[atom_idx]}",
+                        f"Residue ID not sequential: {atom_array.res_id[atom_idx - 1]} -> {atom_array.res_id[atom_idx]}",
                     )
 
             # Check if total number of unique residues matches the peptide length
@@ -586,7 +586,9 @@ class TestGenerator(unittest.TestCase):
                 self.assertGreater(len(atom_lines), 0, "No ATOM lines found.")
 
                 for i, line in enumerate(atom_lines):
-                    self.assertEqual(len(line), 80, f"Line length not 80 for line {i+1}: '{line}'")
+                    self.assertEqual(
+                        len(line), 80, f"Line length not 80 for line {i + 1}: '{line}'"
+                    )
 
                     atom_data = self._parse_atom_line(line)
 

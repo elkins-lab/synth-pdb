@@ -143,9 +143,9 @@ class TestBfactorCalculation:
 
         for atom_name, res_num, total_res, res_name in test_cases:
             bfactor = _calculate_bfactor(atom_name, res_num, total_res, res_name)
-            assert (
-                5.0 <= bfactor <= 100.0
-            ), f"B-factor {bfactor} out of range for {res_name} {atom_name}"
+            assert 5.0 <= bfactor <= 100.0, (
+                f"B-factor {bfactor} out of range for {res_name} {atom_name}"
+            )
 
     def test_bfactor_in_generated_pdb(self):
         """Test that generated PDB files contain realistic B-factors.
@@ -212,6 +212,6 @@ class TestBfactorCalculation:
         c_term_avg = np.mean([ca_bfactors[i] for i in range(18, 21)])
 
         # At least one terminus should be higher than middle
-        assert (n_term_avg > middle_avg) or (
-            c_term_avg > middle_avg
-        ), "Termini should have higher B-factors than middle"
+        assert (n_term_avg > middle_avg) or (c_term_avg > middle_avg), (
+            "Termini should have higher B-factors than middle"
+        )

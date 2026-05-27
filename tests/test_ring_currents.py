@@ -86,9 +86,9 @@ def test_ring_current_shielding():
     # The current code (without RC) will just return base_shift +/- noise (0.15)
 
     # Ensure it's not just noise
-    assert probe_shift < (
-        base_shift - 0.2
-    ), f"Probe above ring should be shielded! (Got {probe_shift}, Base {base_shift})"
+    assert probe_shift < (base_shift - 0.2), (
+        f"Probe above ring should be shielded! (Got {probe_shift}, Base {base_shift})"
+    )
 
 
 def test_ring_current_deshielding():
@@ -111,6 +111,6 @@ def test_ring_current_deshielding():
     print(f"Deshielded Probe: {probe_shift}")
 
     # Ring Current Effect should be POSITIVE (Downfield Shift)
-    assert probe_shift > (
-        base_shift + 0.2
-    ), f"Probe in ring plane should be deshielded! (Got {probe_shift}, Base {base_shift})"
+    assert probe_shift > (base_shift + 0.2), (
+        f"Probe in ring plane should be deshielded! (Got {probe_shift}, Base {base_shift})"
+    )

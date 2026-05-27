@@ -6,7 +6,6 @@ from synth_pdb.packing import SideChainPacker
 
 
 class TestPackingCoverage:
-
     def get_dummy_peptide(self):
         # Create a simple structure
         atoms = struc.array(

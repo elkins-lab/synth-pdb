@@ -125,6 +125,6 @@ def test_side_effect_flag_produces_file(
         # A 0-byte output is almost certainly a regression (the call site
         # opened the file but never wrote - happens when an exception is
         # swallowed mid-write).
-        assert (
-            out_path.stat().st_size > 0
-        ), f"{case_id!r} produced an empty {fname!r} - write path likely failed silently."
+        assert out_path.stat().st_size > 0, (
+            f"{case_id!r} produced an empty {fname!r} - write path likely failed silently."
+        )

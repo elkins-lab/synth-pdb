@@ -19,9 +19,9 @@ def test_pre_pro_definitions_exist():
     """TDD: Verify PRE_PRO definitions exist in data.py.
     Currently fails because key is missing.
     """
-    assert (
-        "PRE_PRO" in RAMACHANDRAN_REGIONS
-    ), "PRE_PRO distribution missing from RAMACHANDRAN_REGIONS"
+    assert "PRE_PRO" in RAMACHANDRAN_REGIONS, (
+        "PRE_PRO distribution missing from RAMACHANDRAN_REGIONS"
+    )
 
 
 def test_pre_pro_distribution_bias():
@@ -86,6 +86,6 @@ def test_gly_pro_exception():
     # If we see significant positive Phis, we know it's using GLY map.
     pos_phi_frac = np.sum(np.array(phis) > 0) / 500.0
 
-    assert (
-        pos_phi_frac > 0.1
-    ), "GLY-PRO should still retain GLY characteristics (positive Phi allowed)"
+    assert pos_phi_frac > 0.1, (
+        "GLY-PRO should still retain GLY characteristics (positive Phi allowed)"
+    )

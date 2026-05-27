@@ -116,6 +116,10 @@ def test_decoy_generator_drift_integration(tmp_path):
 
     # Generate with high drift
     decoys = gen.generate_ensemble(
-        sequence=sequence, n_decoys=1, out_dir=str(out_dir), drift=45.0, seed=123  # Massive drift
+        sequence=sequence,
+        n_decoys=1,
+        out_dir=str(out_dir),
+        drift=45.0,
+        seed=123,  # Massive drift
     )
     assert len(decoys) == 1

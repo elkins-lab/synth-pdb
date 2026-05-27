@@ -73,7 +73,8 @@ class TestCisProline:
         seq = "APA"  # ALA-PRO-ALA. The A-P bond should be cis.
 
         content = generate_pdb_content(
-            sequence_str=seq, cis_proline_frequency=1.0  # 100% probability
+            sequence_str=seq,
+            cis_proline_frequency=1.0,  # 100% probability
         )
 
         omegas = self._get_omega_angles(content)

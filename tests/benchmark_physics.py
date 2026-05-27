@@ -32,7 +32,7 @@ def run_benchmark():
     end_time = time.time()
     duration_opt = end_time - start_time
     logger.info(f" Optimized Generation took {duration_opt:.4f} seconds.")
-    logger.info(f" Speedup: {duration/duration_opt:.2f}x")
+    logger.info(f" Speedup: {duration / duration_opt:.2f}x")
 
     if len(pdb_content) < 100:
         logger.error("Generated content seems too short!")

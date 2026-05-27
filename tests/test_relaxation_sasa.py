@@ -71,9 +71,9 @@ def test_sasa_modulation_of_s2():
     # Exposed should stay near 0.65 (or lower?)
 
     # Assert significant difference (> 0.05)
-    assert (
-        s2_buried > s2_exposed + 0.05
-    ), f"Buried residue S2 ({s2_buried}) should be higher than Exposed S2 ({s2_exposed})"
+    assert s2_buried > s2_exposed + 0.05, (
+        f"Buried residue S2 ({s2_buried}) should be higher than Exposed S2 ({s2_exposed})"
+    )
 
 
 def test_sasa_integration_runs():

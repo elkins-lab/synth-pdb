@@ -45,9 +45,9 @@ class TestTopologicalComplexity:
                 ss_conect_found = True
                 break
 
-        assert (
-            ss_conect_found
-        ), f"Disulfide CONECT missing between {sg_indices[0]} and {sg_indices[1]}"
+        assert ss_conect_found, (
+            f"Disulfide CONECT missing between {sg_indices[0]} and {sg_indices[1]}"
+        )
 
         # 3. Verify N-C Closure
         import io
@@ -71,6 +71,6 @@ class TestTopologicalComplexity:
         ss_dist = np.sqrt(np.sum((sg1.coord - sg6.coord) ** 2))
         # Minimized structures can be highly strained (especially small cyclic rings),
         # matching the generator's generous range [1.5, 3.0].
-        assert (
-            1.5 <= ss_dist <= 3.0
-        ), f"Disulfide bond distance invalid in cyclic peptide! Dist: {ss_dist:.3f}"
+        assert 1.5 <= ss_dist <= 3.0, (
+            f"Disulfide bond distance invalid in cyclic peptide! Dist: {ss_dist:.3f}"
+        )

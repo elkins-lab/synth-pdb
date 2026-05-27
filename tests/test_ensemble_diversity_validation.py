@@ -143,6 +143,6 @@ def test_medoid_has_minimal_mean_deviation(ensemble_coords):
     overall_mean = float(np.mean(rmsds[rmsds > 0]))  # non-zero off-diagonal
 
     print(f"\n  Medoid mean RMSD = {medoid_mean:.3f} A  |  Ensemble mean = {overall_mean:.3f} A")
-    assert (
-        medoid_mean <= overall_mean * 1.10
-    ), f"Medoid mean RMSD ({medoid_mean:.3f}) > 110% of ensemble mean ({overall_mean:.3f})"
+    assert medoid_mean <= overall_mean * 1.10, (
+        f"Medoid mean RMSD ({medoid_mean:.3f}) > 110% of ensemble mean ({overall_mean:.3f})"
+    )

@@ -180,9 +180,9 @@ class TestRDCPhysics:
             val = rdcs[1]
             rdc_max = 2 * da
             rdc_min = da * (-1 - 1.5 * R)
-            assert (
-                rdc_min <= val <= rdc_max
-            ), f"RDC={val:.2f} Hz outside theoretical range [{rdc_min:.2f}, {rdc_max:.2f}] Hz"
+            assert rdc_min <= val <= rdc_max, (
+                f"RDC={val:.2f} Hz outside theoretical range [{rdc_min:.2f}, {rdc_max:.2f}] Hz"
+            )
 
 
 class TestRDCEdgeCases:

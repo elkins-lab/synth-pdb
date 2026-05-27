@@ -41,9 +41,9 @@ class TestStericClashRobustness(unittest.TestCase):
         # If distance < 1e-6 (or similar), we might need a fallback.
 
         # If it fails, I'll need to add a jitter to the implementation.
-        assert (
-            dist > 1.9
-        ), f"Exactly superimposed atoms should be pushed apart, but distance is {dist}"
+        assert dist > 1.9, (
+            f"Exactly superimposed atoms should be pushed apart, but distance is {dist}"
+        )
 
     def test_apply_steric_clash_tweak_multi_chain(self):
         """Test that clashes between different chains are detected and resolved."""

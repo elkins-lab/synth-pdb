@@ -84,12 +84,12 @@ class TestRamachandranDistributions:
         - GENERAL: All other 18 amino acids
         """
         # Check that we have the necessary keys
-        assert (
-            "GLY" in RAMACHANDRAN_PRESETS or "glycine" in RAMACHANDRAN_PRESETS
-        ), "Should have GLY-specific Ramachandran data"
-        assert (
-            "PRO" in RAMACHANDRAN_PRESETS or "proline" in RAMACHANDRAN_PRESETS
-        ), "Should have PRO-specific Ramachandran data"
+        assert "GLY" in RAMACHANDRAN_PRESETS or "glycine" in RAMACHANDRAN_PRESETS, (
+            "Should have GLY-specific Ramachandran data"
+        )
+        assert "PRO" in RAMACHANDRAN_PRESETS or "proline" in RAMACHANDRAN_PRESETS, (
+            "Should have PRO-specific Ramachandran data"
+        )
 
     def test_glycine_can_access_left_handed_alpha(self):
         """Test that glycine structures can have positive phi angles.
@@ -145,7 +145,7 @@ class TestRamachandranDistributions:
         # With 100 iterations (approx 200 angles), this is statistically robust
         assert positive_phi_count / total_angles > 0.05, (
             f"GLY should access left-handed alpha region (positive phi), "
-            f"but only {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had positive phi"
+            f"but only {positive_phi_count}/{total_angles} ({100 * positive_phi_count / total_angles:.1f}%) had positive phi"
         )
 
     def test_proline_has_restricted_phi(self):
@@ -238,7 +238,7 @@ class TestRamachandranDistributions:
         # Less than 5% should have positive phi (should avoid left-handed alpha)
         assert positive_phi_count / total_angles < 0.05, (
             f"Non-GLY residues should avoid left-handed alpha, "
-            f"but {positive_phi_count}/{total_angles} ({100*positive_phi_count/total_angles:.1f}%) had phi > 30deg"
+            f"but {positive_phi_count}/{total_angles} ({100 * positive_phi_count / total_angles:.1f}%) had phi > 30deg"
         )
 
     def test_alpha_helix_conformation_uses_correct_angles(self):
@@ -271,12 +271,12 @@ class TestRamachandranDistributions:
             psi_deg = np.degrees(psi_valid)
 
             # Check that angles are in alpha helix region
-            assert (
-                np.mean(phi_deg) < -50 and np.mean(phi_deg) > -70
-            ), f"Alpha helix phi should be ~-60deg, got {np.mean(phi_deg):.1f}deg"
-            assert (
-                np.mean(psi_deg) < -35 and np.mean(psi_deg) > -55
-            ), f"Alpha helix psi should be ~-45deg, got {np.mean(psi_deg):.1f}deg"
+            assert np.mean(phi_deg) < -50 and np.mean(phi_deg) > -70, (
+                f"Alpha helix phi should be ~-60deg, got {np.mean(phi_deg):.1f}deg"
+            )
+            assert np.mean(psi_deg) < -35 and np.mean(psi_deg) > -55, (
+                f"Alpha helix psi should be ~-45deg, got {np.mean(psi_deg):.1f}deg"
+            )
         finally:
             os.remove(temp_path)
 
@@ -306,11 +306,11 @@ class TestRamachandranDistributions:
             psi_deg = np.degrees(psi_valid)
 
             # Check that angles are in beta sheet region
-            assert (
-                np.mean(phi_deg) < -100 and np.mean(phi_deg) > -140
-            ), f"Beta sheet phi should be ~-120deg, got {np.mean(phi_deg):.1f}deg"
-            assert (
-                np.mean(psi_deg) > 100 and np.mean(psi_deg) < 140
-            ), f"Beta sheet psi should be ~+120deg, got {np.mean(psi_deg):.1f}deg"
+            assert np.mean(phi_deg) < -100 and np.mean(phi_deg) > -140, (
+                f"Beta sheet phi should be ~-120deg, got {np.mean(phi_deg):.1f}deg"
+            )
+            assert np.mean(psi_deg) > 100 and np.mean(psi_deg) < 140, (
+                f"Beta sheet psi should be ~+120deg, got {np.mean(psi_deg):.1f}deg"
+            )
         finally:
             os.remove(temp_path)

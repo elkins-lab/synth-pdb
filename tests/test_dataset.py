@@ -87,9 +87,9 @@ class TestDatasetGenerator:
                         args = ("id_001", 20, "alpha", "train", str(output_dir))
                         result = _generate_single_sample_task(args)
 
-                        assert (
-                            result["success"] is True
-                        ), f"Failed with error: {result.get('error')}"
+                        assert result["success"] is True, (
+                            f"Failed with error: {result.get('error')}"
+                        )
                         assert result["sample_id"] == "id_001"
                         assert (Path(output_dir) / "train/id_001.pdb").exists()
                         assert (Path(output_dir) / "train/id_001.casp").exists()

@@ -8,7 +8,6 @@ from synth_pdb import physics
 
 
 class TestMDEquilibration:
-
     def test_equilibrate_calls_simulation_step(self, mocker, tmp_path):
         """Test that equilibrate runs minimization AND simulation steps."""
         # 1. Prepare Mocks

@@ -294,11 +294,11 @@ class TestScientificRigor(unittest.TestCase):
 
         print(
             f"\n[CSI] Helix  CA mean: {helix_mean:+.3f} ppm  "
-            f"(frac > +0.7: {sum(v > 0.7 for v in helix_vals)/len(helix_vals):.2f})"
+            f"(frac > +0.7: {sum(v > 0.7 for v in helix_vals) / len(helix_vals):.2f})"
         )
         print(
             f"[CSI] Strand CA mean: {strand_mean:+.3f} ppm  "
-            f"(frac < -0.7: {sum(v < -0.7 for v in strand_vals)/len(strand_vals):.2f})"
+            f"(frac < -0.7: {sum(v < -0.7 for v in strand_vals) / len(strand_vals):.2f})"
         )
 
         # -- Assertions (Wishart & Sykes 1994 thresholds) -----------------------

@@ -93,9 +93,9 @@ class TestBurialRatioFormula:
         # With mean_hydro ~ 0, ratio = mean_polar / 1e-6 which is very large
         # In the else-branch mean_polar defaults to 1.0 when polar_vals is empty,
         # but here GLY IS polar so polar_vals will be populated.
-        assert (
-            result["burial_ratio"] > 1.0
-        ), f"All-polar sequence should give burial_ratio > 1.0, got {result['burial_ratio']}"
+        assert result["burial_ratio"] > 1.0, (
+            f"All-polar sequence should give burial_ratio > 1.0, got {result['burial_ratio']}"
+        )
 
     def test_all_hydrophobic_gives_lower_burial_ratio_than_all_polar(self) -> None:
         """A pure hydrophobic chain should have a lower burial ratio than a polar chain."""
@@ -165,9 +165,9 @@ class TestHydrophobicClassification:
         seq = f"GGG{one_letter}GGG"
         v = _make_validator(seq)
         result = v.calculate_residue_sasa()
-        assert (
-            result["mean_hydrophobic_sasa"] > 0.0
-        ), f"{three_letter} was not classified as hydrophobic (mean_hydrophobic_sasa=0)"
+        assert result["mean_hydrophobic_sasa"] > 0.0, (
+            f"{three_letter} was not classified as hydrophobic (mean_hydrophobic_sasa=0)"
+        )
 
     def test_gly_ala_ser_classified_as_polar(self) -> None:
         """GLY, ALA, SER should NOT appear in hydro_vals - only in polar."""
@@ -275,6 +275,6 @@ class TestBurialRatioInQualityReport:
         v = _make_validator("ALALALA")
         direct = v.calculate_residue_sasa()["burial_ratio"]
         report = v.get_quality_report()["hydrophobic_burial_ratio"]
-        assert (
-            abs(direct - report) < 1e-9
-        ), f"Direct call returned {direct:.6f}, report returned {report:.6f}"
+        assert abs(direct - report) < 1e-9, (
+            f"Direct call returned {direct:.6f}, report returned {report:.6f}"
+        )

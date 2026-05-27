@@ -62,15 +62,15 @@ def test_optimization_improves_score():
     logger.info(f"Final Score: {final_score}")
 
     # It should not get worse
-    assert (
-        final_score <= initial_score + 1e-6
-    ), "Optimization should not worsen the score significantly"
+    assert final_score <= initial_score + 1e-6, (
+        "Optimization should not worsen the score significantly"
+    )
 
     # Ideally it improves, but if initial was already good (0.0), it stays 0.0
     if initial_score > 1.0:
-        assert final_score < (
-            initial_score - 0.1
-        ), "Optimization should improve score significantly if major clashes exist"
+        assert final_score < (initial_score - 0.1), (
+            "Optimization should improve score significantly if major clashes exist"
+        )
 
 
 def test_packer_class():

@@ -86,9 +86,9 @@ def test_best_of_n_debug_enumerates_each_violation(
         "Missing DEBUG report header - per-violation enumeration was likely "
         "dropped from the --guarantee-valid retry path."
     )
-    assert (
-        "--- End Validation Report ---" in caplog.text
-    ), "Missing DEBUG report footer - enumeration block is unbalanced."
+    assert "--- End Validation Report ---" in caplog.text, (
+        "Missing DEBUG report footer - enumeration block is unbalanced."
+    )
     for v in canned_violations:
         assert v in caplog.text, f"Canned violation {v!r} not enumerated at DEBUG"
 
@@ -151,8 +151,8 @@ def test_best_of_n_debug_silent_at_info_level(
 
     # Summary warning should appear; the DEBUG enumeration should not.
     assert "1 violations. Retrying..." in caplog.text
-    assert (
-        "--- PDB Validation Report for failed attempt ---" not in caplog.text
-    ), "DEBUG-only enumeration block leaked at INFO level."
+    assert "--- PDB Validation Report for failed attempt ---" not in caplog.text, (
+        "DEBUG-only enumeration block leaked at INFO level."
+    )
     for v in canned_violations:
         assert v not in caplog.text, f"Per-violation enumeration leaked at INFO: {v!r}"

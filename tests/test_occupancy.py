@@ -75,9 +75,9 @@ class TestOccupancyCalculation:
         )
 
         # Backbone should have higher occupancy (more ordered)
-        assert (
-            backbone_avg > sidechain_avg
-        ), f"Backbone occupancy ({backbone_avg:.2f}) should be > side chain ({sidechain_avg:.2f})"
+        assert backbone_avg > sidechain_avg, (
+            f"Backbone occupancy ({backbone_avg:.2f}) should be > side chain ({sidechain_avg:.2f})"
+        )
 
     def test_terminal_residues_lower_occupancy(self):
         """Test that terminal residues have lower occupancy than middle residues.
@@ -108,12 +108,12 @@ class TestOccupancyCalculation:
         )
 
         # Termini should have lower occupancy (more disordered)
-        assert (
-            n_term_avg < middle_avg
-        ), f"N-terminus ({n_term_avg:.2f}) should have lower occupancy than middle ({middle_avg:.2f})"
-        assert (
-            c_term_avg < middle_avg
-        ), f"C-terminus ({c_term_avg:.2f}) should have lower occupancy than middle ({middle_avg:.2f})"
+        assert n_term_avg < middle_avg, (
+            f"N-terminus ({n_term_avg:.2f}) should have lower occupancy than middle ({middle_avg:.2f})"
+        )
+        assert c_term_avg < middle_avg, (
+            f"C-terminus ({c_term_avg:.2f}) should have lower occupancy than middle ({middle_avg:.2f})"
+        )
 
     def test_flexible_residues_lower_occupancy(self):
         """Test that flexible residues have lower occupancy.
@@ -150,9 +150,9 @@ class TestOccupancyCalculation:
             ]
         )
 
-        assert (
-            gly_avg < ala_avg
-        ), f"GLY ({gly_avg:.2f}) should have lower occupancy than ALA ({ala_avg:.2f})"
+        assert gly_avg < ala_avg, (
+            f"GLY ({gly_avg:.2f}) should have lower occupancy than ALA ({ala_avg:.2f})"
+        )
 
     def test_rigid_residues_higher_occupancy(self):
         """Test that rigid residues have higher occupancy.
@@ -188,9 +188,9 @@ class TestOccupancyCalculation:
             ]
         )
 
-        assert (
-            pro_avg > ala_avg
-        ), f"PRO ({pro_avg:.2f}) should have higher occupancy than ALA ({ala_avg:.2f})"
+        assert pro_avg > ala_avg, (
+            f"PRO ({pro_avg:.2f}) should have higher occupancy than ALA ({ala_avg:.2f})"
+        )
 
     def test_occupancy_realistic_range(self):
         """Test that occupancy values are in realistic range (0.85-1.00).
@@ -222,9 +222,9 @@ class TestOccupancyCalculation:
 
         for atom_name, res_num, total_res, res_name, bf in test_cases:
             occupancy = _calculate_occupancy(atom_name, res_num, total_res, res_name, bf)
-            assert (
-                0.85 <= occupancy <= 1.00
-            ), f"Occupancy {occupancy:.2f} out of range for {res_name} {atom_name}"
+            assert 0.85 <= occupancy <= 1.00, (
+                f"Occupancy {occupancy:.2f} out of range for {res_name} {atom_name}"
+            )
 
     def test_occupancy_correlates_with_bfactor(self):
         """Test that lower occupancy correlates with higher B-factors.
@@ -269,9 +269,9 @@ class TestOccupancyCalculation:
         )
 
         # Lower B-factor should have higher occupancy
-        assert (
-            occ_low_bf > occ_high_bf
-        ), f"Low B-factor occupancy ({occ_low_bf:.2f}) should be > high B-factor ({occ_high_bf:.2f})"
+        assert occ_low_bf > occ_high_bf, (
+            f"Low B-factor occupancy ({occ_low_bf:.2f}) should be > high B-factor ({occ_high_bf:.2f})"
+        )
 
     def test_occupancy_in_generated_pdb(self):
         """Test that generated PDB files contain realistic occupancy values.
@@ -305,9 +305,9 @@ class TestOccupancyCalculation:
         assert not all(o == 1.00 for o in occupancies), "All occupancies are 1.00 (not realistic)"
 
         # Should be in realistic range
-        assert all(
-            0.85 <= o <= 1.00 for o in occupancies
-        ), f"Some occupancies out of range: {occupancies}"
+        assert all(0.85 <= o <= 1.00 for o in occupancies), (
+            f"Some occupancies out of range: {occupancies}"
+        )
 
         # Should show variation (not all the same)
         assert len(set(occupancies)) > 1, "All occupancies are identical (should vary)"
@@ -347,6 +347,6 @@ class TestOccupancyCalculation:
         c_term_avg = np.mean([ca_occupancies[i] for i in range(18, 21)])
 
         # At least one terminus should be lower than middle
-        assert (n_term_avg < middle_avg) or (
-            c_term_avg < middle_avg
-        ), "Termini should have lower occupancy than middle"
+        assert (n_term_avg < middle_avg) or (c_term_avg < middle_avg), (
+            "Termini should have lower occupancy than middle"
+        )

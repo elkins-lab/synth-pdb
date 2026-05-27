@@ -1832,8 +1832,7 @@ def _assemble_output(
         ter_res_num = int(last_protein_atom_line[22:26].strip())
 
         ter_record = (
-            f"TER   {ter_atom_num: >5}      {ter_res_name: >3} "
-            f"{ter_chain_id: <1}{ter_res_num: >4}"
+            f"TER   {ter_atom_num: >5}      {ter_res_name: >3} {ter_chain_id: <1}{ter_res_num: >4}"
         ).ljust(80)
 
         # Standard insertion after last ATOM

@@ -11,7 +11,6 @@ def run_synth_pdb(args):
 
 
 class TestEducationalExamples:
-
     def test_glucagon_alpha_helix(self, tmp_path):
         """Test Glucagon (29 residues) as an alpha-helical hormone.
         Verifies that the generated PDB has low Ramachandran violations for an alpha helix.
@@ -108,9 +107,9 @@ class TestEducationalExamples:
         # BPTI is small and constrained; some disulfides should be detected.
         # Check for SSBOND and CONECT correlation
         if "SSBOND" in content:
-            assert (
-                "CONECT" in content
-            ), "SSBOND header present but no CONECT records for structural bonding"
+            assert "CONECT" in content, (
+                "SSBOND header present but no CONECT records for structural bonding"
+            )
 
             # Verify that SG atoms are involved in CONECT records
             lines = content.split("\n")

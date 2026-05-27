@@ -620,9 +620,9 @@ class TestPDBValidator:
         tweaked_clashes = [v for v in tweaked_validator.get_violations() if "Steric clash" in v]
 
         # Assert that clashes are reduced
-        assert len(tweaked_clashes) < len(
-            initial_clashes
-        ), f"Expected clashes to be reduced, but got {len(tweaked_clashes)} from {len(initial_clashes)}"
+        assert len(tweaked_clashes) < len(initial_clashes), (
+            f"Expected clashes to be reduced, but got {len(tweaked_clashes)} from {len(initial_clashes)}"
+        )
         # Optionally, check that total violations are not drastically increased (for a simple tweak)
         # For simplicity, we just check reduction of steric clashes for now.
 

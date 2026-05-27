@@ -104,9 +104,9 @@ def test_val_rotamer_dependence_on_structure():
     # Expectation: Beta loves Trans (0.40), Alpha hates it (0.05)
     # Generic: Trans is 0.20
     # Difference should be large
-    assert (
-        abs(alpha_trans - beta_trans) > 0.10
-    ), f"VAL: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    assert abs(alpha_trans - beta_trans) > 0.10, (
+        f"VAL: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    )
 
 
 def test_leu_rotamer_dependence_on_structure():
@@ -131,9 +131,9 @@ def test_leu_rotamer_dependence_on_structure():
     beta_trans = beta_counts["t"] / 30.0
 
     # This assertion should FAIL if both use Generic Library
-    assert (
-        abs(alpha_trans - beta_trans) > 0.10
-    ), f"LEU: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    assert abs(alpha_trans - beta_trans) > 0.10, (
+        f"LEU: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    )
 
 
 def test_phe_rotamer_dependence_on_structure():
@@ -157,9 +157,9 @@ def test_phe_rotamer_dependence_on_structure():
     alpha_trans = alpha_counts["t"] / 30.0
     beta_trans = beta_counts["t"] / 30.0
 
-    assert (
-        abs(alpha_trans - beta_trans) > 0.10
-    ), f"PHE: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    assert abs(alpha_trans - beta_trans) > 0.10, (
+        f"PHE: Distributions similar. Alpha={alpha_trans}, Beta={beta_trans}"
+    )
 
 
 def test_arg_rotamer_dependence():

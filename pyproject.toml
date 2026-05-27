@@ -13,10 +13,10 @@ authors = [
     {name = "George Elkins", email = "george@example.com"}
 ]
 keywords = [
-    "pdb", 
-    "protein", 
-    "structure", 
-    "bioinformatics", 
+    "pdb",
+    "protein",
+    "structure",
+    "bioinformatics",
     "testing",
     "peptide-generation",
     "molecular-modeling",
@@ -44,7 +44,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=1.26.4,<2.0",
+    "numpy>=1.26.4",
     "biotite>=0.35.0",
     "openmm>=8.1.0,!=8.5.0,!=8.5.1",
     "numba>=0.57.0",
@@ -131,16 +131,13 @@ synth_pdb = ["py.typed", "quality/models/*.joblib", "quality/models/*.pt"]
 
 [tool.black]
 line-length = 100
-target-version = ["py310", "py311"]
+target-version = ["py310", "py311", "py312"]
 include = '\.pyi?$'
 extend-exclude = '''
 /(
-  # directories
   \.eggs
   | \.git
-  | \.hg
   | \.mypy_cache
-  | \.tox
   | \.venv
   | build
   | dist
@@ -150,6 +147,12 @@ extend-exclude = '''
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.ruff.lint]
 select = [
@@ -186,7 +189,11 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"__init__.py" = ["F401"]  # re-exports are intentional
+"tests/*" = ["N", "B"]   # naming/bugbear not enforced in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["synth_pdb"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
@@ -213,18 +220,17 @@ filterwarnings = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
-ignore_errors = true
-strict_equality = true
-exclude = "(build/|scratch/)"
-
-[[tool.mypy.overrides]]
-module = "synth_pdb.*"
-ignore_errors = false
 disallow_untyped_defs = true
 check_untyped_defs = true
+strict_equality = true
+exclude = ["build/", "dist/", "scratch/", "site/"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "scripts.*", "examples.*", "scratch.*"]
+disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [

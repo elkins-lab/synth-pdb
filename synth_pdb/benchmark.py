@@ -176,7 +176,7 @@ class BenchmarkResults:
         same_fold = sum(1 for t in tm_scores if t > 0.5)
         lines.append(
             f"\n  Structures with TM-score > 0.5 (same fold): "
-            f"{same_fold}/{len(tm_scores)} ({100*same_fold/len(tm_scores):.0f}%)"
+            f"{same_fold}/{len(tm_scores)} ({100 * same_fold / len(tm_scores):.0f}%)"
         )
         return "\n".join(lines)
 

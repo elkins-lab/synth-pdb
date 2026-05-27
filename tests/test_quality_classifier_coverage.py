@@ -30,9 +30,9 @@ class TestClassifierInit:
         # Model should be None because there's no .joblib file in the package
         # (in CI / fresh checkouts the model file is not bundled)
         if clf.model is None:
-            assert any(
-                "No model found" in r.message for r in caplog.records
-            ), "Expected a 'No model found' warning when no model file exists"
+            assert any("No model found" in r.message for r in caplog.records), (
+                "Expected a 'No model found' warning when no model file exists"
+            )
 
     def test_explicit_model_path_triggers_load(self, tmp_path):
         """Passing an explicit model_path should call load_model.
@@ -72,9 +72,9 @@ class TestLoadModelImportError:
                 clf.load_model(fake_path)
 
         assert clf.model is None
-        assert any(
-            "joblib" in r.message.lower() for r in caplog.records
-        ), "Expected an error log mentioning 'joblib' when the import fails"
+        assert any("joblib" in r.message.lower() for r in caplog.records), (
+            "Expected an error log mentioning 'joblib' when the import fails"
+        )
 
     def test_load_model_exception_sets_model_none(self, tmp_path, caplog):
         """When joblib is available but joblib.load raises, model should be set
@@ -99,9 +99,9 @@ class TestLoadModelImportError:
                 clf.load_model(fake_path)
 
         assert clf.model is None, "load_model must set model=None on exception"
-        assert any(
-            "Failed to load" in r.message for r in caplog.records
-        ), "Expected an error log when joblib.load raises"
+        assert any("Failed to load" in r.message for r in caplog.records), (
+            "Expected an error log when joblib.load raises"
+        )
 
 
 # ---------------------------------------------------------------------------

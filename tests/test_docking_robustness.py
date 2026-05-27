@@ -6,7 +6,6 @@ from synth_pdb.generator import generate_pdb_content
 
 
 class TestDockingRobustness:
-
     def test_pqr_generation_with_real_structure(self):
         """Verify PQR generation using a realistically generated structure from synth-pdb.
         This ensures OpenMM templates match correctly.

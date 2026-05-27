@@ -89,7 +89,9 @@ def run_experiment():
     print(f"Good Geometry (Bias) Time: {good_time:.4f}s")
 
     if good_time < bad_time:
-        print(f"--> Improvement: {(bad_time - good_time)/bad_time * 100:.1f}% faster minimization!")
+        print(
+            f"--> Improvement: {(bad_time - good_time) / bad_time * 100:.1f}% faster minimization!"
+        )
     else:
         print("--> No significant speedup detected (noise or minimal clash cost).")
 

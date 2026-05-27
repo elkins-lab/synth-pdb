@@ -117,7 +117,7 @@ def main() -> None:
         # Create boolean mask for 'Good' structures
         mask = np.array([s.global_score >= args.min_quality for s in scores])
         n_kept = int(np.sum(mask))
-        logger.info(f"Quality Filter: Kept {n_kept}/{args.n} structures ({n_kept/args.n:.1%}).")
+        logger.info(f"Quality Filter: Kept {n_kept}/{args.n} structures ({n_kept / args.n:.1%}).")
 
         if n_kept == 0:
             logger.error("No structures passed the quality filter. Aborting.")
@@ -185,7 +185,7 @@ def main() -> None:
 
     elapsed = time.time() - start_time
     logger.info(f"Successfully built dataset at {out_path.absolute()}")
-    logger.info(f"Total Time: {elapsed:.2f}s ({elapsed/args.n:.3f} s/sample)")
+    logger.info(f"Total Time: {elapsed:.2f}s ({elapsed / args.n:.3f} s/sample)")
 
 
 if __name__ == "__main__":

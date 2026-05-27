@@ -48,17 +48,17 @@ def test_valine_chi1_distribution() -> None:
 
     total = len(chi_angles)
     print(f"\nValine Chi1 Stats (n={total}):")
-    print(f"  g- (-60): {m_count} ({m_count/total:.1%})")
-    print(f"  g+ (+60): {p_count} ({p_count/total:.1%})")
-    print(f"  t  (180): {t_count} ({t_count/total:.1%})")
+    print(f"  g- (-60): {m_count} ({m_count / total:.1%})")
+    print(f"  g+ (+60): {p_count} ({p_count / total:.1%})")
+    print(f"  t  (180): {t_count} ({t_count / total:.1%})")
 
     # Assert that we didn't just get a single flat distribution at 0
     # and that most residues fall into one of the three clusters.
-    assert (m_count + p_count + t_count) > (
-        0.8 * total
-    ), "Too many Valines in non-rotameric conformations"
+    assert (m_count + p_count + t_count) > (0.8 * total), (
+        "Too many Valines in non-rotameric conformations"
+    )
     # Ensure diversity - at least 2 categories should be populated
     populated = sum(1 for c in [m_count, p_count, t_count] if c > 0)
-    assert (
-        populated >= 2
-    ), f"Valine rotamers are not diverse enough (only {populated} categories populated)"
+    assert populated >= 2, (
+        f"Valine rotamers are not diverse enough (only {populated} categories populated)"
+    )

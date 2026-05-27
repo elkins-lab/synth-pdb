@@ -49,9 +49,9 @@ class TestCalculateOrderParameter:
         for angle in [0.0, np.pi / 3, -np.pi / 2, np.pi]:
             angles = np.full(50, angle)
             result = DAOPCalculator.calculate_order_parameter(angles)
-            assert result == pytest.approx(
-                1.0, abs=1e-10
-            ), f"Expected S=1.0 for uniform angle {angle:.3f}, got {result:.6f}"
+            assert result == pytest.approx(1.0, abs=1e-10), (
+                f"Expected S=1.0 for uniform angle {angle:.3f}, got {result:.6f}"
+            )
 
     def test_opposite_angles_returns_zero(self) -> None:
         """Two angles exactly 180deg apart cancel each other -> S ~ 0."""
@@ -322,9 +322,9 @@ class TestDAOPScientificValidation:
         angles = rng.vonmises(0.0, kappa, 10_000)
         result = DAOPCalculator.calculate_order_parameter(angles)
         # Allow +/-0.05 tolerance due to finite sample
-        assert (
-            0.85 <= result <= 0.95
-        ), f"Expected S~0.9 for [0x3ba]={kappa} (sigma~24deg), got {result:.4f}"
+        assert 0.85 <= result <= 0.95, (
+            f"Expected S~0.9 for [0x3ba]={kappa} (sigma~24deg), got {result:.4f}"
+        )
 
     def test_sum_phi_psi_criterion_matches_pdbstat_convention(self) -> None:
         """

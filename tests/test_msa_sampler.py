@@ -64,9 +64,9 @@ def test_sampler_rejection_low_temp():
     final_energy = sampler.current_energy
 
     # Energy must monotonicially decrease or stay identical at freezing temperatures
-    assert (
-        final_energy <= initial_energy
-    ), "Low Temperature MCMC should never accept higher energy states."
+    assert final_energy <= initial_energy, (
+        "Low Temperature MCMC should never accept higher energy states."
+    )
 
     # The two bulky Tryptophans in contact should have been mutated to smaller residues
     # to relieve the heavy steric penalty defined in the coupling matrix.

@@ -30,7 +30,7 @@ def demo_pytorch_integration():
     batch = generator.generate_batch(drift=2.0)  # Add some 'structural noise' for the model
 
     gen_time = time.time() - start_time
-    print(f"Generation Complete in {gen_time:.4f}s ({n_batch/gen_time:.1f} structures/sec)")
+    print(f"Generation Complete in {gen_time:.4f}s ({n_batch / gen_time:.1f} structures/sec)")
 
     # 2. Handover to PyTorch
     # torch.from_numpy() creates a tensor that shares the memory with the numpy array.

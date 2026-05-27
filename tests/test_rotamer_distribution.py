@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestRotamerDistribution(unittest.TestCase):
-
     def test_valine_rotamer_distribution(self):
         """Verify that Valine rotamers follow approximately the expected distribution.
         Expected weights from data.py for VAL:

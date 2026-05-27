@@ -58,9 +58,9 @@ def test_gen_couplings_one_row_per_residue(tmp_path: Path) -> None:
     """One data row per input residue - prolines and N-term must not be silently skipped."""
     csv_path = _run_gen_couplings(tmp_path)
     data_rows = csv_path.read_text().splitlines()[1:]
-    assert len(data_rows) == len(
-        SEQ_RESIDUES
-    ), f"Expected {len(SEQ_RESIDUES)} rows for {SEQ}, got {len(data_rows)}: {data_rows}"
+    assert len(data_rows) == len(SEQ_RESIDUES), (
+        f"Expected {len(SEQ_RESIDUES)} rows for {SEQ}, got {len(data_rows)}: {data_rows}"
+    )
 
 
 def test_gen_couplings_first_residue_is_nan(tmp_path: Path) -> None:

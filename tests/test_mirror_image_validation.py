@@ -50,9 +50,9 @@ def test_mirror_image_protein_g_validation(mocker) -> None:
 
     # Correct implementation: 0 chirality violations for D-residues
     chirality_violations = [v for v in validator.violations if "Chirality" in v]
-    assert (
-        len(chirality_violations) == 0
-    ), f"Should have 0 chirality violations, got: {chirality_violations}"
+    assert len(chirality_violations) == 0, (
+        f"Should have 0 chirality violations, got: {chirality_violations}"
+    )
 
     # 5. Backbone Check
     # Updated: The generator now correctly mirrors the backbone (positive Phi/Psi)

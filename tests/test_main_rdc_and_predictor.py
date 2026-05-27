@@ -170,9 +170,9 @@ class TestOutputRDCsFlag:
 
         with open(output_csv) as f:
             header = f.readline().strip()
-        assert (
-            header == "res_id,residue,RDC_NH_Hz"
-        ), f"Expected 'res_id,residue,RDC_NH_Hz', got '{header}'"
+        assert header == "res_id,residue,RDC_NH_Hz", (
+            f"Expected 'res_id,residue,RDC_NH_Hz', got '{header}'"
+        )
 
     def test_output_rdcs_csv_has_data_rows(self, mocker: Any, tmp_path: Any) -> None:
         """CSV must contain at least one data row with the computed RDC values."""
@@ -370,9 +370,9 @@ class TestShiftPredictorFlag:
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert (
-            call_kwargs.get("use_shiftx2") is True
-        ), "--shift-predictor shiftx2 must pass use_shiftx2=True"
+        assert call_kwargs.get("use_shiftx2") is True, (
+            "--shift-predictor shiftx2 must pass use_shiftx2=True"
+        )
 
     def test_shift_predictor_empirical_passes_use_shiftx2_false(
         self, mocker: Any, tmp_path: Any
@@ -386,9 +386,9 @@ class TestShiftPredictorFlag:
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert (
-            call_kwargs.get("use_shiftx2") is False
-        ), "--shift-predictor empirical must pass use_shiftx2=False"
+        assert call_kwargs.get("use_shiftx2") is False, (
+            "--shift-predictor empirical must pass use_shiftx2=False"
+        )
 
     def test_shift_predictor_default_is_shiftx2(self, mocker: Any, tmp_path: Any) -> None:
         """When --gen-shifts is used without --shift-predictor, the default must be
@@ -429,9 +429,9 @@ class TestShiftPredictorFlag:
 
         mock_predict.assert_called_once()
         _, call_kwargs = mock_predict.call_args
-        assert (
-            call_kwargs.get("use_shiftx2") is True
-        ), "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
+        assert call_kwargs.get("use_shiftx2") is True, (
+            "Default --shift-predictor should be 'shiftx2' (use_shiftx2=True)"
+        )
 
     def test_shift_predictor_appears_in_command_string(self, mocker: Any, tmp_path: Any) -> None:
         """The --shift-predictor flag must appear in the command string recorded
@@ -477,6 +477,6 @@ class TestShiftPredictorFlag:
 
         with open(output_pdb) as f:
             content = f.read()
-        assert (
-            "empirical" in content or "shift-predictor" in content.lower()
-        ), "The PDB REMARK header must record the --shift-predictor value"
+        assert "empirical" in content or "shift-predictor" in content.lower(), (
+            "The PDB REMARK header must record the --shift-predictor value"
+        )

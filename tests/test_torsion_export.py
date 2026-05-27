@@ -8,7 +8,6 @@ from synth_pdb import torsion
 
 
 class TestTorsionExport:
-
     @pytest.fixture
     def alpha_helix_pdb(self):
         """Returns a string wrapper for a simple 3-residue alpha helix PDB content."""

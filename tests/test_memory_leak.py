@@ -55,7 +55,7 @@ class TestMemoryStability:
                 current_mem = get_mem_mb()
                 mem_history.append(current_mem)
                 print(
-                    f"Iteration {i+1}: {current_mem:.2f} MB (Delta: {current_mem - initial_mem:.2f} MB)"
+                    f"Iteration {i + 1}: {current_mem:.2f} MB (Delta: {current_mem - initial_mem:.2f} MB)"
                 )
 
         final_mem = get_mem_mb()
@@ -64,9 +64,9 @@ class TestMemoryStability:
         # OpenMM can have some non-linear initialization, so we allow a generous 50MB growth
         # for a batch of 50, but if it's a true leak (e.g. 2MB per context), 50 iter = 100MB+.
         # In a leak-free environment, delta should be nearly 0 after warm-up.
-        assert (
-            total_delta < 50.0
-        ), f"Memory leak detected: {total_delta:.2f} MB growth over {n_iterations} iterations"
+        assert total_delta < 50.0, (
+            f"Memory leak detected: {total_delta:.2f} MB growth over {n_iterations} iterations"
+        )
 
         # Also check if the trend is strictly increasing (linear growth)
         if len(mem_history) > 3:
@@ -76,9 +76,9 @@ class TestMemoryStability:
             # Slope should be near zero.
             # We allow 3.0 MB per checkpoint (0.3 MB/iteration) to account for
             # OS-level RSS fluctuations and Python metadata accumulation.
-            assert (
-                slope < 3.0
-            ), f"Significant linear memory growth detected: slope={slope:.4f} MB per 10 iterations"
+            assert slope < 3.0, (
+                f"Significant linear memory growth detected: slope={slope:.4f} MB per 10 iterations"
+            )
 
     def test_batch_generator_memory_stability(self) -> None:
         """Monitor memory usage for large batch generation."""

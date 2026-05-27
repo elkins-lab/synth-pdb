@@ -18,7 +18,6 @@ def create_mock_structure():
 
 
 class TestMSAGenerator:
-
     def test_sasa_identification(self, mocker):
         """Test detection of buried vs exposed residues."""
         atoms = create_mock_structure()

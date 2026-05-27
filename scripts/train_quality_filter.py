@@ -210,7 +210,7 @@ def train_model(output_path, n_samples=200):
 
     if X.ndim != 2 or X.shape[0] == 0:
         raise RuntimeError(
-            f"Feature matrix has unexpected shape {X.shape}. " "Expected a non-empty 2D array."
+            f"Feature matrix has unexpected shape {X.shape}. Expected a non-empty 2D array."
         )
 
     logger.info("\nTraining RandomForest Classifier...")

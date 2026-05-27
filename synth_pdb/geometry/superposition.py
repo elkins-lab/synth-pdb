@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def kabsch_superposition(
-    P: npt.NDArray[np.float64], Q: npt.NDArray[np.float64]  # noqa: N803
+    P: npt.NDArray[np.float64],
+    Q: npt.NDArray[np.float64],  # noqa: N803
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     """
     Calculate optimal rotation and translation to superimpose P onto Q.

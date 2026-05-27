@@ -40,9 +40,9 @@ def test_gen_cd_logs_validation_report(tmp_path: Path, caplog: pytest.LogCapture
     with patch("sys.argv", test_args):
         main()
 
-    assert (
-        "Synthetic CD Validation Report" in caplog.text
-    ), "CD validation report header missing from logs - was validate_cd_against_literature called?"
+    assert "Synthetic CD Validation Report" in caplog.text, (
+        "CD validation report header missing from logs - was validate_cd_against_literature called?"
+    )
     # At least one finding line for a helical signature must be logged.
     assert "Helix" in caplog.text or "helix" in caplog.text, (
         "No helix-related CD finding logged. Either the validator returned no findings "

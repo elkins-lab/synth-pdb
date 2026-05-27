@@ -73,9 +73,9 @@ class TestScoreStructure:
 
         for pdb in (helix_pdb, random_pdb):
             result = score_structure(pdb)
-            assert (
-                0.0 <= result.global_score <= 1.0
-            ), f"global_score={result.global_score} is outside [0, 1]"
+            assert 0.0 <= result.global_score <= 1.0, (
+                f"global_score={result.global_score} is outside [0, 1]"
+            )
 
     def test_helix_scores_higher_than_random(self, helix_pdb, random_pdb):
         from synth_pdb.score import _get_classifier, score_structure
@@ -85,9 +85,9 @@ class TestScoreStructure:
 
         helix_result = score_structure(helix_pdb)
         random_result = score_structure(random_pdb)
-        assert (
-            helix_result.global_score > random_result.global_score
-        ), "Helix should score higher than random coil"
+        assert helix_result.global_score > random_result.global_score, (
+            "Helix should score higher than random coil"
+        )
 
     def test_file_path_input(self, helix_pdb):
         """score_structure() should accept a file path as well as a PDB string."""
@@ -120,9 +120,9 @@ class TestPerResiduePLDDT:
         from synth_pdb.score import score_structure
 
         result = score_structure(helix_pdb)
-        assert (
-            len(result.per_residue) == result.n_residues
-        ), f"per_residue length {len(result.per_residue)} != n_residues {result.n_residues}"
+        assert len(result.per_residue) == result.n_residues, (
+            f"per_residue length {len(result.per_residue)} != n_residues {result.n_residues}"
+        )
 
     def test_per_residue_labels_length_matches(self, helix_pdb):
         from synth_pdb.score import score_structure

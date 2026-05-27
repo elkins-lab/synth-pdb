@@ -58,15 +58,15 @@ class TestRamachandranPolygons:
         # Allowed Proline: (-60, -30) or (-60, 150)
         good_point = (-60.0, -30.0)
         polygons = RAMACHANDRAN_POLYGONS["PRO"]["Favored"]
-        assert any(
-            validator._is_point_in_polygon(good_point, p) for p in polygons
-        ), "Proline should allow (-60, -30)"
+        assert any(validator._is_point_in_polygon(good_point, p) for p in polygons), (
+            "Proline should allow (-60, -30)"
+        )
 
         # Forbidden Proline: (-120, 120) -> Standard Beta but Proline phi can't do -120
         bad_point = (-120.0, 120.0)
-        assert not any(
-            validator._is_point_in_polygon(bad_point, p) for p in polygons
-        ), "Proline should NOT allow Phi=-120"
+        assert not any(validator._is_point_in_polygon(bad_point, p) for p in polygons), (
+            "Proline should NOT allow Phi=-120"
+        )
 
     def test_boundary_conditions(self):
         """Test points exactly on vertices or edges (simple check)."""

@@ -38,7 +38,8 @@ class TestBetaTurns:
 
         # NOTE: generator structure uses 1-based indexing.
         content = generate_pdb_content(
-            sequence_str=seq, structure="3-6:typeII"  # Unspecified defaults to alpha/random
+            sequence_str=seq,
+            structure="3-6:typeII",  # Unspecified defaults to alpha/random
         )
 
         phi, psi = self._get_backbone_angles(content)

@@ -56,9 +56,9 @@ def test_chirality_invariant() -> None:
         improper = calculate_dihedral(n, ca, c, cb)
 
         # Standard L-amino acid improper N-CA-C-CB is ~ -120 deg
-        assert (
-            -150.0 < improper < -90.0
-        ), f"Residue {res_id} {res_name} has non-standard chirality: {improper:.1f}"
+        assert -150.0 < improper < -90.0, (
+            f"Residue {res_id} {res_name} has non-standard chirality: {improper:.1f}"
+        )
 
 
 def test_peptide_bond_planarity() -> None:

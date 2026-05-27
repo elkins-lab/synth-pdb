@@ -61,7 +61,8 @@ def test_sec_sasa_s2_calculation():
 
     # This triggers predict_order_parameters which calls SASA
     pdb_content = generate_pdb_content(
-        sequence_str=sequence, minimize_energy=False  # Test the path in generator.py directly
+        sequence_str=sequence,
+        minimize_energy=False,  # Test the path in generator.py directly
     )
 
     # If we reached here without "SASA calculation failed" error in logs (which we can't easily check here),

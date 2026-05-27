@@ -94,7 +94,7 @@ def main() -> None:
     results = []
 
     for name, seq in test_sequences:
-        print(f"\n🚀 Benchmarking {name} (Total Res: {len(seq.replace(':',''))})")
+        print(f"\n🚀 Benchmarking {name} (Total Res: {len(seq.replace(':', ''))})")
         for n in test_sizes:
             print(f"Testing N={n}...")
             serial_time = benchmark_serial(seq, n)

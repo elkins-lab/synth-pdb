@@ -65,16 +65,16 @@ def test_disulfide_detection_uses_minimized_structure():
         )
 
         # 3. Verification
-        assert (
-            "SSBOND" in pdb_content
-        ), "SSBOND record should be present when using minimized structure coordinates"
+        assert "SSBOND" in pdb_content, (
+            "SSBOND record should be present when using minimized structure coordinates"
+        )
 
         import re
 
         ssbond_pattern = r"SSBOND\s+\d+\s+CYS\s+A\s+1\s+CYS\s+A\s+4"
-        assert re.search(
-            ssbond_pattern, pdb_content
-        ), f"SSBOND record does not match expected residues 1 and 4. Content:\n{pdb_content}"
+        assert re.search(ssbond_pattern, pdb_content), (
+            f"SSBOND record does not match expected residues 1 and 4. Content:\n{pdb_content}"
+        )
 
         print("\nSUCCESS: Disulfide bond detected from minimized structure!")
 
@@ -114,6 +114,6 @@ def test_disulfide_detection_fails_if_far():
             sequence_str="CYS-ALA-ALA-CYS", minimize_energy=True, metal_ions="ignore"
         )
 
-        assert (
-            "SSBOND" not in pdb_content
-        ), "SSBOND record should NOT be present for distant residues"
+        assert "SSBOND" not in pdb_content, (
+            "SSBOND record should NOT be present for distant residues"
+        )

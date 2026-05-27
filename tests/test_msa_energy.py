@@ -53,9 +53,9 @@ def test_potts_energy_compensatory_mutation():
     # This should create a severe steric clash (volume 4 + 4 = 8 > 5)
     clash_sequence = "WGTTW"
     e_clash = model.calculate_energy(clash_sequence)
-    assert (
-        e_clash > e_native
-    ), "Double steric mutation should drastically increase potential energy."
+    assert e_clash > e_native, (
+        "Double steric mutation should drastically increase potential energy."
+    )
 
     # E2: Compensatory Mutation. Residue 4 mutates to the smallest amino acid (Gly)
     # to make room for the massive Trp at Residue 0. (volume 4 + 0 = 4 < 5)

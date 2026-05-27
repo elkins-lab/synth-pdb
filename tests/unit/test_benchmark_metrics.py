@@ -60,9 +60,7 @@ def simple_pdb():
     lines = []
     for i in range(1, 6):
         x, y, z = float(i), float(i * 2), float(i * 3)
-        line = (
-            f"ATOM  {i:5d}  CA  ALA A{i:4d}    " f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00           C"
-        )
+        line = f"ATOM  {i:5d}  CA  ALA A{i:4d}    {x:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00           C"
         lines.append(line)
     return "\n".join(lines)
 
@@ -123,9 +121,9 @@ class TestTMScore:
         from synth_pdb.benchmark_metrics import tm_score
 
         score = tm_score(helix_coords, helix_coords)
-        assert (
-            abs(score - 1.0) < 1e-4
-        ), f"Identical structures should have TM-score ~ 1.0, got {score}"
+        assert abs(score - 1.0) < 1e-4, (
+            f"Identical structures should have TM-score ~ 1.0, got {score}"
+        )
 
     def test_score_in_unit_interval(self, helix_coords, random_coords):
         from synth_pdb.benchmark_metrics import tm_score
@@ -159,9 +157,9 @@ class TestLddt:
         from synth_pdb.benchmark_metrics import lddt
 
         scores = lddt(helix_coords, helix_coords)
-        assert np.allclose(
-            scores, 1.0, atol=1e-4
-        ), f"Identical structures should have per-residue lDDT = 1.0, got {scores}"
+        assert np.allclose(scores, 1.0, atol=1e-4), (
+            f"Identical structures should have per-residue lDDT = 1.0, got {scores}"
+        )
 
     def test_lddt_output_shape(self, helix_coords):
         from synth_pdb.benchmark_metrics import lddt

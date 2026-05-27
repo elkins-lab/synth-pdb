@@ -540,9 +540,9 @@ class TestMainCLI:
         # Assert header presence
         assert lines[0].startswith("HEADER"), "PDB file should start with a HEADER line."
         assert lines[1].startswith("TITLE"), "PDB file should have a TITLE line."
-        assert (
-            "GENERATED LINEAR PEPTIDE OF LENGTH 2" in lines[1]
-        ), "TITLE should reflect sequence length."
+        assert "GENERATED LINEAR PEPTIDE OF LENGTH 2" in lines[1], (
+            "TITLE should reflect sequence length."
+        )
         assert any("REMARK" in line for line in lines), "PDB file should contain REMARK lines."
         assert any("COMPND" in line for line in lines), "PDB file should contain COMPND lines."
         assert any("SOURCE" in line for line in lines), "PDB file should contain SOURCE lines."

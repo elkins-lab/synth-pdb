@@ -67,9 +67,9 @@ def test_q_factor_scaled_invariance():
     calc = np.array([9.0, -5.5, 7.5, -4.2])
     q_base = calculate_rdc_q_factor(obs, calc)
     q_scaled = calculate_rdc_q_factor(obs * 2.0, calc * 2.0)
-    assert q_base == pytest.approx(
-        q_scaled, abs=1e-8
-    ), "Q-factor should be invariant to uniform scaling"
+    assert q_base == pytest.approx(q_scaled, abs=1e-8), (
+        "Q-factor should be invariant to uniform scaling"
+    )
 
 
 def test_q_factor_mismatched_lengths_raises():
@@ -142,6 +142,6 @@ def test_rdc_values_within_physical_range(helix_structure):
     if not rdc_dict:
         pytest.skip("calculate_rdcs returned no values")
     for res_id, val in rdc_dict.items():
-        assert (
-            -2 * da <= val <= 2 * da
-        ), f"RDC at residue {res_id} = {val:.2f} Hz outside [-{2*da}, {2*da}] Hz"
+        assert -2 * da <= val <= 2 * da, (
+            f"RDC at residue {res_id} = {val:.2f} Hz outside [-{2 * da}, {2 * da}] Hz"
+        )

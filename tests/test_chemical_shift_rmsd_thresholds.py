@@ -84,9 +84,9 @@ def test_ca_shifts_physically_bounded(helix_shifts):
     for res_id, atoms in helix_shifts.items():
         ca = atoms.get("CA")
         if ca is not None:
-            assert (
-                45.0 <= ca <= 70.0
-            ), f"Residue {res_id} CA {ca:.2f} ppm outside physical bounds [45, 70]"
+            assert 45.0 <= ca <= 70.0, (
+                f"Residue {res_id} CA {ca:.2f} ppm outside physical bounds [45, 70]"
+            )
 
 
 def test_n_shifts_physically_bounded(helix_shifts):
@@ -99,9 +99,9 @@ def test_n_shifts_physically_bounded(helix_shifts):
     for res_id, atoms in helix_shifts.items():
         n = atoms.get("N")
         if n is not None:
-            assert (
-                100.0 <= n <= 135.0
-            ), f"Residue {res_id} N {n:.2f} ppm outside physical bounds [100, 135]"
+            assert 100.0 <= n <= 135.0, (
+                f"Residue {res_id} N {n:.2f} ppm outside physical bounds [100, 135]"
+            )
 
 
 def test_ha_shifts_physically_bounded(helix_shifts):
@@ -115,9 +115,9 @@ def test_ha_shifts_physically_bounded(helix_shifts):
     for res_id, atoms in helix_shifts.items():
         ha = atoms.get("HA")
         if ha is not None:
-            assert (
-                3.0 <= ha <= 5.5
-            ), f"Residue {res_id} HA {ha:.2f} ppm outside physical bounds [3.0, 5.5]"
+            assert 3.0 <= ha <= 5.5, (
+                f"Residue {res_id} HA {ha:.2f} ppm outside physical bounds [3.0, 5.5]"
+            )
 
 
 def test_predict_chemical_shifts_returns_backbone_atoms(helix_shifts):
@@ -188,6 +188,6 @@ def test_calculate_shift_metrics_rmsd_increases_with_error(helix_shifts):
     large_err = ca_vals + 2.0
     rmsd_small = float(calculate_shift_metrics(ca_vals, small_err)["rmsd"])
     rmsd_large = float(calculate_shift_metrics(ca_vals, large_err)["rmsd"])
-    assert (
-        rmsd_small < rmsd_large
-    ), f"RMSD should increase with larger errors: small={rmsd_small:.4f}, large={rmsd_large:.4f}"
+    assert rmsd_small < rmsd_large, (
+        f"RMSD should increase with larger errors: small={rmsd_small:.4f}, large={rmsd_large:.4f}"
+    )
