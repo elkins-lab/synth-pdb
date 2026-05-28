@@ -1271,6 +1271,14 @@ def _build_peptide_chains(
                 transformed_res.res_name[:] = res_name
             transformed_res.chain_id[:] = chain_id
 
+            # Add intent annotation for metadata generation
+            if "conformation_intent" not in transformed_res.get_annotation_categories():
+                transformed_res.set_annotation(
+                    "conformation_intent", np.array([res_conformation] * len(transformed_res))
+                )
+            else:
+                transformed_res.conformation_intent[:] = res_conformation
+
             if i == 0:
                 current_chain_array = transformed_res.copy()
             else:
@@ -1696,11 +1704,51 @@ def _assemble_output(
 
     s2_values = s2_lookup[peptide.res_id.astype(int)]
 
+    # Calculate distance from termini for biased metadata (B-factors and occupancy)
+    norm_res_id = (peptide.res_id.astype(float) - 1.0) / max(total_residues - 1, 1)
+    dist_from_term = np.minimum(
+        norm_res_id, (total_residues - peptide.res_id.astype(float)) / max(total_residues - 1, 1)
+    )
+
     # 2. Vectorized B-factor calculation
     b_factors = 100.0 * (1.0 - s2_values) + 5.0
     b_factors[~backbone_mask] *= 1.5
     b_factors[peptide.res_name == "GLY"] += 5.0
     b_factors[peptide.res_name == "PRO"] -= 3.0
+
+    # SCIENTIFIC ENHANCEMENT: Secondary Structure Bias
+    # We use the explicit conformational intent (stored during construction)
+    # to ensure B-factors reflect the intended biophysical properties.
+    if "conformation_intent" in peptide.get_annotation_categories():
+        intent = peptide.conformation_intent
+        is_loop = np.isin(intent, ["random", "coil", "turn"])
+        is_helix = np.isin(intent, ["alpha", "310", "pi"])
+        is_sheet = np.isin(intent, ["beta", "extended"])
+
+        # Explicitly boost loop B-factors to reflect higher flexibility
+        b_factors[is_loop] += 12.0
+        # Dampen structured regions
+        b_factors[is_helix] -= 3.0
+        b_factors[is_sheet] -= 1.0
+    else:
+        # Fallback to SSE annotation if intent is missing (e.g. externally loaded PDB)
+        try:
+            sse = struc.annotate_sse(peptide)
+            if sse is not None and len(sse) > 0:
+                unique_ids = np.unique(peptide.res_id)
+                sse_lookup = dict(zip(unique_ids, sse))
+                atom_sse = np.array([sse_lookup.get(rid, "C") for rid in peptide.res_id])
+                b_factors[atom_sse == "C"] += 10.0
+                b_factors[atom_sse == "H"] -= 2.0
+        except Exception:
+            pass
+
+    # Termini bias (Universal pattern: ends are more flexible)
+    # We use a very localized bias (power of 4) and a smaller magnitude (5.0)
+    # to ensure it only affects the first/last few residues and doesn't
+    # overshadow the secondary structure contrast.
+    b_factors += 5.0 * (1.0 - dist_from_term * 2.0) ** 4
+
     # Use localized rng if provided, otherwise numpy's global random
     if rng:
         noise_bf = np.array([rng.uniform(-2.0, 2.0) for _ in range(len(b_factors))])
@@ -1712,10 +1760,6 @@ def _assemble_output(
 
     # 3. Vectorized Occupancy calculation
     occupancies = np.where(backbone_mask, 0.98, 0.95)
-    norm_res_id = (peptide.res_id.astype(float) - 1.0) / max(total_residues - 1, 1)
-    dist_from_term = np.minimum(
-        norm_res_id, (total_residues - peptide.res_id.astype(float)) / max(total_residues - 1, 1)
-    )
     occupancies -= 0.10 * (1.0 - dist_from_term)
 
     res_mask_1 = np.isin(peptide.res_name, ["GLY", "SER", "ASN", "GLN"])
