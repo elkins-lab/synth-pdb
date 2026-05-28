@@ -22,28 +22,9 @@ CURRENT_VERSION=$(grep '^version = ' pyproject.toml | cut -d'"' -f2)
 echo -e "${GREEN}✓${NC} Current version: ${CURRENT_VERSION}"
 echo ""
 
-# Step 1.5: NumPy 2.0 Compatibility Check
-echo -e "${YELLOW}Checking environment compatibility...${NC}"
-NUMPY_VERSION=$(python -c "import numpy; print(numpy.__version__)" 2>/dev/null || echo "0.0.0")
-if [[ "$NUMPY_VERSION" == 2.* ]]; then
-    echo -e "${RED}⚠️  NumPy 2.x detected ($NUMPY_VERSION)${NC}"
-    echo "This project requires NumPy 1.x to avoid C-extension crashes in dependencies like Numba and PyArrow."
-    echo ""
-    read -p "Would you like to downgrade to NumPy 1.x now? (yes/no): " FIX_NUMPY
-    if [ "$FIX_NUMPY" = "yes" ]; then
-        pip install "numpy<2.0.0"
-        echo -e "${GREEN}✓${NC} NumPy downgraded."
-    else
-        echo -e "${RED}✗${NC} Incompatible NumPy version. Aborting to prevent crash."
-        exit 1
-    fi
-fi
-echo -e "${GREEN}✓${NC} Environment compatible."
-echo ""
-
 # Step 2: Run tests
 echo -e "${YELLOW}Running tests...${NC}"
-if pytest tests/ --tb=no -q; then
+if python -m pytest tests/; then
     echo -e "${GREEN}✓${NC} All tests passed!"
 else
     echo -e "${RED}✗${NC} Tests failed! Aborting."
