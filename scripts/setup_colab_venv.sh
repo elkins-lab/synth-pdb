@@ -54,6 +54,22 @@ pip install \
 echo "Installing synth-pdb with [dev,ai,gnn,plm,test] extras..."
 pip install -e ".[dev,ai,gnn,plm,test]"
 
+# 5b. Install local sibling packages (private, not on PyPI)
+# These packages are required by interactive tutorials but are not on PyPI.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+SIBLING_PKGS="synth-saxs synth-dynamics synth-afm"
+for pkg in $SIBLING_PKGS; do
+    PKG_DIR="$(dirname "$REPO_ROOT")/$pkg"
+    if [ -d "$PKG_DIR" ]; then
+        echo "Installing local $pkg from $PKG_DIR..."
+        pip install -e "$PKG_DIR"
+    else
+        echo "Warning: $pkg not found at $PKG_DIR. Some notebooks may fail."
+        echo "         Clone it alongside this repo: git clone <$pkg-repo>"
+    fi
+done
+
 # 6. Verify installation
 echo "Checking installation..."
 python -c "import synth_pdb; print(f'synth-pdb version: {synth_pdb.__version__}')"
