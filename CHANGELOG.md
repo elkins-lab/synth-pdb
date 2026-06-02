@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.0] - 2026-06-02
+
+### Added
+- **New Visual Lab Tutorials**: Added five new substantive 'Lab' experiences (Mirror World, Molecular Machine, Prion Chameleon, etc.) with enhanced visualisations and interactive mechanics.
+- **Modern JAX Stack Support**: Updated core dependencies to support the latest JAX/NVIDIA stack and lifted version caps for broader environment compatibility.
+
+### Changed
+- **SAXS Module Extraction**: Extracted heavy SAXS simulation logic into the standalone `synth-saxs` package. The `synth_pdb.saxs` module is now a compatibility shim, reducing the core package footprint while maintaining backward compatibility.
+- **Numpy 2.0 Compatibility**: Extensive codebase updates to ensure full compatibility with Numpy 2.x while maintaining support for 1.x.
+
+### Fixed
+- **RDC Q-Factor Edge Cases**: Refactored Q-factor calculation to correctly return `nan` for empty datasets, preventing false "perfect agreement" signals in automated pipelines.
+- **CI Robustness**: Resolved several systemic CI failures related to environment-specific paths and library warnings.
+- **Type Safety**: Expanded type annotations across geometry and biophysics modules to ensure strict `mypy` compliance.
+
 ## [1.37.0] - 2026-05-14
 
 ### Added

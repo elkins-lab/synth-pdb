@@ -59,7 +59,7 @@ def run_forge(
             st.session_state.pdb_output = pdb_str
 
             # Generate Report
-            v = PDBValidator(pdb_str)
+            v = PDBValidator(str(pdb_str))
             st.session_state.quality_report = v.get_quality_report(include_ml=quality_filter)
             st.success("Structure Forged Successfully!")
     except Exception as e:
@@ -205,6 +205,6 @@ with tab_pathology:
 # Footer
 st.divider()
 st.markdown(
-    "<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v1.37.0 | Professional Edition</div>",
+    "<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v1.38.0 | Professional Edition</div>",
     unsafe_allow_html=True,
 )
