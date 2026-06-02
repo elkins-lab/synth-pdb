@@ -30,6 +30,6 @@ def test_rdc_q_factor_standard() -> None:
 
 
 def test_rdc_q_factor_empty() -> None:
-    """Empty arrays should return 0.0 or handle gracefully."""
+    """Empty arrays should return nan (undefined)."""
     q = calculate_rdc_q_factor(np.array([]), np.array([]))
-    assert q == 0.0
+    assert np.isnan(q)

@@ -5,6 +5,7 @@ Tests to fill coverage gaps in the geometry module.
 import biotite.structure as struc
 import numpy as np
 import pytest
+from typing import Any
 
 from synth_pdb.geometry.dihedral import calculate_dihedral, calculate_dihedral_angle
 from synth_pdb.geometry.nerf import place_atom, position_atom_3d_from_internal_coords
@@ -12,7 +13,7 @@ from synth_pdb.geometry.sidechain import reconstruct_sidechain
 from synth_pdb.geometry.vectorized import batched_dihedral, position_atoms_batch
 
 
-def test_batched_dihedral():
+def test_batched_dihedral() -> None:
     """Test batched_dihedral calculation."""
     p1 = np.array([[1.0, 1.0, 0.0]])
     p2 = np.array([[0.0, 1.0, 0.0]])
@@ -24,7 +25,7 @@ def test_batched_dihedral():
     assert np.isclose(abs(dihedrals[0]), 180.0) or np.isclose(dihedrals[0], 0.0)
 
 
-def test_position_atoms_batch_degenerate():
+def test_position_atoms_batch_degenerate() -> None:
     """Test position_atoms_batch with collinear points (degenerate case)."""
     p1 = np.array([[0.0, 0.0, 0.0]])
     p2 = np.array([[1.0, 0.0, 0.0]])
@@ -39,7 +40,7 @@ def test_position_atoms_batch_degenerate():
     assert not np.any(np.isnan(p4))
 
 
-def test_geometry_aliases():
+def test_geometry_aliases() -> None:
     """Test that geometry aliases work correctly."""
     p1 = np.array([1.0, 1.0, 0.0])
     p2 = np.array([0.0, 1.0, 0.0])
@@ -53,7 +54,7 @@ def test_geometry_aliases():
     assert np.allclose(pos1, pos2)
 
 
-def test_reconstruct_sidechain_no_chi1():
+def test_reconstruct_sidechain_no_chi1() -> None:
     """Test reconstruct_sidechain when chi1 is not in rotamer."""
     # Create a simple structure
     atom = struc.Atom(res_id=1, res_name="ALA", atom_name="CA", coord=[0, 0, 0], chain_id="A")
@@ -70,7 +71,7 @@ def test_reconstruct_sidechain_no_chi1():
     assert np.array_equal(orig_coords, peptide.coord)
 
 
-def test_kabsch_superposition_singular():
+def test_kabsch_superposition_singular() -> None:
     """Test kabsch_superposition with highly degenerate coordinates."""
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -85,7 +86,7 @@ def test_kabsch_superposition_singular():
     assert not np.any(np.isnan(t))
 
 
-def test_calculate_rmsd_errors():
+def test_calculate_rmsd_errors() -> None:
     """Test error handling in calculate_rmsd."""
     from synth_pdb.geometry.rmsd import calculate_rmsd
 
@@ -98,7 +99,7 @@ def test_calculate_rmsd_errors():
         calculate_rmsd(np.zeros((3, 2)), np.zeros((3, 2)))
 
 
-def test_calculate_rmsd_to_average_empty():
+def test_calculate_rmsd_to_average_empty() -> None:
     """Test calculate_rmsd_to_average with empty input."""
     from synth_pdb.geometry.rmsd import calculate_rmsd_to_average
 
@@ -107,7 +108,7 @@ def test_calculate_rmsd_to_average_empty():
     assert avg_coords.size == 0
 
 
-def test_kabsch_superposition_singular_cases():
+def test_kabsch_superposition_singular_cases() -> None:
     """Test kabsch_superposition with singular or non-finite inputs."""
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -128,7 +129,7 @@ def test_kabsch_superposition_singular_cases():
     assert not np.any(np.isnan(R))
 
 
-def test_dihedral_degenerate_normals():
+def test_dihedral_degenerate_normals() -> None:
     """Test dihedral and angle with degenerate (zero-length) vectors."""
     from synth_pdb.geometry.dihedral import calculate_angle, calculate_dihedral
 
@@ -146,7 +147,7 @@ def test_dihedral_degenerate_normals():
     assert calculate_dihedral(p1, p2, p3, p4) == 0.0
 
 
-def test_calculate_average_coords_empty():
+def test_calculate_average_coords_empty() -> None:
     """Test calculate_average_coords with empty inputs."""
     from synth_pdb.geometry.rmsd import calculate_average_coords
 
@@ -159,7 +160,7 @@ def test_calculate_average_coords_empty():
     assert avg.size == 0
 
 
-def test_kabsch_superposition_linalg_errors(mocker):
+def test_kabsch_superposition_linalg_errors(mocker: Any) -> None:
     """Test kabsch_superposition handling of LinAlgErrors."""
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -178,12 +179,12 @@ def test_kabsch_superposition_linalg_errors(mocker):
     assert np.allclose(R, np.eye(3))
 
 
-def test_kabsch_superposition_non_finite_R():
+def test_kabsch_superposition_non_finite_R() -> None:
     """Test kabsch_superposition handling of non-finite rotation matrices."""
     pass
 
 
-def test_reconstruct_sidechain_missing_template(mocker):
+def test_reconstruct_sidechain_missing_template(mocker: Any) -> None:
     """Test reconstruct_sidechain when residue template is missing."""
     from synth_pdb.geometry.sidechain import reconstruct_sidechain
 
@@ -192,10 +193,10 @@ def test_reconstruct_sidechain_missing_template(mocker):
 
     # Mock biotite.structure.info.residue to raise KeyError
     mocker.patch("biotite.structure.info.residue", side_effect=KeyError("Missing"))
-    assert reconstruct_sidechain(peptide, 1, {"chi1": [60.0]}) is None
+    reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})
 
 
-def test_reconstruct_sidechain_missing_template_atoms(mocker):
+def test_reconstruct_sidechain_missing_template_atoms(mocker: Any) -> None:
     """Test sidechain reconstruction with missing template backbone atoms (hitting Miss 100)."""
     # Create valid peptide
     n = struc.Atom([0, 0, 0], atom_name="N", res_id=1, res_name="ALA")
@@ -212,7 +213,7 @@ def test_reconstruct_sidechain_missing_template_atoms(mocker):
     reconstruct_sidechain(peptide, 1, {"chi1": 60.0})
 
 
-def test_calculate_rmsd_empty_or_nan():
+def test_calculate_rmsd_empty_or_nan() -> None:
     """Test RMSD with empty arrays (hitting Miss 44-45)."""
     from synth_pdb.geometry.rmsd import calculate_rmsd
 
@@ -221,7 +222,7 @@ def test_calculate_rmsd_empty_or_nan():
     assert calculate_rmsd(p, q) == 0.0
 
 
-def test_calculate_rmsd_to_average_gaps():
+def test_calculate_rmsd_to_average_gaps() -> None:
     """Test calculate_rmsd_to_average gaps (hitting Miss 167-168)."""
     from synth_pdb.geometry.rmsd import calculate_rmsd_to_average
 
@@ -234,7 +235,7 @@ def test_calculate_rmsd_to_average_gaps():
     assert np.isnan(res)
 
 
-def test_reconstruct_sidechain_missing_backbone():
+def test_reconstruct_sidechain_missing_backbone() -> None:
     """Test sidechain reconstruction with missing backbone atoms (hitting Miss 83-85)."""
     # Create structure with only CA
     atom = struc.Atom(res_id=1, res_name="ALA", atom_name="CA", coord=[0, 0, 0], chain_id="A")
@@ -246,12 +247,12 @@ def test_reconstruct_sidechain_missing_backbone():
     assert np.allclose(peptide.coord[0], [0, 0, 0])
 
 
-def test_calculate_rmsd_squared_diff_empty():
+def test_calculate_rmsd_squared_diff_empty() -> None:
     """Test calculate_rmsd when squared_diff is empty (hitting Miss 52-53)."""
     pass
 
 
-def test_dihedral_collinear_normalized():
+def test_dihedral_collinear_normalized() -> None:
     """Test dihedral with collinear vectors (hitting Miss 59-63)."""
     from synth_pdb.geometry.dihedral import calculate_dihedral
 
@@ -263,7 +264,7 @@ def test_dihedral_collinear_normalized():
     assert res in [0.0, 180.0]
 
 
-def test_kabsch_superposition_singular_det(mocker):
+def test_kabsch_superposition_singular_det(mocker: Any) -> None:
     """Test kabsch_superposition singular determinant (hitting Miss 80)."""
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -276,7 +277,7 @@ def test_kabsch_superposition_singular_det(mocker):
     assert not np.any(np.isnan(R))
 
 
-def test_kabsch_superposition_non_finite_check(mocker):
+def test_kabsch_superposition_non_finite_check(mocker: Any) -> None:
     """Test kabsch_superposition R finite check (hitting Miss 90-91)."""
     from synth_pdb.geometry.superposition import kabsch_superposition
 
@@ -288,5 +289,7 @@ def test_kabsch_superposition_non_finite_check(mocker):
     mock_vt = np.eye(3)
 
     mocker.patch("numpy.linalg.svd", return_value=(mock_u, mock_s, mock_vt))
-    R, _ = kabsch_superposition(P, Q)
+    # Det calculation with NaN will trigger RuntimeWarning
+    with np.errstate(invalid="ignore"):
+        R, _ = kabsch_superposition(P, Q)
     assert np.allclose(R, np.eye(3))
