@@ -1,3 +1,5 @@
+from typing import Any
+
 """
 Scientific Validation: Karplus Equation Fidelity.
 
@@ -55,7 +57,7 @@ _KARPLUS_CASES = [
 
 
 @pytest.mark.parametrize("phi_deg,expected,label", _KARPLUS_CASES)
-def test_karplus_analytical_values(phi_deg, expected, label):
+def test_karplus_analytical_values(phi_deg: float, expected: float, label: str) -> None:
     """calculate_hn_ha_coupling must match the Vuister & Bax Karplus reference.
 
     EDUCATIONAL NOTE:
@@ -71,7 +73,7 @@ def test_karplus_analytical_values(phi_deg, expected, label):
     )
 
 
-def test_alpha_helix_coupling_is_small():
+def test_alpha_helix_coupling_is_small() -> None:
     """Helical residues (phi ~ -60deg) must have 3J < 5 Hz.
 
     SCIENTIFIC BASIS:
@@ -84,7 +86,7 @@ def test_alpha_helix_coupling_is_small():
     assert j > 2.0, f"alpha-helix coupling should be > 2 Hz (non-trivial), got {j:.3f} Hz"
 
 
-def test_beta_sheet_coupling_is_large():
+def test_beta_sheet_coupling_is_large() -> None:
     """Sheet residues (phi ~ -135deg) must have 3J > 7 Hz.
 
     SCIENTIFIC BASIS:
@@ -97,7 +99,7 @@ def test_beta_sheet_coupling_is_large():
     assert j < 12.0, f"beta-sheet coupling should be < 12 Hz (physical max), got {j:.3f} Hz"
 
 
-def test_coupling_physically_bounded():
+def test_coupling_physically_bounded() -> None:
     """3J(HN-HA) must stay within physical bounds [0, 12] Hz for all phi."""
     for phi in range(-180, 181, 5):
         j = calculate_hn_ha_coupling(float(phi))
@@ -106,7 +108,7 @@ def test_coupling_physically_bounded():
         )
 
 
-def test_coupling_periodicity():
+def test_coupling_periodicity() -> None:
     """Karplus equation must be periodic with period 360deg in phi."""
     for phi in [-170.0, -90.0, 0.0, 45.0, 120.0]:
         j1 = calculate_hn_ha_coupling(phi)
@@ -116,7 +118,7 @@ def test_coupling_periodicity():
         )
 
 
-def test_helix_sheet_coupling_ordering():
+def test_helix_sheet_coupling_ordering() -> None:
     """beta-sheet J must be substantially larger than alpha-helix J.
 
     This validates the directionality of the implementation - not just that
@@ -127,3 +129,61 @@ def test_helix_sheet_coupling_ordering():
     assert j_sheet > j_helix + 3.0, (
         f"Sheet J ({j_sheet:.2f} Hz) should exceed helix J ({j_helix:.2f} Hz) by > 3 Hz"
     )
+
+
+# ---------------------------------------------------------------------------
+# D-amino acid stereochemistry tests
+# ---------------------------------------------------------------------------
+
+
+def test_d_amino_acid_coupling_correction_is_nontrivial() -> None:
+    """The Karplus equation is NOT symmetric in φ, so the D-amino acid correction
+    (evaluating at -φ instead of +φ) produces materially different results.
+
+    SCIENTIFIC BASIS:
+    The Karplus equation J(θ) = A·cos²θ + B·cosθ + C has a linear term B·cosθ
+    (B = -1.76 Hz, Vuister & Bax 1993).  This term is ODD in θ, so the function
+    is NOT even-symmetric in φ.  Specifically:
+
+        J(φ) = Karplus(φ - 60°)   ← L-amino acid convention
+        J(-φ) = Karplus(-φ - 60°) ≠ Karplus(φ - 60°)  in general
+
+    The D-amino acid code in predict_couplings_from_structure correctly uses
+    J_D(φ) = J_L(-φ), i.e. evaluates the L-parameterized Karplus curve at the
+    NEGATED phi.  This test confirms:
+
+    (1) J(φ) ≠ J(-φ) in general  →  the correction is non-trivial (not a no-op).
+    (2) J_L(-60°) is in the helical range  →  D-helix residues at φ=+60° get
+        the correct small coupling after negation.
+    (3) J_L(-135°) is in the sheet range  →  D-sheet residues at φ=+135° get
+        the correct large coupling after negation.
+    """
+    import math
+
+    # --- Verify the B-term breaks symmetry ---
+    phi_test = -135.0
+    j_at_phi = calculate_hn_ha_coupling(phi_test)
+    j_at_neg_phi = calculate_hn_ha_coupling(-phi_test)
+    assert abs(j_at_phi - j_at_neg_phi) > 1.0, (
+        f"Karplus should NOT be symmetric: J({phi_test})={j_at_phi:.2f} Hz, "
+        f"J({-phi_test})={j_at_neg_phi:.2f} Hz — difference must be > 1 Hz"
+    )
+
+    # --- Verify D-helix coupling via negation is physically correct ---
+    # D-helix: phi_D ≈ +60°  →  code uses J_L(-60°)
+    j_d_helix = calculate_hn_ha_coupling(-60.0)
+    assert j_d_helix < 5.0, f"D-helix J (via -phi) should be < 5 Hz, got {j_d_helix:.2f}"
+    assert j_d_helix > 2.0, f"D-helix J (via -phi) should be > 2 Hz, got {j_d_helix:.2f}"
+
+    # Without the negation (applying Karplus at +60° directly), we'd get a
+    # different value.  Confirm the correction changes the answer meaningfully.
+    j_uncorrected = calculate_hn_ha_coupling(+60.0)
+    assert abs(j_d_helix - j_uncorrected) > 1.0, (
+        "D-amino acid coupling correction must differ from uncorrected by > 1 Hz; "
+        f"corrected={j_d_helix:.2f} Hz, uncorrected={j_uncorrected:.2f} Hz"
+    )
+
+    # --- Verify D-sheet coupling via negation is physically correct ---
+    # D-sheet: phi_D ≈ +135°  →  code uses J_L(-135°)
+    j_d_sheet = calculate_hn_ha_coupling(-135.0)
+    assert j_d_sheet > 7.0, f"D-sheet J (via -phi) should be > 7 Hz, got {j_d_sheet:.2f}"

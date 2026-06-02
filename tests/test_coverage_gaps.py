@@ -179,3 +179,95 @@ class TestCoverageGaps:
         assert b0 > b1
         assert 5.0 <= b1 <= 99.0
         assert 5.0 <= b0 <= 99.0
+
+
+# ---------------------------------------------------------------------------
+# Kabsch algorithm — reflection correction
+# ---------------------------------------------------------------------------
+
+
+def test_kabsch_superposition_reflection_correction() -> None:
+    """The Kabsch algorithm must return a proper rotation (det=+1), not a reflection.
+
+    SCIENTIFIC BASIS:
+    SVD of the cross-covariance matrix H = U Σ Vᵀ may produce U and V such
+    that det(V Uᵀ) = -1, corresponding to an improper rotation (reflection).
+    The algorithm corrects this by constructing R = V diag(1,1,d) Uᵀ where
+    d = det(V Uᵀ), which flips the last singular vector and guarantees
+    det(R) = +1.
+
+    We construct a structure pair that deliberately triggers d = -1 by
+    reflecting one point cloud through the XY plane, then verify that:
+    (a) det(rotation_matrix) = +1, and
+    (b) the RMSD after superposition is smaller than before.
+    """
+    import numpy as np
+    from synth_pdb.benchmark_metrics import superpose_kabsch
+
+    rng = np.random.default_rng(0)
+    ref = rng.standard_normal((10, 3)).astype(np.float64)
+
+    # Create a reflected version: flip Z so the naive SVD gives det=-1
+    mobile_reflected = ref.copy()
+    mobile_reflected[:, 2] *= -1.0
+
+    rotated, rmsd = superpose_kabsch(mobile_reflected, ref)
+
+    # RMSD after superposition must be finite and non-negative
+    assert np.isfinite(rmsd), "RMSD is not finite after Kabsch superposition"
+    assert rmsd >= 0.0
+
+    # The rotation matrix implied by the superposition must be proper (det=+1).
+    # We back-calculate R from centred coordinates: rotated_c = mobile_c @ R^T
+    mob_c = mobile_reflected - mobile_reflected.mean(axis=0)
+    rot_c = rotated - ref.mean(axis=0)
+    # Least-squares solve: mob_c @ R^T ≈ rot_c  →  R^T ≈ pinv(mob_c) @ rot_c
+    r_approx = np.linalg.lstsq(mob_c, rot_c, rcond=None)[0].T
+    det = np.linalg.det(r_approx)
+    assert det == pytest.approx(1.0, abs=0.05), (
+        f"Rotation matrix determinant {det:.4f} ≠ +1 — reflection not corrected"
+    )
+
+
+# ---------------------------------------------------------------------------
+# shift_rmsd — NaN (missing assignment) handling
+# ---------------------------------------------------------------------------
+
+
+def test_shift_rmsd_nan_filtering() -> None:
+    """shift_rmsd must exclude NaN entries from both the squared-error sum and
+    the weight denominator, not treat them as zero-error observations.
+
+    SCIENTIFIC BASIS:
+    Experimental spectra routinely have unassigned resonances (NaN).  Including
+    NaN values as zero deviations would artifically deflate the RMSD.  The
+    denominator must count only the valid (finite) pairs so the result equals
+    the RMSD computed over the non-NaN subset alone.
+    """
+    import math
+    import numpy as np
+    from synth_pdb.benchmark_metrics import shift_rmsd
+
+    # 4 residues; residues 2 and 3 are unassigned (NaN) in both arrays
+    pred = np.array([8.1, float("nan"), float("nan"), 8.3])
+    ref = np.array([8.0, float("nan"), float("nan"), 8.4])
+
+    result = shift_rmsd({"H": pred}, {"H": ref})
+
+    # Only residues 0 and 3 contribute: errors are 0.1 and 0.1
+    expected = math.sqrt((0.1**2 + 0.1**2) / 2)
+    assert result == pytest.approx(expected, abs=1e-6), (
+        f"shift_rmsd={result:.6f} ppm, expected {expected:.6f} ppm "
+        "— NaN entries not correctly excluded"
+    )
+
+
+def test_shift_rmsd_all_nan_returns_nan() -> None:
+    """If every entry is NaN, shift_rmsd must return nan (no valid pairs)."""
+    import numpy as np
+    from synth_pdb.benchmark_metrics import shift_rmsd
+
+    pred = np.array([float("nan"), float("nan")])
+    ref = np.array([float("nan"), float("nan")])
+    result = shift_rmsd({"H": pred}, {"H": ref})
+    assert np.isnan(result), f"All-NaN input should return nan, got {result}"

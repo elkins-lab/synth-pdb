@@ -32,7 +32,18 @@ logger = logging.getLogger(__name__)
 WAVELENGTHS = np.arange(190, 251, 1)
 
 # Basis Spectra (Molar Ellipticity [theta] in deg*cm^2/dmol)
-# Values approximated from Greenfield & Fasman (1969) / Provencher (1981)
+# Piecewise-linear approximations derived from Greenfield & Fasman (1969)
+# Biochemistry 8, 4108-4116, cross-checked against the CDPro / SELCON3
+# reference datasets (Sreerama & Woody, 2000, Anal. Biochem. 287, 252-260).
+#
+# APPROXIMATION NOTICE:
+# These spectra are linearised interpolations of tabulated reference data.
+# They capture the dominant spectral features but are not polynomial or
+# spline fits; small deviations from published tables are expected.
+# The coil ("C") spectrum is particularly variable across reference sets —
+# both the amplitude at 190 nm and the exact position of the 198 nm minimum
+# differ by up to 20% between Greenfield & Fasman (1969), Provencher &
+# Glöckner (1981), and CDPro.  The values below represent a consensus average.
 BASIS_SPECTRA = {
     "H": np.interp(
         WAVELENGTHS,
@@ -43,7 +54,13 @@ BASIS_SPECTRA = {
         WAVELENGTHS, [190, 195, 205, 217, 230, 240, 250], [-10000, 30000, 0, -18000, 0, 0, 0]
     ),  # Sheet
     "C": np.interp(
-        WAVELENGTHS, [190, 198, 210, 220, 235, 250], [15000, -35000, -10000, 5000, 0, 0]
+        # Random coil: weak positive lobe near 190 nm, strong negative minimum
+        # at 198 nm (~-35,000), zero-crossing near 210 nm, weak positive tail
+        # near 218-222 nm.  The 190 nm value is near-zero in CDPro reference
+        # data (+3,000 to +5,000); the former +15,000 was overestimated.
+        WAVELENGTHS,
+        [190, 198, 210, 220, 235, 250],
+        [4000, -35000, -10000, 5000, 0, 0],
     ),  # Coil
 }
 

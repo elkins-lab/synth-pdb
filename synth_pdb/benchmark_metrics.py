@@ -260,11 +260,24 @@ def shift_rmsd(
     Parameters
     ----------
     pred_shifts, ref_shifts : dict mapping nucleus -> np.ndarray [N]
-        Nucleus keys are typically "H", "C", "N" (matching BMRB convention).
-        Arrays must be the same length (one entry per residue).
+        Nucleus keys are typically ``"H"``, ``"C"``, ``"N"`` (BMRB convention).
+        Arrays must be the same length (one value per residue).
+
+        .. note::
+            The ``"C"`` key is intentionally ambiguous: it conflates Cα, Cβ,
+            and carbonyl C′ shifts.  Those three nucleus types have very
+            different inherent RMS errors (~1.0, ~1.5, and ~0.5 ppm,
+            respectively).  For high-accuracy benchmarking, supply separate
+            ``"CA"``, ``"CB"``, and ``"C"`` keys with per-nucleus weights.
+
     nucleus_weights : dict, optional
-        Per-nucleus weighting (default: H=1.0, C=0.25, N=0.1, matching
-        the CamSol / SPARTA+ convention for weighted shift RMSD).
+        Per-nucleus weighting.  The default values
+        ``{"H": 1.0, "C": 0.25, "N": 0.1}`` are a **heuristic** chosen to
+        reflect the relative measurement precision of each nucleus type in a
+        typical solution-NMR experiment.  They are **not** derived from a
+        published calibration (e.g., SPARTA+ or CamSol) and should not be
+        cited as such.  Pass an explicit ``nucleus_weights`` dict if you need
+        a specific literature-validated weighting scheme.
 
     Returns
     -------
@@ -280,7 +293,12 @@ def shift_rmsd(
     0.1155 ppm
 
     """
-    # Default SPARTA+-style nucleus weights
+    # Heuristic per-nucleus weights (not from SPARTA+ or any single reference).
+    # H is weighted 1.0 because 1H shifts have the best experimental precision.
+    # C (generic carbon) is downweighted to 0.25 to account for the larger
+    # spread of reference-corrected 13C shifts (~1-2 ppm vs ~0.1 ppm for 1H).
+    # N is downweighted to 0.1 because 15N shifts span a much wider range
+    # (~120 ppm) and prediction errors are correspondingly larger.
     if nucleus_weights is None:
         nucleus_weights = {"H": 1.0, "C": 0.25, "N": 0.1}
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 """
 Scientific Validation: RDC Q-factor Self-Consistency.
 
@@ -35,7 +37,7 @@ from synth_pdb.rdc import calculate_rdc_q_factor, calculate_rdcs
 # -- UNIT TESTS: Q-factor formula correctness ---------------------------------
 
 
-def test_q_factor_perfect_agreement():
+def test_q_factor_perfect_agreement() -> None:
     """Q must equal 0.0 when observed == calculated (perfect agreement)."""
     obs = np.array([10.0, -5.0, 3.0, -8.0, 6.0])
     calc = obs.copy()
@@ -43,7 +45,7 @@ def test_q_factor_perfect_agreement():
     assert q == pytest.approx(0.0, abs=1e-8), f"Perfect agreement should yield Q=0, got {q}"
 
 
-def test_q_factor_known_analytical():
+def test_q_factor_known_analytical() -> None:
     """Q-factor must match analytical formula for a simple case.
 
     If obs = [1, 0, 0] and calc = [0, 0, 0]:
@@ -56,7 +58,7 @@ def test_q_factor_known_analytical():
     assert q == pytest.approx(1.0, abs=1e-8)
 
 
-def test_q_factor_scaled_invariance():
+def test_q_factor_scaled_invariance() -> None:
     """Q must be invariant to overall scaling of the alignment tensor.
 
     SCIENTIFIC BASIS:
@@ -72,19 +74,40 @@ def test_q_factor_scaled_invariance():
     )
 
 
-def test_q_factor_mismatched_lengths_raises():
+def test_q_factor_mismatched_lengths_raises() -> None:
     """Mismatched array lengths must raise ValueError."""
     with pytest.raises(ValueError):
         calculate_rdc_q_factor(np.array([1.0, 2.0]), np.array([1.0]))
 
 
-def test_q_factor_empty_arrays_returns_zero():
-    """Empty arrays must return Q=0 (edge-case guard)."""
+def test_q_factor_empty_arrays_returns_nan() -> None:
+    """Empty arrays must return Q=nan (edge-case guard).
+
+    SCIENTIFIC BASIS:
+    The Q-factor formula is Q = sqrt(sum_residuals / sum_obs²).  With no data
+    the ratio is 0/0 which is undefined, not zero.  The previous implementation
+    returned 0.0, which would be misread as "perfect agreement".
+    """
     q = calculate_rdc_q_factor(np.array([]), np.array([]))
-    assert q == pytest.approx(0.0, abs=1e-8)
+    assert np.isnan(q), f"Empty arrays should yield Q=nan, got {q}"
 
 
-def test_q_bounds_for_typical_data():
+def test_q_factor_zero_obs_nonzero_calc_returns_nan() -> None:
+    """When all D_obs=0 but D_calc≠0 the Q-factor must be nan, not 0.0.
+
+    SCIENTIFIC BASIS:
+    Q = sqrt(sum(D_obs - D_calc)² / sum(D_obs²))
+    When sum(D_obs²) = 0, the denominator is zero.  This is mathematically
+    undefined.  Returning 0.0 here would falsely signal "perfect agreement"
+    even though the calculated RDCs are completely unmatched by any data.
+    """
+    obs = np.array([0.0, 0.0, 0.0])
+    calc = np.array([5.0, -3.0, 8.0])
+    q = calculate_rdc_q_factor(obs, calc)
+    assert np.isnan(q), f"All-zero D_obs with non-zero D_calc should yield Q=nan, got {q}"
+
+
+def test_q_bounds_for_typical_data() -> None:
     """Q must always be in [0, inf); typical realistic Q is in [0, 1]."""
     rng = np.random.default_rng(42)
     for _ in range(20):
@@ -98,13 +121,13 @@ def test_q_bounds_for_typical_data():
 
 
 @pytest.fixture(scope="module")
-def helix_structure():
+def helix_structure() -> Any:
     """Generate a short helical peptide for RDC back-calculation."""
     pdb_content = generate_pdb_content(sequence_str="AAAAAAAAAAAA")
-    return pdb_io.PDBFile.read(io.StringIO(pdb_content)).get_structure(model=1)
+    return pdb_io.PDBFile.read(io.StringIO(str(pdb_content))).get_structure(model=1)
 
 
-def test_rdc_back_calc_self_consistent_q(helix_structure):
+def test_rdc_back_calc_self_consistent_q(helix_structure: Any) -> None:
     """Q from back-calculated RDCs vs themselves must be 0 (tautology test).
 
     EDUCATIONAL NOTE:
@@ -120,7 +143,7 @@ def test_rdc_back_calc_self_consistent_q(helix_structure):
     assert q == pytest.approx(0.0, abs=1e-6), f"Self-consistent Q must be 0; got {q}"
 
 
-def test_rdc_back_calc_produces_finite_values(helix_structure):
+def test_rdc_back_calc_produces_finite_values(helix_structure: Any) -> None:
     """Back-calculated RDCs must all be finite real numbers."""
     rdc_dict = calculate_rdcs(helix_structure, da=10.0, r=0.0)
     if not rdc_dict:
@@ -129,7 +152,7 @@ def test_rdc_back_calc_produces_finite_values(helix_structure):
         assert np.isfinite(val), f"RDC at residue {res_id} is not finite: {val}"
 
 
-def test_rdc_values_within_physical_range(helix_structure):
+def test_rdc_values_within_physical_range(helix_structure: Any) -> None:
     """Back-calculated RDCs must lie within [-2*Da, 2*Da] = [-20, 20] Hz.
 
     SCIENTIFIC BASIS:

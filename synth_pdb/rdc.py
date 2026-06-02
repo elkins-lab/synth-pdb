@@ -398,35 +398,33 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
         )
 
     # -- HANDLE EMPTY DATA ----------------------------------------------------
-    # Returning 0.0 for empty sets prevents division-by-zero errors in automated loops.
-    # Logging at INFO level tracks these cases for researcher awareness.
-    # This prevents the need for manual null-checks in high-throughput scripts.
+    # The Q-factor formula is undefined with no data (0/0).  We return nan
+    # rather than 0.0 so callers can detect and handle this case explicitly;
+    # returning 0.0 would falsely indicate "perfect agreement".
     if len(observed) == 0:
-        logger.info("Empty RDC arrays provided; Q-factor defaulted to 0.0.")
-        return 0.0
+        logger.warning("Empty RDC arrays provided; Q-factor is undefined (nan).")
+        return float("nan")
 
     # -- NUMERICAL CALCULATION ------------------------------------------------
     # Vectorized execution path for high-throughput ensemble validation.
 
     # 1. Calculate the squared differences (the residuals)
-    # diff = (D_obs - D_calc)
-    # Larger residuals contribute more heavily due to the squaring.
-    # Squared residuals are stored in a temporary NumPy array.
     diff_sq = (observed - calculated) ** 2
 
     # 2. Calculate the sum of squares of the observed values (normalization)
-    # This ensures the Q-factor is independent of the alignment tensor magnitude (Da).
-    # obs_sq = (D_obs)^2
     obs_sq = observed**2
 
-    # 3. Handle the edge case where all observed values are zero
-    # Prevents NaN in the final ratio calculation.
-    # This might occur in simulation scripts with uninitialized data.
-    # We log a warning to ensure the researcher is aware of null inputs.
+    # 3. Handle the edge case where all observed values are zero.
+    # Q = sqrt(sum(D_calc²) / 0) is mathematically undefined, not zero.
+    # Returning nan forces the caller to acknowledge the degenerate input
+    # rather than treating it as a perfect-agreement signal.
     sum_obs_sq = np.sum(obs_sq)
     if sum_obs_sq == 0:
-        logger.warning("Sum of squared observed RDCs is zero. Returning Q=0.0.")
-        return 0.0
+        logger.warning(
+            "Sum of squared observed RDCs is zero (all D_obs=0). "
+            "Q-factor is undefined (nan) — returning nan, not 0.0."
+        )
+        return float("nan")
 
     # 4. Compute the final Q-factor ratio
     # Q = sqrt( mean_square_residual / mean_square_data )

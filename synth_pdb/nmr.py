@@ -290,18 +290,46 @@ def calculate_rpf_score(
     for res in restraints:
         # Support multiple key naming conventions for robustness across
         # different versions of the synth-nmr engine and external tools.
-        # Format A: index_1, atom_name_1, etc. (standard engine format)
-        # Format B: res_i, atom_i, etc. (convenience/user format)
-        # This normalization ensures the function is backward compatible.
-        res_i = res.get("index_1") or res.get("res_i")
-        atom_i = res.get("atom_name_1") or res.get("atom_i")
-        res_j = res.get("index_2") or res.get("res_j")
-        atom_j = res.get("atom_name_2") or res.get("atom_j")
+        # Format A: seq_1 / atom_name_1 / seq_2 / atom_name_2 / upper_limit
+        #   — returned by calculate_synthetic_noes() in synth-nmr
+        # Format B: res_i / atom_i / res_j / atom_j / upper_bound
+        #   — convenience/user format accepted for manual restraint lists
+        # NOTE: we must NOT use `or` here because residue id 0 and
+        # distance 0.0 are falsy in Python and would be silently dropped.
+        if "seq_1" in res:
+            res_i = res["seq_1"]
+        elif "index_1" in res:
+            res_i = res["index_1"]
+        else:
+            res_i = res.get("res_i")
 
-        # Upper bound distance limit (default to 5.0 A if not specified).
-        # This is the "target" distance derived from the NOE spectrum.
-        # A model atom pair must be closer than this to satisfy the data.
-        upper_bound = res.get("upper_limit") or res.get("upper_bound") or 5.0
+        if "atom_name_1" in res:
+            atom_i = res["atom_name_1"]
+        else:
+            atom_i = res.get("atom_i")
+
+        if "seq_2" in res:
+            res_j = res["seq_2"]
+        elif "index_2" in res:
+            res_j = res["index_2"]
+        else:
+            res_j = res.get("res_j")
+
+        if "atom_name_2" in res:
+            atom_j = res["atom_name_2"]
+        else:
+            atom_j = res.get("atom_j")
+
+        # Upper bound: prefer 'upper_limit' (engine key) then 'upper_bound'
+        # (user key), then fall back to 5.0 Å only when the key is absent —
+        # a value of 0.0 would be physically wrong but must not be silently
+        # replaced by 5.0.
+        if "upper_limit" in res:
+            upper_bound = res["upper_limit"]
+        elif "upper_bound" in res:
+            upper_bound = res["upper_bound"]
+        else:
+            upper_bound = 5.0
 
         # -- CREATE MASKS -----------------------------------------------------
         # We create Boolean masks to isolate the specific atoms i and j in the
@@ -404,20 +432,33 @@ def calculate_rpf_score(
         # atoms in the restraint (i-j vs j-i) does not affect the match.
         restraint_pairs = set()
         for r in restraints:
-            # Normalize keys for lookup optimization to handle different formats.
-            # This logic must be identical to the Recall normalization above.
-            ri = r.get("index_1") or r.get("res_i")
-            ai = r.get("atom_name_1") or r.get("atom_i")
-            rj = r.get("index_2") or r.get("res_j")
-            aj = r.get("atom_name_2") or r.get("atom_j")
+            # Normalize keys — must mirror the Recall key-resolution logic exactly.
+            if "seq_1" in r:
+                ri = r["seq_1"]
+            elif "index_1" in r:
+                ri = r["index_1"]
+            else:
+                ri = r.get("res_i")
 
-            # Create a unique, hashable identifier for each atom in the pair.
-            # Using a tuple of (res, atom) allows for precise matching.
-            # We use (index, name) as the primary key.
+            if "atom_name_1" in r:
+                ai = r["atom_name_1"]
+            else:
+                ai = r.get("atom_i")
+
+            if "seq_2" in r:
+                rj = r["seq_2"]
+            elif "index_2" in r:
+                rj = r["index_2"]
+            else:
+                rj = r.get("res_j")
+
+            if "atom_name_2" in r:
+                aj = r["atom_name_2"]
+            else:
+                aj = r.get("atom_j")
+
             p1_id = (ri, ai)
             p2_id = (rj, aj)
-            # Sorted tuple ensures a canonical representation for the pair.
-            # e.g., (1, 'HA') and (5, 'HN') always becomes ((1, 'HA'), (5, 'HN')).
             pair = tuple(sorted([p1_id, p2_id]))
             restraint_pairs.add(pair)
 
