@@ -181,9 +181,14 @@ class BenchmarkResults:
         return "\n".join(lines)
 
     def to_csv(self, path: str) -> None:
-        """Write full per-structure results to a CSV file."""
-        import csv
+        """Write full per-structure results to a CSV file.
 
+        Parent directories are created automatically if they do not exist.
+        """
+        import csv
+        from pathlib import Path
+
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         fields = [
             "sequence",
             "length",
