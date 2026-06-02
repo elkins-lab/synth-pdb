@@ -57,23 +57,22 @@ class TestBenchmarkModule(unittest.TestCase):
         summary = results.summary()
         self.assertEqual(summary, "Benchmark 'FailedModel': 0/5 succeeded.")
 
-    def test_benchmark_results_to_csv(
-        self, tmp_path_str: str = "/Users/georgeelkins/.gemini/tmp/synth-pdb/test_bench.csv"
-    ) -> None:
+    def test_benchmark_results_to_csv(self) -> None:
         """Test CSV export."""
+        import tempfile
+
         r1 = StructureResult(sequence="AAA", tm_score=1.0)
         results = BenchmarkResults(results=[r1], n_structures=1, n_success=1)
 
-        results.to_csv(tmp_path_str)
-        self.assertTrue(os.path.exists(tmp_path_str))
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path_str = os.path.join(tmp_dir, "subdir", "test_bench.csv")
+            results.to_csv(tmp_path_str)
+            self.assertTrue(os.path.exists(tmp_path_str))
 
-        df = pd.read_csv(tmp_path_str)
-        self.assertEqual(len(df), 1)
-        self.assertEqual(df.iloc[0]["sequence"], "AAA")
-        self.assertEqual(df.iloc[0]["tm_score"], 1.0)
-
-        if os.path.exists(tmp_path_str):
-            os.remove(tmp_path_str)
+            df = pd.read_csv(tmp_path_str)
+            self.assertEqual(len(df), 1)
+            self.assertEqual(df.iloc[0]["sequence"], "AAA")
+            self.assertEqual(df.iloc[0]["tm_score"], 1.0)
 
     def test_benchmark_results_to_dataframe(self) -> None:
         """Test conversion to pandas DataFrame."""
