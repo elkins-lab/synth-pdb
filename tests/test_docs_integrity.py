@@ -424,6 +424,7 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Ensure rdc.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - What are Residual Dipolar Couplings (RDCs)?",
+            "EDUCATIONAL NOTE — The Zero-Denominator Hazard in Q-Factor Calculation:",
         ]
         self._check_file_contains(self.rdc_path, required_notes)
 
@@ -529,6 +530,9 @@ class TestDocumentationIntegrity(unittest.TestCase):
         """Ensure nmr.py retains key educational blocks."""
         required_notes = [
             "EDUCATIONAL NOTE - The Nuclear Overhauser Effect (NOE)",
+            "EDUCATIONAL NOTE — Key-Format Normalization and the Falsy-Zero Hazard:",
+            "EDUCATIONAL NOTE — Precision in RPF and the Set-Lookup Pattern:",
+            "EDUCATIONAL NOTE — The F-Measure (S\u00f8rensen-Dice Coefficient):",
         ]
         self._check_file_contains(self.nmr_path, required_notes)
 

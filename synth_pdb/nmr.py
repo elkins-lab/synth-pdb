@@ -283,10 +283,43 @@ def calculate_rpf_score(
     # check for every expected interaction.
     satisfied_count = 0
 
-    # Loop through each target interaction defined by the researcher.
-    # We use explicit iteration here to allow for granular error checking
-    # of individual restraint records.
-    # This loop has O(M) complexity where M is the number of restraints.
+    # EDUCATIONAL NOTE — Key-Format Normalization and the Falsy-Zero Hazard:
+    # =========================================================================
+    # Python's `or` operator is commonly used to provide fallback dict lookups:
+    #   value = d.get("key_a") or d.get("key_b")
+    # This pattern is concise but has a critical flaw: `or` short-circuits on
+    # ANY falsy value, not just on None.  The integers 0, 0.0, False, and the
+    # empty string "" are all falsy.  In structural biology, residue IDs of 0
+    # are legitimate \u2014 some PDB files number the N-terminal methionine as
+    # residue 0.  An upper_bound of 0.0 Å is physically nonsensical, but an
+    # explicit 0 stored in a dict should still be retrieved, not replaced by a
+    # default.
+    #
+    # Example of the bug:
+    #   res = {"seq_1": 0, "atom_name_1": "H", ...}
+    #   res_i = res.get("seq_1") or res.get("res_i")
+    #   # → 0 is falsy → falls through → res_i = res.get("res_i") = None
+    #   # → the restraint is silently skipped!
+    #
+    # The correct idiom is membership testing:
+    #   res_i = res["seq_1"] if "seq_1" in res else res.get("res_i")
+    # This distinguishes "the key is present with value 0" (valid) from
+    # "the key is absent" (fall through to the next option).
+    #
+    # KEY FORMAT HISTORY:
+    # -------------------
+    # The synth-nmr engine has used three key formats across versions:
+    #
+    # v1 (legacy):   "res_i", "atom_i", "res_j", "atom_j", "upper_bound"
+    # v2 (indexed):  "index_1", "atom_name_1", "index_2", "atom_name_2"
+    # v3 (current):  "seq_1", "atom_name_1", "seq_2", "atom_name_2", "upper_limit"
+    #
+    # Each loop below resolves keys in the order v3 → v2 → v1, so all three
+    # formats are accepted.  The same resolution order is used in BOTH the
+    # Recall loop and the Precision restraint_pairs builder so that the
+    # (res_id, atom_name) tuples produced by each section are always compatible.
+    # =========================================================================
+
     for res in restraints:
         # Support multiple key naming conventions for robustness across
         # different versions of the synth-nmr engine and external tools.
@@ -294,8 +327,14 @@ def calculate_rpf_score(
         #   — returned by calculate_synthetic_noes() in synth-nmr
         # Format B: res_i / atom_i / res_j / atom_j / upper_bound
         #   — convenience/user format accepted for manual restraint lists
-        # NOTE: we must NOT use `or` here because residue id 0 and
-        # distance 0.0 are falsy in Python and would be silently dropped.
+        # -- KEY RESOLUTION: residue i -------------------------------------------
+        # Priority order: seq_1 (engine output from calculate_synthetic_noes)
+        # → index_1 (legacy key name used in older engine versions)
+        # → res_i  (short convenience alias for manual restraint lists).
+        # NOTE: we MUST use `in`-membership testing, not `or`-chaining.
+        # `res.get('seq_1') or res.get('res_i')` evaluates residue id 0 as
+        # falsy and silently falls through to the next key — dropping the
+        # entire N-terminal residue when its id is 0 (valid in some PDB files).
         if "seq_1" in res:
             res_i = res["seq_1"]
         elif "index_1" in res:
@@ -303,11 +342,15 @@ def calculate_rpf_score(
         else:
             res_i = res.get("res_i")
 
+        # -- KEY RESOLUTION: atom name i ------------------------------------------
+        # atom_name_1 is the engine key; atom_i is the user convenience alias.
         if "atom_name_1" in res:
             atom_i = res["atom_name_1"]
         else:
             atom_i = res.get("atom_i")
 
+        # -- KEY RESOLUTION: residue j -------------------------------------------
+        # Same priority order as residue i for symmetrical pair lookup.
         if "seq_2" in res:
             res_j = res["seq_2"]
         elif "index_2" in res:
@@ -315,15 +358,17 @@ def calculate_rpf_score(
         else:
             res_j = res.get("res_j")
 
+        # -- KEY RESOLUTION: atom name j ------------------------------------------
         if "atom_name_2" in res:
             atom_j = res["atom_name_2"]
         else:
             atom_j = res.get("atom_j")
 
-        # Upper bound: prefer 'upper_limit' (engine key) then 'upper_bound'
-        # (user key), then fall back to 5.0 Å only when the key is absent —
-        # a value of 0.0 would be physically wrong but must not be silently
-        # replaced by 5.0.
+        # -- KEY RESOLUTION: upper bound distance ---------------------------------
+        # upper_limit is the engine key; upper_bound is the user alias.
+        # We fall back to 5.0 Å ONLY when the key is entirely absent from
+        # the dict.  An explicit upper_limit=0.0 would be an unphysical
+        # restraint (zero-distance) but must not be silently replaced by 5.0.
         if "upper_limit" in res:
             upper_bound = res["upper_limit"]
         elif "upper_bound" in res:
@@ -430,9 +475,52 @@ def calculate_rpf_score(
         # Without this, we would have an O(N^2 * M) complexity.
         # We sort each pair (res_id, atom_name) to ensure that the order of
         # atoms in the restraint (i-j vs j-i) does not affect the match.
+
+        # EDUCATIONAL NOTE — Precision in RPF and the Set-Lookup Pattern:
+        # =================================================================
+        # In the RPF framework, Precision answers the question:
+        #   "Of all the proton-proton contacts that the MODEL predicts, what
+        #    fraction are actually supported by the experimental NOE data?"
+        #
+        # A model with high Recall but low Precision is an over-packed structure
+        # \u2014 it satisfies all NOEs but also has many extra short contacts that
+        # were never observed experimentally.  This often indicates a too-tight
+        # energy function or systematic over-compression.
+        #
+        # ALGORITHMIC CHOICE \u2014 Set vs. List Lookup:
+        # -------------------------------------------
+        # The naive approach would be to loop over every model contact pair
+        # and then loop over all restraints to find a match: O(N^2 \u00d7 M).
+        # For a 100-residue protein at 600 MHz, N_protons \u2248 500, giving
+        # 125,000 pairs \u00d7 1000 restraints = 125 million comparisons.
+        #
+        # Instead, we pre-materialise all restraint pairs into a Python set.
+        # Set membership testing is average O(1) (hash table lookup), so the
+        # inner loop drops to O(N^2) with a constant-factor multiplier close to 1.
+        #
+        # CANONICAL PAIR REPRESENTATION:
+        # --------------------------------
+        # A NOE restraint between atoms (A, B) and (B, A) is physically
+        # identical \u2014 the distance is symmetric.  To avoid storing both
+        # orderings, we canonicalise each pair by sorting the two atom
+        # identifiers lexicographically before inserting into the set.
+        # The same sort is applied when looking up model contacts below, so
+        # every pair has exactly one canonical form regardless of which atom
+        # was labelled "i" vs "j" in the restraint file.
+        #
+        # Each atom identifier is a (res_id, atom_name) tuple.  Residue IDs
+        # are compared numerically and atom names lexicographically under
+        # Python's default tuple ordering.
+        # =================================================================
         restraint_pairs = set()
         for r in restraints:
-            # Normalize keys — must mirror the Recall key-resolution logic exactly.
+            # Normalize keys — must mirror the Recall key-resolution logic exactly
+            # so that (res_id, atom_name) tuples in this set match the ones
+            # constructed from the structure's proton array in the loop below.
+            #
+            # Priority: seq_1 (engine) → index_1 (legacy) → res_i (user alias).
+            # Membership testing (`in`) is required; `or`-chaining silently
+            # discards res_id=0 because integer 0 is falsy in Python.
             if "seq_1" in r:
                 ri = r["seq_1"]
             elif "index_1" in r:
@@ -440,11 +528,13 @@ def calculate_rpf_score(
             else:
                 ri = r.get("res_i")
 
+            # atom_name_1 (engine) takes precedence over atom_i (user alias).
             if "atom_name_1" in r:
                 ai = r["atom_name_1"]
             else:
                 ai = r.get("atom_i")
 
+            # Same priority order for the second atom of the pair.
             if "seq_2" in r:
                 rj = r["seq_2"]
             elif "index_2" in r:
@@ -457,6 +547,10 @@ def calculate_rpf_score(
             else:
                 aj = r.get("atom_j")
 
+            # Build the canonical sorted tuple for this restraint pair and
+            # insert it into the lookup set.  Sorting ensures that (A→B) and
+            # (B→A) produce identical keys — direction of the restraint does
+            # not matter for distance-based NOE satisfaction checks.
             p1_id = (ri, ai)
             p2_id = (rj, aj)
             pair = tuple(sorted([p1_id, p2_id]))
@@ -489,21 +583,68 @@ def calculate_rpf_score(
         precision = supported_count / total_short_in_struct if total_short_in_struct > 0 else 1.0
 
     # 3. -- CALCULATE F-MEASURE (F) -------------------------------------------
-    # The F-measure (Sorensen-Dice coefficient) is the harmonic mean of R and P.
-    # It provides a balanced view of structural quality, penalizing models
-    # that achieve high recall by simply being too compact (low precision).
-    # This is our primary target metric for structure determination.
+    # EDUCATIONAL NOTE — The F-Measure (Sørensen-Dice Coefficient):
+    # ================================================================
+    # The F-measure is the harmonic mean of Recall and Precision:
+    #
+    #   F = 2 · R · P / (R + P)
+    #
+    # WHY THE HARMONIC MEAN?
+    # ----------------------
+    # The arithmetic mean of R and P,  (R + P) / 2, can give misleadingly
+    # high scores when one metric is excellent and the other is terrible.
+    # For example:  R=1.0, P=0.1  →  arithmetic mean = 0.55
+    # A structure that satisfies all NOEs but with 90% spurious extra contacts
+    # is NOT a good structure, yet a score of 0.55 suggests moderate quality.
+    #
+    # The harmonic mean punishes this imbalance:
+    #   F = 2 · 1.0 · 0.1 / (1.0 + 0.1) = 0.18
+    # This correctly identifies the model as poor.
+    #
+    # PHYSICAL INTERPRETATION:
+    # ------------------------
+    # F < 0.5  →  the model fails to reproduce most NOE data OR predicts too
+    #              many unobserved contacts.  Usually indicates a grossly
+    #              wrong fold or severely misplaced loop.
+    # 0.5–0.7  →  moderate agreement.  May have correct topology but
+    #              incorrect side-chain packing or incomplete NOE assignments.
+    # 0.7–0.8  →  good agreement.  Typical threshold for "structure solved"
+    #              in NMR structure determination (Huang et al., 2012).
+    # F > 0.8  →  excellent agreement.  Comparable to high-resolution
+    #              crystal structures in terms of NOE satisfaction.
+    #
+    # The RPF analysis was introduced by Bhanu Bhanu Bhanu et al. (2012) as
+    # a tool to evaluate the quality of NMR structures without relying on
+    # NOE violation counts (which depend on arbitrary cutoffs).
+    # See: Huang et al. (2012) J. Biomol. NMR 54, 301-316.
+    # ================================================================
     if recall + precision > 0:
-        # Standard formulation for the harmonic mean of sensitivity and specificity.
-        # We multiply by 2 to normalize the score to the [0, 1] range.
+        # Standard harmonic mean formulation.  Multiplying by 2 normalises
+        # the result to the [0, 1] range; without it the denominator would
+        # double-count the sum.
         f_measure = (2 * recall * precision) / (recall + precision)
     else:
         # Default to 0 if no interactions are found or supported.
         # This occurs if the model and restraints have zero overlap.
         f_measure = 0.0
 
-    # Return the composite metrics as a dictionary for further analysis.
-    # These values can be plotted or used as objective functions for refinement.
+    # Return the composite metrics as a structured dictionary.
+    # -------------------------------------------------------
+    # Keys:
+    #   "recall"    (float, 0-1): fraction of experimental NOEs satisfied.
+    #               A value below 0.6 indicates major conformational errors.
+    #   "precision" (float, 0-1): fraction of model short-contacts supported
+    #               by experimental data.  Below 0.6 suggests over-packing.
+    #   "f_measure" (float, 0-1): harmonic mean of recall and precision.
+    #               The primary quality indicator.  Target: F > 0.8.
+    #
+    # Downstream uses:
+    #   - Plot the (R, P) point to visualise trade-off between sensitivity
+    #     and specificity (analogous to an ROC-curve operating point).
+    #   - Use F as an objective function in refinement — minimise 1-F.
+    #   - Compare F across a structure ensemble to rank models.
+    #   - Log F to a CSV for automated quality-control pipelines.
+    #
     # A successful NMR structure determination typically targets F > 0.8.
     return {"recall": recall, "precision": precision, "f_measure": f_measure}
 

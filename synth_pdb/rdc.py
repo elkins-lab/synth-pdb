@@ -414,10 +414,15 @@ def calculate_rdc_q_factor(observed: np.ndarray, calculated: np.ndarray) -> floa
     # 2. Calculate the sum of squares of the observed values (normalization)
     obs_sq = observed**2
 
+    # EDUCATIONAL NOTE — The Zero-Denominator Hazard in Q-Factor Calculation:
+    # ------------------------------------------------------------------------
     # 3. Handle the edge case where all observed values are zero.
     # Q = sqrt(sum(D_calc²) / 0) is mathematically undefined, not zero.
     # Returning nan forces the caller to acknowledge the degenerate input
     # rather than treating it as a perfect-agreement signal.
+    # The same logic applies to the empty-array guard above: 0/0 is
+    # undefined, not 0.  Both cases return nan so that numpy functions
+    # (np.isnan, np.nanmean, etc.) can filter them correctly downstream.
     sum_obs_sq = np.sum(obs_sq)
     if sum_obs_sq == 0:
         logger.warning(
