@@ -27,6 +27,17 @@ researchers can de-convolve the global and local motions. synth-pdb uses
 S^2 parameters predicted from sequence and structure to generate synthetic
 T1/T2 rates that reflect the protein's dynamic landscape.
 
+APPROXIMATION NOTICE — MAX_SASA constant in predict_order_parameters:
+=====================================================================
+The S² prediction in synth-nmr normalises per-residue SASA by a fixed
+constant MAX_SASA = 150 Å².  This is a backbone-average heuristic: the true
+maximum SASA varies from ~75 Å² (Gly) to ~240 Å² (Trp), so small residues
+will be scored as more buried and large aromatics as more exposed than they
+physically are.  This introduces a systematic bias in S² for Gly/Ala vs
+Trp/Phe residues.  See synth_nmr/relaxation.py for the full citation
+(Miller et al., 1987, J. Mol. Biol. 196, 641-656) and guidance on replacing
+the constant with a per-residue lookup table if higher accuracy is needed.
+
 """
 
 # Re-export from synth-nmr for backward compatibility
