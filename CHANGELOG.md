@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.38.1] - 2026-06-07
+
+### Added
+- Added interactive Electrostatic Surfaces & pH Titration Lab Jupyter Notebook tutorial.
+
+### Fixed
+- Resolved `NamedTemporaryFile` permission issues causing test failures on Windows.
+- Resolved HuggingFace cache loading `TypeError` on Windows by explicitly setting `HF_HOME`.
+
+### Security
+- Removed compromised `polyfill.io` CDN script from MkDocs configuration to resolve supply-chain vulnerability.
+
 ## [1.38.0] - 2026-06-02
 
 ### Added

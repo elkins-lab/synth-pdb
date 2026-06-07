@@ -7,7 +7,7 @@ site_author: George Elkins
 copyright: Copyright &copy; 2026 George Elkins
 
 extra:
-  version: v1.38.0
+  version: v1.38.1
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/elkins/synth-pdb
