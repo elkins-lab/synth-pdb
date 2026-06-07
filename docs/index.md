@@ -6,6 +6,7 @@
   <a href="https://doi.org/10.5281/zenodo.18357242"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.18357242.svg" alt="DOI"></a>
   <a href="https://github.com/elkins/synth-pdb/actions/workflows/test.yml"><img src="https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
   <a href="https://codecov.io/gh/elkins/synth-pdb"><img src="https://codecov.io/gh/elkins/synth-pdb/branch/master/graph/badge.svg" alt="codecov"></a>
+  <a href="https://www.bestpractices.dev/projects/13127"><img src="https://www.bestpractices.dev/projects/13127/badge" alt="OpenSSF Best Practices"></a>
 </p>
 
 **Generate realistic PDB files with mixed secondary structures for bioinformatics testing, education, and tool development.**
