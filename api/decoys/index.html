@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="George Elkins">
+        <link rel="canonical" href="https://elkins.github.io/synth-pdb/api/decoys/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>decoys Module - synth-pdb</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../stylesheets/extra.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">synth-pdb</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">synth-pdb</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../nmr/" class="nav-link">NMR Observables</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../physics/" class="nav-link">Physics Engine</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../technical_notes/" class="nav-link">Technical Implementation Notes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../usage/" class="nav-link">Usage</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../visualization/" class="nav-link">Interactive Visualization</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">About</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../about/changelog/" class="dropdown-item">Changelog</a>
+</li>
+                                    
+<li>
+    <a href="../../about/citation/" class="dropdown-item">Citation</a>
+</li>
+                                    
+<li>
+    <a href="../../about/license/" class="dropdown-item">License</a>
+</li>
+                                    
+<li>
+    <a href="../../about/roadmap/" class="dropdown-item">Project Roadmap &amp; Future Horizons</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Api</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../analysis/" class="dropdown-item">analysis Module</a>
+</li>
+                                    
+<li>
+    <a href="../batch_generator/" class="dropdown-item">batch_generator Module</a>
+</li>
+                                    
+<li>
+    <a href="../benchmark/" class="dropdown-item">benchmark — Structure Prediction Benchmarking</a>
+</li>
+                                    
+<li>
+    <a href="../benchmark_metrics/" class="dropdown-item">benchmark_metrics Module</a>
+</li>
+                                    
+<li>
+    <a href="../biophysics/" class="dropdown-item">biophysics Module</a>
+</li>
+                                    
+<li>
+    <a href="../bmrb_api/" class="dropdown-item">bmrb_api Module</a>
+</li>
+                                    
+<li>
+    <a href="../cd_simulator/" class="dropdown-item">cd_simulator Module</a>
+</li>
+                                    
+<li>
+    <a href="../chemical_shifts/" class="dropdown-item">chemical_shifts Module</a>
+</li>
+                                    
+<li>
+    <a href="../cofactors/" class="dropdown-item">cofactors Module</a>
+</li>
+                                    
+<li>
+    <a href="../contact/" class="dropdown-item">contact Module</a>
+</li>
+                                    
+<li>
+    <a href="../coupling/" class="dropdown-item">coupling — J-Coupling Prediction</a>
+</li>
+                                    
+<li>
+    <a href="../cryo_em/" class="dropdown-item">cryo_em Module</a>
+</li>
+                                    
+<li>
+    <a href="../data/" class="dropdown-item">data Module</a>
+</li>
+                                    
+<li>
+    <a href="../dataset/" class="dropdown-item">dataset Module</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">decoys Module</a>
+</li>
+                                    
+<li>
+    <a href="../distogram/" class="dropdown-item">distogram Module</a>
+</li>
+                                    
+<li>
+    <a href="../docking/" class="dropdown-item">docking Module</a>
+</li>
+                                    
+<li>
+    <a href="../ensemble/" class="dropdown-item">ensemble Module</a>
+</li>
+                                    
+<li>
+    <a href="../evolution/" class="dropdown-item">evolution Module</a>
+</li>
+                                    
+<li>
+    <a href="../export/" class="dropdown-item">export Module</a>
+</li>
+                                    
+<li>
+    <a href="../generator/" class="dropdown-item">generator Module</a>
+</li>
+                                    
+<li>
+    <a href="../geometry/" class="dropdown-item">geometry</a>
+</li>
+                                    
+<li>
+    <a href="../j_coupling/" class="dropdown-item">j_coupling Module</a>
+</li>
+                                    
+<li>
+    <a href="../llm/" class="dropdown-item">llm Module</a>
+</li>
+                                    
+<li>
+    <a href="../main/" class="dropdown-item">main Module</a>
+</li>
+                                    
+<li>
+    <a href="../msa/" class="dropdown-item">msa Module</a>
+</li>
+                                    
+<li>
+    <a href="../nef_io/" class="dropdown-item">nef_io Module</a>
+</li>
+                                    
+<li>
+    <a href="../nmr/" class="dropdown-item">NMR</a>
+</li>
+                                    
+<li>
+    <a href="../orientogram/" class="dropdown-item">orientogram Module</a>
+</li>
+                                    
+<li>
+    <a href="../overview/" class="dropdown-item">API Reference</a>
+</li>
+                                    
+<li>
+    <a href="../packing/" class="dropdown-item">packing Module</a>
+</li>
+                                    
+<li>
+    <a href="../pdb_utils/" class="dropdown-item">pdb_utils Module</a>
+</li>
+                                    
+<li>
+    <a href="../physics/" class="dropdown-item">physics Module</a>
+</li>
+                                    
+<li>
+    <a href="../plm/" class="dropdown-item">synth_pdb.plm — Protein Language Model Embeddings</a>
+</li>
+                                    
+<li>
+    <a href="../quality/" class="dropdown-item">quality — Publication Visualization &amp; Structure Quality</a>
+</li>
+                                    
+<li>
+    <a href="../rdc/" class="dropdown-item">rdc Module</a>
+</li>
+                                    
+<li>
+    <a href="../relaxation/" class="dropdown-item">relaxation Module</a>
+</li>
+                                    
+<li>
+    <a href="../saxs/" class="dropdown-item">saxs Module</a>
+</li>
+                                    
+<li>
+    <a href="../score/" class="dropdown-item">score Module</a>
+</li>
+                                    
+<li>
+    <a href="../scoring/" class="dropdown-item">score — GNN Quality Scoring API</a>
+</li>
+                                    
+<li>
+    <a href="../special_chemistry/" class="dropdown-item">special_chemistry Module</a>
+</li>
+                                    
+<li>
+    <a href="../structure_utils/" class="dropdown-item">structure_utils Module</a>
+</li>
+                                    
+<li>
+    <a href="../torsion/" class="dropdown-item">torsion Module</a>
+</li>
+                                    
+<li>
+    <a href="../validator/" class="dropdown-item">validator Module</a>
+</li>
+                                    
+<li>
+    <a href="../viewer/" class="dropdown-item">Viewer Module</a>
+</li>
+                                    
+<li>
+    <a href="../visualization/" class="dropdown-item">visualization Module</a>
+</li>
+                                    
+<li>
+    <a href="../visualization_saxs/" class="dropdown-item">visualization_saxs Module</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Biophysics</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../biophysics/cd_spectroscopy/" class="dropdown-item">Circular Dichroism (CD) Spectroscopy</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Development</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../development/ai_strategy/" class="dropdown-item">Synth-PDB: Long-Term AI Integration Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../development/architecture/" class="dropdown-item">Architecture</a>
+</li>
+                                    
+<li>
+    <a href="../../development/contributing/" class="dropdown-item">Contributing</a>
+</li>
+                                    
+<li>
+    <a href="../../development/release/" class="dropdown-item">Release Process</a>
+</li>
+                                    
+<li>
+    <a href="../../development/testing/" class="dropdown-item">Testing</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Examples</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../examples/advanced/" class="dropdown-item">Advanced Features</a>
+</li>
+                                    
+<li>
+    <a href="../../examples/biological/" class="dropdown-item">Biologically-Inspired Examples</a>
+</li>
+                                    
+<li>
+    <a href="../../examples/dark_proteome/" class="dropdown-item">The Dark Proteome &amp; Pathological Models</a>
+</li>
+                                    
+<li>
+    <a href="../../examples/gallery/" class="dropdown-item">Examples Gallery</a>
+</li>
+                                    
+<li>
+    <a href="../../examples/visualization/" class="dropdown-item">Visualization Examples</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Getting started</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../getting-started/first-structure/" class="dropdown-item">Your First Structure</a>
+</li>
+                                    
+<li>
+    <a href="../../getting-started/installation/" class="dropdown-item">Installation Guide</a>
+</li>
+                                    
+<li>
+    <a href="../../getting-started/quickstart/" class="dropdown-item">Quick Start</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Guides</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../guides/beginners/" class="dropdown-item">Beginners</a>
+</li>
+                                    
+<li>
+    <a href="../../guides/cli-reference/" class="dropdown-item">Command-Line Reference</a>
+</li>
+                                    
+<li>
+    <a href="../../guides/ml-researchers/" class="dropdown-item">Guide for AI/ML Researchers</a>
+</li>
+                                    
+<li>
+    <a href="../../guides/nmr-spectroscopists/" class="dropdown-item">Guide for NMR Spectroscopists</a>
+</li>
+                                    
+<li>
+    <a href="../../guides/prompt-interface/" class="dropdown-item">Prompt-to-Protein Interface</a>
+</li>
+                                    
+<li>
+    <a href="../../guides/publication-figures/" class="dropdown-item">Publication-Ready Visualizations</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Science</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../science/benchmarking/" class="dropdown-item">Scientific Benchmarking &amp; Defensibility</a>
+</li>
+                                    
+<li>
+    <a href="../../science/biophysics/" class="dropdown-item">Biophysics Fundamentals</a>
+</li>
+                                    
+<li>
+    <a href="../../science/coevolution/" class="dropdown-item">Co-Evolution &amp; Synthetic MSAs</a>
+</li>
+                                    
+<li>
+    <a href="../../science/energy-minimization/" class="dropdown-item">Energy Minimization</a>
+</li>
+                                    
+<li>
+    <a href="../../science/ensemble-analysis/" class="dropdown-item">NMR Ensemble Analysis</a>
+</li>
+                                    
+<li>
+    <a href="../../science/gnn-structure-scoring/" class="dropdown-item">GNN Structure Scoring — Scientific Background</a>
+</li>
+                                    
+<li>
+    <a href="../../science/ground-truth-philosophy/" class="dropdown-item">Ground Truth Philosophy: Geometry vs. Physics</a>
+</li>
+                                    
+<li>
+    <a href="../../science/idp-dynamics/" class="dropdown-item">Intrinsically Disordered Proteins (IDPs)</a>
+</li>
+                                    
+<li>
+    <a href="../../science/multi-modal-observables/" class="dropdown-item">Multi-Modal Observables</a>
+</li>
+                                    
+<li>
+    <a href="../../science/multimodal/" class="dropdown-item">Multimodal Scientific Observables</a>
+</li>
+                                    
+<li>
+    <a href="../../science/nerf-geometry/" class="dropdown-item">NeRF Geometry</a>
+</li>
+                                    
+<li>
+    <a href="../../science/nmr-theory/" class="dropdown-item">NMR Theory</a>
+</li>
+                                    
+<li>
+    <a href="../../science/plm/" class="dropdown-item">Protein Language Models (PLMs)</a>
+</li>
+                                    
+<li>
+    <a href="../../science/ramachandran/" class="dropdown-item">Ramachandran Plots</a>
+</li>
+                                    
+<li>
+    <a href="../../science/rotamers/" class="dropdown-item">Rotamer Libraries</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Tutorials</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../tutorials/bmrb_validation/" class="dropdown-item">BMRB Validation Pipeline</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../dataset/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../distogram/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/elkins/synth-pdb/edit/master/docs/api/decoys.md" class="nav-link">Edit on elkins/synth-pdb
+                                    </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#decoys-module" class="nav-link">decoys Module</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#api-reference" class="nav-link">API Reference</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="decoys-module">decoys Module</h1>
+<p>The <code>decoys</code> module is part of the synth-pdb package.</p>
+<h2 id="overview">Overview</h2>
+<p><em>(Documentation overview to be expanded)</em></p>
+<h2 id="api-reference">API Reference</h2>
+<p>::: synth_pdb.decoys
+    handler: python</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2026 George Elkins</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../javascripts/mathjax.js"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
