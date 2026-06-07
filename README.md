@@ -5,7 +5,7 @@ A command-line tool to generate Protein Data Bank (PDB) files with full atomic r
 [![PyPI version](https://img.shields.io/badge/pypi-v1.38.1-blue)](https://pypi.org/project/synth-pdb/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18357242.svg)](https://doi.org/10.5281/zenodo.18357242)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.18357242-blue)](https://doi.org/10.5281/zenodo.18357242)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/elkins/synth-pdb/branch/master/graph/badge.svg)](https://codecov.io/gh/elkins/synth-pdb)
 [![Documentation](https://img.shields.io/badge/docs-live-brightgreen)](https://elkins.github.io/synth-pdb/)
