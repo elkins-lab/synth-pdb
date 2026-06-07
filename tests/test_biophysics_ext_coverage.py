@@ -11,25 +11,36 @@ from synth_pdb.docking import DockingPrep
 from synth_pdb.generator import generate_pdb_content
 
 
-def test_docking_prep_pqr():
+def test_docking_prep_pqr() -> None:
     # Use generator with minimization to ensure OpenMM-compatible atom sets
-    pdb_content = generate_pdb_content(
-        sequence_str="ALA-GLY-SER", minimize_energy=True, cap_termini=True
+    from typing import cast
+
+    pdb_content = cast(
+        str,
+        generate_pdb_content(sequence_str="ALA-GLY-SER", minimize_energy=True, cap_termini=True),
     )
 
-    with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w") as tmp_pdb:
-        tmp_pdb.write(pdb_content)
-        tmp_pdb.flush()
+    tmp_pdb = tempfile.NamedTemporaryFile(suffix=".pdb", mode="w", delete=False)
+    tmp_pdb.write(pdb_content)
+    tmp_pdb.close()
 
-        with tempfile.NamedTemporaryFile(suffix=".pqr") as tmp_pqr:
-            prep = DockingPrep()
-            # This should now succeed with a real structure
-            success = prep.write_pqr(tmp_pdb.name, tmp_pqr.name)
-            assert success
-            assert os.path.exists(tmp_pqr.name)
+    tmp_pqr = tempfile.NamedTemporaryFile(suffix=".pqr", mode="w", delete=False)
+    tmp_pqr.close()
+
+    try:
+        prep = DockingPrep()
+        # This should now succeed with a real structure
+        success = prep.write_pqr(tmp_pdb.name, tmp_pqr.name)
+        assert success
+        assert os.path.exists(tmp_pqr.name)
+    finally:
+        if os.path.exists(tmp_pdb.name):
+            os.remove(tmp_pdb.name)
+        if os.path.exists(tmp_pqr.name):
+            os.remove(tmp_pqr.name)
 
 
-def test_contact_map_noe_method():
+def test_contact_map_noe_method() -> None:
     atoms = struc.array(
         [
             struc.Atom([0, 0, 0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),
@@ -47,7 +58,7 @@ def test_contact_map_noe_method():
         compute_contact_map(atoms, method="invalid")
 
 
-def test_distogram_edge_cases():
+def test_distogram_edge_cases() -> None:
     atoms = struc.array(
         [
             struc.Atom([0, 0, 0], atom_name="CA", res_name="ALA", res_id=1, chain_id="A"),

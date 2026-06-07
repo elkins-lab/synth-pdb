@@ -345,6 +345,12 @@ class ESM2Embedder:
                 "torch is required for ESM2Embedder. Install with: pip install synth-pdb[plm]"
             ) from exc
 
+        # Ensure HF_HOME is set to avoid huggingface_hub path resolution bugs on some Windows setups
+        import os
+
+        if "HF_HOME" not in os.environ:
+            os.environ["HF_HOME"] = os.path.expanduser("~/.cache/huggingface")
+
         try:
             from transformers import EsmModel, EsmTokenizer
         except (ImportError, TypeError) as exc:
