@@ -97,8 +97,8 @@ def test_reconstruct_sidechain_unknown_residue():
     pdb_file = pdb.PDBFile.read(io.StringIO(pdb_content))
     peptide = pdb_file.get_structure(model=1)
 
-    # Change residue name to something unknown
-    peptide.res_name[0] = "XYZ"
+    # Change ALL residue names to something unknown
+    peptide.res_name[:] = "INVALID123"
 
     # Should log warning and return
     reconstruct_sidechain(peptide, 1, {"chi1": [60.0]})

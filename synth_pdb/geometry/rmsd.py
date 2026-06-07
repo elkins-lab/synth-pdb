@@ -165,8 +165,5 @@ def calculate_rmsd_to_average(
         logger.warning("calculate_rmsd_to_average: No coordinates provided.")
         return float("nan"), avg_coords
     rmsds = [calculate_rmsd(coords, avg_coords) for coords in coords_list]
-    if len(rmsds) == 0:
-        logger.warning("calculate_rmsd_to_average: No RMSDs calculated.")
-        return float("nan"), avg_coords
     avg_rmsd = float(np.mean(rmsds))
     return avg_rmsd, avg_coords
