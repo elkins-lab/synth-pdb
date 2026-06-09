@@ -1,3 +1,4 @@
+from typing import cast
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
 
@@ -11,7 +12,7 @@ def test_engh_huber_zscore_validation() -> None:
     statistically impossible for a real protein.
     """
     # 1. Good structure (standard alpha helix)
-    pdb_good = generate_pdb_content(length=10)
+    pdb_good = cast(str, generate_pdb_content(length=10))
     val_good = PDBValidator(pdb_content=pdb_good)
 
     # Method to implement: get_geometric_z_scores()
@@ -41,7 +42,7 @@ def test_dunbrack_rotamer_probability() -> None:
     Sidechain Chi angles prefer specific 'rotamers'. Conformations with
     low probability in the Dunbrack library are likely steric outliers.
     """
-    pdb_content = generate_pdb_content(length=20)
+    pdb_content = cast(str, generate_pdb_content(length=20, seed=42))
     validator = PDBValidator(pdb_content=pdb_content)
 
     # Method to implement: get_rotamer_quality_report()
@@ -54,7 +55,7 @@ def test_dunbrack_rotamer_probability() -> None:
 
 def test_comprehensive_scientific_defense_report() -> None:
     """Verify that all metrics are integrated into the final quality assessment."""
-    pdb_content = generate_pdb_content(length=10)
+    pdb_content = cast(str, generate_pdb_content(length=10))
     validator = PDBValidator(pdb_content=pdb_content)
 
     report = validator.get_quality_report()
