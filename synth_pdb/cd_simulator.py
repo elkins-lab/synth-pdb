@@ -119,6 +119,15 @@ class CDSimulator:
     def plot(self, save_path: str | None = None) -> None:
         """Plots the synthetic CD spectrum."""
         try:
+            import os
+            import sys
+            import matplotlib
+
+            # Prevent Tkinter crashes in headless CI environments or when just saving a file
+            if "matplotlib.pyplot" not in sys.modules:
+                if save_path or os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
+                    matplotlib.use("Agg")
+
             import matplotlib.pyplot as plt
         except ImportError:
             logger.warning("Matplotlib not installed. CD plotting is disabled.")
