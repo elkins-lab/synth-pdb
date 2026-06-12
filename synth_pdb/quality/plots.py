@@ -8,7 +8,7 @@ high-DPI export, consistent typography, and scientifically accurate scales.
 
 import logging
 import os
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -60,7 +60,7 @@ def apply_publication_style() -> None:
         "savefig.dpi": 300,
         "savefig.bbox": "tight",
     }
-    mpl.rcParams.update(params)
+    mpl.rcParams.update(cast(Any, params))
 
 
 def save_publication_figure(fig: Any, path: str, transparent: bool = False) -> None:
