@@ -2,8 +2,8 @@
 
 A command-line tool to generate Protein Data Bank (PDB) files with full atomic representation for testing, benchmarking and educational purposes.
 
-[![PyPI version](https://img.shields.io/badge/pypi-v1.38.1-blue)](https://pypi.org/project/synth-pdb/)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI version](https://img.shields.io/pypi/v/synth-pdb)](https://pypi.org/project/synth-pdb/)
+[![Python versions](https://img.shields.io/pypi/pyversions/synth-pdb)](https://pypi.org/project/synth-pdb/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.18357242-blue)](https://doi.org/10.5281/zenodo.18357242)
 [![Tests](https://github.com/elkins/synth-pdb/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-pdb/actions/workflows/test.yml)

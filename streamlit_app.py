@@ -2,6 +2,12 @@ from typing import Any
 
 import streamlit as st
 import streamlit.components.v1 as components
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("synth-pdb")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 from synth_pdb.generator import generate_pdb_content
 from synth_pdb.validator import PDBValidator
@@ -205,6 +211,6 @@ with tab_pathology:
 # Footer
 st.divider()
 st.markdown(
-    "<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v1.38.1 | Professional Edition</div>",
+    f"<div style='text-align: center; color: #6b7280; font-size: 12px;'>synth-pdb v{__version__} | Professional Edition</div>",
     unsafe_allow_html=True,
 )
