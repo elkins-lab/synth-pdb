@@ -34,38 +34,44 @@ _FORCEFIELD_CACHE: dict[tuple[str, ...], "app.ForceField"] = {}
 _BEST_PLATFORM_CACHE: dict[str, Any] = {"platform": None, "props": {}}
 
 
-class LoggingMinimizationReporter(mm.MinimizationReporter):
-    """OpenMM MinimizationReporter that logs progress to the logger at DEBUG level.
+if HAS_OPENMM:
 
-    ### Educational Note: Minimization Reporters
-    -------------------------------------------
-    In high-performance physics engines like OpenMM, energy minimization is
-    often a "black box" operation performed by highly optimized C++ code (like L-BFGS).
-    By default, you only get the final state.
+    class LoggingMinimizationReporter(mm.MinimizationReporter):  # type: ignore[misc]
+        """OpenMM MinimizationReporter that logs progress to the logger at DEBUG level.
 
-    A `MinimizationReporter` is a "callback" mechanism. It allows the Python
-    layer to "peek" into the C++ optimization loop at every iteration. This is
-    essential for:
-    1. Monitoring convergence: Seeing how fast the energy is dropping.
-    2. Debugging: Identifying exactly which iteration caused a system to "explode."
-    3. Early Exit: Stopping the process if the energy goes above a threshold (e.g. steric clash).
-    """
+        ### Educational Note: Minimization Reporters
+        -------------------------------------------
+        In high-performance physics engines like OpenMM, energy minimization is
+        often a "black box" operation performed by highly optimized C++ code (like L-BFGS).
+        By default, you only get the final state.
 
-    def __init__(self, interval: int = 50):
-        super().__init__()
-        self.interval = interval
+        A `MinimizationReporter` is a "callback" mechanism. It allows the Python
+        layer to "peek" into the C++ optimization loop at every iteration. This is
+        essential for:
+        1. Monitoring convergence: Seeing how fast the energy is dropping.
+        2. Debugging: Identifying exactly which iteration caused a system to "explode."
+        3. Early Exit: Stopping the process if the energy goes above a threshold (e.g. steric clash).
+        """
 
-    def report(self, iteration: int, x: Any, grad: Any, args: Any) -> bool:
-        if iteration % self.interval == 0:
-            # args is a SWIG mapstringdouble; it behaves like a dict but may lack .get()
-            try:
-                energy = args["system energy"]
-            except (KeyError, TypeError, RuntimeError):
-                energy = 0.0
-            logger.debug(
-                f"Physics: Minimization Iteration {iteration} | Energy: {energy:.4f} kJ/mol"
-            )
-        return False  # Continue minimization
+        def __init__(self, interval: int = 50):
+            super().__init__()
+            self.interval = interval
+
+        def report(self, iteration: int, x: Any, grad: Any, args: Any) -> bool:
+            if iteration % self.interval == 0:
+                # args is a SWIG mapstringdouble; it behaves like a dict but may lack .get()
+                try:
+                    energy = args["system energy"]
+                except (KeyError, TypeError, RuntimeError):
+                    energy = 0.0
+                logger.debug(
+                    f"Physics: Minimization Iteration {iteration} | Energy: {energy:.4f} kJ/mol"
+                )
+            return False  # Continue minimization
+else:
+
+    class LoggingMinimizationReporter:  # type: ignore[no-redef]
+        pass
 
 
 class EnergyMinimizer:
