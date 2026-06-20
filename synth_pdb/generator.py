@@ -1720,7 +1720,7 @@ def _assemble_output(
     # We use the explicit conformational intent (stored during construction)
     # to ensure B-factors reflect the intended biophysical properties.
     if "conformation_intent" in peptide.get_annotation_categories():
-        intent = cast(np.ndarray, peptide.conformation_intent)
+        intent = cast(np.ndarray, peptide.get_annotation("conformation_intent"))
         is_loop = np.isin(intent, ["random", "coil", "turn"])
         is_helix = np.isin(intent, ["alpha", "310", "pi"])
         is_sheet = np.isin(intent, ["beta", "extended"])
