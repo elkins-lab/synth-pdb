@@ -1809,7 +1809,7 @@ def _assemble_output(
         # This ensures consistency even if OpenMM provided its own PDB output.
         atomic_and_ter_content = extract_atomic_content(atomic_and_ter_content)
         processed_lines = []
-        atom_id_to_idx = {aid: i for i, aid in enumerate(peptide.atom_id)}
+        atom_id_to_idx = {int(aid): i for i, aid in enumerate(peptide.atom_id)}
 
         for line in atomic_and_ter_content.splitlines():
             if line.startswith("ATOM") or line.startswith("HETATM"):

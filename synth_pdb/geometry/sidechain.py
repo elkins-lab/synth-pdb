@@ -123,8 +123,8 @@ def reconstruct_sidechain(
                 g_atom = gamma_atoms[0]
                 n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
 
-                curr_chi1: float = struc.dihedral(
-                    n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
+                curr_chi1: float = float(
+                    struc.dihedral(n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord)
                 )
                 curr_chi1_deg = np.rad2deg(curr_chi1)
 

@@ -816,7 +816,7 @@ def _find_hbonds(pdb_content: str) -> list:
                 if hasattr(hbond, "hbond"):
                     triplets = hbond.hbond(structure, selection1=mask_n, selection2=mask_o)
                 else:
-                    triplets = hbond(structure, selection1=mask_n, selection2=mask_o)
+                    triplets = hbond(structure, selection1=mask_n, selection2=mask_o)  # type: ignore
             except Exception:
                 pass  # Fallback
 

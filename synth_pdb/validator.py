@@ -1060,7 +1060,9 @@ class PDBValidator:
             # We must map map array indices to self.atoms indices.
             # Assuming 1-to-1 mapping since both parse the same file.
 
-            bond_array = bonds.as_array()  # Shape (M, 2) or (M, 3) depending on version/args
+            bond_array: np.ndarray = (
+                bonds.as_array()
+            )  # Shape (M, 2) or (M, 3) depending on version/args
 
             adj_list: dict[int, list[int]] = {}  # for finding 1-3
 
