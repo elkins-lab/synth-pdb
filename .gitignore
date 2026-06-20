@@ -169,3 +169,4 @@ scratch
 
 # AI crap
 .gemini/
+_version.py

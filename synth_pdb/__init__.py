@@ -11,4 +11,7 @@ logger = logging.getLogger(__name__)
 
 logger.debug("synth_pdb package initialized.")
 
-__version__ = "1.38.1"
+try:
+    from ._version import version as __version__
+except ImportError:
+    __version__ = "unknown"
