@@ -80,6 +80,8 @@ def test_proline_exclusion() -> None:
     structure.res_id = np.array([1, 1, 1])
     structure.res_name = np.array(["PRO", "PRO", "PRO"])
     structure.atom_name = np.array(["N", "CA", "CD"])  # No H
+    # Provide distinct coordinates to prevent SASA capacity overflow panics
+    structure.coord = np.array([[0.0, 0.0, 0.0], [1.5, 0.0, 0.0], [0.0, 1.5, 0.0]])
 
     rates = calculate_relaxation_rates(structure)
     assert len(rates) == 0
