@@ -53,6 +53,8 @@ def find_gfp_chromophore_motif(structure: struc.AtomArray) -> dict | None:
         logger.warning("GFP chromophore search only supported for single chains.")
         return None
 
+    res_ids: np.ndarray
+    res_names: np.ndarray
     res_ids, res_names = struc.get_residues(structure)
 
     for i in range(len(res_names) - 2):
@@ -92,7 +94,7 @@ def form_gfp_chromophore(structure: struc.AtomArray, motif: dict) -> struc.AtomA
         The modified AtomArray with the residues renamed to CRO.
 
     """
-    new_structure = structure.copy()
+    new_structure: struc.AtomArray = structure.copy()
 
     ser_id = motif["ser_res_id"]
     tyr_id = motif["tyr_res_id"]

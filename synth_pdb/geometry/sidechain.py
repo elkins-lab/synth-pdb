@@ -5,6 +5,7 @@ Sidechain reconstruction and rotation utilities.
 import logging
 
 import biotite.structure as struc
+import biotite.structure.info as struc_info
 import numpy as np
 
 from synth_pdb.geometry._numba import njit
@@ -79,7 +80,7 @@ def reconstruct_sidechain(
 
     # Get standard template
     try:
-        ref_res_template = struc.info.residue(res_name).copy()
+        ref_res_template = struc_info.residue(res_name).copy()  # type: ignore
     except KeyError:
         logger.warning(f"Unknown residue {res_name}, cannot reconstruct.")
         return
@@ -122,7 +123,9 @@ def reconstruct_sidechain(
                 g_atom = gamma_atoms[0]
                 n_atom = ref_res_template[ref_res_template.atom_name == "N"][0]
 
-                curr_chi1 = struc.dihedral(n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord)
+                curr_chi1: float = struc.dihedral(
+                    n_atom.coord, ca_atom.coord, cb_atom.coord, g_atom.coord
+                )
                 curr_chi1_deg = np.rad2deg(curr_chi1)
 
                 _chi1_val_r = rotamer["chi1"]

@@ -173,7 +173,7 @@ class SideChainPacker:
             # This handles side-chain heavy atoms and hydrogens.
             # We use the specialized reconstruct_sidechain helper from geometry.py.
             try:
-                reconstruct_sidechain(peptide, target_res_id, new_rotamer, target_res_name)
+                reconstruct_sidechain(peptide, int(target_res_id), new_rotamer, target_res_name)
             except Exception as e:
                 # If geometry construction fails (rare), we skip this step.
                 # This could happen if backbone geometry is severely distorted.

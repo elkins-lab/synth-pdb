@@ -44,7 +44,7 @@ class PDBValidator:
 
     def __init__(
         self,
-        pdb_content: str | None = None,
+        pdb_content: str | struc.AtomArray | None = None,
         parsed_atoms: list[dict[str, Any]] | None = None,
     ) -> None:
         """Initialize the validator with structure data.

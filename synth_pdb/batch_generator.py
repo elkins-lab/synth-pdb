@@ -3,6 +3,7 @@ import re
 from typing import Any
 
 import biotite.structure as struc
+import biotite.structure.info as struc_info
 import numpy as np
 
 from .data import (
@@ -138,9 +139,10 @@ class BatchedPeptide:
             A :class:`biotite.structure.AtomArrayStack` containing all structures.
         """
         import biotite.structure as struc
+        import biotite.structure.info as struc_info
 
         # Create a stack with B models and N atoms
-        stack = struc.AtomArrayStack(self.n_structures, self.n_atoms)
+        stack: struc.AtomArrayStack = struc.AtomArrayStack(self.n_structures, self.n_atoms)
 
         # Set coordinates directly (vectorized)
         stack.coord = self.coords
@@ -353,7 +355,7 @@ class BatchedGenerator:
 
                 if full_atom:
                     # Fetch sidechain templates for Kabsch superimposition
-                    template = struc.info.residue(res_name)
+                    template = struc_info.residue(res_name)
                     # Prune terminal capping atoms not used in internal peptide bonds
                     mask = ~np.isin(template.atom_name, ["OXT", "H2", "H3", "HXT"])
                     template = template[mask]

@@ -871,7 +871,7 @@ def _build_peptide_chains(
         Complete :class:`biotite.structure.AtomArray` with multiple chains.
 
     """
-    complex_array = struc.AtomArray(0)
+    complex_array: struc.AtomArray = struc.AtomArray(0)
     chain_ids = [chr(65 + i) for i in range(len(chain_sequences))]  # A, B, C...
 
     # Spatial offset between chains to prevent overlap
@@ -885,7 +885,7 @@ def _build_peptide_chains(
         # Build the per-residue {index: conformation} map for this chain
         residue_conformations = _resolve_conformation_map(sequence, conformation, structure)
 
-        current_chain_array = struc.AtomArray(0)
+        current_chain_array: struc.AtomArray = struc.AtomArray(0)
         residue_coordinates: dict[int, dict[str, np.ndarray]] = {}
 
         for i, full_res_name in enumerate(sequence):
@@ -1720,7 +1720,7 @@ def _assemble_output(
     # We use the explicit conformational intent (stored during construction)
     # to ensure B-factors reflect the intended biophysical properties.
     if "conformation_intent" in peptide.get_annotation_categories():
-        intent = peptide.conformation_intent
+        intent = cast(np.ndarray, peptide.conformation_intent)
         is_loop = np.isin(intent, ["random", "coil", "turn"])
         is_helix = np.isin(intent, ["alpha", "310", "pi"])
         is_sheet = np.isin(intent, ["beta", "extended"])
@@ -1733,7 +1733,7 @@ def _assemble_output(
     else:
         # Fallback to SSE annotation if intent is missing (e.g. externally loaded PDB)
         try:
-            sse = struc.annotate_sse(peptide)
+            sse: np.ndarray = struc.annotate_sse(peptide)
             if sse is not None and len(sse) > 0:
                 unique_ids = np.unique(peptide.res_id)
                 sse_lookup = dict(zip(unique_ids, sse))
@@ -2293,6 +2293,7 @@ class PeptideResult:
         """Initialize the result container with generated content."""
         self.content = content
         self.format = format
+        self._structure: struc.AtomArray | None = None
         self._structure = None
 
     @property
@@ -2341,8 +2342,10 @@ class PeptideResult:
 
             if self.format == "cif":
                 # mmCIF (PDBx) parsing using the modern CIFFile API.
-                f = CIFFile.read(io.StringIO(content_str))
-                self._structure = get_structure(f, model=1, extra_fields=["b_factor", "occupancy"])
+                f_cif = CIFFile.read(io.StringIO(content_str))
+                self._structure = get_structure(
+                    f_cif, model=1, extra_fields=["b_factor", "occupancy"]
+                )
             else:
                 # Legacy PDB format handling.
                 from biotite.structure.io.pdb import PDBFile

@@ -83,7 +83,7 @@ class CDSimulator:
 
     def __init__(self, structure: struc.AtomArray):
         self.structure = structure
-        self.sse = struc.annotate_sse(structure)
+        self.sse: np.ndarray = struc.annotate_sse(structure)
         self.fractions = self._calculate_fractions()
 
     def _calculate_fractions(self) -> dict[str, float]:

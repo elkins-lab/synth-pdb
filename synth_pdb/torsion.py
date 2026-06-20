@@ -43,7 +43,7 @@ def calculate_torsion_angles(atom_array: struc.AtomArray) -> list[dict[str, Any]
     # Ideally should use residue iterator to be safe, but backbone arrays map to residues.
 
     # Get unique residue IDs to map back
-    residue_starts = struc.get_residue_starts(atom_array)
+    residue_starts: np.ndarray = struc.get_residue_starts(atom_array)
 
     results = []
 

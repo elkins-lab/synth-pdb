@@ -447,7 +447,7 @@ def _extract_sequence(structure: Any) -> str:
     """
     import biotite.structure as struc
 
-    res_starts = struc.get_residue_starts(structure)
+    res_starts: np.ndarray = struc.get_residue_starts(structure)
     sequence = []
     for start in res_starts:
         res_name = structure.res_name[start].strip()
