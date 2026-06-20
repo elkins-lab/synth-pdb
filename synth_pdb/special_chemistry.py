@@ -94,6 +94,18 @@ def form_gfp_chromophore(structure: struc.AtomArray, motif: dict) -> struc.AtomA
         The modified AtomArray with the residues renamed to CRO.
 
     """
+    # EDUCATIONAL NOTE - Structural Representation of CRO:
+    # ----------------------------------------------------
+    # In standard Molecular Dynamics forcefields (like Amber or CHARMM), the
+    # mature GFP chromophore (CRO) is not a standard amino acid. It lacks standard
+    # parameters because of its highly delocalized electronic structure and
+    # the unusual non-peptide bonds connecting the imidazolinone ring.
+    #
+    # To simulate mature GFP, specialized forcefield parameters (derived from
+    # quantum mechanical calculations, like RESP charges) must be provided via
+    # an external XML/topology file. Here, we simulate the topological
+    # "renaming" step, which signals to the simulation engine to look up
+    # the special CRO patch instead of building standard Ser-Tyr-Gly.
     new_structure: struc.AtomArray = structure.copy()
 
     ser_id = motif["ser_res_id"]

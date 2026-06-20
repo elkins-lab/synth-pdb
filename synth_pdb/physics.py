@@ -487,7 +487,7 @@ class EnergyMinimizer:
                     pass
 
     def _create_system_robust(
-        self, topology: Any, constraints: Any, modeller: Any | None = None
+        self, topology: Any, constraints: Any, modeller: Any | None = None, cyclic: bool = False
     ) -> tuple[Any, Any, Any]:
         """Creates an OpenMM system, with robust fallbacks for template mismatches
         and incompatible forcefield arguments. Returns (system, topology, positions).
@@ -495,7 +495,11 @@ class EnergyMinimizer:
         if not hasattr(self, "_suppressed_args"):
             self._suppressed_args: set[str] = set()
 
-        sys_kwargs = {"nonbondedMethod": app.NoCutoff, "constraints": constraints}
+        sys_kwargs = {
+            "nonbondedMethod": app.NoCutoff,
+            "constraints": constraints,
+            "ignoreExternalBonds": cyclic,
+        }
         if (
             self.implicit_solvent_enum is not None
             and "implicitSolvent" not in self._suppressed_args
@@ -553,7 +557,10 @@ class EnergyMinimizer:
                 f"Robust system creation failed, final fallback to no constraints: {final_e}"
             )
             sys = self.forcefield.createSystem(
-                current_topo, nonbondedMethod=app.NoCutoff, constraints=None
+                current_topo,
+                nonbondedMethod=app.NoCutoff,
+                constraints=None,
+                ignoreExternalBonds=cyclic,
             )
             return (sys, current_topo, current_pos)
 
@@ -667,8 +674,6 @@ class EnergyMinimizer:
             # a CONECT (written by generator.py). We must remove it here so
             # addHydrogens later does not see a conflicting terminal N-C bond.
             n_term_serial, c_term_serial = None, None
-            c_coords, c_line_template = None, None
-            has_existing_oxt = False
             if cyclic and atom_lines:
                 for line in atom_lines:
                     res_id = line[22:26].strip()
@@ -678,14 +683,6 @@ class EnergyMinimizer:
                     if res_id == last_res_id:
                         if atom_name == "C":
                             c_term_serial = line[6:11].strip()
-                            c_coords = (
-                                float(line[30:38]),
-                                float(line[38:46]),
-                                float(line[46:54]),
-                            )
-                            c_line_template = line
-                        if atom_name == "OXT":
-                            has_existing_oxt = True
 
             for line in pdb_lines:
                 if line.startswith("CONECT") and cyclic and n_term_serial and c_term_serial:
@@ -726,39 +723,6 @@ class EnergyMinimizer:
                             if atom_name in ptm_atom_names:
                                 continue
                 modified_lines.append(line)
-
-            # EDUCATIONAL NOTE - Dummy OXT Insertion:
-            # OpenMM amber14 residue templates for C-termini require an OXT
-            # oxygen to match the "C_TERM" patch. Cyclic peptides lack this atom
-            # so we add a temporary OXT positioned ~1.2 A from the terminal C.
-            # physics.py _finalize_output() will delete it after minimization.
-            # Add dummy OXT for cyclic peptides to satisfy C-terminal templates
-            if cyclic and last_res_id and c_line_template and not has_existing_oxt:
-                insert_idx = -1
-                for idx, line in enumerate(modified_lines):
-                    if line.startswith("ATOM") and line[22:26].strip() == last_res_id:
-                        insert_idx = idx + 1
-                if insert_idx != -1 and c_coords is not None:
-                    x, y, z = c_coords
-                    # c_line_template was captured in the first pass, before PTM
-                    # renaming. Apply ptm_map here so the dummy OXT carries the
-                    # same residue name as the renamed residue atoms it joins -
-                    # otherwise OpenMM's PDB reader sees two residues with the
-                    # same (chain, id) but different names (e.g. HIE vs HIS) and
-                    # emits a "two consecutive residues with same number" warning.
-                    raw_res_name_c = c_line_template[17:20].strip()
-                    renamed_c = ptm_map.get(raw_res_name_c, raw_res_name_c)
-                    res_name_c = f"{renamed_c: >3}"
-                    res_id_full = c_line_template[21:26]
-                    oxt_line = (
-                        f"ATOM   9999  OXT {res_name_c} {res_id_full}    "
-                        f"{x + 1.2:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00           O\n"
-                    )
-                    modified_lines.insert(insert_idx, oxt_line)
-                    logger.info(
-                        f"Added temporary OXT to residue {last_res_id} "
-                        f"(Renamed: {res_name_c.strip()})"
-                    )
 
             with tempfile.NamedTemporaryFile(mode="w", suffix=".pdb", delete=False) as tf:
                 tf.writelines(modified_lines)
@@ -1054,22 +1018,34 @@ class EnergyMinimizer:
         # of hydrogens at specific pH (7.0).
         # Add hydrogens
         if add_hydrogens:
-            modeller.addHydrogens(self.forcefield, pH=7.0)
+            if cyclic:
+                # EDUCATIONAL NOTE - Dummy OXT Insertion:
+                # In earlier versions, we manually inserted a dummy OXT oxygen
+                # because standard terminal patches demand it. Now, we bypass this
+                # entirely by using ignoreExternalBonds=True during System creation.
+                # Add head-to-tail bond BEFORE adding hydrogens
+                try:
+                    res = list(modeller.topology.residues())
+                    if len(res) >= 2:
+                        res1, res_n = res[0], res[-1]
+                        c_at = next((a for a in res_n.atoms() if a.name == "C"), None)
+                        n_at = next((a for a in res1.atoms() if a.name == "N"), None)
+                        if c_at and n_at:
+                            modeller.topology.addBond(c_at, n_at)
+                            logger.info(
+                                f"Welded cyclic link in Topology: "
+                                f"{res_n.name}{res_n.id} -> {res1.name}{res1.id}"
+                            )
+                except Exception as e:
+                    logger.debug(f"Pre-hydrogen cyclic welding failed: {e}")
 
-        # Post-hydrogen cyclic weld
-        if cyclic:
-            try:
-                res = list(modeller.topology.residues())
-                if len(res) >= 2:
-                    res1, res_n = res[0], res[-1]
-                    c_at = next((a for a in res_n.atoms() if a.name == "C"), None)
-                    n_at = next((a for a in res1.atoms() if a.name == "N"), None)
-                    if c_at and n_at:
-                        modeller.topology.addBond(c_at, n_at)
-                        logger.info(
-                            f"Welded cyclic link in Topology: "
-                            f"{res_n.name}{res_n.id} -> {res1.name}{res1.id}"
-                        )
+                modeller.addHydrogens(pH=7.0)
+
+                # Remove extra terminal hydrogens and oxygens
+                try:
+                    res = list(modeller.topology.residues())
+                    if len(res) >= 2:
+                        res1, res_n = res[0], res[-1]
                         to_delete = []
                         for a in res_n.atoms():
                             if a.name in ["OXT", "OT1", "OT2", "HXT"]:
@@ -1083,8 +1059,10 @@ class EnergyMinimizer:
                             logger.info(
                                 f"Purged {len(to_delete)} terminal atoms for cyclic closure."
                             )
-            except Exception as e:
-                logger.debug(f"Cyclic welding failed: {e}")
+                except Exception as e:
+                    logger.debug(f"Cyclic atom purge failed: {e}")
+            else:
+                modeller.addHydrogens(self.forcefield, pH=7.0)
 
         # EDUCATIONAL NOTE - CYX Renaming & Thiol Stripping:
         # -------------------------------------------------
@@ -1185,7 +1163,7 @@ class EnergyMinimizer:
                 )
             else:
                 system, topology, positions = self._create_system_robust(
-                    topology, current_constraints, modeller=modeller
+                    topology, current_constraints, modeller=modeller, cyclic=cyclic
                 )
         except Exception as e:
             logger.error(f"Initial system creation failed despite robustness. Error: {e}")
