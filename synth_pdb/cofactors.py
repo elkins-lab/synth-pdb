@@ -164,14 +164,14 @@ def add_metal_ion(structure: struc.AtomArray, site: dict) -> struc.AtomArray:
     ion.res_name = np.array([ion_type])
     ion.atom_name = np.array([ion_type])
     ion.element = np.array([ion_type])  # "ZN" not "Z" for Zinc
-    ion.coord = np.array([centroid])
+    ion.coord = np.array([centroid])  # type: ignore[assignment]
 
     # Metadata
     # Pick a residue ID higher than existing
     max_res_id = np.max(structure.res_id)
     ion.res_id = np.array([max_res_id + 1])
     ion.chain_id = np.array([structure.chain_id[0]])
-    ion.hetero = np.array([True])
+    ion.hetero = np.array([True])  # type: ignore[assignment]
 
     logger.info(f"Injected {ion_type} ion at coordinated site {centroid}.")
 

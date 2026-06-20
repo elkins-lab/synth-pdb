@@ -288,7 +288,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
         # forward to make room for the ACE residue at index 1.
 
         # Re-index existing residues: Shift all by +1
-        final_structure.res_id += 1
+        final_structure.res_id += 1  # type: ignore[misc]
         # ACE is now Res 1
         ace_structure.res_id[:] = 1
 
@@ -389,8 +389,8 @@ def find_salt_bridges(structure: struc.AtomArray, cutoff: float = 5.0) -> list[d
         structure.atom_name, BASIC_ATOMS
     )
 
-    acids = structure[acid_mask]
-    bases = structure[base_mask]
+    acids = structure[acid_mask]  # type: ignore[index]
+    bases = structure[base_mask]  # type: ignore[index]
 
     # Early exit if no candidates found
     if len(acids) == 0 or len(bases) == 0:

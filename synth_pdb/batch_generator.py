@@ -148,23 +148,23 @@ class BatchedPeptide:
         stack.coord = self.coords
 
         # Set metadata for all models simultaneously
-        stack.atom_name = np.array(self.atom_names)
-        stack.res_id = np.array(self.residue_indices)
-        stack.chain_id = np.array(self.atom_chain_ids)
+        stack.atom_name = np.array(self.atom_names)  # type: ignore[assignment]
+        stack.res_id = np.array(self.residue_indices)  # type: ignore[assignment]
+        stack.chain_id = np.array(self.atom_chain_ids)  # type: ignore[assignment]
 
         # Biotite requires res_name to be an array of size N
         # We need to map residue_indices back to sequence
         res_names = []
         for ridx in self.residue_indices:
             res_names.append(self.sequence[ridx - 1])
-        stack.res_name = np.array(res_names)
+        stack.res_name = np.array(res_names)  # type: ignore[assignment]
 
         # Basic element derivation
         elements = []
         for name in self.atom_names:
             match = re.search(r"[A-Z]", name.strip())
             elements.append(match.group(0) if match else "C")
-        stack.element = np.array(elements)
+        stack.element = np.array(elements)  # type: ignore[assignment]
 
         return stack
 
@@ -358,7 +358,7 @@ class BatchedGenerator:
                     template = struc_info.residue(res_name)
                     # Prune terminal capping atoms not used in internal peptide bonds
                     mask = ~np.isin(template.atom_name, ["OXT", "H2", "H3", "HXT"])
-                    template = template[mask]
+                    template = template[mask]  # type: ignore[index]
                     names = template.atom_name.tolist()
                     n_atoms = len(names)
 

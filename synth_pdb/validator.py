@@ -362,7 +362,7 @@ class PDBValidator:
 
             radii.append(rad)
 
-        sasa_per_atom = struc.sasa(b_struc, probe_radius=1.4, vdw_radii=np.array(radii))
+        sasa_per_atom = struc.sasa(b_struc, probe_radius=1.4, vdw_radii=np.array(radii))  # type: ignore[arg-type]
 
         # Aggregate by residue
         res_sasa = {}
@@ -1908,7 +1908,7 @@ class PDBValidator:
             for atom in atom_array:
                 rad = vdw_radius_single(atom.element)
                 radii.append(rad if rad is not None else 1.7)
-            sasa = struc.sasa(atom_array, probe_radius=1.4, vdw_radii=np.array(radii))
+            sasa = struc.sasa(atom_array, probe_radius=1.4, vdw_radii=np.array(radii))  # type: ignore[arg-type]
             return float(np.sum(sasa))
 
         sasa_complex = get_total_sasa(b_struc)
