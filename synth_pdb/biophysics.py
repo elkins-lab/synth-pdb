@@ -56,8 +56,8 @@ def apply_ph_titration(
     if ph < 6.0:
         # Simplistic Henderson-Hasselbalch Logic:
         # If pH < pKa (6.0), predominant species is protonated.
-        # Rename ALL HIS to HIP.
-        mask = structure.res_name == "HIS"
+        # Rename ALL HIS/HIE/HID to HIP.
+        mask = np.isin(structure.res_name, ["HIS", "HIE", "HID"])
         if mask.any():
             count = len(set(structure.res_id[mask]))
             structure.res_name[mask] = "HIP"
@@ -70,7 +70,7 @@ def apply_ph_titration(
         # We will assign probabilistically per residue.
 
         # Get all HIS residue IDs
-        his_mask = structure.res_name == "HIS"
+        his_mask = np.isin(structure.res_name, ["HIS", "HIP"])
         his_res_ids = sorted(set(structure.res_id[his_mask]))
 
         for res_id in his_res_ids:
@@ -82,7 +82,7 @@ def apply_ph_titration(
             new_name = "HIE" if _rng.random() < 0.8 else "HID"
 
             # Update this residue
-            res_mask = (structure.res_id == res_id) & (structure.res_name == "HIS")
+            res_mask = (structure.res_id == res_id) & np.isin(structure.res_name, ["HIS", "HIP"])
             structure.res_name[res_mask] = new_name
 
         if his_res_ids:
@@ -350,7 +350,7 @@ def cap_termini(structure: struc.AtomArray) -> struc.AtomArray:
 # Journal of Molecular Recognition, 17(1), 1-16.
 
 ACIDIC_RESIDUES = ["ASP", "GLU"]
-BASIC_RESIDUES = ["LYS", "ARG", "HIS"]
+BASIC_RESIDUES = ["LYS", "ARG", "HIS", "HIP", "HIE", "HID"]
 
 # Specific atoms that carry the formal charges
 ACIDIC_ATOMS = ["OD1", "OD2", "OE1", "OE2"]
