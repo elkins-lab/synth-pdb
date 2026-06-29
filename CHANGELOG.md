@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.39.0] - 2026-06-29
+
+### Added
+- **Dynamic Versioning**: Transitioned to `setuptools_scm` for dynamic version management, ensuring synchronization across the package.
+- **Interactive Tutorials**: Added distance geometry and Ramachandran explorer tutorials to the documentation.
+- **Modern Badges**: Updated documentation with modern Shields.io and Colab badges.
+
+### Fixed
+- **Colab Notebook Compatibility**: Resolved `numpy<2` conflicts and py3Dmol WebGL context exhaustion issues to stabilize Jupyter Notebook execution in Google Colab.
+- **Biophysical Validation**: Corrected Histidine tautomer recognition and $i, i+4$ salt bridge formation logic.
+- **Type Checking**: Resolved extensive `mypy` typing errors related to Matplotlib, Numba, and array shape warnings.
+
 ## [1.38.1] - 2026-06-07
 
 ### Added

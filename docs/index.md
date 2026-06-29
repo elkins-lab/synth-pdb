@@ -135,7 +135,7 @@ If you use `synth-pdb` in your research, please cite it:
   author = {Elkins, George},
   title = {synth-pdb: High-Performance Protein Structure Generator},
   url = {https://github.com/elkins/synth-pdb},
-  version = {1.38.1},
+  version = {1.39.0},
   year = {2026}
 }
 ```
